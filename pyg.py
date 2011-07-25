@@ -25,7 +25,7 @@
 # <h3>Bugs</h3>
 # <ol><li>The HTML to code link assumes there's no comments before the pre tag.
 #          I need some way to detect this an insert a comment.</li>
-#     <li>The code to html link incorrectly merges comment with different 
+#     <li>The code to html link incorrectly merges comments with different 
 #         amount of leading whitespace. It shouldn't.</li>
 #     <li>The code to html link translates ## to # # (However, I don't think
 #         there's a workaround for this).<br />
@@ -58,24 +58,20 @@
 #         appearance of the document</li></ol>
 # <h2>HTML to Code<br /></h2>
 # 
-# The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>. Some simplifying assumptions:<br />
+# The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>. Some simplifying assumptions about the structure of the HTML document:<br />
 # <ul>
-# <li>All code should be wrapped in a &lt;pre&gt;, but not inside a
-#         comment tag. This eliminates &lt;br&gt; translation confusion.</li>
-# <li>All code must come first, optionally followed by a comment.
-#         Code may never follow a comment on a line.<br />
-# </li>
+# <li>All code is wrapped in a &lt;pre&gt;.</li><li>All comments are wrapped in &lt;span class="c"&gt;<br /></li>
+# <li>On a lne, all code must come first, optionally followed by a comment.
+#         Code may never follow a comment on a single line.</li><li>All header information (everything not inside the &lt;body&gt; tag) is discarded, to be regenerated when code is translated back to HTML.<br /></li>
 # </ul>
 #     With this, body text is comment; &lt;pre&gt; begins discarding all
 #     tags and emits only text until a comment tag, which outputs its
 #     entire subtree as a comment (including any code-tagged text).
 #     Newlines can be echoed without modification whether in code or
 #     comment mode.<br />
-# <br />
-#     Implementation:<br />
-# <ul>
-# <li>Will the parser eat all my whitespace? I hope not...</li>
-# <li>As a three-state machine: outsidePre (initial state), inPre,
+# <br />The implementation:<br /><ol><li>The HTML document is parsed, then the &lt;body&gt; tag contents <a href="#body_translate">translated</a>.</li><li><br /></li></ol>
+#     <br />
+# <ul><li>As a three-state machine: outsidePre (initial state), inPre,
 #         inComment.</li>
 # <ul>
 # <li>outsidePre state:</li>
@@ -339,6 +335,7 @@ class HtmlToCodeTranslator(object):
         self.indent = ''
         self.indent_re = re.compile(r'\n([ \t\r\f\v]*)$')
         
+    # <a name="body_translate"></a>Parse then translate the body of the given HTML document.
     def translate(self, HtmlString):
         soup = BeautifulSoup(HtmlString)
 #        print soup
@@ -622,5 +619,7 @@ if __name__ == '__main__':
         HtmlToCode(baseFileName)
     else:
         print('Time is identical -- giving up')
+
+
 
 # 
