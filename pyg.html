@@ -182,8 +182,8 @@ whitespace and totally destroy the code.<br>
     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
     hilighter. In particular:<br>
 <ol>
-<li>Multi-line comments are <a>merged</a><br>
-</li><li>Comments are <a>typeset in a
+<li>Multi-line comments are <a href="#merge_comments">merged</a><br>
+</li><li>Comments are <a href="#typeset_comments_in_a_proportional_font">typeset in a
           proportional font</a></li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
         addition, comment #, //, or /* characters are automatically
         removed during translation to preserve the visual appearance of
@@ -303,8 +303,7 @@ this&nbsp; uses Pygments to do most of the work, adding only a formatter
                 
     <span class="c"><a name="merge_comments"></a>This routine takes tokens as its input, combining multiple lines of single-line comments separated
     only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br>
-    <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). In particular, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br></li></ul>
-    Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.</span>
+    <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). In particular, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br></li></ul><img alt="" src="state_machine.png" height="535" width="519"><br>The state machine syntax: &lt;condition / action&gt;, so that cr / yield all tokens means that if a carriage return (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br><br>Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.</span>
     <span class="k">def</span> <span class="nf">_merge_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_source</span><span class="p">):</span>
         <span class="c">Keep a history of tokens; if we can't combine then, then yield a
         bunch of these.</span>
