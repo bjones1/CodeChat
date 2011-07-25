@@ -1,101 +1,181 @@
-# -*- coding: utf-8 -*-
-
+# -*- coding: utf-8 -*-<br />
 # <h1>Overview</h1>
-# This program attempts to bring to life some of the ideas espoused by Donald Knuth:<br />
 # 
-# <blockquote>I believe that the time is ripe for significantly better documentation of programs, and that we can best achieve this by considering programs to be works of literature. Hence, my title: "Literate Programming."<br /><br />
 # 
-# Let us change our traditional attitude to the construction of programs: Instead of imagining that our main task is to instruct a computer what to do, let us concentrate rather on explaining to human beings what we want a computer to do.<br /><br />
+#     This program attempts to bring to life some of the ideas espoused by
+#     Donald Knuth:<br />
+# <blockquote>I believe that the time is ripe for significantly better
+#       documentation of programs, and that we can best achieve this by
+#       considering programs to be works of literature. Hence, my title:
+#       "Literate Programming."<br />
+# <br />
+#       Let us change our traditional attitude to the construction of
+#       programs: Instead of imagining that our main task is to instruct a
+#       computer what to do, let us concentrate rather on explaining to
+#       human beings what we want a computer to do.<br />
+# <br />
+#       The practitioner of literate programming can be regarded as an
+#       essayist, whose main concern is with exposition and excellence of
+#       style. Such an author, with thesaurus in hand, chooses the names
+#       of variables carefully and explains what each variable means. He
+#       or she strives for a program that is comprehensible because its
+#       concepts have been introduced in an order that is best for human
+#       understanding, using a mixture of formal and informal methods that
+#       reinforce each other.<br />
+# <br />
+#       -- Donald Knuth, &#8220;<a href="http://www.literateprogramming.com/knuthweb.pdf">Literate
+#         Programming</a> (1984)&#8221; in Literate Programming. CSLI, 1992, pg.
+#       99.<br />
+# </blockquote>
 # 
-# The practitioner of literate programming can be regarded as an essayist, whose main concern is with exposition and excellence of style. Such an author, with thesaurus in hand, chooses the names of variables carefully and explains what each variable means. He or she strives for a program that is comprehensible because its concepts have been introduced in an order that is best for human understanding, using a mixture of formal and informal methods that reinforce each other.<br /><br />
 # 
-# -- Donald Knuth, &#8220;<a href="http://www.literateprogramming.com/knuthweb.pdf">Literate Programming</a> (1984)&#8221; in Literate Programming. CSLI, 1992, pg. 99.<br /></blockquote>I believe that a program must exist simultaneously in two forms: as beautifully-formatted document replete with digrams and other illustrations and as source code, reflecting two complementary approaches to develping a program. A document provides a programmer with a means to express and record their design of the program, focusing on high-level design. As source code, it captures the minute details of an implementation of that idea.<br /><br />Therefore, the purpose of this program is to provide a bidirectional link between a
-# source file and a corresponding HTML document, so that the source can be
-# exactly recreated from the HTML file and vice versa. The intention is to
-# enable editing in the most convenient location: for code development and
-# debugging, in a text editor / IDE; for design and documentation, in a WYSWIG
-# HTML editor.<br />
+#     I believe that a program must exist simultaneously in two forms: as
+#     beautifully-formatted document replete with digrams and other
+#     illustrations and as source code, reflecting two complementary
+#     approaches to develping a program. A document provides a programmer
+#     with a means to express and record their design of the program,
+#     focusing on high-level design. As source code, it captures the
+#     minute details of an implementation of that idea.<br />
+# <br />
 # 
+# 
+#     Therefore, the purpose of this program is to provide a bidirectional
+#     link between a
+#     source file and a corresponding HTML document, so that the source
+#     can be
+#     exactly recreated from the HTML file and vice versa. The intention
+#     is to
+#     enable editing in the most convenient location: for code development
+#     and
+#     debugging, in a text editor / IDE; for design and documentation, in
+#     a WYSWIG
+#     HTML editor.<br />
 # <h2>Getting started</h2>
-# Install Python (tested with v 2.6), <a href="http://pygments.org/">Pygments</a> (tested with v 1.4), and <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a> (tested with v3.2.0; the 4.x series was tested and didn't work well with the default parser). Then, simply run the program to convert between <code>pyg.py</code> and <code>pyg.html</code> (the newer file is converted to the other format).<br />
+# 
+# 
+#     Install Python (tested with v 2.6), <a href="http://pygments.org/">Pygments</a>
+#     (tested with v 1.4), and <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>
+#     (tested with v3.2.0; the 4.x series was tested and didn't work well
+#     with the default parser). Then, simply run the program to convert
+#     between <code>pyg.py</code> and <code>pyg.html</code> (the newer
+#     file is converted to the other format).<br />
 # <h2>Status</h2>
-# Currently, the bidirectional link is functional (though needs lots of testing
-# and better documentation). I'm using it to write this document.<br />
 # 
+# 
+#     Currently, the bidirectional link is functional (though needs lots
+#     of testing, some bug fixes,
+#     and better documentation). I'm using it to write this document.<br />
 # <h3>Bugs</h3>
-# <ol><li>The HTML to code link assumes there's no comments before the pre tag.
-#          I need some way to detect this an insert a comment.</li>
-#     <li>The code to html link incorrectly merges comments with different 
-#         amount of leading whitespace. It shouldn't.</li>
-#     <li>The code to html link translates ## to # # (However, I don't think
-#         there's a workaround for this).<br />
-# </li></ol>
-# 
-# <h3>To do</h3>
-# <ol><li>Implement a <a href="http://packages.python.org/watchdog/">file 
-#         change monitor</a> to auto-translate on save.</li>
-#     <li>Implement a Python GUI HTML editor, which 
-#         auto-reloads the source file. Or, find a good editor which offers an 
-#         auto-reload option.<br /></li>
-#     <li>Fix line numbering -- have the line numbers skip an empty line on 
-#         code to HTML; remove line numbers in HTML to code.</li>
-#     <li>Offer some sort of cross-reference capability. This will require
-#         some significant thought.</li>
-#     <li>Much better testing. In particular, test all possible paths through
-#         the state machine.</li><li>Word wrap comment when going from HTML to
-#         code. However, there must be some way to preserve preformatted
-#         paragraphs.</li><li>The HTML produced by the SeaMonkey composer doesn't read nicely in the code. Establish some sort of pretty-print routine to print code-readable HTML.</li><li>Make comment paragraphs wrap after the initial indenting spaces (wrap them in a div element?)</li><li>Come up with a better visual design. Blue text is annoying. Perhaps use Sphinx styles?<br /></li></ol>
-# 
-# <h1>Implementation</h1>The program consists of two separate portions (code to HTML and HTML to code) with a bit of glue code, supplemented with tests.<br />
-# <h2>Code to HTML<br /></h2>
-# The code to HTML link consists of modifications to <a href="http://pygments.org">Pygments</a>, a
-#       wonderful source hilighter. In particular:<br />
 # <ol>
-# <li>Multi-line comments are <a href="#merge_comments">merged</a><br /></li><li>Comments are <a href="#typeset_comments_in_a_proportional_font">typeset in a proportional font</a></li>
-# <li>Comments are assumed to contain HTML, so that <a href="#no_escape">no escaping</a> is
-#         done on them. In addition, comment #, //, or /* characters are
-#         automatically removed during translation to preserve the visual
-#         appearance of the document</li></ol>
-# <h2>HTML to Code<br /></h2>
+# <li>The HTML to code link assumes there's no comments before the
+#         pre tag. I need some way to detect this an insert a comment.</li><li>The code to html link incorrectly merges comments with
+#         different amount of leading whitespace. It shouldn't.</li><li>The code to html link translates ## to # # (However, I don't
+#         think there's a workaround for this).</li><li>The program dorks the beginning and ending tags, putting extra
+#         lines at the end and eventually moving comments around on the
+#         first line.</li><li>SeaMonkey doesn't like &lt;pre&gt;. It's not that happy with
+#         &lt;span&gt;, either. I suspect that only wrapping code lines in
+#         a &lt;pre&gt; would help. Or, I could drop the pre entirely and
+#         use a &lt;span&gt; on the spaces; I'm not sure which is better.
+#         Either way, I need to minimize &lt;pre&gt; in the document.</li>
+# <li>The implementation is fragile -- an unescaped tag in the code 
+# destroys the HTML; likewise, the HTML editor can easily lose all 
+# whitespace and totally destroy the code.<br />
+# </li>
+# </ol>
+# <h3>To do</h3>
+# <ol>
+# <li>Implement a <a href="http://packages.python.org/watchdog/">file
+#           change monitor</a> to auto-translate on save.</li><li>Fix line numbering -- have the line numbers skip an empty line
+#         on code to HTML; remove line numbers in HTML to code.</li><li>Offer some sort of cross-reference capability. This will
+#         require some significant thought.</li><li>Much better testing. In particular, test all possible paths
+#         through the state machine.</li><li>Word wrap comments when going from HTML to code. However, there
+#         must be some way to preserve preformatted paragraphs.</li><li>The HTML produced by the SeaMonkey composer doesn't read
+#         nicely in the code. Establish some sort of pretty-print routine
+#         to print code-readable HTML.</li><li>Come up with a better visual design. Blue text is annoying.
+#         Perhaps use Sphinx styles?</li><li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
+#         widget to program a GUI editor. It would be really neat to:</li><ol><li>Open either HTML or source code</li><li>Have a hotkey toggle between HTML and text views, syncing
+#           cursor position in the toggle.</li><li>Auto-reload if either file is modified<br />
+# </li></ol><li>Support C and C++<br />
+# </li>
+# </ol>
+# <h1>Implementation</h1>
 # 
-# The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>. Some simplifying assumptions about the structure of the HTML document:<br />
+# 
+#     The program consists of two separate portions (code to HTML and HTML
+#     to code) with a bit of glue code, supplemented with tests.<br />
+# <h2><a name="CodeToHtml_overview"></a>Code to HTML<br />
+# </h2>
+# 
+# 
+#     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
+#     hilighter. In particular:<br />
+# <ol>
+# <li>Multi-line comments are <a>merged</a><br />
+# </li><li>Comments are <a>typeset in a
+#           proportional font</a></li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
+#         addition, comment #, //, or /* characters are automatically
+#         removed during translation to preserve the visual appearance of
+#         the document</li>
+# </ol>
+# <h2>HTML to Code<br />
+# </h2>
+# 
+# 
+#     The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>.
+#     Some simplifying assumptions about the structure of the HTML
+#     document:<br />
 # <ul>
-# <li>All code is wrapped in a &lt;pre&gt;.</li><li>All comments are wrapped in &lt;span class="c"&gt;<br /></li>
-# <li>On a lne, all code must come first, optionally followed by a comment.
-#         Code may never follow a comment on a single line.</li><li>All header information (everything not inside the &lt;body&gt; tag) is discarded, to be regenerated when code is translated back to HTML.<br /></li>
+# <li>All code must be wrapped in a &lt;pre&gt;.<br />
+# </li><li>All comments are wrapped in &lt;span class="c"&gt; or appear
+#         as body text. Comments contain HTML.<br />
+# </li><li>On a line, all code must come first, optionally followed by a
+#         comment. Code may never follow a comment on a single line
+#         (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
+#         tag) is discarded, to be regenerated when code is translated
+#         back to HTML.<br />
+# </li>
 # </ul>
+# 
+# 
 #     With this, body text is comment; &lt;pre&gt; begins discarding all
 #     tags and emits only text until a comment tag, which outputs its
 #     entire subtree as a comment (including any code-tagged text).
 #     Newlines can be echoed without modification whether in code or
 #     comment mode.<br />
-# <br />The implementation:<br /><ol><li>The HTML document is parsed, then the &lt;body&gt; tag contents <a href="#body_translate">translated</a>.</li><li><br /></li></ol>
-#     <br />
-# <ul><li>As a three-state machine: outsidePre (initial state), inPre,
-#         inComment.</li>
+# <h3>The implementation</h3>
+# <ol>
+# <li>The HTML document is parsed, then only the &lt;body&gt; tag
+#         contents <a>translated</a>.</li><li><a>All comments</a> (body text or
+#         anything in a &lt;span class="c"&gt; tag) are prepended with a
+#         comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
+#         &lt;pre&gt; tag from the beginning of the line to the first
+#         &lt;span class="c") tag) is stripped of HTML tags, HTML
+#         unescaped, then written.<br />
+# </li>
+# </ol>
+# <h2>Misc</h2>
+# 
+# 
+#     Several other routines support development:<br />
 # <ul>
-# <li>outsidePre state:</li>
+# <li>Some driver code sets up and runs the code to HTML and HTML to
+#         code classes.</li><li>Unit testing to support development.<br />
+# </li>
+# </ul>
 # <ul>
-# <li>If a string, "\n" -&gt; "\n# "</li>
-# <li>If a tag, check name: pre causes transition to inPre
+# <li>As a three-state machine: outsidePre (initial state), inPre,
+#         inComment.</li><ul><li>outsidePre state:</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>If a tag, check name: pre causes transition to inPre
 #             state, dump contents, transition back to outsidePre<br />
-# </li>
-# </ul>
-# <li>inPre state: output only text, skip all tags.</li>
-# <ul>
-# <li>If a string, dump raw text</li>
-# <li>If a tag, check name: comment tag causes transition to
+# </li></ul><li>inPre state: output only text, skip all tags.</li><ul><li>If a string, dump raw text</li><li>If a tag, check name: comment tag causes transition to
 #             inComment state, insert #, dump contents, transition back<br />
-# </li>
+# </li></ul><li>inComment state: "\n" -&gt; "\n# " for string, recur on
+#           contents.</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>Dump contents</li></ul></ul>
 # </ul>
-# <li>inComment state: "\n" -&gt; "\n# " for string, recur on
-#           contents.</li>
-# <ul>
-# <li>If a string, "\n" -&gt; "\n# "</li>
-# <li>Dump contents</li>
-# </ul>
-# </ul>
-# </ul>
+# <span class="c">This class converts from source to to HTML. As the <a>overview</a>
+#  states,
+# this&nbsp; uses Pygments to do most of the work, adding only a formatter
+#  to that library. Therefore, to use this class, simply select this class
+#  as the formatter for Pygments (see example <a href="#CodeToHtml">below</a>). </span>
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -105,16 +185,25 @@ from pygments.token import Token
 import re
 
 class CodeToHtmlFormatter(HtmlFormatter):
-    # <a name="typeset_comments_in_a_proportional_font"></a>Copied verbatim from Pygments, then modified to typeset comments in a proportional font. 
+    # <a name="typeset_comments_in_a_proportional_font"></a>The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
     def _create_stylesheet(self):
         t2c = self.ttype2class = {Token: ''}
         c2s = self.class2style = {}
         for ttype, ndef in self.style:
             name = self._get_css_class(ttype)
             style = ''
-            # BAJ modification: typeset comments nicely
+            # <a name="insertedCode"></a><b>BAJ modification</b>: typeset comments nicely. In particular:<br />
+            # <ul><li>Because comments are embedded in &lt;pre&gt; text, the <a href="http://www.w3schools.com/cssref/pr_text_white-space.asp">white-space property</a> must be returned to normal to allow line wrapping, consuming of additional space, etc. One concern: now, whitespace in the code will no longer match whitespace in the HTML document.</li>
+            # <li>On Chrome and SeaMonkey, the proportional 
+            # font is much larger than its corresponding monospaced font used for the 
+            # code. Using <code>font-size: small</code> helps. Specifying the font as a percentags 
+            # is bad, because if the &lt;span&gt; tags get nested, all fonts in the 
+            # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. TODO: However, this seems to grow the right margin by the indent, making it hard to read. I'm not sure how to fix this.<br /></li>
+            # <li> TODO: the test (ttype is Token.Comment) is not robust -- it only catches that particular token. However, many more sub-types <a href="http://pygments.org/docs/tokens/#comments">exist</a>; I don't think this catches them. Would isinstance(ttype, Token.Comment) work better? I'm not sure.</li></ul>
             if ttype is Token.Comment:
-                style += 'font-family: Sans-serif; white-space: normal; font-size: small; '
+                style += 'font-family: Sans-serif; white-space: normal; ' + \
+                  'font-size: small; display: inline-block; '
+	    # End of modification.
             if ndef['color']:
                 style += 'color: #%s; ' % ndef['color']
             if ndef['bold']:
@@ -132,15 +221,18 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 # save len(ttype) to enable ordering the styles by
                 # hierarchy (necessary for CSS cascading rules!)
                 c2s[name] = (style[:-2], ttype, len(ttype))
-                
+
+    # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. 
     def _format_lines(self, token_source):
         merged_token_source = self._merge_comments(token_source)
         source = self._format_lines1(merged_token_source)
         for tup in source:
             yield tup
                 
-    # <a name="merge_comments"></a>A routine to combine multiple lines of single-line comment separated
-    # only by a newline into a single comment token
+    # <a name="merge_comments"></a>This routine takes tokens as its input, combining multiple lines of single-line comments separated
+    # only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
+    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). In particular, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul>
+    # Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
     def _merge_comments(self, token_source):
         # Keep a history of tokens; if we can't combine then, then yield a
         # bunch of these.
@@ -204,7 +296,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     state = 4
                 elif ttype is Token.Comment:
                     # Combine two comments into a single comment by modifying the value of the first comment token
-                    token_stack[-2][1] = ''.join([ts[1] for ts in token_stack[-2:]]) + value
+                    token_stack[-2][1] = (''.join([ts[1] for ts in
+                      token_stack[-2:]]) + value)
                     del token_stack[-1]
                     state = 2
                 else:
@@ -221,7 +314,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
                         i = -3
                     else:
                         i = -2
-                    token_stack[i][1] = ''.join([ts[1] for ts in token_stack[i:]]) + value
+                    token_stack[i][1] = (''.join([ts[1] for ts in
+                      token_stack[i:]]) + value)
                     del token_stack[i + 1:]
                     state = 2
                 else:
@@ -241,7 +335,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
         for t in token_stack:
             yield t
         
-    # Copied verbatim from Pygments _format_lines, then modified to
+    # Copied verbatim from Pygments' _format_lines, then modified to
     # not escape comments and remove inital comment chars
     def _format_lines1(self, tokensource):
         """
@@ -479,7 +573,8 @@ class TestHtmlToCode(unittest.TestCase):
         self.assertEquals(s, "\n  code")
 
     def atest_xlCommentCodeComment(self):
-        s = self.xlate("comment1<pre>\ncode <span class=c id=1>comment2</span></pre>")
+        s = self.xlate("comment1<pre>\ncode <span class=c id=1>" +
+          "comment2</span></pre>")
         self.assertEquals(s, "# comment1\ncode # comment2")
 
     def atest_xlWhitespace1(self):
@@ -491,16 +586,18 @@ class TestHtmlToCode(unittest.TestCase):
         self.assertEquals(s, "\n    code1\n    code2")
         
     # TODO: can't find a text case whose whitespace isn't eaten. Blah.
-    def test_MultiLineTag(self):
+    def atest_MultiLineTag(self):
         s = self.xlate('<span\n  style="c">comment</span>')
         self.assertEquals(s, '# <span\n#  style="c">comment</span>\n')
 
     def test_xlWhitespace4(self):
-        s = self.xlate('<pre>\n  <span class="c">comment1\n  comment2</span></pre>')
+        s = self.xlate('<pre>\n  <span class="c">comment1\n' +
+          '  comment2</span></pre>')
         self.assertEquals(s, '\n  # comment1\n  # comment2')
 
     def test_xlWhitespace5(self):
-        s = self.xlate('<pre>\n\n  <span class="c">comment1\n  comment2</span></pre>')
+        s = self.xlate('<pre>\n\n  <span class="c">comment1\n' +
+          '  comment2</span></pre>')
         self.assertEquals(s, '\n\n  # comment1\n  # comment2')
 
     def test_0(self):
@@ -528,12 +625,14 @@ class TestCodeToHtml(unittest.TestCase):
     # State machine test: 0, 1, 2, 5
     def test_sm3(self):
         s = self.hilight(" # comment\ncode")
-        self.assertEqual(s, ' <span class="c">comment</span>\n<span class="n">code</span>\n')
+        self.assertEqual(s, ' <span class="c">comment</span>\n' + 
+          '<span class="n">code</span>\n')
                 
     # State machine test: 0, 2, 5
     def test_sm4(self):
         s = self.hilight("# comment\ncode")
-        self.assertEqual(s, '<span class="c">comment</span>\n<span class="n">code</span>\n')
+        self.assertEqual(s, '<span class="c">comment</span>\n' + 
+          '<span class="n">code</span>\n')
                 
     def test_mlComment1(self):
         s = self.hilight("# comment1\n# comment2")
@@ -541,11 +640,13 @@ class TestCodeToHtml(unittest.TestCase):
         
     def test_mlComment2(self):
         s = self.hilight("# comment1\n\n# comment2")
-        self.assertEqual(s, '<span class="c">comment1</span>\n\n<span class="c">comment2</span>\n')
+        self.assertEqual(s, '<span class="c">comment1</span>\n\n' + 
+          '<span class="c">comment2</span>\n')
 
     def test_mlComment3(self):
         s = self.hilight("# comment1\ncode # comment2")
-        self.assertEqual(s, '<span class="c">comment1</span>\n<span class="n">code</span> <span class="c">comment2</span>\n')
+        self.assertEqual(s, '<span class="c">comment1</span>\n' + 
+          '<span class="n">code</span> <span class="c">comment2</span>\n')
 
     def test_mlComment4(self):
         s = self.hilight("  # comment1\n  # comment2")
@@ -553,11 +654,13 @@ class TestCodeToHtml(unittest.TestCase):
 
     def test_mlComment5(self):
         s = self.hilight("code\n\n# comment1\n# comment2")
-        self.assertEqual(s, '<span class="n">code</span>\n\n<span class="c">comment1\ncomment2</span>\n')
+        self.assertEqual(s, '<span class="n">code</span>\n\n' + 
+          '<span class="c">comment1\ncomment2</span>\n')
 
     def test_mlComment6(self):
         s = self.hilight("code1\n\ncode2")
-        self.assertEqual(s, '<span class="n">code1</span>\n\n<span class="n">code2</span>\n')
+        self.assertEqual(s, '<span class="n">code1</span>\n\n' + 
+          '<span class="n">code2</span>\n')
 
     def test_mlComment7(self):
         s = self.hilight(" \n # comment1\n # comment2")
@@ -572,7 +675,7 @@ def test(one_test):
     else:
         unittest.main()
         
-
+# Use the HtmlToCodeTranslator class to translate a specific file.
 def HtmlToCode(baseFileName):
     code = open(baseFileName + '.html', 'r').read()
     outfile = open(baseFileName + '.py', 'w')
@@ -590,10 +693,11 @@ from pygments.token import Comment
 DefaultStyle.styles[Comment] = "#408080"
 class CodeToHtmlStyle(DefaultStyle):
     pass
-    
+    # Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToHtml(baseFileName):
     code = open(baseFileName + '.py', 'r').read()
-    formatter = CodeToHtmlFormatter(full=True, nobackground=True, style=CodeToHtmlStyle)
+    formatter = CodeToHtmlFormatter(full=True, nobackground=True,
+                                    style=CodeToHtmlStyle)
     outfile = open(baseFileName + '.html', 'w')
     hi_code = highlight(code, PythonLexer(), formatter)
     # Remove a little goop created by the full=True option in for formatter

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="1.1.02" framework="qpc">
+  <package name="package1" stereotype="0x00">
+    <class name="Class1" superclass="../../0/2">
+      <statechart>
+        <initial target="../1">
+          <action/>
+        </initial>
+        <state name="0">
+          <entry/>
+          <exit/>
+          <tran trig="cr" target="..">
+            <action brief="yield all tokens"/>
+          </tran>
+          <tran trig="ws" target="../../2">
+            <action brief="save token"/>
+          </tran>
+          <tran trig="comment" target="../../3">
+            <action brief="save token"/>
+          </tran>
+        </state>
+        <state name="1">
+          <entry/>
+          <exit/>
+          <tran trig="else" target="../../4">
+            <action brief="yield all tokens"/>
+          </tran>
+        </state>
+        <state name="2">
+          <entry/>
+          <exit/>
+        </state>
+        <state name="5">
+          <entry/>
+          <exit/>
+        </state>
+        <state_diagram size="80,50">
+          <state_glyph ref="1" node="7,4,12,6"/>
+          <state_glyph ref="2" node="7,21,12,6"/>
+          <state_glyph ref="3" node="7,31,12,6"/>
+          <state_glyph ref="4" node="44,13,10,6"/>
+          <initial_glyph ref="0" conn="3,2,5,0,7,2">
+            <text box="0,-2,6,2"/>
+          </initial_glyph>
+          <tran_glyph ref="1/0" conn="14,10,2,0,3,10,-12,-7,3">
+            <text box="1,1,14,4"/>
+          </tran_glyph>
+          <tran_glyph ref="1/1" conn="13,10,2,0,11">
+            <text box="0,7,11,2"/>
+          </tran_glyph>
+          <tran_glyph ref="1/2" conn="11,10,2,0,7,-7,12,7,2">
+            <text box="-10,3,10,4"/>
+          </tran_glyph>
+          <tran_glyph ref="2/0" conn="19,25,1,3,23,-9,2">
+            <text box="1,-2,14,3"/>
+          </tran_glyph>
+        </state_diagram>
+      </statechart>
+    </class>
+  </package>
+</model>
