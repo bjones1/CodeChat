@@ -429,7 +429,7 @@ class HtmlToCodeTranslator(object):
         self.CommentString = '# '
         self.State = HtmlToCodeTranslator.State
         self.indent = ''
-        self.indent_re = re.compile(r'\n([ \t\r\f\v]*)$')
+        self.indent_re = re.compile(r'([ \t\r\f\v]*)$')
         self.at_newline = True
         
     # <a name="body_translate"></a>Parse then translate the body of the given HTML document.
@@ -449,7 +449,7 @@ class HtmlToCodeTranslator(object):
                 # Update indent -- empty unless this is a newline followed by spaces
                 s = str(soup)
                 m = re.search(self.indent_re, s)
-                self.indent = m.group(1) if m else ''
+                self.indent = m.group(1) if (m and self.at_newline) else ''
                 s = unescape(s)
                 self.at_newline = True if s.endswith('\n') else False
                 # Translate entities in code (but not in comments)
@@ -622,6 +622,10 @@ class TestHtmlToCode(unittest.TestCase):
         s = self.xlate('<pre><span class="c">comment1</span></pre>\n<pre>code2</pre>')
         self.assertEquals(s, '# comment1\ncode2')
 
+    def test_3(self):
+        s = self.xlate('<pre>  <span class="c">comment1\n  comment2</span></pre>')
+        self.assertEquals(s, '  # comment1\n  # comment2')
+
 
 class TestCodeToHtml(unittest.TestCase):
     def hilight(self, s):
@@ -687,7 +691,7 @@ def test(one_test):
     if one_test:
         ts = unittest.TestSuite()
 #        ts.addTest(TestCodeToHtml('test_mlComment8'))
-        ts.addTest(TestHtmlToCode('test_2'))
+        ts.addTest(TestHtmlToCode('test_3'))
         unittest.TextTestRunner().run(ts)
     else:
         unittest.main()
