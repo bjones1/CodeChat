@@ -103,21 +103,7 @@
 # 
 #     The program consists of two separate portions (code to HTML and HTML
 #     to code) with a bit of glue code, supplemented with tests.<br />
-# <h2><a name="CodeToHtml_overview"></a>Code to HTML<br />
-# </h2>
-# 
-# 
-#     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
-#     hilighter. In particular:<br />
-# <ol>
-# <li>Multi-line comments are <a href="#merge_comments">merged</a><br />
-# </li><li>Comments are <a href="#typeset_comments_in_a_proportional_font">typeset in a
-#           proportional font</a></li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
-#         addition, comment #, //, or /* characters are automatically
-#         removed during translation to preserve the visual appearance of
-#         the document</li>
-# </ol>
-# <h2>HTML to Code<br />
+# <h2><a name="CodeToHtml_overview"></a>HTML to Code<br />
 # </h2>
 # 
 # 
@@ -171,12 +157,19 @@
 # </li></ul><li>inComment state: "\n" -&gt; "\n# " for string, recur on
 #           contents.</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>Dump contents</li></ul></ul>
 # </ul>
-# This class converts from source to to HTML. As the <a>overview</a>
-#  states,
-# this uses Pygments to do most of the work, adding only a formatter
-#  to that library. Therefore, to use this class, simply select this class
-#  as the formatter for Pygments (see example <a href="#CodeToHtml">below</a>).
-
+# <h2>Code to HTML<br />
+# </h2>
+# 
+# 
+#     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
+#     hilighter. In particular:<br />
+# <ol>
+# <li>Multi-line comments are <a>merged</a><br />
+# </li><li>Comments are <a>typeset in a
+#           proportional font</a></li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
+#        addition, comment #, //, or /* characters are automatically
+#        removed during translation to preserve the visual appearance of
+#       the document</li></ol>
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -184,6 +177,11 @@ from pygments.formatters.html import _escape_html_table
 from pygments.token import Token
 import re
 
+# This class converts from source to to HTML. As the <a>overview</a>
+#  states,
+# this uses Pygments to do most of the work, adding only a formatter
+#  to that library. Therefore, to use this class, simply select this class
+#  as the formatter for Pygments (see example <a>below</a>).<br />
 class CodeToHtmlFormatter(HtmlFormatter):
     # <a name="typeset_comments_in_a_proportional_font"></a>The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
     def _create_stylesheet(self):
@@ -697,7 +695,7 @@ def test(one_test):
         unittest.main()
         
 # Test / development interface
-if __name__ == '__main__':
+if __name__ == '__main__a':
     test(one_test = False)
 
 # Use the HtmlToCodeTranslator class to translate a specific file.
@@ -728,13 +726,13 @@ def CodeToHtml(baseFileName):
     # Remove a little goop created by the full=True option in for formatter
     hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
     hi_code = hi_code.replace('pre { line-height: 125%; }', 
-                              'pre { line-height: 125%; margin: 0px }', 1)
+                              'pre { line-height: 125%; margin: 0px; min-height: 1em }', 1)
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
 
 # Run interface
 import os
-if __name__ == '__main__a':
+if __name__ == '__main__':
     baseFileName = 'pyg'
     st_py =   os.stat(baseFileName + '.py')
     st_html = os.stat(baseFileName + '.html')
