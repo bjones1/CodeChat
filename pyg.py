@@ -164,9 +164,8 @@
 #     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
 #     hilighter. In particular:<br />
 # <ol>
-# <li>Multi-line comments are <a>merged</a><br />
-# </li><li>Comments are <a>typeset in a
-#           proportional font</a></li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
+# <li>Comments are indented and typeset in a proportional font in <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.<br /></li><li>Multi-line comments are <a>merged</a><br />
+# </li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
 #        addition, comment #, //, or /* characters are automatically
 #        removed during translation to preserve the visual appearance of
 #       the document</li></ol>
@@ -196,7 +195,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
             # font is much larger than its corresponding monospaced font used for the 
             # code. Using <code>font-size: small</code> helps. Specifying the font as a percentags 
             # is bad, because if the &lt;span&gt; tags get nested, all fonts in the 
-            # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. TODO: However, this seems to grow the right margin by the indent, making it hard to read. I'm not sure how to fix this.<br /></li>
+            # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. However, this either grows the right margin by the indent or causes the entire comment to fall on to the next line, making it hard to read. The addition of <code><span class="s">width: 5.5in</span></code> avoid this problem by limiting the max width of a comment. An ideal solution would be to dynamically set this so the width extends to the edge of the screen, but this would require JavaScript (I think).<br /></li>
             # <li> TODO: the test (ttype is Token.Comment) is not robust -- it only catches that particular token. However, many more sub-types <a href="http://pygments.org/docs/tokens/#comments">exist</a>; I don't think this catches them. Would isinstance(ttype, Token.Comment) work better? I'm not sure.</li></ul>
             if ttype is Token.Comment:
                 style += 'font-family: sans-serif; white-space: normal; ' + \
@@ -220,12 +219,12 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 # hierarchy (necessary for CSS cascading rules!)
                 c2s[name] = (style[:-2], ttype, len(ttype))
 
-    # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. 
+    # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. It also wraps each line in a &lt;pre&gt; tag.<br />
     def _format_lines(self, token_source):
         merged_token_source = self._merge_comments(token_source)
         source = self._format_lines1(merged_token_source)
         for is_code, line in source:
-            if is_code:
+            if is_code and line.endswith('\n'):
                 yield is_code, '<pre>' + line[:-1] + '</pre>\n'
             else:
                 yield is_code, line
@@ -744,5 +743,6 @@ if __name__ == '__main__':
         HtmlToCode(baseFileName)
     else:
         print('Time is identical -- giving up')
+
 
 # 
