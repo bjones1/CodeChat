@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-<br />
 # <h1>Overview</h1>
 # 
@@ -48,7 +49,7 @@
 #     enable editing in the most convenient location: for code development
 #     and
 #     debugging, in a text editor / IDE; for design and documentation, in
-#     a WYSWIG
+#     a WYSIWYG
 #     HTML editor.<br />
 # <h2>Getting started</h2>
 # 
@@ -58,7 +59,7 @@
 #     (tested with v3.2.0; the 4.x series was tested and didn't work well
 #     with the default parser). Then, simply run the program to convert
 #     between <code>pyg.py</code> and <code>pyg.html</code> (the newer
-#     file is converted to the other format).<br />
+#     file is converted to the other format).<br />API<br />TODO: document the API.<br />
 # <h2>Status</h2>
 # 
 # 
@@ -88,8 +89,7 @@
 #           change monitor</a> to auto-translate on save.</li><li>Fix line numbering -- have the line numbers skip an empty line
 #         on code to HTML; remove line numbers in HTML to code.</li><li>Offer some sort of cross-reference capability. This will
 #         require some significant thought.</li><li>Much better testing. In particular, test all possible paths
-#         through the state machine.</li><li>Word wrap comments when going from HTML to code. However, there
-#         must be some way to preserve preformatted paragraphs.</li><li>The HTML produced by the SeaMonkey composer doesn't read
+#         through the state machine.</li><li>The HTML produced by the SeaMonkey composer doesn't read
 #         nicely in the code. Establish some sort of pretty-print routine
 #         to print code-readable HTML.</li><li>Come up with a better visual design. Blue text is annoying.
 #         Perhaps use Sphinx styles?</li><li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
@@ -103,72 +103,16 @@
 # 
 #     The program consists of two separate portions (code to HTML and HTML
 #     to code) with a bit of glue code, supplemented with tests.<br />
-# <h2><a name="CodeToHtml_overview"></a>HTML to Code<br />
-# </h2>
 # 
-# 
-#     The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>.
-#     Some simplifying assumptions about the structure of the HTML
-#     document:<br />
-# <ul>
-# <li>All code must be wrapped in a &lt;pre&gt;.<br />
-# </li><li>All comments are wrapped in &lt;span class="c"&gt; or appear
-#         as body text. Comments contain HTML.<br />
-# </li><li>On a line, all code must come first, optionally followed by a
-#         comment. Code may never follow a comment on a single line
-#         (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
-#         tag) is discarded, to be regenerated when code is translated
-#         back to HTML.<br />
-# </li>
-# </ul>
-# 
-# 
-#     With this, body text is comment; &lt;pre&gt; begins discarding all
-#     tags and emits only text until a comment tag, which outputs its
-#     entire subtree as a comment (including any code-tagged text).
-#     Newlines can be echoed without modification whether in code or
-#     comment mode.<br />
-# <h3>The implementation</h3>
-# <ol>
-# <li>The HTML document is parsed, then only the &lt;body&gt; tag
-#         contents <a>translated</a>.</li><li><a>All comments</a> (body text or
-#         anything in a &lt;span class="c"&gt; tag) are prepended with a
-#         comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
-#         &lt;pre&gt; tag from the beginning of the line to the first
-#         &lt;span class="c") tag) is stripped of HTML tags, HTML
-#         unescaped, then written.<br />
-# </li>
-# </ol>
-# <h2>Misc</h2>
-# 
-# 
-#     Several other routines support development:<br />
-# <ul>
-# <li>Some driver code sets up and runs the code to HTML and HTML to
-#         code classes.</li><li>Unit testing to support development.<br />
-# </li>
-# </ul>
-# <ul>
-# <li>As a three-state machine: outsidePre (initial state), inPre,
-#         inComment.</li><ul><li>outsidePre state:</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>If a tag, check name: pre causes transition to inPre
-#             state, dump contents, transition back to outsidePre<br />
-# </li></ul><li>inPre state: output only text, skip all tags.</li><ul><li>If a string, dump raw text</li><li>If a tag, check name: comment tag causes transition to
-#             inComment state, insert #, dump contents, transition back<br />
-# </li></ul><li>inComment state: "\n" -&gt; "\n# " for string, recur on
-#           contents.</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>Dump contents</li></ul></ul>
-# </ul>
-# <h2>Code to HTML<br />
-# </h2>
-# 
-# 
+# <h2>Code to HTML</h2>
 #     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
 #     hilighter. In particular:<br />
 # <ol>
-# <li>Comments are indented and typeset in a proportional font in <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.<br /></li><li>Multi-line comments are <a>merged</a><br />
-# </li><li>Comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
+# <li>Comments are indented and typeset in a proportional font in <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.<br /></li><li>Multi-line comments are <a>merged</a> in <a href="#merge_comments">_merge_comments</a>.<br />
+# </li><li><a href="#_format_lines1">_format_lines1</a> carries out special processing for comments. In particular, comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
 #        addition, comment #, //, or /* characters are automatically
 #        removed during translation to preserve the visual appearance of
-#       the document</li></ol>
+#       the document.</li><li>Each line is wrapped in a &lt;pre&gt; tag in <a href="#_format_lines">_format_lines</a>, after being passed through the formatting pipeline in the two preceeding steps.<br /></li></ol>
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -334,7 +278,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
         for t in token_stack:
             yield t
         
-    # Copied verbatim from Pygments' _format_lines, then modified to
+    # <a name="_format_lines1"></a><a name="_format_lines"></a>Copied verbatim from Pygments' _format_lines, then modified to
     # not escape comments and remove inital comment chars
     def _format_lines1(self, tokensource):
         """
@@ -411,7 +355,44 @@ class CodeToHtmlFormatter(HtmlFormatter):
     def wrap(self, source, outfile):
         return source
         
-
+# <br />
+# <h2><a name="CodeToHtml_overview"></a>HTML to Code<br />
+# </h2>
+# 
+# 
+# 
+#     The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>.
+#     Some simplifying assumptions about the structure of the HTML
+#     document:<br />
+# <ul>
+# <li>All code must be wrapped in a &lt;pre&gt;.<br />
+# </li><li>All comments are wrapped in &lt;span class="c"&gt; or appear
+        # as body text. Comments contain HTML.<br />
+# </li><li>On a line, all code must come first, optionally followed by a
+        # comment. Code may never follow a comment on a single line
+        # (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
+        # tag) is discarded, to be regenerated when code is translated
+        # back to HTML.<br />
+# </li>
+# </ul>
+# 
+# 
+# 
+#     With this, body text is comment; &lt;pre&gt; begins discarding all
+#     tags and emits only text until a comment tag, which outputs its
+#     entire subtree as a comment (including any code-tagged text).
+#     Newlines can be echoed without modification whether in code or
+#     comment mode.<br />
+# <h3>The implementation</h3>
+# <ol>
+# <li>The HTML document is parsed, then only the &lt;body&gt; tag
+        # contents <a>translated</a>.</li><li><a>All comments</a> (body text or
+        # anything in a &lt;span class="c"&gt; tag) are prepended with a
+        # comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
+        # &lt;pre&gt; tag from the beginning of the line to the first
+        # &lt;span class="c") tag) is stripped of HTML tags, HTML
+        # unescaped, then written.</li>
+# </ol>
 # Beautiful Soup v3.x version
 from BeautifulSoup import BeautifulSoup, Tag, NavigableString
 # Beautiful Soup v4.x version
@@ -429,7 +410,19 @@ class HtmlToCodeTranslator(object):
         self.indent_re = re.compile(r'([ \t\r\f\v]*)$')
         self.at_newline = True
         
-    # <a name="body_translate"></a>Parse then translate the body of the given HTML document.
+    # <a name="body_translate"></a>Parse then translate 
+    # the body of the given HTML document. Uses a state machine, which really 
+    # should be better documented, but here's what I have now.<br />
+    # 
+    # <ul>
+    # <li>As a three-state machine: outsidePre (initial state), inPre,
+    #     inComment.</li><ul><li>outsidePre state:</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>If a tag, check name: pre causes transition to inPre
+    #     state, dump contents, transition back to outsidePre<br />
+    # </li></ul><li>inPre state: output only text, skip all tags.</li><ul><li>If a string, dump raw text</li><li>If a tag, check name: comment tag causes transition to
+    #     inComment state, insert #, dump contents, transition back<br />
+    # </li></ul><li>inComment state: "\n" -&gt; "\n# " for string, recur on
+    #   contents.</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>Dump contents</li></ul></ul>
+    # </ul>
     def translate(self, HtmlString):
         soup = BeautifulSoup(HtmlString)
 #        print soup
@@ -743,6 +736,8 @@ if __name__ == '__main__':
         HtmlToCode(baseFileName)
     else:
         print('Time is identical -- giving up')
+
+
 
 
 # 
