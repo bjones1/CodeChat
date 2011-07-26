@@ -171,11 +171,11 @@
 # </li></ul><li>inComment state: "\n" -&gt; "\n# " for string, recur on
 #           contents.</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>Dump contents</li></ul></ul>
 # </ul>
-# <span class="c">This class converts from source to to HTML. As the <a>overview</a>
+# This class converts from source to to HTML. As the <a>overview</a>
 #  states,
-# this&nbsp; uses Pygments to do most of the work, adding only a formatter
+# this uses Pygments to do most of the work, adding only a formatter
 #  to that library. Therefore, to use this class, simply select this class
-#  as the formatter for Pygments (see example <a href="#CodeToHtml">below</a>). </span>
+#  as the formatter for Pygments (see example <a href="#CodeToHtml">below</a>).
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -430,6 +430,7 @@ class HtmlToCodeTranslator(object):
         self.State = HtmlToCodeTranslator.State
         self.indent = ''
         self.indent_re = re.compile(r'\n([ \t\r\f\v]*)$')
+        self.at_newline = True
         
     # <a name="body_translate"></a>Parse then translate the body of the given HTML document.
     def translate(self, HtmlString):
@@ -442,15 +443,17 @@ class HtmlToCodeTranslator(object):
 
     # Translate a chunk of html
     def translateBody(self, soup, state):
-#        print state, soup, ('"%s"' % self.indent)
+#        print state, soup, ('"%s"' % self.indent), self.at_newline
         if isinstance(soup, NavigableString):
             if state == self.State.inPre:
                 # Update indent -- empty unless this is a newline followed by spaces
                 s = str(soup)
                 m = re.search(self.indent_re, s)
                 self.indent = m.group(1) if m else ''
+                s = unescape(s)
+                self.at_newline = True if s.endswith('\n') else False
                 # Translate entities in code (but not in comments)
-                return unescape(str(s))
+                return s
                 # BeautifulSoup 3.x does this, but it eats any leading whitespace. Ouch.<br />
                 # return str(BeautifulSoup(s, convertEntities=BeautifulStoneSoup.HTML_ENTITIES))
             else:
@@ -466,10 +469,15 @@ class HtmlToCodeTranslator(object):
                         (indent, comment) = line.split(self.indent, 1)
                         L.append(self.indent + self.CommentString + comment)
                     else:
-                        # Put a comment char at the beginning of the line
-                        L.append(self.CommentString + line)
+                        # Put a comment char at the beginning of the line, unless the next tag is a pre
+                        if isinstance(soup.next, Tag) and (soup.next.name == 'pre'):
+                            L.append(line)
+                        else:
+                            L.append(self.CommentString + line)
                 # Now, glue each line together
-                return '\n'.join(L)
+                s = '\n'.join(L)
+                self.at_newline = True if s.endswith('\n') else False                
+                return s
         else:
             # We hae a tag.
             assert(isinstance(soup, Tag))
@@ -603,9 +611,16 @@ class TestHtmlToCode(unittest.TestCase):
         self.assertEquals(s, '\n\n  # comment1\n  # comment2')
 
     def test_0(self):
-        s = self.xlate('\n<pre><span class="c">comment</span>')
-        print s
-        self.assertEquals(s, '# \n# comment')
+        s = self.xlate('<pre>  code <span class="c">comment</span>')
+        self.assertEquals(s, '  code # comment')
+
+    def test_1(self):
+        s = self.xlate('<pre>  <span class="n">code</span> <span class="c">comment</span>')
+        self.assertEquals(s, '  code # comment')
+
+    def test_2(self):
+        s = self.xlate('<pre><span class="c">comment1</span></pre>\n<pre>code2</pre>')
+        self.assertEquals(s, '# comment1\ncode2')
 
 
 class TestCodeToHtml(unittest.TestCase):
@@ -672,11 +687,15 @@ def test(one_test):
     if one_test:
         ts = unittest.TestSuite()
 #        ts.addTest(TestCodeToHtml('test_mlComment8'))
-        ts.addTest(TestHtmlToCode('test_xlWhitespace5'))
+        ts.addTest(TestHtmlToCode('test_2'))
         unittest.TextTestRunner().run(ts)
     else:
         unittest.main()
         
+# Test / development interface
+if __name__ == '__main__':
+    test(one_test = False)
+
 # Use the HtmlToCodeTranslator class to translate a specific file.
 def HtmlToCode(baseFileName):
     code = open(baseFileName + '.html', 'r').read()
@@ -709,13 +728,9 @@ def CodeToHtml(baseFileName):
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
 
-# Test / development interface
-if __name__ == '__main__s':
-    test(one_test = False)
-
 # Run interface
 import os
-if __name__ == '__main__':
+if __name__ == '__main__a':
     baseFileName = 'pyg'
     st_py =   os.stat(baseFileName + '.py')
     st_html = os.stat(baseFileName + '.html')
