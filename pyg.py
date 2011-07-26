@@ -201,8 +201,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
             # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. TODO: However, this seems to grow the right margin by the indent, making it hard to read. I'm not sure how to fix this.<br /></li>
             # <li> TODO: the test (ttype is Token.Comment) is not robust -- it only catches that particular token. However, many more sub-types <a href="http://pygments.org/docs/tokens/#comments">exist</a>; I don't think this catches them. Would isinstance(ttype, Token.Comment) work better? I'm not sure.</li></ul>
             if ttype is Token.Comment:
-                style += 'font-family: Sans-serif; white-space: normal; ' + \
-                  'font-size: small; display: inline-block; '
+                style += 'font-family: sans-serif; white-space: normal; ' + \
+                  'font-size: small; display: inline-block; width: 5.5in; '
 	    # End of modification.
             if ndef['color']:
                 style += 'color: #%s; ' % ndef['color']
@@ -226,8 +226,11 @@ class CodeToHtmlFormatter(HtmlFormatter):
     def _format_lines(self, token_source):
         merged_token_source = self._merge_comments(token_source)
         source = self._format_lines1(merged_token_source)
-        for tup in source:
-            yield tup
+        for is_code, line in source:
+            if is_code:
+                yield is_code, '<pre>' + line[:-1] + '</pre>\n'
+            else:
+                yield is_code, line
                 
     # <a name="merge_comments"></a>This routine takes tokens as its input, combining multiple lines of single-line comments separated
     # only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
@@ -407,9 +410,9 @@ class CodeToHtmlFormatter(HtmlFormatter):
             yield 1, line + (lspan and '</span>') + lsep
 
     # By default, the html formatter wraps the code in a div and a pre.
-    # Just wrap it in a pre.
+    # Don't wrap it at all.
     def wrap(self, source, outfile):
-        return self._wrap_pre(source)
+        return source
         
 
 # Beautiful Soup v3.x version
@@ -701,6 +704,8 @@ def CodeToHtml(baseFileName):
     hi_code = highlight(code, PythonLexer(), formatter)
     # Remove a little goop created by the full=True option in for formatter
     hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
+    hi_code = hi_code.replace('pre { line-height: 125%; }', 
+                              'pre { line-height: 125%; margin: 0px }', 1)
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
 
@@ -722,7 +727,5 @@ if __name__ == '__main__':
         HtmlToCode(baseFileName)
     else:
         print('Time is identical -- giving up')
-
-
 
 # 
