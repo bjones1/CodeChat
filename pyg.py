@@ -58,10 +58,10 @@
 #     (tested with v3.2.0; the 4.x series was tested and didn't work well
 #     with the default parser). Then, simply run the program to convert
 #     between <code>pyg.py</code> and <code>pyg.html</code> (the newer
-#     file is converted to the other format).<br />
+#     file is converted to the other format).<br /><br />TODO: show a short demo video of how it's used.<br />
 # <h2>API</h2>
 # TODO: document the API.<br />
-#
+# 
 # <h2>Status</h2>
 # 
 #     Currently, the bidirectional link is functional (though needs lots
@@ -96,7 +96,7 @@
 #         Perhaps use Sphinx styles?</li><li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
 #         widget to program a GUI editor. It would be really neat to:</li><ol><li>Open either HTML or source code</li><li>Have a hotkey toggle between HTML and text views, syncing
 #           cursor position in the toggle.</li><li>Auto-reload if either file is modified<br />
-# </li></ol><li>Support C and C++</li><li>Create a GUI editor so, with a hotkey, the view would switch between HTML and source.</li><li>Use ReST instead of HTML as the underlying language, since that is so much more readable in code. Would need to write / find a good HTML to ReST translator.</li><li>Incorproate a language parser like Doxygen to auto-crossref function names, variables, etc. Use a plain-text format to pick up on function parameters.</li><li>Fix formatting: add a width: blah to the style for each comment based on the number of preceeding characters.</li><li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments in any html. This would, I think, make HTML editors work a bit better.<br /></li>
+# </li></ol><li>Support C and C++</li><li>Create a GUI editor so, with a hotkey, the view would switch between HTML and source.</li><li>Use ReST instead of HTML as the underlying language, since that is so much more readable in code. Would need to write / find a good HTML to ReST translator.</li><li>Incorproate a language parser like Doxygen to auto-crossref function names, variables, etc. Use a plain-text format to pick up on function parameters.</li><li>Fix formatting: add a width: blah to the style for each comment based on the number of preceeding characters.</li><li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments in any html. This would, I think, make HTML editors work a bit better.</li><li>Things that bother me I'd like to fix:</li><ol><li>I can't see what HTML anchors already exist. This makes it hard to hyperlink. Just having auto-hyperlinks to global symbols would help a lot.<br /></li><li>Many editor annoyances; it's fairly fraglie.</li><li>The documentation I have feels unwieldly: there's too much information on one page. Should I factor the code, or factors the docs into two files?<br /></li></ol>
 # </ol>
 # <h1>Implementation</h1>
 # 
@@ -176,7 +176,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
     # <h3>Merge multi-line comments</h3>
     # This routine takes tokens as its input, combining multiple lines of single-line comments separated
     # only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
-    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that cr / yield all tokens means that if a carriage return (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
+    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that nl / yield all tokens means that if a newline (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
     def _merge_comments(self, token_source):
         # Keep a history of tokens; if we can't combine then, then yield a
         # bunch of these.
@@ -397,12 +397,12 @@ def CodeToHtml(baseFileName):
 # <ul>
 # <li>All code must be wrapped in a &lt;pre&gt;.<br />
 # </li><li>All comments are wrapped in &lt;span class="c"&gt; or appear
-        # as body text. Comments contain HTML.<br />
+#         as body text. Comments contain HTML.<br />
 # </li><li>On a line, all code must come first, optionally followed by a
-        # comment. Code may never follow a comment on a single line
-        # (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
-        # tag) is discarded, to be regenerated when code is translated
-        # back to HTML.<br />
+#         comment. Code may never follow a comment on a single line
+#         (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
+#         tag) is discarded, to be regenerated when code is translated
+#         back to HTML.<br />
 # </li>
 # </ul>
 # 
@@ -416,12 +416,12 @@ def CodeToHtml(baseFileName):
 # <h3>The implementation</h3>
 # <ol>
 # <li>The HTML document is parsed, then only the &lt;body&gt; tag
-        # contents <a>translated</a>.</li><li><a>All comments</a> (body text or
-        # anything in a &lt;span class="c"&gt; tag) are prepended with a
-        # comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
-        # &lt;pre&gt; tag from the beginning of the line to the first
-        # &lt;span class="c") tag) is stripped of HTML tags, HTML
-        # unescaped, then written.</li>
+#         contents <a>translated</a>.</li><li><a>All comments</a> (body text or
+#         anything in a &lt;span class="c"&gt; tag) are prepended with a
+#         comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
+#         &lt;pre&gt; tag from the beginning of the line to the first
+#         &lt;span class="c") tag) is stripped of HTML tags, HTML
+#         unescaped, then written.</li>
 # </ol>
 # Beautiful Soup v3.x version
 from BeautifulSoup import BeautifulSoup, Tag, NavigableString
@@ -743,4 +743,5 @@ import os
 if __name__ == '__main__':
 #    test(one_test = False)
     convert('pyg')
+
 # 
