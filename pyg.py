@@ -7,12 +7,12 @@
 #       documentation of programs, and that we can best achieve this by
 #       considering programs to be works of literature. Hence, my title:
 #       "Literate Programming."<br /><br />
-#
+# 
 #       Let us change our traditional attitude to the construction of
 #       programs: Instead of imagining that our main task is to instruct a
 #       computer what to do, let us concentrate rather on explaining to
 #       human beings what we want a computer to do.<br /><br />
-#
+# 
 #       The practitioner of literate programming can be regarded as an
 #       essayist, whose main concern is with exposition and excellence of
 #       style. Such an author, with thesaurus in hand, chooses the names
@@ -21,9 +21,9 @@
 #       concepts have been introduced in an order that is best for human
 #       understanding, using a mixture of formal and informal methods that
 #       reinforce each other.<br /><br />
-#
+# 
 #       -- Donald Knuth, &#8220;<a href="http://www.literateprogramming.com/knuthweb.pdf">Literate
-#
+# 
 #         Programming</a> (1984)&#8221; in Literate Programming. CSLI, 1992, pg.
 #       99.<br />
 # </blockquote>
@@ -42,8 +42,8 @@
 # The intention is to enable editing in the most convenient location:
 # for code development and debugging, in a text editor / IDE; for design and
 # documentation, in a WYSIWYG HTML editor.
-#
-#
+# 
+# 
 # <h2>Getting started</h2>
 # 
 # Install Python (tested with v 2.6), <a href="http://pygments.org/">Pygments</a>
@@ -52,19 +52,19 @@
 # with the default parser). Then, simply run the program to convert
 # between <code>pyg.py</code> and <code>pyg.html</code> (the newer
 # file is converted to the other format).<br /><br />TODO: show a short demo video of how it's used.
-#
-#
+# 
+# 
 # <h2>API</h2>
-#
+# 
 # TODO: document the API.<br />
-#
+# 
 # 
 # <h2>Status</h2>
 # 
 # Currently, the bidirectional link is functional (though needs lots of
 # testing, some bug fixes, and better documentation). I'm using it to write
 # this document.
-#
+# 
 # <h3>Bugs</h3>
 # <ol><li>The HTML to code link assumes there's no comments before the
 #         pre tag. I need some way to detect this an insert a
@@ -84,7 +84,7 @@
 #     <li>The implementation is fragile -- an unescaped tag in the code 
 #         destroys the HTML; likewise, the HTML editor can easily lose all 
 #         whitespace and totally destroy the code.</li></ol>
-#
+# 
 # <h3>To do</h3>
 # <ol><li>Implement a <a href="http://packages.python.org/watchdog/">file
 #           change monitor</a> to auto-translate on save.</li>
@@ -131,15 +131,15 @@
 #             <li>The documentation I have feels unwieldly: there's too much
 #                 information on one page. Should I factor the code, or factors
 #                 the docs into two files?</li></ol></ol>
-#
+# 
 # <h1>Implementation</h1>
-#
+# 
 # 
 # The program consists of two separate portions (code to HTML and HTML
 # to code) with a bit of glue code, supplemented with tests.
 # 
 # <h2><a name="Code_to_HTML"></a>Code to HTML</h2>
-#
+# 
 # The code to HTML link consists of modifications to
 # <a href="http://pygments.org/">Pygments</a>, a wonderful source
 # hilighter. Pygments already provides a lexer to break the input code into
@@ -432,8 +432,9 @@ def CodeToHtml(baseFileName):
                                     style=CodeToHtmlStyle)
     outfile = open(baseFileName + '.html', 'w')
     hi_code = highlight(code, PythonLexer(), formatter)
-    # Remove a little goop created by the full=True option in for formatter
+    # Remove a little goop created by the full=True option above
     hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
+    # Force an &lt;pre&gt; tag to occupy one line, instead of collapsing to an empty element, with <code>min-height: 1em</code>. Make it single spaced instead of the default double spacing with <code>margin: 0px</code>.<br />
     hi_code = hi_code.replace('pre { line-height: 125%; }', 
                               'pre { line-height: 125%; margin: 0px; min-height: 1em }', 1)
     outfile.write(hi_code)
@@ -796,5 +797,3 @@ import os
 if __name__ == '__main__':
 #    test(one_test = False)
     convert('pyg')
-
-# 
