@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-<br />
 # <h1>Overview</h1>
 # 
@@ -104,7 +103,7 @@
 #     The program consists of two separate portions (code to HTML and HTML
 #     to code) with a bit of glue code, supplemented with tests.<br />
 # 
-# <h2>Code to HTML</h2>
+# <h2><a name="Code_to_HTML"></a>Code to HTML</h2>
 #     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
 #     hilighter. In particular:<br />
 # <ol>
@@ -124,7 +123,7 @@ import re
 #  states,
 # this uses Pygments to do most of the work, adding only a formatter
 #  to that library. Therefore, to use this class, simply select this class
-#  as the formatter for Pygments (see example <a>below</a>).<br />
+#  as the formatter for Pygments (see an example <a href="#def_CodeToHtml">below</a>).<br />
 class CodeToHtmlFormatter(HtmlFormatter):
     # <a name="typeset_comments_in_a_proportional_font"></a>The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
     def _create_stylesheet(self):
@@ -175,7 +174,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 
     # <a name="merge_comments"></a>This routine takes tokens as its input, combining multiple lines of single-line comments separated
     # only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
-    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). In particular, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that cr / yield all tokens means that if a carriage return (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
+    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that cr / yield all tokens means that if a carriage return (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
     def _merge_comments(self, token_source):
         # Keep a history of tokens; if we can't combine then, then yield a
         # bunch of these.
@@ -196,27 +195,22 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 if re.search(ws, value):
                     token_stack.append([ttype, value])
                     state = 1
-                elif value == '\n':
-                    for t in token_stack:
-                        yield t
-                    token_stack = []
-                    yield ttype, value
                 elif ttype is Token.Comment:
                     token_stack.append([ttype, value])
                     state = 2                    
                 else:
-                    yield (ttype, value)
-                    state = 5
-            elif state == 1:
-                if ttype is Token.Comment:
-                    token_stack.append([ttype, value])
-                    state = 2
-                elif value == '\n':
+                    # While the code sequence to yield all tokens is repeated frequently and hence an excellent candidate for a function, the requirement of a yield keeps it from being easily placed in a function. So, I've just used a copy and paste approach instead.
                     for t in token_stack:
                         yield t
                     token_stack = []
                     yield ttype, value
-                    state = 0
+                    state = 0 if value == '\n' else 5
+            elif state == 1:
+                # Assume we will never receive two whitespace tokens back to back.
+                assert(not re.search(ws, value))
+                if ttype is Token.Comment:
+                    token_stack.append([ttype, value])
+                    state = 2
                 else:
                     for t in token_stack:
                         yield t
@@ -224,6 +218,10 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     yield ttype, value
                     state = 0 if value == '\n' else 5
             elif state == 2:
+                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace>
+                assert(not re.search(ws, value))
+                # For now, assume we will never receive two comment tokens back to back. TODO: this could happen in C, perhaps as a /*blah*//*blah*/.
+                assert(ttype is not Token.Comment)
                 if value == '\n':
                     token_stack.append([ttype, value])
                     state = 3
@@ -250,6 +248,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     yield ttype, value                
                     state = 0 if value == '\n' else 5
             elif state == 4:
+                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace>
+                assert(not re.search(ws, value))
                 if ttype is Token.Comment:
                     # Combine two comments into a single comment by modifying the value of the first comment token<br />
                     # First, determine if we need to merge the previous three or the previous two entries on the stack (state transition 2, 3, 4 vs. 2, 4)
@@ -265,10 +265,10 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     for t in token_stack:
                         yield t
                     token_stack = []
-                    yield ttype, value                
-                    state = 5                
+                    yield ttype, value
+                    state = 0 if value == '\n' else 5
             elif state == 5:
-                yield (ttype, value)
+                yield ttype, value
                 if value == '\n':
                     state = 0
             else:
@@ -686,10 +686,6 @@ def test(one_test):
     else:
         unittest.main()
         
-# Test / development interface
-if __name__ == '__main__a':
-    test(one_test = False)
-
 # Use the HtmlToCodeTranslator class to translate a specific file.
 def HtmlToCode(baseFileName):
     code = open(baseFileName + '.html', 'r').read()
@@ -708,7 +704,8 @@ from pygments.token import Comment
 DefaultStyle.styles[Comment] = "#408080"
 class CodeToHtmlStyle(DefaultStyle):
     pass
-    # Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
+
+# <a name="def_CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToHtml(baseFileName):
     code = open(baseFileName + '.py', 'r').read()
     formatter = CodeToHtmlFormatter(full=True, nobackground=True,
@@ -722,10 +719,7 @@ def CodeToHtml(baseFileName):
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
 
-# Run interface
-import os
-if __name__ == '__main__':
-    baseFileName = 'pyg'
+def convert(baseFileName):
     st_py =   os.stat(baseFileName + '.py')
     st_html = os.stat(baseFileName + '.html')
     if   st_py.st_mtime > st_html.st_mtime:
@@ -737,7 +731,8 @@ if __name__ == '__main__':
     else:
         print('Time is identical -- giving up')
 
-
-
-
-# 
+# Run interface
+import os
+if __name__ == '__main__':
+#    test(one_test = False)
+    convert('pyg')
