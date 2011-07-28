@@ -428,7 +428,7 @@ def CodeToHtml(baseFileName):
 #         unescaped, then written.</li>
 # </ol>
 # Beautiful Soup v3.x version
-from BeautifulSoup import BeautifulSoup, Tag, NavigableString
+from BeautifulSoup import BeautifulSoup, Tag, NavigableString, DEFAULT_OUTPUT_ENCODING 
 # Beautiful Soup v4.x version
 # from bs4 import BeautifulSoup, Tag, NavigableString
 # from bs4.builder import HTMLTreeBuilder
@@ -534,7 +534,7 @@ class HtmlToCodeTranslator(object):
 #        dupSoup = Tag(BeautifulSoup(), HTMLTreeBuilder(), soup.name, soup.attrs)
         dupSoup = Tag(BeautifulSoup(), soup.name, soup.attrs)
         dupSoup.insert(0, "!")
-        s = str(dupSoup)
+        s = dupSoup.__str__(prettyPrint = True)
         return s.replace('\n', '\n' + comment_string).rsplit('!', 1)
 
 
