@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-<br />
 # <h1>Overview</h1>
 # 
-# 
-#     This program attempts to bring to life some of the ideas espoused by
-#     Donald Knuth:<br />
+# This program attempts to bring to life some of the ideas espoused by
+# Donald Knuth:<br />
 # <blockquote>I believe that the time is ripe for significantly better
 #       documentation of programs, and that we can best achieve this by
 #       considering programs to be works of literature. Hence, my title:
-#       "Literate Programming."<br />
-# <br />
+#       "Literate Programming."<br /><br />
+#
 #       Let us change our traditional attitude to the construction of
 #       programs: Instead of imagining that our main task is to instruct a
 #       computer what to do, let us concentrate rather on explaining to
-#       human beings what we want a computer to do.<br />
-# <br />
+#       human beings what we want a computer to do.<br /><br />
+#
 #       The practitioner of literate programming can be regarded as an
 #       essayist, whose main concern is with exposition and excellence of
 #       style. Such an author, with thesaurus in hand, chooses the names
@@ -21,97 +20,146 @@
 #       or she strives for a program that is comprehensible because its
 #       concepts have been introduced in an order that is best for human
 #       understanding, using a mixture of formal and informal methods that
-#       reinforce each other.<br />
-# <br />
+#       reinforce each other.<br /><br />
+#
 #       -- Donald Knuth, &#8220;<a href="http://www.literateprogramming.com/knuthweb.pdf">Literate
+#
 #         Programming</a> (1984)&#8221; in Literate Programming. CSLI, 1992, pg.
 #       99.<br />
 # </blockquote>
 # 
+# I believe that a program must exist simultaneously in two forms: as
+# beautifully-formatted document replete with digrams and other
+# illustrations and as source code, reflecting two complementary
+# approaches to develping a program. A document provides a programmer
+# with a means to express and record their design of the program,
+# focusing on high-level design. As source code, it captures the
+# minute details of an implementation of that idea.<br /><br />
 # 
-#     I believe that a program must exist simultaneously in two forms: as
-#     beautifully-formatted document replete with digrams and other
-#     illustrations and as source code, reflecting two complementary
-#     approaches to develping a program. A document provides a programmer
-#     with a means to express and record their design of the program,
-#     focusing on high-level design. As source code, it captures the
-#     minute details of an implementation of that idea.<br />
-# <br />
-# 
-# 
-#     Therefore, the purpose of this program is to provide a bidirectional
-#     link between a
-#     source file and a corresponding HTML document, so that the source
-#     can be
-#     exactly recreated from the HTML file and vice versa. The intention
-#     is to
-#     enable editing in the most convenient location: for code development
-#     and
-#     debugging, in a text editor / IDE; for design and documentation, in
-#     a WYSIWYG
-#     HTML editor.<br />
+# Therefore, the purpose of this program is to provide a bidirectional
+# link between a source file and a corresponding HTML document, so that
+# the source can be exactly recreated from the HTML file and vice versa.
+# The intention is to enable editing in the most convenient location:
+# for code development and debugging, in a text editor / IDE; for design and
+# documentation, in a WYSIWYG HTML editor.
+#
+#
 # <h2>Getting started</h2>
 # 
-# 
-#     Install Python (tested with v 2.6), <a href="http://pygments.org/">Pygments</a>
-#     (tested with v 1.4), and <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>
-#     (tested with v3.2.0; the 4.x series was tested and didn't work well
-#     with the default parser). Then, simply run the program to convert
-#     between <code>pyg.py</code> and <code>pyg.html</code> (the newer
-#     file is converted to the other format).<br /><br />TODO: show a short demo video of how it's used.<br />
+# Install Python (tested with v 2.6), <a href="http://pygments.org/">Pygments</a>
+# (tested with v 1.4), and <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>
+# (tested with v3.2.0; the 4.x series was tested and didn't work well
+# with the default parser). Then, simply run the program to convert
+# between <code>pyg.py</code> and <code>pyg.html</code> (the newer
+# file is converted to the other format).<br /><br />TODO: show a short demo video of how it's used.
+#
+#
 # <h2>API</h2>
+#
 # TODO: document the API.<br />
+#
 # 
 # <h2>Status</h2>
 # 
-#     Currently, the bidirectional link is functional (though needs lots
-#     of testing, some bug fixes,
-#     and better documentation). I'm using it to write this document.<br />
+# Currently, the bidirectional link is functional (though needs lots of
+# testing, some bug fixes, and better documentation). I'm using it to write
+# this document.
+#
 # <h3>Bugs</h3>
-# <ol>
-# <li>The HTML to code link assumes there's no comments before the
-#         pre tag. I need some way to detect this an insert a comment.</li><li>The code to html link incorrectly merges comments with
-#         different amount of leading whitespace. It shouldn't.</li><li>The code to html link translates ## to # # (However, I don't
-#         think there's a workaround for this).</li><li>The program dorks the beginning and ending tags, putting extra
+# <ol><li>The HTML to code link assumes there's no comments before the
+#         pre tag. I need some way to detect this an insert a
+#         comment.</li>
+#    <li>The code to html link incorrectly merges comments with
+#         different amount of leading whitespace. It shouldn't.</li>
+#     <li>The code to html link translates ## to # # (However, I don't
+#         think there's a workaround for this).</li><li>The program dorks the
+#         beginning and ending tags, putting extra
 #         lines at the end and eventually moving comments around on the
-#         first line.</li><li>SeaMonkey doesn't like &lt;pre&gt;. It's not that happy with
+#         first line.</li>
+#     <li>SeaMonkey doesn't like &lt;pre&gt;. It's not that happy with
 #         &lt;span&gt;, either. I suspect that only wrapping code lines in
 #         a &lt;pre&gt; would help. Or, I could drop the pre entirely and
 #         use a &lt;span&gt; on the spaces; I'm not sure which is better.
 #         Either way, I need to minimize &lt;pre&gt; in the document.</li>
-# <li>The implementation is fragile -- an unescaped tag in the code 
-# destroys the HTML; likewise, the HTML editor can easily lose all 
-# whitespace and totally destroy the code.<br />
-# </li>
-# </ol>
+#     <li>The implementation is fragile -- an unescaped tag in the code 
+#         destroys the HTML; likewise, the HTML editor can easily lose all 
+#         whitespace and totally destroy the code.</li></ol>
+#
 # <h3>To do</h3>
-# <ol>
-# <li>Implement a <a href="http://packages.python.org/watchdog/">file
-#           change monitor</a> to auto-translate on save.</li><li>Fix line numbering -- have the line numbers skip an empty line
-#         on code to HTML; remove line numbers in HTML to code.</li><li>Offer some sort of cross-reference capability. This will
-#         require some significant thought.</li><li>Much better testing. In particular, test all possible paths
-#         through the state machine.</li><li>The HTML produced by the SeaMonkey composer doesn't read
+# <ol><li>Implement a <a href="http://packages.python.org/watchdog/">file
+#           change monitor</a> to auto-translate on save.</li>
+#     <li>Fix line numbering -- have the line numbers skip an empty line
+#         on code to HTML; remove line numbers in HTML to code.</li>
+#     <li>Offer some sort of cross-reference capability. This will
+#         require some significant thought.</li>
+#     <li>Much better testing. In particular, test all possible paths
+#         through the state machine.</li>
+#     <li>The HTML produced by the SeaMonkey composer doesn't read
 #         nicely in the code. Establish some sort of pretty-print routine
-#         to print code-readable HTML.</li><li>Come up with a better visual design. Blue text is annoying.
-#         Perhaps use Sphinx styles?</li><li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
-#         widget to program a GUI editor. It would be really neat to:</li><ol><li>Open either HTML or source code</li><li>Have a hotkey toggle between HTML and text views, syncing
-#           cursor position in the toggle.</li><li>Auto-reload if either file is modified<br />
-# </li></ol><li>Support C and C++ better. It's untested and doesn't support /* */ comment currently.</li><li>Look for unescaped &lt; and &gt; characters. I need a nice regexp to distinguish a true tag from random text.<br /></li><li>Create a GUI editor so, with a hotkey, the view would switch between HTML and source.</li><li>Use ReST instead of HTML as the underlying language, since that is so much more readable in code. Would need to write / find a good HTML to ReST translator. Or perhaps just translate recognized HTML to ReST and leave anything unrecognized in the source.<br /></li><li>Incorproate a language parser like Doxygen to auto-crossref function names, variables, etc. Use a plain-text format to pick up on function parameters.</li><li>Fix formatting: add a width: blah to the style for each comment based on the number of preceeding characters.</li><li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments in any html. This would, I think, make HTML editors work a bit better.</li><li>Things that bother me I'd like to fix:</li><ol><li>I can't see what HTML anchors already exist. This makes it hard to hyperlink. Just having auto-hyperlinks to global symbols would help a lot.<br /></li><li>Many editor annoyances; it's fairly fraglie.</li><li>The documentation I have feels unwieldly: there's too much information on one page. Should I factor the code, or factors the docs into two files?<br /></li></ol>
-# </ol>
+#         to print code-readable HTML.</li>
+#     <li>Come up with a better visual design. Blue text is annoying.
+#         Perhaps use Sphinx styles?</li>
+#     <li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
+#         widget to program a GUI editor. It would be really neat to:</li>
+#         <ol><li>Open either HTML or source code</li>
+#             <li>Have a hotkey toggle between HTML and text views, syncing
+#                 cursor position in the toggle.</li>
+#             <li>Auto-reload if either file is modified</li></ol>
+#     <li>Support C and C++ better. It's untested and doesn't support /* */
+#         comment currently.</li><li>Look for unescaped &lt; and &gt;
+#         characters. I need a nice regexp to distinguish a true tag from
+#         random text.</li>
+#     <li>Create a GUI editor so, with a hotkey, the view would switch between
+#         HTML and source.</li><li>Use ReST instead of HTML as the underlying
+#         language, since that is so much more readable in code. Would need to
+#         write / find a good HTML to ReST translator. Or perhaps just
+#         translate recognized HTML to ReST and leave anything unrecognized in
+#         the source.</li>
+#     <li>Incorproate a language parser like Doxygen to auto-crossref function
+#         names, variables, etc. Use a plain-text format to pick up on function
+#         parameters.</li>
+#     <li>Fix formatting: add a width: blah to the style for each comment based
+#         on the number of preceeding characters.</li>
+#     <li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments
+#         in any html. This would, I think, make HTML editors work a bit
+#         better.</li>
+#     <li>Things that bother me I'd like to fix:</li>
+#         <ol><li>I can't see what HTML anchors already exist. This makes it
+#                 hard to hyperlink. Just having auto-hyperlinks to global
+#                 symbols would help a lot.</li>
+#             <li>Many editor annoyances; it's fairly fraglie.</li>
+#             <li>The documentation I have feels unwieldly: there's too much
+#                 information on one page. Should I factor the code, or factors
+#                 the docs into two files?</li></ol></ol>
+#
 # <h1>Implementation</h1>
+#
 # 
-#     The program consists of two separate portions (code to HTML and HTML
-#     to code) with a bit of glue code, supplemented with tests.<br />
+# The program consists of two separate portions (code to HTML and HTML
+# to code) with a bit of glue code, supplemented with tests.
 # 
 # <h2><a name="Code_to_HTML"></a>Code to HTML</h2>
-#     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
-#     hilighter. Pygments already provides a lexer to break the input code into tokens and an HTML formatter to transform those tokens to HTML, based upon a variety of styles. These modification therefore change a bit of functionality in the HTML formatter. In particular:<br />
-# <ol>
-# <li>Comments are indented and typeset in a proportional font in <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.<br /></li><li>Multi-line comments are <a>merged</a> in <a href="#merge_comments">_merge_comments</a>.<br />
-# </li><li><a href="#_format_lines1">_format_lines1</a> carries out special processing for comments. In particular, comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
-#        addition, comment #, //, or /* characters are automatically
-#        removed during translation to preserve the visual appearance of
-#       the document.</li><li>Each line is wrapped in a &lt;pre&gt; tag in <a href="#_format_lines">_format_lines</a>, after being passed through the formatting pipeline in the two preceeding steps.<br /></li></ol>
+#
+# The code to HTML link consists of modifications to
+# <a href="http://pygments.org/">Pygments</a>, a wonderful source
+# hilighter. Pygments already provides a lexer to break the input code into
+# tokens and an HTML formatter to transform those tokens to HTML, based upon a
+# variety of styles. These modification therefore change a bit of functionality
+# in the HTML formatter. In particular:
+# <ol><li>Comments are indented and typeset in a proportional font in 
+#         <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.</li>
+#     <li>Multi-line comments are <a>merged</a> in
+#         <a href="#merge_comments">_merge_comments</a>.</li>
+#     <li><a href="#_format_lines1">_format_lines1</a> carries out special
+#          processing for comments. In particular, comments are assumed to
+#          contain HTML, so that <a>no escaping</a> is done on them. In
+#          addition, comment #, //, or /* characters are automatically
+#          removed during translation to preserve the visual appearance of
+#          the document.</li>
+#      <li>Each line is wrapped in a &lt;pre&gt; tag in
+#          <a href="#_format_lines">_format_lines</a>, after being passed
+#          through the formatting pipeline in the two preceeding
+#          steps.</li></ol>
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -119,15 +167,17 @@ from pygments.formatters.html import _escape_html_table
 from pygments.token import Token
 import re
 
-# The string indicating a comment in the chosen programming language. This must end in a space for the regular expression in _format_lines1 to work. The space also makes the output a bit prettier.
+# The string indicating a comment in the chosen programming language. This must
+# end in a space for the regular expression in _format_lines1 to work. The space
+# also makes the output a bit prettier.
 comment_string = '# '
 
 
 # This class converts from source to to HTML. As the <a>overview</a>
-#  states,
-# this uses Pygments to do most of the work, adding only a formatter
-#  to that library. Therefore, to use this class, simply select this class
-#  as the formatter for Pygments (see an example <a href="#def_CodeToHtml">below</a>).<br />
+# states, this uses Pygments to do most of the work, adding only a formatter
+# to that library. Therefore, to use this class, simply select this class
+# as the formatter for Pygments (see an example 
+# <a href="#def_CodeToHtml">below</a>).<br />
 class CodeToHtmlFormatter(HtmlFormatter):
     # <a name="typeset_comments_in_a_proportional_font"></a><h3>Typeset comments</h3>
     # The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
@@ -428,7 +478,7 @@ def CodeToHtml(baseFileName):
 #         unescaped, then written.</li>
 # </ol>
 # Beautiful Soup v3.x version
-from BeautifulSoup import BeautifulSoup, Tag, NavigableString, DEFAULT_OUTPUT_ENCODING 
+from BeautifulSoup import BeautifulSoup, Tag, NavigableString
 # Beautiful Soup v4.x version
 # from bs4 import BeautifulSoup, Tag, NavigableString
 # from bs4.builder import HTMLTreeBuilder
@@ -534,7 +584,7 @@ class HtmlToCodeTranslator(object):
 #        dupSoup = Tag(BeautifulSoup(), HTMLTreeBuilder(), soup.name, soup.attrs)
         dupSoup = Tag(BeautifulSoup(), soup.name, soup.attrs)
         dupSoup.insert(0, "!")
-        s = dupSoup.__str__(prettyPrint = True)
+        s = dupSoup.__str__(prettyPrint = False)
         return s.replace('\n', '\n' + comment_string).rsplit('!', 1)
 
 
