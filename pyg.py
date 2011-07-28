@@ -58,9 +58,11 @@
 #     (tested with v3.2.0; the 4.x series was tested and didn't work well
 #     with the default parser). Then, simply run the program to convert
 #     between <code>pyg.py</code> and <code>pyg.html</code> (the newer
-#     file is converted to the other format).<br />API<br />TODO: document the API.<br />
+#     file is converted to the other format).<br />
+# <h2>API</h2>
+# TODO: document the API.<br />
+#
 # <h2>Status</h2>
-# 
 # 
 #     Currently, the bidirectional link is functional (though needs lots
 #     of testing, some bug fixes,
@@ -94,18 +96,16 @@
 #         Perhaps use Sphinx styles?</li><li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
 #         widget to program a GUI editor. It would be really neat to:</li><ol><li>Open either HTML or source code</li><li>Have a hotkey toggle between HTML and text views, syncing
 #           cursor position in the toggle.</li><li>Auto-reload if either file is modified<br />
-# </li></ol><li>Support C and C++<br />
-# </li>
+# </li></ol><li>Support C and C++</li><li>Create a GUI editor so, with a hotkey, the view would switch between HTML and source.</li><li>Use ReST instead of HTML as the underlying language, since that is so much more readable in code. Would need to write / find a good HTML to ReST translator.</li><li>Incorproate a language parser like Doxygen to auto-crossref function names, variables, etc. Use a plain-text format to pick up on function parameters.</li><li>Fix formatting: add a width: blah to the style for each comment based on the number of preceeding characters.</li><li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments in any html. This would, I think, make HTML editors work a bit better.<br /></li>
 # </ol>
 # <h1>Implementation</h1>
-# 
 # 
 #     The program consists of two separate portions (code to HTML and HTML
 #     to code) with a bit of glue code, supplemented with tests.<br />
 # 
 # <h2><a name="Code_to_HTML"></a>Code to HTML</h2>
 #     The code to HTML link consists of modifications to <a href="http://pygments.org/">Pygments</a>, a wonderful source
-#     hilighter. In particular:<br />
+#     hilighter. Pygments already provides a lexer to break the input code into tokens and an HTML formatter to transform those tokens to HTML, based upon a variety of styles. These modification therefore change a bit of functionality in the HTML formatter. In particular:<br />
 # <ol>
 # <li>Comments are indented and typeset in a proportional font in <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.<br /></li><li>Multi-line comments are <a>merged</a> in <a href="#merge_comments">_merge_comments</a>.<br />
 # </li><li><a href="#_format_lines1">_format_lines1</a> carries out special processing for comments. In particular, comments are assumed to contain HTML, so that <a>no escaping</a> is done on them. In
@@ -125,7 +125,8 @@ import re
 #  to that library. Therefore, to use this class, simply select this class
 #  as the formatter for Pygments (see an example <a href="#def_CodeToHtml">below</a>).<br />
 class CodeToHtmlFormatter(HtmlFormatter):
-    # <a name="typeset_comments_in_a_proportional_font"></a>The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
+    # <a name="typeset_comments_in_a_proportional_font"></a><h3>Typeset comments</h3>
+    # The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
     def _create_stylesheet(self):
         t2c = self.ttype2class = {Token: ''}
         c2s = self.class2style = {}
@@ -172,7 +173,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
             else:
                 yield is_code, line
                 
-    # <a name="merge_comments"></a>This routine takes tokens as its input, combining multiple lines of single-line comments separated
+    # <h3>Merge multi-line comments</h3>
+    # This routine takes tokens as its input, combining multiple lines of single-line comments separated
     # only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
     # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that cr / yield all tokens means that if a carriage return (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
     def _merge_comments(self, token_source):
@@ -218,7 +220,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     yield ttype, value
                     state = 0 if value == '\n' else 5
             elif state == 2:
-                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace>
+                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace>
                 assert(not re.search(ws, value))
                 # For now, assume we will never receive two comment tokens back to back. TODO: this could happen in C, perhaps as a /*blah*//*blah*/.
                 assert(ttype is not Token.Comment)
@@ -248,7 +250,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     yield ttype, value                
                     state = 0 if value == '\n' else 5
             elif state == 4:
-                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace>
+                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace>
                 assert(not re.search(ws, value))
                 if ttype is Token.Comment:
                     # Combine two comments into a single comment by modifying the value of the first comment token<br />
@@ -278,7 +280,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
         for t in token_stack:
             yield t
         
-    # <a name="_format_lines1"></a><a name="_format_lines"></a>Copied verbatim from Pygments' _format_lines, then modified to
+    # <h3>Special processing for comments</h3>
+    # Copied verbatim from Pygments' _format_lines, then modified to
     # not escape comments and remove inital comment chars
     def _format_lines1(self, tokensource):
         """
@@ -355,6 +358,33 @@ class CodeToHtmlFormatter(HtmlFormatter):
     def wrap(self, source, outfile):
         return source
         
+
+# <h3>Supporting code</h3>
+# Define a new style based on the default style, but which
+# places comments in a non-italic font.<br />
+# Because the base class (Styles) is a metaclass, first
+# change the desired member, then inherit (so the metaclass
+# runs on the modified value in the default style).
+from pygments.styles.default import DefaultStyle
+from pygments.token import Comment
+DefaultStyle.styles[Comment] = "#408080"
+class CodeToHtmlStyle(DefaultStyle):
+    pass
+
+# <a name="def_CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
+def CodeToHtml(baseFileName):
+    code = open(baseFileName + '.py', 'r').read()
+    formatter = CodeToHtmlFormatter(full=True, nobackground=True,
+                                    style=CodeToHtmlStyle)
+    outfile = open(baseFileName + '.html', 'w')
+    hi_code = highlight(code, PythonLexer(), formatter)
+    # Remove a little goop created by the full=True option in for formatter
+    hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
+    hi_code = hi_code.replace('pre { line-height: 125%; }', 
+                              'pre { line-height: 125%; margin: 0px; min-height: 1em }', 1)
+    outfile.write(hi_code)
+    print("Wrote " + baseFileName + '.html')
+
 # <br />
 # <h2><a name="CodeToHtml_overview"></a>HTML to Code<br />
 # </h2>
@@ -686,6 +716,7 @@ def test(one_test):
     else:
         unittest.main()
         
+
 # Use the HtmlToCodeTranslator class to translate a specific file.
 def HtmlToCode(baseFileName):
     code = open(baseFileName + '.html', 'r').read()
@@ -694,30 +725,6 @@ def HtmlToCode(baseFileName):
     outfile.write(xl.translate(code))
     print('Wrote ' + baseFileName + '.py')
 
-# Define a new style based on the default style, but which
-# places comments in a non-italic font.<br />
-# Because the base class (Styles) is a metaclass, first
-# change the desired member, then inherit (so the metaclass
-# runs on the modified value in the default style).
-from pygments.styles.default import DefaultStyle
-from pygments.token import Comment
-DefaultStyle.styles[Comment] = "#408080"
-class CodeToHtmlStyle(DefaultStyle):
-    pass
-
-# <a name="def_CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
-def CodeToHtml(baseFileName):
-    code = open(baseFileName + '.py', 'r').read()
-    formatter = CodeToHtmlFormatter(full=True, nobackground=True,
-                                    style=CodeToHtmlStyle)
-    outfile = open(baseFileName + '.html', 'w')
-    hi_code = highlight(code, PythonLexer(), formatter)
-    # Remove a little goop created by the full=True option in for formatter
-    hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
-    hi_code = hi_code.replace('pre { line-height: 125%; }', 
-                              'pre { line-height: 125%; margin: 0px; min-height: 1em }', 1)
-    outfile.write(hi_code)
-    print("Wrote " + baseFileName + '.html')
 
 def convert(baseFileName):
     st_py =   os.stat(baseFileName + '.py')
@@ -736,3 +743,4 @@ import os
 if __name__ == '__main__':
 #    test(one_test = False)
     convert('pyg')
+# 
