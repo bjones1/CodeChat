@@ -96,7 +96,7 @@
 #         Perhaps use Sphinx styles?</li><li>Use a <a href="http://doc.qt.nokia.com/latest/qtextedit.html">QTextEdit</a>
 #         widget to program a GUI editor. It would be really neat to:</li><ol><li>Open either HTML or source code</li><li>Have a hotkey toggle between HTML and text views, syncing
 #           cursor position in the toggle.</li><li>Auto-reload if either file is modified<br />
-# </li></ol><li>Support C and C++</li><li>Create a GUI editor so, with a hotkey, the view would switch between HTML and source.</li><li>Use ReST instead of HTML as the underlying language, since that is so much more readable in code. Would need to write / find a good HTML to ReST translator.</li><li>Incorproate a language parser like Doxygen to auto-crossref function names, variables, etc. Use a plain-text format to pick up on function parameters.</li><li>Fix formatting: add a width: blah to the style for each comment based on the number of preceeding characters.</li><li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments in any html. This would, I think, make HTML editors work a bit better.</li><li>Things that bother me I'd like to fix:</li><ol><li>I can't see what HTML anchors already exist. This makes it hard to hyperlink. Just having auto-hyperlinks to global symbols would help a lot.<br /></li><li>Many editor annoyances; it's fairly fraglie.</li><li>The documentation I have feels unwieldly: there's too much information on one page. Should I factor the code, or factors the docs into two files?<br /></li></ol>
+# </li></ol><li>Support C and C++ better. It's untested and doesn't support /* */ comment currently.</li><li>Look for unescaped &lt; and &gt; characters. I need a nice regexp to distinguish a true tag from random text.<br /></li><li>Create a GUI editor so, with a hotkey, the view would switch between HTML and source.</li><li>Use ReST instead of HTML as the underlying language, since that is so much more readable in code. Would need to write / find a good HTML to ReST translator. Or perhaps just translate recognized HTML to ReST and leave anything unrecognized in the source.<br /></li><li>Incorproate a language parser like Doxygen to auto-crossref function names, variables, etc. Use a plain-text format to pick up on function parameters.</li><li>Fix formatting: add a width: blah to the style for each comment based on the number of preceeding characters.</li><li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments in any html. This would, I think, make HTML editors work a bit better.</li><li>Things that bother me I'd like to fix:</li><ol><li>I can't see what HTML anchors already exist. This makes it hard to hyperlink. Just having auto-hyperlinks to global symbols would help a lot.<br /></li><li>Many editor annoyances; it's fairly fraglie.</li><li>The documentation I have feels unwieldly: there's too much information on one page. Should I factor the code, or factors the docs into two files?<br /></li></ol>
 # </ol>
 # <h1>Implementation</h1>
 # 
@@ -118,6 +118,10 @@ from pygments.formatters import HtmlFormatter
 from pygments.formatters.html import _escape_html_table
 from pygments.token import Token
 import re
+
+# The string indicating a comment in the chosen programming language. This must end in a space for the regular expression in _format_lines1 to work. The space also makes the output a bit prettier.
+comment_string = '# '
+
 
 # This class converts from source to to HTML. As the <a>overview</a>
 #  states,
@@ -289,7 +293,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
         Yield individual lines.
         """
         # BAJ: regular expression to remove comment chars
-        regexp = re.compile(r'(^[ \t]*)# ?', re.MULTILINE)        
+        regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)        
         
         nocls = self.noclasses
         lsep = self.lineseparator
@@ -434,7 +438,6 @@ class HtmlToCodeTranslator(object):
     class State: outsidePre, inPre, inComment = range(3)
     
     def __init__(self):
-        self.CommentString = '# '
         self.State = HtmlToCodeTranslator.State
         self.indent = ''
         self.indent_re = re.compile(r'([ \t\r\f\v]*)$')
@@ -487,13 +490,13 @@ class HtmlToCodeTranslator(object):
                     if self.indent and line.startswith(self.indent):
                         # If the line begins with an indent, insert the comment char after the indent
                         (indent, comment) = line.split(self.indent, 1)
-                        L.append(self.indent + self.CommentString + comment)
+                        L.append(self.indent + comment_string + comment)
                     else:
                         # Put a comment char at the beginning of the line, unless the next tag is a pre
                         if isinstance(soup.next, Tag) and (soup.next.name == 'pre'):
                             L.append(line)
                         else:
-                            L.append(self.CommentString + line)
+                            L.append(comment_string + line)
                 # Now, glue each line together
                 s = '\n'.join(L)
                 self.at_newline = True if s.endswith('\n') else False                
@@ -513,7 +516,7 @@ class HtmlToCodeTranslator(object):
                   ('class' in attrs) and
                   (attrs['class'] == 'c')):
                 state = self.State.inComment
-                L.append(self.CommentString)
+                L.append(comment_string)
             elif state != self.State.inPre:
             # Output the tag only if we're still outsidePre or if we're still inComment.
                 tags = self.strTag(soup)
@@ -532,7 +535,7 @@ class HtmlToCodeTranslator(object):
         dupSoup = Tag(BeautifulSoup(), soup.name, soup.attrs)
         dupSoup.insert(0, "!")
         s = str(dupSoup)
-        return s.replace('\n', '\n' + self.CommentString).rsplit('!', 1)
+        return s.replace('\n', '\n' + comment_string).rsplit('!', 1)
 
 
 # From http://effbot.org/zone/re-sub.htm#unescape-html:
