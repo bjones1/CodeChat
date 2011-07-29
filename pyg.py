@@ -173,6 +173,11 @@ import re
 comment_string = '# '
 
 
+# File extension for the source file
+#source_extension = '.py'
+source_extension = '.cpp'
+
+
 # This class converts from source to to HTML. As the <a>overview</a>
 # states, this uses Pygments to do most of the work, adding only a formatter
 # to that library. Therefore, to use this class, simply select this class
@@ -194,8 +199,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
             # code. Using <code>font-size: small</code> helps. Specifying the font as a percentags 
             # is bad, because if the &lt;span&gt; tags get nested, all fonts in the 
             # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. However, this either grows the right margin by the indent or causes the entire comment to fall on to the next line, making it hard to read. The addition of <code><span class="s">width: 5.5in</span></code> avoid this problem by limiting the max width of a comment. An ideal solution would be to dynamically set this so the width extends to the edge of the screen, but this would require JavaScript (I think).<br /></li>
-            # <li> TODO: the test (ttype is Token.Comment) is not robust -- it only catches that particular token. However, many more sub-types <a href="http://pygments.org/docs/tokens/#comments">exist</a>; I don't think this catches them. Would isinstance(ttype, Token.Comment) work better? I'm not sure.</li></ul>
-            if ttype is Token.Comment:
+            # <li> TODO: No multi-line comment support yet.</li></ul>
+            if (ttype is Token.Comment) or (ttype is Token.Comment.Single):
                 style += 'font-family: sans-serif; white-space: normal; ' + \
                   'font-size: small; display: inline-block; width: 5.5in; '
 	    # End of modification.
@@ -251,7 +256,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 if re.search(ws, value):
                     token_stack.append([ttype, value])
                     state = 1
-                elif ttype is Token.Comment:
+                elif ((ttype is Token.Comment) or 
+                  (ttype is Token.Comment.Single)):
                     token_stack.append([ttype, value])
                     state = 2                    
                 else:
@@ -264,7 +270,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
             elif state == 1:
                 # Assume we will never receive two whitespace tokens back to back.
                 assert(not re.search(ws, value))
-                if ttype is Token.Comment:
+                if ((ttype is Token.Comment) or 
+                  (ttype is Token.Comment.Single)):
                     token_stack.append([ttype, value])
                     state = 2
                 else:
@@ -277,7 +284,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace>
                 assert(not re.search(ws, value))
                 # For now, assume we will never receive two comment tokens back to back. TODO: this could happen in C, perhaps as a /*blah*//*blah*/.
-                assert(ttype is not Token.Comment)
+                assert( (ttype is not Token.Comment) and
+                  (ttype is not Token.Comment.Single) )
                 if value == '\n':
                     token_stack.append([ttype, value])
                     state = 3
@@ -291,7 +299,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 if re.search(ws, value):
                     token_stack.append([ttype, value])
                     state = 4
-                elif ttype is Token.Comment:
+                elif ((ttype is Token.Comment) or 
+                  (ttype is Token.Comment.Single)):
                     # Combine two comments into a single comment by modifying the value of the first comment token
                     token_stack[-2][1] = (''.join([ts[1] for ts in
                       token_stack[-2:]]) + value)
@@ -306,7 +315,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
             elif state == 4:
                 # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace>
                 assert(not re.search(ws, value))
-                if ttype is Token.Comment:
+                if ((ttype is Token.Comment) or 
+                  (ttype is Token.Comment.Single)):
                     # Combine two comments into a single comment by modifying the value of the first comment token<br />
                     # First, determine if we need to merge the previous three or the previous two entries on the stack (state transition 2, 3, 4 vs. 2, 4)
                     if re.search(ws, token_stack[-1][1]):
@@ -367,7 +377,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
 
             # <a name="no_escape"></a>BAJ: If this is a comment, assume we're already using HTML and
             # don't need to escape characters.
-            if ttype is Token.Comment:
+            if ((ttype is Token.Comment) or 
+              (ttype is Token.Comment.Single)):
                 # Remove the comment character (and one space, if it's there)
                 value = re.sub(regexp, r'\1', value)
                 # Don't split, since we merge multi-line comments
@@ -425,13 +436,16 @@ DefaultStyle.styles[Comment] = "#408080"
 class CodeToHtmlStyle(DefaultStyle):
     pass
 
+
+from pygments.lexers import get_lexer_for_filename
 # <a name="def_CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToHtml(baseFileName):
-    code = open(baseFileName + '.py', 'r').read()
+    in_file_name = baseFileName + source_extension
+    code = open(in_file_name, 'r').read()
     formatter = CodeToHtmlFormatter(full=True, nobackground=True,
                                     style=CodeToHtmlStyle)
     outfile = open(baseFileName + '.html', 'w')
-    hi_code = highlight(code, PythonLexer(), formatter)
+    hi_code = highlight(code, get_lexer_for_filename(in_file_name), formatter)
     # Remove a little goop created by the full=True option above
     hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
     # Force an &lt;pre&gt; tag to occupy one line, instead of collapsing to an empty element, with <code>min-height: 1em</code>. Make it single spaced instead of the default double spacing with <code>margin: 0px</code>.<br />
@@ -565,7 +579,7 @@ class HtmlToCodeTranslator(object):
                 state = self.State.inPre
             elif ((state == self.State.inPre) and
                   ('class' in attrs) and
-                  (attrs['class'] == 'c')):
+                  ((attrs['class'] == 'c') or (attrs['class'] == 'c1'))):
                 state = self.State.inComment
                 L.append(comment_string)
             elif state != self.State.inPre:
@@ -774,26 +788,31 @@ def test(one_test):
 # Use the HtmlToCodeTranslator class to translate a specific file.
 def HtmlToCode(baseFileName):
     code = open(baseFileName + '.html', 'r').read()
-    outfile = open(baseFileName + '.py', 'w')
+    outfile = open(baseFileName + source_extension, 'w')
     xl = HtmlToCodeTranslator()
     outfile.write(xl.translate(code))
-    print('Wrote ' + baseFileName + '.py')
+    print('Wrote ' + baseFileName + source_extension)
 
 
+import os
 def convert(baseFileName):
-    st_py =   os.stat(baseFileName + '.py')
-    st_html = os.stat(baseFileName + '.html')
-    if   st_py.st_mtime > st_html.st_mtime:
-        print('Py newer')
+    source_file_name = baseFileName + source_extension
+    html_file_name = baseFileName + '.html'
+    source_time = os.stat(source_file_name).st_mtime \
+      if os.path.exists(source_file_name) else 0
+    html_time = os.stat(html_file_name).st_mtime \
+      if os.path.exists(html_file_name) else 0
+    if source_time > html_time:
+        print('Source newer')
         CodeToHtml(baseFileName)
-    elif st_py.st_mtime < st_html.st_mtime:
+    elif source_time < html_time:
         print('HTML newer')
         HtmlToCode(baseFileName)
     else:
         print('Time is identical -- giving up')
 
 # Run interface
-import os
 if __name__ == '__main__':
 #    test(one_test = False)
-    convert('pyg')
+#    convert('pyg')
+    convert('winclient')
