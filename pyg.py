@@ -161,7 +161,6 @@
 #          through the formatting pipeline in the two preceeding
 #          steps.</li></ol>
 from pygments import highlight
-from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 from pygments.formatters.html import _escape_html_table
 from pygments.token import Token
@@ -170,7 +169,8 @@ import re
 # The string indicating a comment in the chosen programming language. This must
 # end in a space for the regular expression in _format_lines1 to work. The space
 # also makes the output a bit prettier.
-comment_string = '# '
+#comment_string = '# '
+comment_string = '// '
 
 
 # File extension for the source file
@@ -224,7 +224,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
 
     # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. It also wraps each line in a &lt;pre&gt; tag.<br />
     def _format_lines(self, token_source):
-        merged_token_source = self._merge_comments(token_source)
+        nl_token_source = self._expand_nl(token_source)
+        merged_token_source = self._merge_comments(nl_token_source)
         source = self._format_lines1(merged_token_source)
         for is_code, line in source:
             if is_code and line.endswith('\n'):
@@ -232,9 +233,22 @@ class CodeToHtmlFormatter(HtmlFormatter):
             else:
                 yield is_code, line
                 
+    def _expand_nl(self, token_source):
+        # Break any comments ending in a newline into two separate tokens
+        for ttype, value in token_source:
+            if (ttype == Token.Comment.Single) and value.endswith('\n'):
+                yield ttype, value[:-1]
+                yield Token.Text, u'\n'
+            else:
+                yield ttype, value
+                
     # <h3>Merge multi-line comments</h3>
-    # This routine takes tokens as its input, combining multiple lines of single-line comments separated
-    # only by a newline into a single comment token. It's structured as a state machine, per the diagram below. Essentially, the machine looks for a multiline comment, which consists of: a newline, optional whitespace, a comment, a newline, optional whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
+    # This routine takes tokens as its input, combining multiple lines of
+    # single-line comments separated only by a newline into a single comment
+    # token. It's structured as a state machine, per the diagram below.
+    # Essentially, the machine looks for a multiline comment, which consists
+    # of: a newline, optional whitespace, a comment, newline, optional
+    # whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
     # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that nl / yield all tokens means that if a newline (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
     def _merge_comments(self, token_source):
         # Keep a history of tokens; if we can't combine then, then yield a
@@ -251,7 +265,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
         # <br />5 - waiting for a newline
         state = 0
         for ttype, value in token_source:
-#            print state, ttype, value
+#            print state, ttype, '"%s"' % value, token_stack
             if state == 0:
                 if re.search(ws, value):
                     token_stack.append([ttype, value])
@@ -259,7 +273,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 elif ((ttype is Token.Comment) or 
                   (ttype is Token.Comment.Single)):
                     token_stack.append([ttype, value])
-                    state = 2                    
+                    state = 2
                 else:
                     # While the code sequence to yield all tokens is repeated frequently and hence an excellent candidate for a function, the requirement of a yield keeps it from being easily placed in a function. So, I've just used a copy and paste approach instead.
                     for t in token_stack:
@@ -301,11 +315,20 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     state = 4
                 elif ((ttype is Token.Comment) or 
                   (ttype is Token.Comment.Single)):
-                    # Combine two comments into a single comment by modifying the value of the first comment token
-                    token_stack[-2][1] = (''.join([ts[1] for ts in
-                      token_stack[-2:]]) + value)
-                    del token_stack[-1]
-                    state = 2
+                    # See if two comments can be combined. The second comment (in value) has no whitespace, so the first comment shouldn't either. In this case, the token_stack should have 2 elements: comment, newline. If it has 3 elements (ws, comment, newline, comment), don't combine.
+                    if len(token_stack) == 2:
+                        token_stack[0][1] += '\n' + value
+                        del token_stack[1]
+                        state = 2
+                    else:
+                        assert(len(token_stack) == 3)
+                        # Can't merge, so yield first comment
+                        for i in range(3):
+                            yield token_stack[0]
+                            del token_stack[0]
+                        # and save the second comment on the stack
+                        token_stack.append([ttype, value])
+                        state = 2
                 else:
                     for t in token_stack:
                         yield t
@@ -317,16 +340,21 @@ class CodeToHtmlFormatter(HtmlFormatter):
                 assert(not re.search(ws, value))
                 if ((ttype is Token.Comment) or 
                   (ttype is Token.Comment.Single)):
-                    # Combine two comments into a single comment by modifying the value of the first comment token<br />
-                    # First, determine if we need to merge the previous three or the previous two entries on the stack (state transition 2, 3, 4 vs. 2, 4)
-                    if re.search(ws, token_stack[-1][1]):
-                        i = -3
+                    # See if two comments can be combined.  The second comment has no whitespace; the first comment must have the same anount of whitespace. In this case, token_stack should have 4 elemements: ws, comment, nl, ws.
+                    if (len(token_stack) == 4 and 
+                       (token_stack[0][1] == token_stack[3][1])):
+                        token_stack[1][1] += '\n' + token_stack[3][1] + value
+                        del token_stack[2]
+                        del token_stack[2]
+                        state = 2
                     else:
-                        i = -2
-                    token_stack[i][1] = (''.join([ts[1] for ts in
-                      token_stack[i:]]) + value)
-                    del token_stack[i + 1:]
-                    state = 2
+                        # Can't merge, so yield first comment
+                        for i in range(len(token_stack) - 1):
+                            yield token_stack[0]
+                            del token_stack[0]
+                        # and save the second comment on the stack
+                        token_stack.append([ttype, value])
+                        state = 2
                 else:
                     for t in token_stack:
                         yield t
@@ -445,7 +473,8 @@ def CodeToHtml(baseFileName):
     formatter = CodeToHtmlFormatter(full=True, nobackground=True,
                                     style=CodeToHtmlStyle)
     outfile = open(baseFileName + '.html', 'w')
-    hi_code = highlight(code, get_lexer_for_filename(in_file_name), formatter)
+    lexer = get_lexer_for_filename(in_file_name)
+    hi_code = highlight(code, lexer, formatter)
     # Remove a little goop created by the full=True option above
     hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
     # Force an &lt;pre&gt; tag to occupy one line, instead of collapsing to an empty element, with <code>min-height: 1em</code>. Make it single spaced instead of the default double spacing with <code>margin: 0px</code>.<br />
@@ -714,12 +743,22 @@ class TestHtmlToCode(unittest.TestCase):
         s = self.xlate('<pre>  <span class="c">comment1\n  comment2</span></pre>')
         self.assertEquals(s, '  # comment1\n  # comment2')
 
+from pygments.lexers import PythonLexer, CLexer, CppLexer
 
 class TestCodeToHtml(unittest.TestCase):
     def hilight(self, s):
+        global comment_string
+        comment_string = '# '
         formatter = CodeToHtmlFormatter(nobackground=True)
         html = highlight(s, PythonLexer(), formatter)
         return html.replace("<pre>", "").replace("</pre>", "")
+        
+    def c_hilight(self, s):
+        global comment_string
+        comment_string = '// '
+        formatter = CodeToHtmlFormatter(nobackground=True)
+        html = highlight(s, CppLexer(), formatter)
+        return html
         
     # State machine test: transition from state 0 to 5
     def test_sm1(self):
@@ -775,11 +814,24 @@ class TestCodeToHtml(unittest.TestCase):
         s = self.hilight(" \n # comment1\n # comment2")
         self.assertEqual(s, ' \n <span class="c">comment1\n comment2</span>\n')
         
+    def test_0(self):
+        s = self.c_hilight('// Comment')
+        self.assertEqual(s, '<pre><span class="c1">Comment</span></pre>\n')
+
+    # TODO: Not parsed correctly: it comes across as a Token.Comment.Preproc        
+    def atest_1(self):
+        s = self.c_hilight('// comment\n#define blah 1')
+        self.assertEqual(s, '<pre><span class="cp">// comment</span></pre>\n<pre><span class="c1">#define blah 1</span></pre>\n')
+        
+    def test_2(self):
+        s = self.c_hilight('// comment1\n// comment2\n')
+        self.assertEqual(s, '<pre><span class="c1">comment1\ncomment2</span></pre>\n')
+        
 def test(one_test):
     if one_test:
         ts = unittest.TestSuite()
-#        ts.addTest(TestCodeToHtml('test_mlComment8'))
-        ts.addTest(TestHtmlToCode('test_3'))
+        ts.addTest(TestCodeToHtml('test_mlComment7'))
+#        ts.addTest(TestHtmlToCode('test_3'))
         unittest.TextTestRunner().run(ts)
     else:
         unittest.main()
@@ -802,6 +854,7 @@ def convert(baseFileName):
       if os.path.exists(source_file_name) else 0
     html_time = os.stat(html_file_name).st_mtime \
       if os.path.exists(html_file_name) else 0
+    html_time = 0
     if source_time > html_time:
         print('Source newer')
         CodeToHtml(baseFileName)

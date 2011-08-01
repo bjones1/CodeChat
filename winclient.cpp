@@ -6,7 +6,9 @@
 //              message to a server based on the 
 //              command-line arguments that it is given.
 //              It then waits for a response.
-//*******************************************************/
+//*******************************************************
+
+int i;
 
 #include "stdafx.h"
 #include <winsock2.h>
@@ -168,4 +170,4 @@ int _tmain(int argc, char* argv[])
         }
     }
 }
-
+// 
