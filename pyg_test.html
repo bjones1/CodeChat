@@ -1,0 +1,256 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=None">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; margin: 0px; min-height: 1em }
+body .hll { background-color: #ffffcc }
+body .c { font-family: sans-serif; white-space: normal; font-size: small; display: inline-block; width: 5.5in; color: #408080 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #008000; font-weight: bold } /* Keyword */
+body .o { color: #666666 } /* Operator */
+body .cm { color: #408080 } /* Comment.Multiline */
+body .cp { color: #BC7A00 } /* Comment.Preproc */
+body .c1 { font-family: sans-serif; white-space: normal; font-size: small; display: inline-block; width: 5.5in; color: #408080 } /* Comment.Single */
+body .cs { color: #408080 } /* Comment.Special */
+body .gd { color: #A00000 } /* Generic.Deleted */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gr { color: #FF0000 } /* Generic.Error */
+body .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+body .gi { color: #00A000 } /* Generic.Inserted */
+body .go { color: #808080 } /* Generic.Output */
+body .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+body .gt { color: #0040D0 } /* Generic.Traceback */
+body .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+body .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+body .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+body .kp { color: #008000 } /* Keyword.Pseudo */
+body .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+body .kt { color: #B00040 } /* Keyword.Type */
+body .m { color: #666666 } /* Literal.Number */
+body .s { color: #BA2121 } /* Literal.String */
+body .na { color: #7D9029 } /* Name.Attribute */
+body .nb { color: #008000 } /* Name.Builtin */
+body .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+body .no { color: #880000 } /* Name.Constant */
+body .nd { color: #AA22FF } /* Name.Decorator */
+body .ni { color: #999999; font-weight: bold } /* Name.Entity */
+body .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+body .nf { color: #0000FF } /* Name.Function */
+body .nl { color: #A0A000 } /* Name.Label */
+body .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+body .nt { color: #008000; font-weight: bold } /* Name.Tag */
+body .nv { color: #19177C } /* Name.Variable */
+body .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+body .w { color: #bbbbbb } /* Text.Whitespace */
+body .mf { color: #666666 } /* Literal.Number.Float */
+body .mh { color: #666666 } /* Literal.Number.Hex */
+body .mi { color: #666666 } /* Literal.Number.Integer */
+body .mo { color: #666666 } /* Literal.Number.Oct */
+body .sb { color: #BA2121 } /* Literal.String.Backtick */
+body .sc { color: #BA2121 } /* Literal.String.Char */
+body .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+body .s2 { color: #BA2121 } /* Literal.String.Double */
+body .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+body .sh { color: #BA2121 } /* Literal.String.Heredoc */
+body .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+body .sx { color: #008000 } /* Literal.String.Other */
+body .sr { color: #BB6688 } /* Literal.String.Regex */
+body .s1 { color: #BA2121 } /* Literal.String.Single */
+body .ss { color: #19177C } /* Literal.String.Symbol */
+body .bp { color: #008000 } /* Name.Builtin.Pseudo */
+body .vc { color: #19177C } /* Name.Variable.Class */
+body .vg { color: #19177C } /* Name.Variable.Global */
+body .vi { color: #19177C } /* Name.Variable.Instance */
+body .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+  </style>
+</head>
+<body><pre><span class="c">-*- coding: utf-8 -*-<br /></span></pre>
+<pre></pre>
+<pre><span class="kn">from</span> <span class="nn">pyg_module</span> <span class="kn">import</span> <span class="n">CodeToHtmlFormatter</span><span class="p">,</span> <span class="n">HtmlToCodeTranslator</span><span class="p">,</span> <span class="n">comment_string</span></pre>
+<pre><span class="kn">from</span> <span class="nn">BeautifulSoup</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span></pre>
+<pre><span class="kn">from</span> <span class="nn">pygments</span> <span class="kn">import</span> <span class="n">highlight</span></pre>
+<pre><span class="kn">import</span> <span class="nn">unittest</span></pre>
+<pre></pre>
+<pre><span class="c">Test the HTML to code translator</span></pre>
+<pre><span class="k">class</span> <span class="nc">TestHtmlToCode</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span></pre>
+<pre>    <span class="c">Wrap a string in a body tag then translate it</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">xlate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span></pre>
+<pre>        <span class="n">tp</span> <span class="o">=</span> <span class="n">HtmlToCodeTranslator</span><span class="p">()</span></pre>
+<pre>        <span class="k">return</span> <span class="n">tp</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s">&quot;&lt;body&gt;&quot;</span> <span class="o">+</span> <span class="n">s</span> <span class="o">+</span> <span class="s">&quot;&lt;/body&gt;&quot;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">test_strTag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="s">&#39;&lt;html&gt;boink&lt;/html&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="c">contents[0] is the tag parsed by BeautifulSoup</span></pre>
+<pre>        <span class="n">tp</span> <span class="o">=</span> <span class="n">HtmlToCodeTranslator</span><span class="p">()</span></pre>
+<pre>        <span class="n">L</span> <span class="o">=</span> <span class="n">tp</span><span class="o">.</span><span class="n">strTag</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">L</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;&lt;html&gt;&#39;</span><span class="p">,</span> <span class="s">&#39;&lt;/html&gt;&#39;</span><span class="p">])</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">atest_xlComment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;comment&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;# comment&quot;</span><span class="p">)</span></pre>
+<pre>    </pre>
+<pre>    <span class="c">Kinda finshy results here...</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlCode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;&lt;pre&gt;</span><span class="se">\n</span><span class="s">code&lt;/pre&gt;&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">code&quot;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlCodeComment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;&lt;pre&gt;</span><span class="se">\n</span><span class="s">code &lt;span class=c id=1&gt;comment&lt;/span&gt;&lt;/pre&gt;&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">code # comment&quot;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlTaglessCode1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;&lt;pre&gt;</span><span class="se">\n</span><span class="s">&lt;span style=n&gt;code&lt;/span&gt;&lt;/pre&gt;&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">code&quot;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlTaglessCode2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;</span><span class="se">\n</span><span class="s">  &lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;&lt;/pre&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">  code&quot;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">atest_xlCommentCodeComment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;comment1&lt;pre&gt;</span><span class="se">\n</span><span class="s">code &lt;span class=c id=1&gt;&quot;</span> <span class="o">+</span></pre>
+<pre>          <span class="s">&quot;comment2&lt;/span&gt;&lt;/pre&gt;&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;# comment1</span><span class="se">\n</span><span class="s">code # comment2&quot;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">atest_xlWhitespace1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;  comment&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;#   comment&quot;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlWhitespace2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&quot;&lt;pre&gt;</span><span class="se">\n</span><span class="s">    code1</span><span class="se">\n</span><span class="s">    code2&lt;/pre&gt;&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">    code1</span><span class="se">\n</span><span class="s">    code2&quot;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="c">TODO: can't find a text case whose whitespace isn't eaten. Blah.</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">atest_MultiLineTag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;span</span><span class="se">\n</span><span class="s">  style=&quot;c&quot;&gt;comment&lt;/span&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;# &lt;span</span><span class="se">\n</span><span class="s">#  style=&quot;c&quot;&gt;comment&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlWhitespace4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;</span><span class="se">\n</span><span class="s">  &lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span></pre>
+<pre>          <span class="s">&#39;  comment2&lt;/span&gt;&lt;/pre&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">  # comment1</span><span class="se">\n</span><span class="s">  # comment2&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_xlWhitespace5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;</span><span class="se">\n\n</span><span class="s">  &lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span></pre>
+<pre>          <span class="s">&#39;  comment2&lt;/span&gt;&lt;/pre&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">  # comment1</span><span class="se">\n</span><span class="s">  # comment2&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;  code &lt;span class=&quot;c&quot;&gt;comment&lt;/span&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;  code # comment&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;  &lt;span class=&quot;n&quot;&gt;code&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;comment&lt;/span&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;  code # comment&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;&lt;span class=&quot;c&quot;&gt;comment1&lt;/span&gt;&lt;/pre&gt;</span><span class="se">\n</span><span class="s">&lt;pre&gt;code2&lt;/pre&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;# comment1</span><span class="se">\n</span><span class="s">code2&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">xlate</span><span class="p">(</span><span class="s">&#39;&lt;pre&gt;  &lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s">  comment2&lt;/span&gt;&lt;/pre&gt;&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEquals</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;  # comment1</span><span class="se">\n</span><span class="s">  # comment2&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre><span class="kn">from</span> <span class="nn">pygments.lexers</span> <span class="kn">import</span> <span class="n">PythonLexer</span><span class="p">,</span> <span class="n">CLexer</span><span class="p">,</span> <span class="n">CppLexer</span></pre>
+<pre></pre>
+<pre><span class="k">class</span> <span class="nc">TestCodeToHtml</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">hilight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span></pre>
+<pre>        <span class="k">global</span> <span class="n">comment_string</span></pre>
+<pre>        <span class="n">comment_string</span> <span class="o">=</span> <span class="s">&#39;# &#39;</span></pre>
+<pre>        <span class="n">formatter</span> <span class="o">=</span> <span class="n">CodeToHtmlFormatter</span><span class="p">(</span><span class="n">nobackground</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></pre>
+<pre>        <span class="n">html</span> <span class="o">=</span> <span class="n">highlight</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">PythonLexer</span><span class="p">(),</span> <span class="n">formatter</span><span class="p">)</span></pre>
+<pre>        <span class="k">return</span> <span class="n">html</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;&lt;pre&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;&lt;/pre&gt;&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">c_hilight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span></pre>
+<pre>        <span class="k">global</span> <span class="n">comment_string</span></pre>
+<pre>        <span class="n">comment_string</span> <span class="o">=</span> <span class="s">&#39;// &#39;</span></pre>
+<pre>        <span class="n">formatter</span> <span class="o">=</span> <span class="n">CodeToHtmlFormatter</span><span class="p">(</span><span class="n">nobackground</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></pre>
+<pre>        <span class="n">html</span> <span class="o">=</span> <span class="n">highlight</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">CppLexer</span><span class="p">(),</span> <span class="n">formatter</span><span class="p">)</span></pre>
+<pre>        <span class="k">return</span> <span class="n">html</span></pre>
+<pre>        </pre>
+<pre>    <span class="c">State machine test: transition from state 0 to 5</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_sm1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;code&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>    </pre>
+<pre>    <span class="c">State machine test: 0, 1, 5</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_sm2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot; code&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39; &lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="c">State machine test: 0, 1, 2, 5</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_sm3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot; # comment</span><span class="se">\n</span><span class="s">code&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39; &lt;span class=&quot;c&quot;&gt;comment&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> </pre>
+<pre>          <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>                </pre>
+<pre>    <span class="c">State machine test: 0, 2, 5</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_sm4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;# comment</span><span class="se">\n</span><span class="s">code&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;c&quot;&gt;comment&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> </pre>
+<pre>          <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>                </pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;# comment1</span><span class="se">\n</span><span class="s"># comment2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s">comment2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;# comment1</span><span class="se">\n\n</span><span class="s"># comment2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;c&quot;&gt;comment1&lt;/span&gt;</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">+</span> </pre>
+<pre>          <span class="s">&#39;&lt;span class=&quot;c&quot;&gt;comment2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment3</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;# comment1</span><span class="se">\n</span><span class="s">code # comment2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;c&quot;&gt;comment1&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> </pre>
+<pre>          <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;comment2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment4</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;  # comment1</span><span class="se">\n</span><span class="s">  # comment2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;  &lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s">  comment2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment5</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;code</span><span class="se">\n\n</span><span class="s"># comment1</span><span class="se">\n</span><span class="s"># comment2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code&lt;/span&gt;</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">+</span> </pre>
+<pre>          <span class="s">&#39;&lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s">comment2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment6</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot;code1</span><span class="se">\n\n</span><span class="s">code2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code1&lt;/span&gt;</span><span class="se">\n\n</span><span class="s">&#39;</span> <span class="o">+</span> </pre>
+<pre>          <span class="s">&#39;&lt;span class=&quot;n&quot;&gt;code2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="k">def</span> <span class="nf">test_mlComment7</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hilight</span><span class="p">(</span><span class="s">&quot; </span><span class="se">\n</span><span class="s"> # comment1</span><span class="se">\n</span><span class="s"> # comment2&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39; </span><span class="se">\n</span><span class="s"> &lt;span class=&quot;c&quot;&gt;comment1</span><span class="se">\n</span><span class="s"> comment2&lt;/span&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">test_0</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_hilight</span><span class="p">(</span><span class="s">&#39;// Comment&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;pre&gt;&lt;span class=&quot;c1&quot;&gt;Comment&lt;/span&gt;&lt;/pre&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="c">TODO: Not parsed correctly: it comes across as a Token.Comment.Preproc        </span></pre>
+<pre>    <span class="k">def</span> <span class="nf">atest_1</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_hilight</span><span class="p">(</span><span class="s">&#39;// comment</span><span class="se">\n</span><span class="s">#define blah 1&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;pre&gt;&lt;span class=&quot;cp&quot;&gt;// comment&lt;/span&gt;&lt;/pre&gt;</span><span class="se">\n</span><span class="s">&lt;pre&gt;&lt;span class=&quot;c1&quot;&gt;#define blah 1&lt;/span&gt;&lt;/pre&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>        </pre>
+<pre>    <span class="k">def</span> <span class="nf">test_2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_hilight</span><span class="p">(</span><span class="s">&#39;// comment1</span><span class="se">\n</span><span class="s">// comment2</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">&#39;&lt;pre&gt;&lt;span class=&quot;c1&quot;&gt;comment1</span><span class="se">\n</span><span class="s">comment2&lt;/span&gt;&lt;/pre&gt;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre><span class="n">one_test</span> <span class="o">=</span> <span class="bp">False</span>        </pre>
+<pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span></pre>
+<pre>    <span class="k">if</span> <span class="n">one_test</span><span class="p">:</span></pre>
+<pre>        <span class="n">ts</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestSuite</span><span class="p">()</span></pre>
+<pre>        <span class="n">ts</span><span class="o">.</span><span class="n">addTest</span><span class="p">(</span><span class="n">TestCodeToHtml</span><span class="p">(</span><span class="s">&#39;test_mlComment7&#39;</span><span class="p">))</span></pre>
+<pre><span class="c">       ts.addTest(TestHtmlToCode('test_3'))</span></pre>
+<pre>        <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">()</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span></pre>
+<pre>    <span class="k">else</span><span class="p">:</span></pre>
+<pre>        <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span></pre>
+</body>
+</html>

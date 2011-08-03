@@ -1,0 +1,573 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+<head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=None">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; margin: 0px; min-height: 1em }
+body .hll { background-color: #ffffcc }
+body .c { font-family: sans-serif; white-space: normal; font-size: small; display: inline-block; width: 5.5in; color: #408080 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #008000; font-weight: bold } /* Keyword */
+body .o { color: #666666 } /* Operator */
+body .cm { color: #408080 } /* Comment.Multiline */
+body .cp { color: #BC7A00 } /* Comment.Preproc */
+body .c1 { font-family: sans-serif; white-space: normal; font-size: small; display: inline-block; width: 5.5in; color: #408080 } /* Comment.Single */
+body .cs { color: #408080 } /* Comment.Special */
+body .gd { color: #A00000 } /* Generic.Deleted */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gr { color: #FF0000 } /* Generic.Error */
+body .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+body .gi { color: #00A000 } /* Generic.Inserted */
+body .go { color: #808080 } /* Generic.Output */
+body .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+body .gt { color: #0040D0 } /* Generic.Traceback */
+body .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+body .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+body .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+body .kp { color: #008000 } /* Keyword.Pseudo */
+body .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+body .kt { color: #B00040 } /* Keyword.Type */
+body .m { color: #666666 } /* Literal.Number */
+body .s { color: #BA2121 } /* Literal.String */
+body .na { color: #7D9029 } /* Name.Attribute */
+body .nb { color: #008000 } /* Name.Builtin */
+body .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+body .no { color: #880000 } /* Name.Constant */
+body .nd { color: #AA22FF } /* Name.Decorator */
+body .ni { color: #999999; font-weight: bold } /* Name.Entity */
+body .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+body .nf { color: #0000FF } /* Name.Function */
+body .nl { color: #A0A000 } /* Name.Label */
+body .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+body .nt { color: #008000; font-weight: bold } /* Name.Tag */
+body .nv { color: #19177C } /* Name.Variable */
+body .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+body .w { color: #bbbbbb } /* Text.Whitespace */
+body .mf { color: #666666 } /* Literal.Number.Float */
+body .mh { color: #666666 } /* Literal.Number.Hex */
+body .mi { color: #666666 } /* Literal.Number.Integer */
+body .mo { color: #666666 } /* Literal.Number.Oct */
+body .sb { color: #BA2121 } /* Literal.String.Backtick */
+body .sc { color: #BA2121 } /* Literal.String.Char */
+body .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+body .s2 { color: #BA2121 } /* Literal.String.Double */
+body .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+body .sh { color: #BA2121 } /* Literal.String.Heredoc */
+body .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+body .sx { color: #008000 } /* Literal.String.Other */
+body .sr { color: #BB6688 } /* Literal.String.Regex */
+body .s1 { color: #BA2121 } /* Literal.String.Single */
+body .ss { color: #19177C } /* Literal.String.Symbol */
+body .bp { color: #008000 } /* Name.Builtin.Pseudo */
+body .vc { color: #19177C } /* Name.Variable.Class */
+body .vg { color: #19177C } /* Name.Variable.Global */
+body .vi { color: #19177C } /* Name.Variable.Instance */
+body .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+  </style>
+</head>
+<body><pre><span class="c">-*- coding: utf-8 -*-<br />
+<h1>Implementation</h1>
+
+The program consists of two separate portions (code to HTML and HTML
+to code) with a bit of glue code, supplemented with tests.
+
+<h2><a name="Code_to_HTML"></a>Code to HTML</h2>
+
+The code to HTML link consists of modifications to
+<a href="http://pygments.org/">Pygments</a>, a wonderful source
+hilighter. Pygments already provides a lexer to break the input code into
+tokens and an HTML formatter to transform those tokens to HTML, based upon a
+variety of styles. These modification therefore change a bit of functionality
+in the HTML formatter. In particular:
+<ol><li>Comments are indented and typeset in a proportional font in 
+        <a href="#typeset_comments_in_a_proportional_font">_create_stylesheet</a>.</li>
+    <li>Multi-line comments are <a>merged</a> in
+        <a href="#merge_comments">_merge_comments</a>.</li>
+    <li><a href="#_format_lines1">_format_lines1</a> carries out special
+         processing for comments. In particular, comments are assumed to
+         contain HTML, so that <a>no escaping</a> is done on them. In
+         addition, comment #, //, or /* characters are automatically
+         removed during translation to preserve the visual appearance of
+         the document.</li>
+     <li>Each line is wrapped in a &lt;pre&gt; tag in
+         <a href="#_format_lines">_format_lines</a>, after being passed
+         through the formatting pipeline in the two preceeding
+         steps.</li></ol></span></pre>
+<pre><span class="kn">from</span> <span class="nn">pygments.formatters</span> <span class="kn">import</span> <span class="n">HtmlFormatter</span></pre>
+<pre><span class="kn">from</span> <span class="nn">pygments.formatters.html</span> <span class="kn">import</span> <span class="n">_escape_html_table</span></pre>
+<pre><span class="kn">from</span> <span class="nn">pygments.token</span> <span class="kn">import</span> <span class="n">Token</span></pre>
+<pre><span class="kn">import</span> <span class="nn">re</span></pre>
+<pre></pre>
+<pre><span class="c">The string indicating a comment in the chosen programming language. This must
+end in a space for the regular expression in _format_lines1 to work. The space
+also makes the output a bit prettier.</span></pre>
+<pre><span class="n">comment_string</span> <span class="o">=</span> <span class="s">&#39;# &#39;</span></pre>
+<pre><span class="c">comment_string = '// '</span></pre>
+<pre></pre>
+<pre></pre>
+<pre><span class="c">File extension for the source file</span></pre>
+<pre><span class="n">source_extension</span> <span class="o">=</span> <span class="s">&#39;.py&#39;</span></pre>
+<pre><span class="c">source_extension = '.cpp'</span></pre>
+<pre></pre>
+<pre></pre>
+<pre><span class="c">This class converts from source to to HTML. As the <a>overview</a>
+states, this uses Pygments to do most of the work, adding only a formatter
+to that library. Therefore, to use this class, simply select this class
+as the formatter for Pygments (see an example 
+<a href="#def_CodeToHtml">below</a>).<br /></span></pre>
+<pre><span class="k">class</span> <span class="nc">CodeToHtmlFormatter</span><span class="p">(</span><span class="n">HtmlFormatter</span><span class="p">):</span></pre>
+<pre>    <span class="c"><a name="typeset_comments_in_a_proportional_font"></a><h3>Typeset comments</h3>
+    The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. </span></pre>
+<pre>    <span class="k">def</span> <span class="nf">_create_stylesheet</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="n">t2c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttype2class</span> <span class="o">=</span> <span class="p">{</span><span class="n">Token</span><span class="p">:</span> <span class="s">&#39;&#39;</span><span class="p">}</span></pre>
+<pre>        <span class="n">c2s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class2style</span> <span class="o">=</span> <span class="p">{}</span></pre>
+<pre>        <span class="k">for</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">ndef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="p">:</span></pre>
+<pre>            <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_css_class</span><span class="p">(</span><span class="n">ttype</span><span class="p">)</span></pre>
+<pre>            <span class="n">style</span> <span class="o">=</span> <span class="s">&#39;&#39;</span></pre>
+<pre>            <span class="c"><a name="insertedCode"></a><b>BAJ modification</b>: typeset comments nicely. In particular:<br />
+            <ul><li>Because comments are embedded in &lt;pre&gt; text, the <a href="http://www.w3schools.com/cssref/pr_text_white-space.asp">white-space property</a> must be returned to normal to allow line wrapping, consuming of additional space, etc. One concern: now, whitespace in the code will no longer match whitespace in the HTML document.</li>
+            <li>On Chrome and SeaMonkey, the proportional 
+            font is much larger than its corresponding monospaced font used for the 
+            code. Using <code>font-size: small</code> helps. Specifying the font as a percentags 
+            is bad, because if the &lt;span&gt; tags get nested, all fonts in the 
+            nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. However, this either grows the right margin by the indent or causes the entire comment to fall on to the next line, making it hard to read. The addition of <code><span class="s">width: 5.5in</span></code> avoid this problem by limiting the max width of a comment. An ideal solution would be to dynamically set this so the width extends to the edge of the screen, but this would require JavaScript (I think).<br /></li>
+            <li> TODO: No multi-line comment support yet.</li></ul></span></pre>
+<pre>            <span class="k">if</span> <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">):</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;font-family: sans-serif; white-space: normal; &#39;</span> <span class="o">+</span> \</pre>
+<pre>                  <span class="s">&#39;font-size: small; display: inline-block; width: 5.5in; &#39;</span></pre>
+<pre>	    <span class="c">End of modification.</span></pre>
+<pre>            <span class="k">if</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;color&#39;</span><span class="p">]:</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;color: #</span><span class="si">%s</span><span class="s">; &#39;</span> <span class="o">%</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;color&#39;</span><span class="p">]</span></pre>
+<pre>            <span class="k">if</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;bold&#39;</span><span class="p">]:</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;font-weight: bold; &#39;</span></pre>
+<pre>            <span class="k">if</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;italic&#39;</span><span class="p">]:</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;font-style: italic; &#39;</span></pre>
+<pre>            <span class="k">if</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;underline&#39;</span><span class="p">]:</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;text-decoration: underline; &#39;</span></pre>
+<pre>            <span class="k">if</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;bgcolor&#39;</span><span class="p">]:</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;background-color: #</span><span class="si">%s</span><span class="s">; &#39;</span> <span class="o">%</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;bgcolor&#39;</span><span class="p">]</span></pre>
+<pre>            <span class="k">if</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;border&#39;</span><span class="p">]:</span></pre>
+<pre>                <span class="n">style</span> <span class="o">+=</span> <span class="s">&#39;border: 1px solid #</span><span class="si">%s</span><span class="s">; &#39;</span> <span class="o">%</span> <span class="n">ndef</span><span class="p">[</span><span class="s">&#39;border&#39;</span><span class="p">]</span></pre>
+<pre>            <span class="k">if</span> <span class="n">style</span><span class="p">:</span></pre>
+<pre>                <span class="n">t2c</span><span class="p">[</span><span class="n">ttype</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span></pre>
+<pre>                <span class="c">save len(ttype) to enable ordering the styles by
+                hierarchy (necessary for CSS cascading rules!)</span></pre>
+<pre>                <span class="n">c2s</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">style</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">ttype</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ttype</span><span class="p">))</span></pre>
+<pre></pre>
+<pre>    <span class="c">Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. It also wraps each line in a &lt;pre&gt; tag.<br /></span></pre>
+<pre>    <span class="k">def</span> <span class="nf">_format_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_source</span><span class="p">):</span></pre>
+<pre>        <span class="n">nl_token_source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expand_nl</span><span class="p">(</span><span class="n">token_source</span><span class="p">)</span></pre>
+<pre>        <span class="n">merged_token_source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_merge_comments</span><span class="p">(</span><span class="n">nl_token_source</span><span class="p">)</span></pre>
+<pre>        <span class="n">source</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_format_lines1</span><span class="p">(</span><span class="n">merged_token_source</span><span class="p">)</span></pre>
+<pre>        <span class="k">for</span> <span class="n">is_code</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">source</span><span class="p">:</span></pre>
+<pre>            <span class="k">if</span> <span class="n">is_code</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">):</span></pre>
+<pre>                <span class="k">yield</span> <span class="n">is_code</span><span class="p">,</span> <span class="s">&#39;&lt;pre&gt;&#39;</span> <span class="o">+</span> <span class="n">line</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39;&lt;/pre&gt;</span><span class="se">\n</span><span class="s">&#39;</span></pre>
+<pre>            <span class="k">else</span><span class="p">:</span></pre>
+<pre>                <span class="k">yield</span> <span class="n">is_code</span><span class="p">,</span> <span class="n">line</span></pre>
+<pre>                </pre>
+<pre>    <span class="k">def</span> <span class="nf">_expand_nl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_source</span><span class="p">):</span></pre>
+<pre>        <span class="c">Break any comments ending in a newline into two separate tokens</span></pre>
+<pre>        <span class="k">for</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">token_source</span><span class="p">:</span></pre>
+<pre>            <span class="k">if</span> <span class="p">(</span><span class="n">ttype</span> <span class="o">==</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">):</span></pre>
+<pre>                <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></pre>
+<pre>                <span class="k">yield</span> <span class="n">Token</span><span class="o">.</span><span class="n">Text</span><span class="p">,</span> <span class="s">u&#39;</span><span class="se">\n</span><span class="s">&#39;</span></pre>
+<pre>            <span class="k">else</span><span class="p">:</span></pre>
+<pre>                <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span></pre>
+<pre>                </pre>
+<pre>    <span class="c"><h3>Merge multi-line comments</h3>
+    This routine takes tokens as its input, combining multiple lines of
+    single-line comments separated only by a newline into a single comment
+    token. It's structured as a state machine, per the diagram below.
+    Essentially, the machine looks for a multiline comment, which consists
+    of: a newline, optional whitespace, a comment, newline, optional
+    whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
+    <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that nl / yield all tokens means that if a newline (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">_merge_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token_source</span><span class="p">):</span></pre>
+<pre>        <span class="c">Keep a history of tokens; if we can't combine then, then yield a
+        bunch of these.</span></pre>
+<pre>        <span class="n">token_stack</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>        <span class="c">A regular expression for whitespace not containing a newline</span></pre>
+<pre>        <span class="n">ws</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;^[ \t\r\f\v]+$&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="c">The sequence (a state machine) needed to combine comments.<br />
+        0 - at the beginning of a line, now waiting for whitespace (initial state)<br />
+        1 - waiting for a comment
+        <br />2 - waiting for a newline
+        <br />3 - waiting for whitespace or a comment
+        <br />4 - waiting for a comment
+        <br />5 - waiting for a newline</span></pre>
+<pre>        <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span></pre>
+<pre>        <span class="k">for</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">token_source</span><span class="p">:</span></pre>
+<pre><span class="c">           print state, ttype, '"%s"' % value, token_stack</span></pre>
+<pre>            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span></pre>
+<pre>                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span></pre>
+<pre>                    <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">1</span></pre>
+<pre>                <span class="k">elif</span> <span class="p">((</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">or</span> </pre>
+<pre>                  <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)):</span></pre>
+<pre>                    <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="c">While the code sequence to yield all tokens is repeated frequently and hence an excellent candidate for a function, the requirement of a yield keeps it from being easily placed in a function. So, I've just used a copy and paste approach instead.</span></pre>
+<pre>                    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">token_stack</span><span class="p">:</span></pre>
+<pre>                        <span class="k">yield</span> <span class="n">t</span></pre>
+<pre>                    <span class="n">token_stack</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>                    <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">else</span> <span class="mi">5</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span></pre>
+<pre>                <span class="c">Assume we will never receive two whitespace tokens back to back.</span></pre>
+<pre>                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span></pre>
+<pre>                <span class="k">if</span> <span class="p">((</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">or</span> </pre>
+<pre>                  <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)):</span></pre>
+<pre>                    <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">token_stack</span><span class="p">:</span></pre>
+<pre>                        <span class="k">yield</span> <span class="n">t</span></pre>
+<pre>                    <span class="n">token_stack</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>                    <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">else</span> <span class="mi">5</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span></pre>
+<pre>                <span class="c">For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace></span></pre>
+<pre>                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span></pre>
+<pre>                <span class="c">For now, assume we will never receive two comment tokens back to back. TODO: this could happen in C, perhaps as a /*blah*//*blah*/.</span></pre>
+<pre>                <span class="k">assert</span><span class="p">(</span> <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">and</span></pre>
+<pre>                  <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)</span> <span class="p">)</span></pre>
+<pre>                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">:</span></pre>
+<pre>                    <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">3</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">token_stack</span><span class="p">:</span></pre>
+<pre>                        <span class="k">yield</span> <span class="n">t</span></pre>
+<pre>                    <span class="n">token_stack</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>                    <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">5</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span></pre>
+<pre>                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span></pre>
+<pre>                    <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">4</span></pre>
+<pre>                <span class="k">elif</span> <span class="p">((</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">or</span> </pre>
+<pre>                  <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)):</span></pre>
+<pre>                    <span class="c">See if two comments can be combined. The second comment (in value) has no whitespace, so the first comment shouldn't either. In this case, the token_stack should have 2 elements: comment, newline. If it has 3 elements (ws, comment, newline, comment), don't combine.</span></pre>
+<pre>                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">token_stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span></pre>
+<pre>                        <span class="n">token_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">value</span></pre>
+<pre>                        <span class="k">del</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></pre>
+<pre>                        <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span></pre>
+<pre>                    <span class="k">else</span><span class="p">:</span></pre>
+<pre>                        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">token_stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span></pre>
+<pre>                        <span class="c">Can't merge, so yield first comment</span></pre>
+<pre>                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span></pre>
+<pre>                            <span class="k">yield</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></pre>
+<pre>                            <span class="k">del</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></pre>
+<pre>                        <span class="c">and save the second comment on the stack</span></pre>
+<pre>                        <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                        <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">token_stack</span><span class="p">:</span></pre>
+<pre>                        <span class="k">yield</span> <span class="n">t</span></pre>
+<pre>                    <span class="n">token_stack</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>                    <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span>                </pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">else</span> <span class="mi">5</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span></pre>
+<pre>                <span class="c">For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace></span></pre>
+<pre>                <span class="k">assert</span><span class="p">(</span><span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">ws</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span></pre>
+<pre>                <span class="k">if</span> <span class="p">((</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">or</span> </pre>
+<pre>                  <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)):</span></pre>
+<pre>                    <span class="c">See if two comments can be combined.  The second comment has no whitespace; the first comment must have the same anount of whitespace. In this case, token_stack should have 4 elemements: ws, comment, nl, ws.</span></pre>
+<pre>                    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">token_stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span> <span class="ow">and</span> </pre>
+<pre>                       <span class="p">(</span><span class="n">token_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">])):</span></pre>
+<pre>                        <span class="n">token_stack</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">value</span></pre>
+<pre>                        <span class="k">del</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></pre>
+<pre>                        <span class="k">del</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span></pre>
+<pre>                        <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span></pre>
+<pre>                    <span class="k">else</span><span class="p">:</span></pre>
+<pre>                        <span class="c">Can't merge, so yield first comment</span></pre>
+<pre>                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">token_stack</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span></pre>
+<pre>                            <span class="k">yield</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></pre>
+<pre>                            <span class="k">del</span> <span class="n">token_stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></pre>
+<pre>                        <span class="c">and save the second comment on the stack</span></pre>
+<pre>                        <span class="n">token_stack</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">ttype</span><span class="p">,</span> <span class="n">value</span><span class="p">])</span></pre>
+<pre>                        <span class="n">state</span> <span class="o">=</span> <span class="mi">2</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">token_stack</span><span class="p">:</span></pre>
+<pre>                        <span class="k">yield</span> <span class="n">t</span></pre>
+<pre>                    <span class="n">token_stack</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>                    <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="k">else</span> <span class="mi">5</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">state</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span></pre>
+<pre>                <span class="k">yield</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span></pre>
+<pre>                <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">:</span></pre>
+<pre>                    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span></pre>
+<pre>            <span class="k">else</span><span class="p">:</span></pre>
+<pre>                <span class="k">assert</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span></pre>
+<pre>                </pre>
+<pre>        <span class="c">When out of tokens, pull any remaining from the stack</span></pre>
+<pre>        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">token_stack</span><span class="p">:</span></pre>
+<pre>            <span class="k">yield</span> <span class="n">t</span></pre>
+<pre>        </pre>
+<pre>    <span class="c"><h3>Special processing for comments</h3>
+    Copied verbatim from Pygments' _format_lines, then modified to
+    not escape comments and remove inital comment chars</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">_format_lines1</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokensource</span><span class="p">):</span></pre>
+<pre>        <span class="sd">&quot;&quot;&quot;</span></pre>
+<pre><span class="sd">        Just format the tokens, without any wrapping tags.</span></pre>
+<pre><span class="sd">        Yield individual lines.</span></pre>
+<pre><span class="sd">        &quot;&quot;&quot;</span></pre>
+<pre>        <span class="c">BAJ: regular expression to remove comment chars</span></pre>
+<pre>        <span class="n">regexp</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;(^[ \t]*)&#39;</span> <span class="o">+</span> <span class="n">comment_string</span> <span class="o">+</span> <span class="s">&#39;?&#39;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">MULTILINE</span><span class="p">)</span>        </pre>
+<pre>        </pre>
+<pre>        <span class="n">nocls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">noclasses</span></pre>
+<pre>        <span class="n">lsep</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lineseparator</span></pre>
+<pre>        <span class="c">for &lt;span style=""&gt; lookup only</span></pre>
+<pre>        <span class="n">getcls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ttype2class</span><span class="o">.</span><span class="n">get</span></pre>
+<pre>        <span class="n">c2s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class2style</span></pre>
+<pre>        <span class="n">escape_table</span> <span class="o">=</span> <span class="n">_escape_html_table</span></pre>
+<pre></pre>
+<pre>        <span class="n">lspan</span> <span class="o">=</span> <span class="s">&#39;&#39;</span></pre>
+<pre>        <span class="n">line</span> <span class="o">=</span> <span class="s">&#39;&#39;</span></pre>
+<pre>        <span class="k">for</span> <span class="n">ttype</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">tokensource</span><span class="p">:</span></pre>
+<pre>            <span class="k">if</span> <span class="n">nocls</span><span class="p">:</span></pre>
+<pre>                <span class="n">cclass</span> <span class="o">=</span> <span class="n">getcls</span><span class="p">(</span><span class="n">ttype</span><span class="p">)</span></pre>
+<pre>                <span class="k">while</span> <span class="n">cclass</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span></pre>
+<pre>                    <span class="n">ttype</span> <span class="o">=</span> <span class="n">ttype</span><span class="o">.</span><span class="n">parent</span></pre>
+<pre>                    <span class="n">cclass</span> <span class="o">=</span> <span class="n">getcls</span><span class="p">(</span><span class="n">ttype</span><span class="p">)</span></pre>
+<pre>                <span class="n">cspan</span> <span class="o">=</span> <span class="n">cclass</span> <span class="ow">and</span> <span class="s">&#39;&lt;span style=&quot;</span><span class="si">%s</span><span class="s">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="n">c2s</span><span class="p">[</span><span class="n">cclass</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span></pre>
+<pre>            <span class="k">else</span><span class="p">:</span></pre>
+<pre>                <span class="n">cls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_css_class</span><span class="p">(</span><span class="n">ttype</span><span class="p">)</span></pre>
+<pre>                <span class="n">cspan</span> <span class="o">=</span> <span class="n">cls</span> <span class="ow">and</span> <span class="s">&#39;&lt;span class=&quot;</span><span class="si">%s</span><span class="s">&quot;&gt;&#39;</span> <span class="o">%</span> <span class="n">cls</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span></pre>
+<pre></pre>
+<pre>            <span class="c"><a name="no_escape"></a>BAJ: If this is a comment, assume we're already using HTML and
+            don't need to escape characters.</span></pre>
+<pre>            <span class="k">if</span> <span class="p">((</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="p">)</span> <span class="ow">or</span> </pre>
+<pre>              <span class="p">(</span><span class="n">ttype</span> <span class="ow">is</span> <span class="n">Token</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">Single</span><span class="p">)):</span></pre>
+<pre>                <span class="c">Remove the comment character (and one space, if it's there)</span></pre>
+<pre>                <span class="n">value</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">regexp</span><span class="p">,</span> <span class="s">r&#39;\1&#39;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></pre>
+<pre>                <span class="c">Don't split, since we merge multi-line comments</span></pre>
+<pre>                <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span></pre>
+<pre>                <span class="c">Kludge to get line numbers to be correct, though annoying.</span></pre>
+<pre>                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)):</span></pre>
+<pre>                    <span class="k">yield</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;&#39;</span></pre>
+<pre>            <span class="k">else</span><span class="p">:</span></pre>
+<pre>                <span class="n">parts</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">escape_table</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>            <span class="c">for all but the last line</span></pre>
+<pre>            <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span></pre>
+<pre>                <span class="k">if</span> <span class="n">line</span><span class="p">:</span></pre>
+<pre>                    <span class="k">if</span> <span class="n">lspan</span> <span class="o">!=</span> <span class="n">cspan</span><span class="p">:</span></pre>
+<pre>                        <span class="n">line</span> <span class="o">+=</span> <span class="p">(</span><span class="n">lspan</span> <span class="ow">and</span> <span class="s">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">cspan</span> <span class="o">+</span> <span class="n">part</span> <span class="o">+</span> \</pre>
+<pre>                                <span class="p">(</span><span class="n">cspan</span> <span class="ow">and</span> <span class="s">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">lsep</span></pre>
+<pre>                    <span class="k">else</span><span class="p">:</span> <span class="c">both are the same</span></pre>
+<pre>                        <span class="n">line</span> <span class="o">+=</span> <span class="n">part</span> <span class="o">+</span> <span class="p">(</span><span class="n">lspan</span> <span class="ow">and</span> <span class="s">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">lsep</span></pre>
+<pre>                    <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">line</span></pre>
+<pre>                    <span class="n">line</span> <span class="o">=</span> <span class="s">&#39;&#39;</span></pre>
+<pre>                <span class="k">elif</span> <span class="n">part</span><span class="p">:</span></pre>
+<pre>                    <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cspan</span> <span class="o">+</span> <span class="n">part</span> <span class="o">+</span> <span class="p">(</span><span class="n">cspan</span> <span class="ow">and</span> <span class="s">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">lsep</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">lsep</span></pre>
+<pre>            <span class="c">for the last line</span></pre>
+<pre>            <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span></pre>
+<pre>                <span class="k">if</span> <span class="n">lspan</span> <span class="o">!=</span> <span class="n">cspan</span><span class="p">:</span></pre>
+<pre>                    <span class="n">line</span> <span class="o">+=</span> <span class="p">(</span><span class="n">lspan</span> <span class="ow">and</span> <span class="s">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">cspan</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></pre>
+<pre>                    <span class="n">lspan</span> <span class="o">=</span> <span class="n">cspan</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="n">line</span> <span class="o">+=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span></pre>
+<pre>                <span class="n">line</span> <span class="o">=</span> <span class="n">cspan</span> <span class="o">+</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></pre>
+<pre>                <span class="n">lspan</span> <span class="o">=</span> <span class="n">cspan</span></pre>
+<pre>            <span class="c">else we neither have to open a new span nor set lspan</span></pre>
+<pre></pre>
+<pre>        <span class="k">if</span> <span class="n">line</span><span class="p">:</span></pre>
+<pre>            <span class="k">yield</span> <span class="mi">1</span><span class="p">,</span> <span class="n">line</span> <span class="o">+</span> <span class="p">(</span><span class="n">lspan</span> <span class="ow">and</span> <span class="s">&#39;&lt;/span&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">lsep</span></pre>
+<pre></pre>
+<pre>    <span class="c">By default, the html formatter wraps the code in a div and a pre.
+    Don't wrap it at all.</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">outfile</span><span class="p">):</span></pre>
+<pre>        <span class="k">return</span> <span class="n">source</span></pre>
+<pre>        </pre>
+<pre></pre>
+<pre><span class="c"><br />
+<h2><a name="CodeToHtml_overview"></a>HTML to Code<br />
+</h2>
+
+
+
+    The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>.
+    Some simplifying assumptions about the structure of the HTML
+    document:<br />
+<ul>
+<li>All code must be wrapped in a &lt;pre&gt;.<br />
+</li><li>All comments are wrapped in &lt;span class="c"&gt; or appear
+        as body text. Comments contain HTML.<br />
+</li><li>On a line, all code must come first, optionally followed by a
+        comment. Code may never follow a comment on a single line
+        (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
+        tag) is discarded, to be regenerated when code is translated
+        back to HTML.<br />
+</li>
+</ul>
+
+
+
+    With this, body text is comment; &lt;pre&gt; begins discarding all
+    tags and emits only text until a comment tag, which outputs its
+    entire subtree as a comment (including any code-tagged text).
+    Newlines can be echoed without modification whether in code or
+    comment mode.<br />
+<h3>The implementation</h3>
+<ol>
+<li>The HTML document is parsed, then only the &lt;body&gt; tag
+        contents <a>translated</a>.</li><li><a>All comments</a> (body text or
+        anything in a &lt;span class="c"&gt; tag) are prepended with a
+        comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
+        &lt;pre&gt; tag from the beginning of the line to the first
+        &lt;span class="c") tag) is stripped of HTML tags, HTML
+        unescaped, then written.</li>
+</ol>
+Beautiful Soup v3.x version</span></pre>
+<pre><span class="kn">from</span> <span class="nn">BeautifulSoup</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span><span class="p">,</span> <span class="n">Tag</span><span class="p">,</span> <span class="n">NavigableString</span></pre>
+<pre><span class="c">Beautiful Soup v4.x version
+from bs4 import BeautifulSoup, Tag, NavigableString
+from bs4.builder import HTMLTreeBuilder</span></pre>
+<pre></pre>
+<pre><span class="k">class</span> <span class="nc">HtmlToCodeTranslator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span></pre>
+<pre>    <span class="c">Dumb enum. Might want to use the smart one at http://code.activestate.com/recipes/413486/ instead.</span></pre>
+<pre>    <span class="k">class</span> <span class="nc">State</span><span class="p">:</span> <span class="n">outsidePre</span><span class="p">,</span> <span class="n">inPre</span><span class="p">,</span> <span class="n">inComment</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span></pre>
+<pre>    </pre>
+<pre>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">State</span> <span class="o">=</span> <span class="n">HtmlToCodeTranslator</span><span class="o">.</span><span class="n">State</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="s">&#39;&#39;</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">indent_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">r&#39;([ \t\r\f\v]*)$&#39;</span><span class="p">)</span></pre>
+<pre>        <span class="bp">self</span><span class="o">.</span><span class="n">at_newline</span> <span class="o">=</span> <span class="bp">True</span></pre>
+<pre>        </pre>
+<pre>    <span class="c"><a name="body_translate"></a>Parse then translate 
+    the body of the given HTML document. Uses a state machine, which really 
+    should be better documented, but here's what I have now.<br />
+    
+    <ul>
+    <li>As a three-state machine: outsidePre (initial state), inPre,
+        inComment.</li><ul><li>outsidePre state:</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>If a tag, check name: pre causes transition to inPre
+        state, dump contents, transition back to outsidePre<br />
+    </li></ul><li>inPre state: output only text, skip all tags.</li><ul><li>If a string, dump raw text</li><li>If a tag, check name: comment tag causes transition to
+        inComment state, insert #, dump contents, transition back<br />
+    </li></ul><li>inComment state: "\n" -&gt; "\n# " for string, recur on
+      contents.</li><ul><li>If a string, "\n" -&gt; "\n# "</li><li>Dump contents</li></ul></ul>
+    </ul></span></pre>
+<pre>    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">HtmlString</span><span class="p">):</span></pre>
+<pre>        <span class="n">soup</span> <span class="o">=</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">HtmlString</span><span class="p">)</span></pre>
+<pre><span class="c">       print soup</span></pre>
+<pre></pre>
+<pre>        <span class="c">For the contents, enter the loop!</span></pre>
+<pre>        <span class="n">L</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">translateBody</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">outsidePre</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">body</span><span class="p">]</span></pre>
+<pre>        <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">L</span><span class="p">)</span></pre>
+<pre></pre>
+<pre>    <span class="c">Translate a chunk of html</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">translateBody</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span></pre>
+<pre><span class="c">       print state, soup, ('"%s"' % self.indent), self.at_newline</span></pre>
+<pre>        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">NavigableString</span><span class="p">):</span></pre>
+<pre>            <span class="k">if</span> <span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">inPre</span><span class="p">:</span></pre>
+<pre>                <span class="c">Update indent -- empty unless this is a newline followed by spaces</span></pre>
+<pre>                <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span></pre>
+<pre>                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indent_re</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span></pre>
+<pre>                <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="n">m</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">at_newline</span><span class="p">)</span> <span class="k">else</span> <span class="s">&#39;&#39;</span></pre>
+<pre>                <span class="n">s</span> <span class="o">=</span> <span class="n">unescape</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></pre>
+<pre>                <span class="bp">self</span><span class="o">.</span><span class="n">at_newline</span> <span class="o">=</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">False</span></pre>
+<pre>                <span class="c">Translate entities in code (but not in comments)</span></pre>
+<pre>                <span class="k">return</span> <span class="n">s</span></pre>
+<pre>                <span class="c">BeautifulSoup 3.x does this, but it eats any leading whitespace. Ouch.<br />
+                return str(BeautifulSoup(s, convertEntities=BeautifulStoneSoup.HTML_ENTITIES))</span></pre>
+<pre>            <span class="k">else</span><span class="p">:</span></pre>
+<pre>                <span class="c">For each line, try to guess an indent before the # character.
+                If an indent isn't found, just put it at the beginning of the line.</span></pre>
+<pre>                <span class="n">s</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span></pre>
+<pre>                <span class="c">Only add comment chars to lines 2 and following. The first line is already taken care of when entering the inComment state.</span></pre>
+<pre>                <span class="n">lines</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span></pre>
+<pre>                <span class="n">L</span> <span class="o">=</span> <span class="p">[</span><span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span></pre>
+<pre>                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span></pre>
+<pre>                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indent</span><span class="p">):</span></pre>
+<pre>                        <span class="c">If the line begins with an indent, insert the comment char after the indent</span></pre>
+<pre>                        <span class="p">(</span><span class="n">indent</span><span class="p">,</span> <span class="n">comment</span><span class="p">)</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indent</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></pre>
+<pre>                        <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indent</span> <span class="o">+</span> <span class="n">comment_string</span> <span class="o">+</span> <span class="n">comment</span><span class="p">)</span></pre>
+<pre>                    <span class="k">else</span><span class="p">:</span></pre>
+<pre>                        <span class="c">Put a comment char at the beginning of the line, unless the next tag is a pre</span></pre>
+<pre>                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">next</span><span class="p">,</span> <span class="n">Tag</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">next</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;pre&#39;</span><span class="p">):</span></pre>
+<pre>                            <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></pre>
+<pre>                        <span class="k">else</span><span class="p">:</span></pre>
+<pre>                            <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comment_string</span> <span class="o">+</span> <span class="n">line</span><span class="p">)</span></pre>
+<pre>                <span class="c">Now, glue each line together</span></pre>
+<pre>                <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">L</span><span class="p">)</span></pre>
+<pre>                <span class="bp">self</span><span class="o">.</span><span class="n">at_newline</span> <span class="o">=</span> <span class="bp">True</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">False</span>                </pre>
+<pre>                <span class="k">return</span> <span class="n">s</span></pre>
+<pre>        <span class="k">else</span><span class="p">:</span></pre>
+<pre>            <span class="c">We hae a tag.</span></pre>
+<pre>            <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">Tag</span><span class="p">))</span></pre>
+<pre>            <span class="n">L</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>            <span class="n">tags</span> <span class="o">=</span> <span class="p">[]</span></pre>
+<pre>            <span class="c">See if this tag will cause a transition
+            Beautiful Soup stores attrs as a list. Convert to a dict to search easily.</span></pre>
+<pre>            <span class="n">attrs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span></pre>
+<pre>            <span class="k">if</span> <span class="p">((</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">outsidePre</span><span class="p">)</span> <span class="ow">and</span></pre>
+<pre>                <span class="p">(</span><span class="n">soup</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">&#39;pre&#39;</span><span class="p">)):</span></pre>
+<pre>                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">inPre</span></pre>
+<pre>            <span class="k">elif</span> <span class="p">((</span><span class="n">state</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">inPre</span><span class="p">)</span> <span class="ow">and</span></pre>
+<pre>                  <span class="p">(</span><span class="s">&#39;class&#39;</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">)</span> <span class="ow">and</span></pre>
+<pre>                  <span class="p">((</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;class&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;c&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">attrs</span><span class="p">[</span><span class="s">&#39;class&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;c1&#39;</span><span class="p">))):</span></pre>
+<pre>                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">inComment</span></pre>
+<pre>                <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comment_string</span><span class="p">)</span></pre>
+<pre>            <span class="k">elif</span> <span class="n">state</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="n">inPre</span><span class="p">:</span></pre>
+<pre>            <span class="c">Output the tag only if we're still outsidePre or if we're still inComment.</span></pre>
+<pre>                <span class="n">tags</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strTag</span><span class="p">(</span><span class="n">soup</span><span class="p">)</span></pre>
+<pre>                <span class="n">L</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">tags</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></pre>
+<pre>            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">soup</span><span class="o">.</span><span class="n">contents</span><span class="p">:</span></pre>
+<pre>                <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">translateBody</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">state</span><span class="p">))</span></pre>
+<pre>            <span class="k">if</span> <span class="n">tags</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tags</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span></pre>
+<pre>                <span class="n">L</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tags</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span></pre>
+<pre>            <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">L</span><span class="p">)</span></pre>
+<pre>            </pre>
+<pre>    <span class="c">Output a tag, divided into opening and closing strings.</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">strTag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">soup</span><span class="p">):</span></pre>
+<pre>        <span class="k">assert</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">soup</span><span class="p">,</span> <span class="n">Tag</span><span class="p">))</span></pre>
+<pre>        <span class="c">Beautiful Soup v4.x version</span></pre>
+<pre><span class="c">       dupSoup = Tag(BeautifulSoup(), HTMLTreeBuilder(), soup.name, soup.attrs)</span></pre>
+<pre>        <span class="n">dupSoup</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">BeautifulSoup</span><span class="p">(),</span> <span class="n">soup</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">soup</span><span class="o">.</span><span class="n">attrs</span><span class="p">)</span></pre>
+<pre>        <span class="n">dupSoup</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s">&quot;!&quot;</span><span class="p">)</span></pre>
+<pre>        <span class="n">s</span> <span class="o">=</span> <span class="n">dupSoup</span><span class="o">.</span><span class="n">__str__</span><span class="p">(</span><span class="n">prettyPrint</span> <span class="o">=</span> <span class="bp">False</span><span class="p">)</span></pre>
+<pre>        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">,</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span> <span class="o">+</span> <span class="n">comment_string</span><span class="p">)</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s">&#39;!&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></pre>
+<pre></pre>
+<pre></pre>
+<pre><span class="c">From http://effbot.org/zone/re-sub.htm#unescape-html:</span></pre>
+<pre><span class="kn">import</span> <span class="nn">htmlentitydefs</span></pre>
+<pre></pre>
+<pre></pre>
+<pre><span class="c">Removes HTML or XML character references and entities from a text string.
+
+@param text The HTML (or XML) source text.
+@return The plain text, as a Unicode string, if necessary.</span></pre>
+<pre><span class="k">def</span> <span class="nf">unescape</span><span class="p">(</span><span class="n">text</span><span class="p">):</span></pre>
+<pre>    <span class="k">def</span> <span class="nf">fixup</span><span class="p">(</span><span class="n">m</span><span class="p">):</span></pre>
+<pre>        <span class="n">text</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></pre>
+<pre>        <span class="k">if</span> <span class="n">text</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;&amp;#&quot;</span><span class="p">:</span></pre>
+<pre>            <span class="c">character reference</span></pre>
+<pre>            <span class="k">try</span><span class="p">:</span></pre>
+<pre>                <span class="k">if</span> <span class="n">text</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;&amp;#x&quot;</span><span class="p">:</span></pre>
+<pre>                    <span class="k">return</span> <span class="nb">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="mi">3</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">16</span><span class="p">))</span></pre>
+<pre>                <span class="k">else</span><span class="p">:</span></pre>
+<pre>                    <span class="k">return</span> <span class="nb">unichr</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">text</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span></pre>
+<pre>            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span></pre>
+<pre>                <span class="k">pass</span></pre>
+<pre>        <span class="k">else</span><span class="p">:</span></pre>
+<pre>            <span class="c">named entity</span></pre>
+<pre>            <span class="k">try</span><span class="p">:</span></pre>
+<pre>                <span class="n">text</span> <span class="o">=</span> <span class="nb">unichr</span><span class="p">(</span><span class="n">htmlentitydefs</span><span class="o">.</span><span class="n">name2codepoint</span><span class="p">[</span><span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span></pre>
+<pre>            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span></pre>
+<pre>                <span class="k">pass</span></pre>
+<pre>        <span class="k">return</span> <span class="n">text</span> <span class="c">leave as is</span></pre>
+<pre>    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&quot;&amp;#?\w+;&quot;</span><span class="p">,</span> <span class="n">fixup</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span></pre>
+</body>
+</html>
