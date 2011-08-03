@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="1.1.02" framework="qpc">
+  <package name="package1" stereotype="0x00">
+    <class name="Class1" superclass="../../0/1">
+      <statechart>
+        <initial target="../1">
+          <action/>
+        </initial>
+        <state name="MOTOR_ON_WFP">
+          <entry/>
+          <exit brief="OC1RS = 0"/>
+          <tran trig="PB_PRESSED()" target="../../2"/>
+        </state>
+        <state name="MOTOR_OFF_WFR">
+          <entry/>
+          <exit/>
+          <tran trig="! PB_PRESSED()" target="../../3"/>
+        </state>
+        <state name="MOTOR_OFF_WFP">
+          <entry/>
+          <exit/>
+          <tran trig="PB_PRESSED()" target="../../4"/>
+        </state>
+        <state name="MOTOR_ON_WFR">
+          <entry/>
+          <exit/>
+          <tran trig="! PB_PRESSED()" target="../../1"/>
+        </state>
+        <state_diagram size="80,50">
+          <state_glyph ref="1" node="7,7,16,6">
+            <text box="1,2,12,2"/>
+          </state_glyph>
+          <state_glyph ref="2" node="7,17,16,6"/>
+          <state_glyph ref="3" node="7,27,16,6"/>
+          <state_glyph ref="4" node="7,37,16,6"/>
+          <initial_glyph ref="0" conn="23,4,5,0,-3,3">
+            <text box="0,-2,6,2"/>
+          </initial_glyph>
+          <tran_glyph ref="1/0" conn="15,13,2,0,4">
+            <text box="1,1,11,2"/>
+          </tran_glyph>
+          <tran_glyph ref="2/0" conn="15,23,2,0,4">
+            <text box="1,1,11,2"/>
+          </tran_glyph>
+          <tran_glyph ref="3/0" conn="15,33,2,0,4">
+            <text box="1,1,10,2"/>
+          </tran_glyph>
+          <tran_glyph ref="4/0" conn="15,43,2,0,4,-11,-43,11,3">
+            <text box="1,1,11,2"/>
+          </tran_glyph>
+        </state_diagram>
+      </statechart>
+    </class>
+  </package>
+</model>

@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+  <title></title>
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+  <style type="text/css">
+td.linenos { background-color: #f0f0f0; padding-right: 10px; }
+span.lineno { background-color: #f0f0f0; padding: 0 5px 0 5px; }
+pre { line-height: 125%; margin: 0px; min-height: 1em }
+body .hll { background-color: #ffffcc }
+body .c { font-family: sans-serif; white-space: normal; font-size: small; display: inline-block; width: 5.5in; color: #408080 } /* Comment */
+body .err { border: 1px solid #FF0000 } /* Error */
+body .k { color: #008000; font-weight: bold } /* Keyword */
+body .o { color: #666666 } /* Operator */
+body .cm { color: #408080 } /* Comment.Multiline */
+body .cp { color: #BC7A00 } /* Comment.Preproc */
+body .c1 { font-family: sans-serif; white-space: normal; font-size: small; display: inline-block; width: 5.5in; color: #408080 } /* Comment.Single */
+body .cs { color: #408080 } /* Comment.Special */
+body .gd { color: #A00000 } /* Generic.Deleted */
+body .ge { font-style: italic } /* Generic.Emph */
+body .gr { color: #FF0000 } /* Generic.Error */
+body .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+body .gi { color: #00A000 } /* Generic.Inserted */
+body .go { color: #808080 } /* Generic.Output */
+body .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+body .gs { font-weight: bold } /* Generic.Strong */
+body .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+body .gt { color: #0040D0 } /* Generic.Traceback */
+body .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+body .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+body .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+body .kp { color: #008000 } /* Keyword.Pseudo */
+body .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+body .kt { color: #B00040 } /* Keyword.Type */
+body .m { color: #666666 } /* Literal.Number */
+body .s { color: #BA2121 } /* Literal.String */
+body .na { color: #7D9029 } /* Name.Attribute */
+body .nb { color: #008000 } /* Name.Builtin */
+body .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+body .no { color: #880000 } /* Name.Constant */
+body .nd { color: #AA22FF } /* Name.Decorator */
+body .ni { color: #999999; font-weight: bold } /* Name.Entity */
+body .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+body .nf { color: #0000FF } /* Name.Function */
+body .nl { color: #A0A000 } /* Name.Label */
+body .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+body .nt { color: #008000; font-weight: bold } /* Name.Tag */
+body .nv { color: #19177C } /* Name.Variable */
+body .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+body .w { color: #bbbbbb } /* Text.Whitespace */
+body .mf { color: #666666 } /* Literal.Number.Float */
+body .mh { color: #666666 } /* Literal.Number.Hex */
+body .mi { color: #666666 } /* Literal.Number.Integer */
+body .mo { color: #666666 } /* Literal.Number.Oct */
+body .sb { color: #BA2121 } /* Literal.String.Backtick */
+body .sc { color: #BA2121 } /* Literal.String.Char */
+body .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+body .s2 { color: #BA2121 } /* Literal.String.Double */
+body .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+body .sh { color: #BA2121 } /* Literal.String.Heredoc */
+body .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+body .sx { color: #008000 } /* Literal.String.Other */
+body .sr { color: #BB6688 } /* Literal.String.Regex */
+body .s1 { color: #BA2121 } /* Literal.String.Single */
+body .ss { color: #19177C } /* Literal.String.Symbol */
+body .bp { color: #008000 } /* Name.Builtin.Pseudo */
+body .vc { color: #19177C } /* Name.Variable.Class */
+body .vg { color: #19177C } /* Name.Variable.Global */
+body .vi { color: #19177C } /* Name.Variable.Instance */
+body .il { color: #666666 } /* Literal.Number.Integer.Long */
+
+  </style>
+</head>
+<body><pre><span class="c1">camerasock.cpp : Defines the entry point for the console application.<br>*******************************************************<br>Process: CP Client<br>Author:      Jacob Bowen<br>Description: This process sends either a TCP or UDP 
+             message to a server based on the 
+             command-line arguments that it is given.
+             It then waits for a response.
+*******************************************************</span></pre>
+<pre></pre>
+<pre><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span></pre>
+<pre></pre>
+<pre><span class="cp">#pragma (lib, "Ws2_32.lib")</span></pre>
+<pre></pre>
+<pre><span class="cp">#include "stdafx.h"</span></pre>
+<pre><span class="cp">#include &lt;winsock2.h&gt;</span></pre>
+<pre><span class="cp">#include &lt;conio.h&gt;</span></pre>
+<pre><span class="cp">#include &lt;iostream&gt;</span></pre>
+<pre><span class="cp">#include &lt;string&gt;</span></pre>
+<pre></pre>
+<pre></pre>
+<pre><span class="cp">#define EXIT_SUCCESS    0</span></pre>
+<pre><span class="cp">#define EXIT_ERROR      1</span></pre>
+<pre><span class="cp">#define TCP_PROTOCOL    6</span></pre>
+<pre><span class="cp">#define UDP_PROTOCOL    17</span></pre>
+<pre><span class="cp">#define TCP             1</span></pre>
+<pre><span class="cp">#define UDP             2</span></pre>
+<pre><span class="cp">#define MSG_SIZE        7</span></pre>
+<pre><span class="cp">#define MIN_BUFFER_SIZE 1</span></pre>
+<pre></pre>
+<pre><span class="c1">Note: calling this _tmain confuses the command-line args passed (since <a href="http://stackoverflow.com/questions/895827/what-is-the-difference-between-tmain-and-main-in-c">everything gets passed in UTF-16</a>). It also breaks all the networking. <br></span></pre>
+<pre><span class="kt">int</span> <span class="n">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span></pre>
+<pre><span class="p">{</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"usage:  client SERVER_IP PORT</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>                </pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre>    </pre>
+<pre>    <span class="kt">int</span> <span class="n">i_portNumber</span><span class="p">;</span></pre>
+<pre>    <span class="kt">int</span> <span class="n">i_connectReturn</span><span class="p">,</span> <span class="n">i_recvReturn</span><span class="p">,</span> <span class="n">i_wsaReturn</span><span class="p">;</span></pre>
+<pre>    <span class="kt">char</span> <span class="n">ac_incomingData</span><span class="p">[</span><span class="n">MSG_SIZE</span><span class="p">];</span></pre>
+<pre>    <span class="n">SOCKET</span> <span class="n">ui_socketDescriptor</span><span class="p">;</span></pre>
+<pre>    <span class="n">sockaddr_in</span> <span class="n">st_serverAddress</span><span class="p">;</span></pre>
+<pre>    <span class="n">WSADATA</span> <span class="n">st_wsaData</span><span class="p">;</span></pre>
+<pre></pre>
+<pre>    <span class="c1">Choose the latest (v 2.2) Winsock version, following
+    the sample code at http://msdn.microsoft.com/en-us/library/ms742213(v=vs.85).aspx.</span></pre>
+<pre>    <span class="n">i_wsaReturn</span> <span class="o">=</span> <span class="n">WSAStartup</span><span class="p">(</span><span class="n">MAKEWORD</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">st_wsaData</span><span class="p">);</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">i_wsaReturn</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"Error invoking WSAStartup"</span><span class="p">);</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre>    <span class="c1">Check that we actually got v 2.2 of the protocol</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">LOBYTE</span><span class="p">(</span><span class="n">st_wsaData</span><span class="p">.</span><span class="n">wVersion</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">HIBYTE</span><span class="p">(</span><span class="n">st_wsaData</span><span class="p">.</span><span class="n">wVersion</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"System does not support requested Winsock version."</span><span class="p">);</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="n">i_portNumber</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span></pre>
+<pre>    <span class="n">printf</span><span class="p">(</span><span class="s">"Parameters passed: address %s, port %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span></pre>
+<pre></pre>
+<pre>    <span class="c1">Create a socket. Per <a href="http://msdn.microsoft.com/en-us/library/ms740506%28v=vs.85%29.aspx">socket docs</a>:<br>address family (af): AF_INET = IPv4<br>type: SOCK_STREAM = TCP/IP<br>protocol: IPPROTO_TCP = TCP/IP</span></pre>
+<pre>    <span class="n">ui_socketDescriptor</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">SOCK_STREAM</span><span class="p">,</span> <span class="n">IPPROTO_TCP</span><span class="p">);</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">ui_socketDescriptor</span> <span class="o">==</span> <span class="n">INVALID_SOCKET</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"Error creating the network socket"</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSACleanup</span><span class="p">();</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="c1">Connect to the server through this socket by setting up this <a href="http://msdn.microsoft.com/en-us/library/ms740496%28v=vs.85%29.aspx">struct</a>.<br></span></pre>
+<pre>    <span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_family</span> <span class="o">=</span> <span class="n">AF_INET</span><span class="p">;</span></pre>
+<pre>    <span class="c1">Use <a href="http://msdn.microsoft.com/en-us/library/ms738557%28v=VS.85%29.aspx">htons</a> to convert between byte orders.<br></span></pre>
+<pre>    <span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_port</span> <span class="o">=</span> <span class="n">htons</span><span class="p">(</span><span class="n">i_portNumber</span><span class="p">);</span></pre>
+<pre>    <span class="c1">Set the address to connect using using the <a href="http://msdn.microsoft.com/en-us/library/ms738571%28VS.85%29.aspx">struct</a> below.<br>Use <a href="http://msdn.microsoft.com/en-us/library/ms738563%28VS.85%29.aspx">inet_addr</a> to convert the address from text to a correct endian dword.<br></span></pre>
+<pre>    <span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">=</span> <span class="n">inet_addr</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span></pre>
+<pre>	<span class="k">if</span> <span class="p">(</span><span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span> <span class="o">==</span> <span class="n">INADDR_NONE</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"Error interpreting IP address entered</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span></pre>
+<pre>        <span class="n">closesocket</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSACleanup</span><span class="p">();</span>
+        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="n">memset</span><span class="p">(</span><span class="o">&amp;</span><span class="p">(</span><span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_zero</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_zero</span><span class="p">));</span></pre>
+<pre>    <span class="n">printf</span><span class="p">(</span><span class="s">"Connecting to address 0x%x, port 0x%x</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_addr</span><span class="p">.</span><span class="n">s_addr</span><span class="p">,</span> <span class="n">st_serverAddress</span><span class="p">.</span><span class="n">sin_port</span><span class="p">);</span></pre>
+<pre>    <span class="n">i_connectReturn</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">,</span> \</pre>
+<pre>                                <span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">st_serverAddress</span><span class="p">,</span> \</pre>
+<pre>                                <span class="k">sizeof</span><span class="p">(</span><span class="n">st_serverAddress</span><span class="p">));</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">i_connectReturn</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"Error connecting to the server"</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSASetLastError</span><span class="p">(</span><span class="n">WSAGetLastError</span><span class="p">());</span></pre>
+<pre>        <span class="n">closesocket</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSACleanup</span><span class="p">();</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Sending message: </span><span class="se">\"</span><span class="s">Hi</span><span class="se">\"\n</span><span class="s">"</span><span class="p">);</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">send</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">,</span> <span class="s">"Hi"</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="s">"Hi"</span><span class="p">),</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"Error sending message to server"</span><span class="p">);</span></pre>
+<pre>        <span class="n">closesocket</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSACleanup</span><span class="p">();</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">shutdown</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">,</span> <span class="n">SD_SEND</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"Error upon halting sends"</span><span class="p">);</span>        </pre>
+<pre>        <span class="n">closesocket</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSACleanup</span><span class="p">();</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="n">i_recvReturn</span> <span class="o">=</span> <span class="n">recv</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">,</span> <span class="n">ac_incomingData</span><span class="p">,</span> <span class="n">MSG_SIZE</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span></pre>
+<pre>    <span class="k">if</span> <span class="p">(</span><span class="n">i_recvReturn</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span></pre>
+<pre>    <span class="p">{</span></pre>
+<pre>        <span class="n">printf</span><span class="p">(</span><span class="s">"ERROR receiving data from server"</span><span class="p">);</span>        </pre>
+<pre>        <span class="n">closesocket</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">);</span></pre>
+<pre>        <span class="n">WSACleanup</span><span class="p">();</span></pre>
+<pre>        <span class="k">return</span> <span class="n">EXIT_ERROR</span><span class="p">;</span></pre>
+<pre>    <span class="p">}</span></pre>
+<pre></pre>
+<pre>    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Received message: </span><span class="se">\"</span><span class="s">%s</span><span class="se">\"\n</span><span class="s">"</span><span class="p">,</span> <span class="n">ac_incomingData</span><span class="p">);</span></pre>
+<pre></pre>
+<pre>    <span class="n">closesocket</span><span class="p">(</span><span class="n">ui_socketDescriptor</span><span class="p">);</span></pre>
+<pre>    <span class="n">WSACleanup</span><span class="p">();</span></pre>
+<pre>    <span class="k">return</span> <span class="n">EXIT_SUCCESS</span><span class="p">;</span></pre>
+<pre><span class="p">}</span></pre>
+
+
+</body></html>
