@@ -86,7 +86,7 @@
 #         whitespace and totally destroy the code.</li></ol>
 # 
 # <h3>To do</h3>
-# <ol><li>Implement a <a href="http://packages.python.org/watchdog/">file
+# <ol><li>Split this up. It's just too much to keep all in one document.</li><li>Find a good HTML editor. KompoZer seems better than SeaMonkey, but doesn't render a lot of things correctly.</li><li>Implement a <a href="http://packages.python.org/watchdog/">file
 #           change monitor</a> to auto-translate on save.</li>
 #     <li>Fix line numbering -- have the line numbers skip an empty line
 #         on code to HTML; remove line numbers in HTML to code.</li>
@@ -105,32 +105,21 @@
 #             <li>Have a hotkey toggle between HTML and text views, syncing
 #                 cursor position in the toggle.</li>
 #             <li>Auto-reload if either file is modified</li></ol>
-#     <li>Support C and C++ better. It's untested and doesn't support /* */
-#         comment currently.</li><li>Look for unescaped &lt; and &gt;
+#     <li>Support C and C++ better. Waiting on a lexer fix before working on this any more. It's somewhat untested and probably doesn't support /* */
+#         comments.</li><li>Look for unescaped &lt; and &gt;
 #         characters. I need a nice regexp to distinguish a true tag from
-#         random text.</li>
-#     <li>Create a GUI editor so, with a hotkey, the view would switch between
-#         HTML and source.</li><li>Use ReST instead of HTML as the underlying
+#         random text.</li><li>Use ReST instead of HTML as the underlying
 #         language, since that is so much more readable in code. Would need to
 #         write / find a good HTML to ReST translator. Or perhaps just
 #         translate recognized HTML to ReST and leave anything unrecognized in
 #         the source.</li>
 #     <li>Incorproate a language parser like Doxygen to auto-crossref function
-#         names, variables, etc. Use a plain-text format to pick up on function
-#         parameters.</li>
+#         names, variables, etc. Add a named anchor for each.</li><ol><li>One option: only identify global names.</li><li>Another option: identify all names, but add scoping -- perhaps function::name for local variables. However, dealing with names at a deeper nesting level would get messy (func::second {::blah?)</li></ol>
 #     <li>Fix formatting: add a width: blah to the style for each comment based
 #         on the number of preceeding characters.</li>
 #     <li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments
 #         in any html. This would, I think, make HTML editors work a bit
-#         better.</li>
-#     <li>Things that bother me I'd like to fix:</li>
-#         <ol><li>I can't see what HTML anchors already exist. This makes it
-#                 hard to hyperlink. Just having auto-hyperlinks to global
-#                 symbols would help a lot.</li>
-#             <li>Many editor annoyances; it's fairly fraglie.</li>
-#             <li>The documentation I have feels unwieldly: there's too much
-#                 information on one page. Should I factor the code, or factors
-#                 the docs into two files?</li></ol></ol>
+#         better.</li><li>Do a better job of matching what HTML shows with the code extracted. There's a lot of ways to shoot yourself in the foot with the present scheme. Examples: &lt;pre&gt;&lt;span class="c"&gt;comment&lt;br&gt;code&lt;/pre&gt; -- Looks right, but parsed as a comment.</li><li>Find a way to avoid the font-size: small directive. Code like &lt;h2&gt;&lt;span class="c"&gt;blah&lt;/span&gt;&lt;/h2&gt; produces very small type. Ideally, ALL comments would be in body, with code wrapped in a &lt;code&gt; tag and styled with white-space: pre or replaced with lots of &amp;nbsp; entities.<br /></li></ol>
 # 
 # <h1>Implementation</h1>
 # 
@@ -169,13 +158,13 @@ import re
 # The string indicating a comment in the chosen programming language. This must
 # end in a space for the regular expression in _format_lines1 to work. The space
 # also makes the output a bit prettier.
-#comment_string = '# '
-comment_string = '// '
+comment_string = '# '
+# comment_string = '// '
 
 
 # File extension for the source file
-#source_extension = '.py'
-source_extension = '.cpp'
+source_extension = '.py'
+# source_extension = '.cpp'
 
 
 # This class converts from source to to HTML. As the <a>overview</a>
@@ -867,5 +856,6 @@ def convert(baseFileName):
 # Run interface
 if __name__ == '__main__':
 #    test(one_test = False)
-#    convert('pyg')
-    convert('winclient')
+    convert('pyg')
+#    convert('winclient')
+# 
