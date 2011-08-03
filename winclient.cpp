@@ -1,14 +1,12 @@
-// camerasock.cpp : Defines the entry point for the console application.
-//*******************************************************
-// Process:     UDP/TCP Client
-// Author:      Jacob Bowen
-// Description: This process sends either a TCP or UDP 
+// camerasock.cpp : Defines the entry point for the console application.<br />*******************************************************<br />Process: CP Client<br />Author:      Jacob Bowen<br />Description: This process sends either a TCP or UDP 
 //              message to a server based on the 
 //              command-line arguments that it is given.
 //              It then waits for a response.
-//*******************************************************
+// *******************************************************
 
-int i;
+using namespace std;
+
+#pragma (lib, "Ws2_32.lib")
 
 #include "stdafx.h"
 #include <winsock2.h>
@@ -16,158 +14,117 @@ int i;
 #include <iostream>
 #include <string>
 
-using namespace std;
 
-#define EXIT_SUCCESS 0
-#define EXIT_ERROR   1
-#define TCP_PROTOCOL 6
-#define UDP_PROTOCOL 17
-#define TCP          1
-#define UDP          2
-#define MSG_SIZE     7
+#define EXIT_SUCCESS    0
+#define EXIT_ERROR      1
+#define TCP_PROTOCOL    6
+#define UDP_PROTOCOL    17
+#define TCP             1
+#define UDP             2
+#define MSG_SIZE        7
+#define MIN_BUFFER_SIZE 1
 
-int _tmain(int argc, char* argv[])
+// Note: calling this _tmain confuses the command-line args passed (since <a href="http://stackoverflow.com/questions/895827/what-is-the-difference-between-tmain-and-main-in-c">everything gets passed in UTF-16</a>). It also breaks all the networking. <br />
+int main(int argc, char* argv[])
 {
-	if(argc < 3)
+    if (argc < 3)
     {
-        printf("usage:  client SERVER_IP PROTOCOL\
-                \n\twhere the PROTOCOL is 1 for TCP and 2 for UDP\n");
-                
+        printf("usage:  client SERVER_IP PORT\n");                
         return EXIT_ERROR;
     }
     
-    int i_protocol, i_portNumber, i_sinSize;
+    int i_portNumber;
     int i_connectReturn, i_recvReturn, i_wsaReturn;
     char ac_incomingData[MSG_SIZE];
-	SOCKET ui_socketDescriptor;
+    SOCKET ui_socketDescriptor;
     sockaddr_in st_serverAddress;
-	WSADATA st_wsaData;
+    WSADATA st_wsaData;
 
-	i_wsaReturn = WSAStartup(0x101, &st_wsaData);
-	if(i_wsaReturn < 0)
-	{
-		printf("Error invoking WSAStartup");
-
-		return EXIT_ERROR;
-	}
-
-    cout << "Enter port number: ";
-	cin >> i_portNumber;
-	cout << endl;
-
-    i_protocol = atoi(argv[2]);
-
-    if(i_protocol == TCP)
+    // Choose the latest (v 2.2) Winsock version, following
+    // the sample code at http://msdn.microsoft.com/en-us/library/ms742213(v=vs.85).aspx.
+    i_wsaReturn = WSAStartup(MAKEWORD(2, 2), &st_wsaData);
+    if (i_wsaReturn < 0)
     {
-        ui_socketDescriptor = socket(AF_INET, SOCK_STREAM, TCP_PROTOCOL);
-        if(ui_socketDescriptor < 0)
-        {
-            printf("Error creating the network socket");
-        
-            return EXIT_ERROR;
-        }
-    
-        st_serverAddress.sin_family = AF_INET;
-        st_serverAddress.sin_port = htons(i_portNumber);
-        st_serverAddress.sin_addr.s_addr = inet_addr(argv[1]);
-        memset(&(st_serverAddress.sin_zero), '\0', 8);
-    
-        i_connectReturn = connect(ui_socketDescriptor, \
-                                    (struct sockaddr*)&st_serverAddress, \
-                                    sizeof(st_serverAddress));
-        if(i_connectReturn < 0)
-        {
-            printf("Error connecting to the server @ %S:%d", argv[1], i_portNumber);
+        printf("Error invoking WSAStartup");
+        return EXIT_ERROR;
+    }
+    // Check that we actually got v 2.2 of the protocol
+    if ( (LOBYTE(st_wsaData.wVersion) != 2) || (HIBYTE(st_wsaData.wVersion) != 2) )
+    {
+        printf("System does not support requested Winsock version.");
+        return EXIT_ERROR;
+    }
 
-			closesocket(ui_socketDescriptor);
-            return EXIT_ERROR;
-        }
-    
-        printf("\nSending message: \"Hi\"\n");
-        if(send(ui_socketDescriptor, "Hi", sizeof("Hi"), 0) < 0)
-        {
-            printf("Error sending message to server");
-        
-			closesocket(ui_socketDescriptor);
-            return EXIT_ERROR;
-        }
-    
-        if(shutdown(ui_socketDescriptor, SD_SEND) < 0)
-        {
-            printf("Error upon halting sends");
-        
-			closesocket(ui_socketDescriptor);
-            return EXIT_ERROR;
-        }
-    
-        i_recvReturn = recv(ui_socketDescriptor, ac_incomingData, MSG_SIZE, 0);
-        if(i_recvReturn < 0)
-        {
-            printf("ERROR receiving data from server");
-        
-			closesocket(ui_socketDescriptor);
-            return EXIT_ERROR;
-        }
-    
-        printf("\nReceived message: \"%s\"\n", ac_incomingData);
-    
+    i_portNumber = atoi(argv[2]);
+    printf("Parameters passed: address %s, port %s\n", argv[1], argv[2]);
+
+    // Create a socket. Per <a href="http://msdn.microsoft.com/en-us/library/ms740506%28v=vs.85%29.aspx">socket docs</a>:<br />address family (af): AF_INET = IPv4<br />type: SOCK_STREAM = TCP/IP<br />protocol: IPPROTO_TCP = TCP/IP
+    ui_socketDescriptor = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    if (ui_socketDescriptor == INVALID_SOCKET)
+    {
+        printf("Error creating the network socket");
+        WSACleanup();
+        return EXIT_ERROR;
+    }
+
+    // Connect to the server through this socket by setting up this <a href="http://msdn.microsoft.com/en-us/library/ms740496%28v=vs.85%29.aspx">struct</a>.<br />
+    st_serverAddress.sin_family = AF_INET;
+    // Use <a href="http://msdn.microsoft.com/en-us/library/ms738557%28v=VS.85%29.aspx">htons</a> to convert between byte orders.<br />
+    st_serverAddress.sin_port = htons(i_portNumber);
+    // Set the address to connect using using the <a href="http://msdn.microsoft.com/en-us/library/ms738571%28VS.85%29.aspx">struct</a> below.<br />Use <a href="http://msdn.microsoft.com/en-us/library/ms738563%28VS.85%29.aspx">inet_addr</a> to convert the address from text to a correct endian dword.<br />
+    st_serverAddress.sin_addr.s_addr = inet_addr(argv[1]);
+	if (st_serverAddress.sin_addr.s_addr == INADDR_NONE)
+    {
+        printf("Error interpreting IP address entered\n");
         closesocket(ui_socketDescriptor);
-        return EXIT_SUCCESS;
-		WSACleanup();
+        WSACleanup();
+        return EXIT_ERROR;
+    }
 
-    }
-    else
+    memset(&(st_serverAddress.sin_zero), 0, sizeof(st_serverAddress.sin_zero));
+    printf("Connecting to address 0x%x, port 0x%x\n", st_serverAddress.sin_addr.s_addr, st_serverAddress.sin_port);
+    i_connectReturn = connect(ui_socketDescriptor, \
+                                (struct sockaddr*)&st_serverAddress, \
+                                sizeof(st_serverAddress));
+    if (i_connectReturn < 0)
     {
-        if(i_protocol == UDP)
-        {
-            ui_socketDescriptor = socket(AF_INET, SOCK_DGRAM, UDP_PROTOCOL);
-            if(ui_socketDescriptor < 0)
-            {
-                printf("Error creating the network socket");
-        
-                return EXIT_ERROR;
-            }
-    
-            st_serverAddress.sin_family = AF_INET;
-            st_serverAddress.sin_port = htons(i_portNumber);
-            st_serverAddress.sin_addr.s_addr = inet_addr(argv[1]);
-            memset(&(st_serverAddress.sin_zero), '\0', 8);
-    
-            printf("\nSending message: \"Hi\"\n");
-            if(sendto(ui_socketDescriptor, "Hi", sizeof("Hi"), 0, \
-                              (struct sockaddr*)&st_serverAddress, \
-                              sizeof(st_serverAddress)) < 0)
-            {
-                printf("Error sending message to server");
-        
-                return EXIT_ERROR;
-            }
-    
-            i_recvReturn = recvfrom(ui_socketDescriptor, ac_incomingData, \
-                                    MSG_SIZE, 0, \
-                                    (struct sockaddr*)&st_serverAddress, \
-                                    &i_sinSize);
-            if(i_recvReturn < 0)
-            {
-                printf("ERROR receiving data from server");
-        
-                return EXIT_ERROR;
-            }
-    
-            printf("\nReceived message: \"%s\"\n", ac_incomingData);
-    
-            closesocket(ui_socketDescriptor);
-            return EXIT_SUCCESS;
-            WSACleanup();
-        }
-        else
-        {
-            printf("Invalid protocol number!\n\
-                    usage:  client SERVER_IP SERVER_PORT PROTOCOL\
-                    \n\twhere the PROTOCOL is 1 for TCP and 2 for UDP\n");
-                    
-            return EXIT_ERROR;
-        }
+        printf("Error connecting to the server");
+        WSASetLastError(WSAGetLastError());
+        closesocket(ui_socketDescriptor);
+        WSACleanup();
+        return EXIT_ERROR;
     }
+
+    printf("\nSending message: \"Hi\"\n");
+    if (send(ui_socketDescriptor, "Hi", sizeof("Hi"), 0) < 0)
+    {
+        printf("Error sending message to server");
+        closesocket(ui_socketDescriptor);
+        WSACleanup();
+        return EXIT_ERROR;
+    }
+
+    if (shutdown(ui_socketDescriptor, SD_SEND) < 0)
+    {
+        printf("Error upon halting sends");        
+        closesocket(ui_socketDescriptor);
+        WSACleanup();
+        return EXIT_ERROR;
+    }
+
+    i_recvReturn = recv(ui_socketDescriptor, ac_incomingData, MSG_SIZE, 0);
+    if (i_recvReturn < 0)
+    {
+        printf("ERROR receiving data from server");        
+        closesocket(ui_socketDescriptor);
+        WSACleanup();
+        return EXIT_ERROR;
+    }
+
+    printf("\nReceived message: \"%s\"\n", ac_incomingData);
+
+    closesocket(ui_socketDescriptor);
+    WSACleanup();
+    return EXIT_SUCCESS;
 }
 // 
