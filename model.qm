@@ -54,7 +54,7 @@
           <tran trig="ws" target="../../5">
             <action brief="save token"/>
           </tran>
-          <tran trig="comment" target="../../1">
+          <tran trig="comment" target="../../3">
             <action brief="combine"/>
           </tran>
           <tran trig="nl" target="../../1">
@@ -67,7 +67,7 @@
           <tran trig="else" target="../../6">
             <action brief="yield all tokens"/>
           </tran>
-          <tran trig="comment" target="../../1">
+          <tran trig="comment" target="../../3">
             <action brief="combine"/>
           </tran>
           <tran trig="nl" target="../../1">
@@ -93,10 +93,10 @@
             <text box="1,-2,12,2"/>
           </tran_glyph>
           <tran_glyph ref="1/1" conn="21,16,2,0,7">
-            <text box="1,4,11,2"/>
+            <text box="1,2,11,2"/>
           </tran_glyph>
           <tran_glyph ref="1/2" conn="19,16,2,0,5,-7,10,7,2">
-            <text box="-10,1,10,4"/>
+            <text box="-9,1,9,4"/>
           </tran_glyph>
           <tran_glyph ref="2/0" conn="27,28,1,3,17,-13,3">
             <text box="1,-2,14,3"/>
@@ -119,14 +119,14 @@
           <tran_glyph ref="3/1" conn="27,38,1,3,17,-23,3">
             <text box="1,-2,14,2"/>
           </tran_glyph>
-          <tran_glyph ref="4/2" conn="15,46,3,0,-8,-41,14,5">
-            <text box="-7,0,10,4"/>
+          <tran_glyph ref="4/2" conn="15,46,3,3,-8,-10,8">
+            <text box="-7,0,7,4"/>
           </tran_glyph>
           <tran_glyph ref="5/0" conn="27,58,1,3,17,-43,3">
             <text box="1,-2,18,2"/>
           </tran_glyph>
-          <tran_glyph ref="5/1" conn="21,59,2,0,3,-14,-57,14,5">
-            <text box="-14,3,10,4"/>
+          <tran_glyph ref="5/1" conn="21,59,2,3,3,-14,-26,8">
+            <text box="-13,3,7,4"/>
           </tran_glyph>
           <tran_glyph ref="1/3" conn="27,15,1,3,20">
             <text box="1,-2,13,3"/>

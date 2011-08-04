@@ -114,7 +114,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
     # Essentially, the machine looks for a multiline comment, which consists
     # of: a newline, optional whitespace, a comment, newline, optional
     # whitespace, a comment. When this sequence is found such that the two whitespaces are identical, the two comments are combined with any intervening whitespace and the search continues. Additional comments:<br />
-    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img alt="" src="state_machine.png" height="535" width="519" /><br />The state machine syntax: &lt;condition / action&gt;, so that nl / yield all tokens means that if a newline (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
+    # <ul><li>Transitions away from the sequence must be handled carefully (see the diagram). Each state may be presented with a comment, newline, whitespace, or any other token and must handle each possibility. To do this, <code>token_stack</code> contains a stack of tokens collected while walking through the state machines, which can be produced when the input varies from the multiline-comment path.<br /></li><li>"Whitespace" in this context does <b>not</b> include a newline. See the <code>ws</code> variable.<br /></li></ul><img src="state_machine.png" /><br />The state machine syntax: &lt;condition / action&gt;, so that nl / yield all tokens means that if a newline (\n character) is found, all tokens in token_stack will be yielded before moving to the next state. The additional abbreviation used: "ws" for whitespace (which does not include a newline).<br /><br />Note that the obvious alternative of doing this combining using a regular expression on the source text before tokenization doesn't work (I tried it). In particular, this removes all indications of where lines were broken earlier, making the comment a mess when going from the HTML back to code. It's possible that, with line wrapping implemented, this could be a much simpler and better approach.
     def _merge_comments(self, token_source):
         # Keep a history of tokens; if we can't combine then, then yield a
         # bunch of these.
@@ -160,7 +160,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     yield ttype, value
                     state = 0 if value == '\n' else 5
             elif state == 2:
-                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace>
+                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ whitespace
                 assert(not re.search(ws, value))
                 # For now, assume we will never receive two comment tokens back to back. TODO: this could happen in C, perhaps as a /*blah*//*blah*/.
                 assert( (ttype is not Token.Comment) and
@@ -180,7 +180,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     state = 4
                 elif ((ttype is Token.Comment) or 
                   (ttype is Token.Comment.Single)):
-                    # See if two comments can be combined. The second comment (in value) has no whitespace, so the first comment shouldn't either. In this case, the token_stack should have 2 elements: comment, newline. If it has 3 elements (ws, comment, newline, comment), don't combine.
+                    # See if two comments can be combined. The second comment (in value) has no whitespace, so the first comment shouldn't either. In this case, the token_stack should have 2 elements: comment, newline. If it has 3 elements (ws, comment, newline), don't combine.
                     if len(token_stack) == 2:
                         token_stack[0][1] += '\n' + value
                         del token_stack[1]
@@ -201,11 +201,11 @@ class CodeToHtmlFormatter(HtmlFormatter):
                     yield ttype, value                
                     state = 0 if value == '\n' else 5
             elif state == 4:
-                # For now, assume we will never receive whitespace following a comment. TODO: this could happen in C: /*blah*/ <whitespace></whitespace>
+                # We should never receive whitespace following whitespace.
                 assert(not re.search(ws, value))
                 if ((ttype is Token.Comment) or 
                   (ttype is Token.Comment.Single)):
-                    # See if two comments can be combined.  The second comment has no whitespace; the first comment must have the same anount of whitespace. In this case, token_stack should have 4 elemements: ws, comment, nl, ws.
+                    # See if two comments can be combined. The second comment has whitespace; the first comment must have the same anount of whitespace. In this case, token_stack should have 4 elemements: ws, comment, nl, ws.
                     if (len(token_stack) == 4 and 
                        (token_stack[0][1] == token_stack[3][1])):
                         token_stack[1][1] += '\n' + token_stack[3][1] + value
@@ -323,37 +323,35 @@ class CodeToHtmlFormatter(HtmlFormatter):
 # 
 # 
 # 
-#     The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>.
-#     Some simplifying assumptions about the structure of the HTML
-#     document:<br />
+# The HTML to code link relies on <a href="http://www.crummy.com/software/BeautifulSoup">Beautiful Soup</a>.
+# Some simplifying assumptions about the structure of the HTML
+# document:<br />
 # <ul>
 # <li>All code must be wrapped in a &lt;pre&gt;.<br />
 # </li><li>All comments are wrapped in &lt;span class="c"&gt; or appear
-#         as body text. Comments contain HTML.<br />
+# as body text. Comments contain HTML.<br />
 # </li><li>On a line, all code must come first, optionally followed by a
-#         comment. Code may never follow a comment on a single line
-#         (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
-#         tag) is discarded, to be regenerated when code is translated
-#         back to HTML.<br />
+# comment. Code may never follow a comment on a single line
+# (C-style /* */ in a line.</li><li>All header information (everything not inside the &lt;body&gt;
+# tag) is discarded, to be regenerated when code is translated
+# back to HTML.<br />
 # </li>
 # </ul>
 # 
-# 
-# 
-#     With this, body text is comment; &lt;pre&gt; begins discarding all
-#     tags and emits only text until a comment tag, which outputs its
-#     entire subtree as a comment (including any code-tagged text).
-#     Newlines can be echoed without modification whether in code or
-#     comment mode.<br />
+# With this, body text is comment; &lt;pre&gt; begins discarding all
+# tags and emits only text until a comment tag, which outputs its
+# entire subtree as a comment (including any code-tagged text).
+# Newlines can be echoed without modification whether in code or
+# comment mode.<br />
 # <h3>The implementation</h3>
 # <ol>
 # <li>The HTML document is parsed, then only the &lt;body&gt; tag
-#         contents <a>translated</a>.</li><li><a>All comments</a> (body text or
-#         anything in a &lt;span class="c"&gt; tag) are prepended with a
-#         comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
-#         &lt;pre&gt; tag from the beginning of the line to the first
-#         &lt;span class="c") tag) is stripped of HTML tags, HTML
-#         unescaped, then written.</li>
+# contents <a>translated</a>.</li><li><a>All comments</a> (body text or
+# anything in a &lt;span class="c"&gt; tag) are prepended with a
+# comment character and output verbatim (no HTML unescaping)</li><li><a>All code</a> (everything in a
+# &lt;pre&gt; tag from the beginning of the line to the first
+# &lt;span class="c") tag) is stripped of HTML tags, HTML
+# unescaped, then written.</li>
 # </ol>
 # Beautiful Soup v3.x version
 from BeautifulSoup import BeautifulSoup, Tag, NavigableString
@@ -470,10 +468,7 @@ class HtmlToCodeTranslator(object):
 import htmlentitydefs
 
 
-# Removes HTML or XML character references and entities from a text string.
-# 
-# @param text The HTML (or XML) source text.
-# @return The plain text, as a Unicode string, if necessary.
+# Removes HTML or XML character references and entities from a text string.<br /><br />@param text The HTML (or XML) source text.<br />@return The plain text, as a Unicode string, if necessary.
 def unescape(text):
     def fixup(m):
         text = m.group(0)
@@ -494,3 +489,4 @@ def unescape(text):
                 pass
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
+# 
