@@ -99,12 +99,13 @@ class CodeToHtmlFormatter(HtmlFormatter):
         nl_token_source = self._expand_nl(token_source)
         merged_token_source = self._merge_comments(nl_token_source)
         source = self._format_lines1(merged_token_source)
-        for is_code, line in source:
-            if is_code and line.startswith('<span class="'):
-                index = line.find('>') + 1
-                yield is_code, line[:index] + '<br />' + line[index:]
-            else:
-                yield is_code, line
+        return source
+#        for is_code, line in source:
+#            if is_code and line.startswith('<span class="'):
+#                index = line.find('>') + 1
+#                yield is_code, line[:index] + '<br />' + line[index:]
+#            else:
+#                yield is_code, line
                 
     def _expand_nl(self, token_source):
         # Break any comments ending in a newline into two separate tokens
@@ -262,6 +263,7 @@ class CodeToHtmlFormatter(HtmlFormatter):
         getcls = self.ttype2class.get
         c2s = self.class2style
         escape_table = _escape_html_table
+        escape_table[ord('\n')] = u'<br />\n'
 
         lspan = ''
         line = ''
