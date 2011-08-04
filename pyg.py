@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-<br />
 # <h1>Overview</h1>
 # 
-# This program attempts to bring to life some of the ideas espoused by
+# This program, the HTML&lt;-&gt;code bridge, attempts to bring to life some of the ideas espoused by
 # Donald Knuth:<br />
 # <blockquote>I believe that the time is ripe for significantly better
 #       documentation of programs, and that we can best achieve this by
@@ -51,12 +51,12 @@
 # (tested with v3.2.0; the 4.x series was tested and didn't work well
 # with the default parser). Then, simply run the program to convert
 # between <code>pyg.py</code> and <code>pyg.html</code> (the newer
-# file is converted to the other format).<br /><br />TODO: show a short demo video of how it's used.
+# file is converted to the other format). Edit the converted file and rerun to translate it back; continue this as your standard development cycle.<br /><br />TODO: show a short demo video of how it's used.
 # 
 # 
 # <h2>API</h2>
 # 
-# TODO: document the API.<br />
+# TODO: document the API. This would be be achieved with cross-references to API functions and perhaps even their documentation. For now, the API consists of:<br /><br /><a href="#convert">convert</a><br /><a href="#HtmlToCode">HtmlToCode</a><br /><a href="#CodeToHtml">CodeToHtml</a><br /><a href="#CodeToHtmlStyle">CodeToHtmlStyle</a><br />
 # 
 # 
 # <h2>Status</h2>
@@ -68,30 +68,20 @@
 # <h3>Bugs</h3>
 # <ol><li>The HTML to code link assumes there's no comments before the
 #         pre tag. I need some way to detect this an insert a
-#         comment.</li>
-#    <li>The code to html link incorrectly merges comments with
-#         different amount of leading whitespace. It shouldn't.</li>
-#     <li>The code to html link translates ## to # # (However, I don't
-#         think there's a workaround for this).</li><li>The program dorks the
-#         beginning and ending tags, putting extra
-#         lines at the end and eventually moving comments around on the
-#         first line.</li>
-#     <li>SeaMonkey doesn't like &lt;pre&gt;. It's not that happy with
-#         &lt;span&gt;, either. I suspect that only wrapping code lines in
-#         a &lt;pre&gt; would help. Or, I could drop the pre entirely and
-#         use a &lt;span&gt; on the spaces; I'm not sure which is better.
-#         Either way, I need to minimize &lt;pre&gt; in the document.</li>
-#     <li>The implementation is fragile -- an unescaped tag in the code 
+#         comment.</li><li>The code to html link translates ## to # # (However, I don't
+#         think there's a workaround for this).</li><li>The HTML editors (SeaMonkey) dork the
+#         ending tags, putting extra
+#         lines at the end. Find a workaround.<br /></li><li>The implementation is fragile -- an unescaped tag in the code 
 #         destroys the HTML; likewise, the HTML editor can easily lose all 
 #         whitespace and totally destroy the code.</li></ol>
 # 
 # <h3>To do</h3>
-# <ol><li>Split this up. It's just too much to keep all in one document.</li><li>Find a good HTML editor. KompoZer seems better than SeaMonkey, but doesn't render a lot of things correctly.</li><li>Implement a <a href="http://packages.python.org/watchdog/">file
+# <ol><li>Find a good HTML editor. KompoZer seems better than SeaMonkey, but doesn't render a lot of things correctly.</li><li>Implement a <a href="http://packages.python.org/watchdog/">file
 #           change monitor</a> to auto-translate on save.</li>
 #     <li>Fix line numbering -- have the line numbers skip an empty line
 #         on code to HTML; remove line numbers in HTML to code.</li>
 #     <li>Offer some sort of cross-reference capability. This will
-#         require some significant thought.</li>
+# require some significant thought. An idea: used named anchors to specify a line in the source, then use attributes of the <a href="http://www.w3schools.com/tags/tag_a.asp">&lt;a&gt;</a> tag as an indication that a cross-ref should be inserted (perhaps the <a href="http://www.w3schools.com/tags/att_a_rel.asp">rel</a> and <a href="http://www.w3schools.com/tags/att_a_rev.asp">rev</a> attributes).</li>
 #     <li>Much better testing. In particular, test all possible paths
 #         through the state machine.</li>
 #     <li>The HTML produced by the SeaMonkey composer doesn't read
@@ -119,26 +109,31 @@
 #         on the number of preceeding characters.</li>
 #     <li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments
 #         in any html. This would, I think, make HTML editors work a bit
-#         better.</li><li>Do a better job of matching what HTML shows with the code extracted. There's a lot of ways to shoot yourself in the foot with the present scheme. Examples: &lt;pre&gt;&lt;span class="c"&gt;comment&lt;br&gt;code&lt;/pre&gt; -- Looks right, but parsed as a comment.</li><li>Find a way to avoid the font-size: small directive. Code like &lt;h2&gt;&lt;span class="c"&gt;blah&lt;/span&gt;&lt;/h2&gt; produces very small type. Ideally, ALL comments would be in body, with code wrapped in a &lt;code&gt; tag and styled with white-space: pre or replaced with lots of &amp;nbsp; entities.<br /></li></ol>
+#         better. Don't wrap comment at all; wrap all code (even spaces, crs which become &lt;br&gt; tag).<br /></li><li>Do a better job of matching what HTML shows with the code extracted. There's a lot of ways to shoot yourself in the foot with the present scheme. Examples: &lt;pre&gt;&lt;span class="c"&gt;comment&lt;br&gt;code&lt;/pre&gt; -- Looks right, but parsed as a comment. Parse in a WYSIWYG fashion: pay attention to the innermost tag when converting. Be lienent with whitespace -- ws as a comment followed by code would be marked as all code. One problem: how to show code in a comment?<br /></li><li>Find a way to avoid the font-size: small directive. Code like &lt;h2&gt;&lt;span class="c"&gt;blah&lt;/span&gt;&lt;/h2&gt; produces very small type. If the previous to-do is implemented, then style all code with a font-size: large.<br /></li></ol>
 # 
-# <h3>Supporting code</h3>
-# Define a new style based on the default style, but which
-# places comments in a non-italic font.<br />
-# Because the base class (Styles) is a metaclass, first
-# change the desired member, then inherit (so the metaclass
-# runs on the modified value in the default style).
+# <h1>Code</h1>
+# This section provides documentation of the front-end API for the
+# HTML&lt;-&gt;Code bridge.<br />
+# <h2>See also</h2>
+# For additional documentation on the code, see:<br />
+# <ul><li>The&nbsp;HTML&lt;-&gt;Code bridge <a href="pyg_module.html">module</a></li>
+#     <li>The&nbsp;HTML&lt;-&gt;Code bridge <a href="pyg_test.html">test suite</a></li></ul>
 from pygments.styles.default import DefaultStyle
 from pygments.token import Comment
+
+# <a name="CodeToHtmlStyle"></a>Define a new style based on the default style, but which
+# places comments in a non-italic font. Because the base class (Styles) is a metaclass, first
+# change the desired member, then inherit (so the metaclass
+# runs on the modified value in the default style).
 DefaultStyle.styles[Comment] = "#408080"
 class CodeToHtmlStyle(DefaultStyle):
     pass
-
 
 from pygments.lexers import get_lexer_for_filename
 from pyg_module import CodeToHtmlFormatter, HtmlToCodeTranslator, source_extension
 from pygments import highlight
 
-# <a name="def_CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
+# <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToHtml(baseFileName):
     in_file_name = baseFileName + source_extension
     code = open(in_file_name, 'r').read()
@@ -155,7 +150,7 @@ def CodeToHtml(baseFileName):
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
 
-# Use the HtmlToCodeTranslator class to translate a specific file.
+# <a name="HtmlToCode"></a>Use the HtmlToCodeTranslator class to translate a specific file.
 def HtmlToCode(baseFileName):
     code = open(baseFileName + '.html', 'r').read()
     outfile = open(baseFileName + source_extension, 'w')
@@ -163,8 +158,8 @@ def HtmlToCode(baseFileName):
     outfile.write(xl.translate(code))
     print('Wrote ' + baseFileName + source_extension)
 
-
 import os
+# <a name="convert"></a>Convert the newer file to the older file's format, overwriting the older file.
 def convert(baseFileName):
     source_file_name = baseFileName + source_extension
     html_file_name = baseFileName + '.html'
@@ -172,7 +167,6 @@ def convert(baseFileName):
       if os.path.exists(source_file_name) else 0
     html_time = os.stat(html_file_name).st_mtime \
       if os.path.exists(html_file_name) else 0
-    html_time = 0
     if source_time > html_time:
         print('Source newer')
         CodeToHtml(baseFileName)
@@ -184,7 +178,7 @@ def convert(baseFileName):
 
 # Run interface
 if __name__ == '__main__':
-#    convert('pyg')
-    convert('pyg_module')
-    convert('pyg_test')
+    convert('pyg')
+#    convert('pyg_module')
+#    convert('pyg_test')
 #    convert('winclient')
