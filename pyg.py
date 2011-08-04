@@ -76,7 +76,7 @@
 #         whitespace and totally destroy the code.</li></ol>
 # 
 # <h3>To do</h3>
-# <ol><li>Find a good HTML editor. KompoZer seems better than SeaMonkey, but doesn't render a lot of things correctly.</li><li>Implement a <a href="http://packages.python.org/watchdog/">file
+# <ol><li>Find a good HTML editor. KompoZer seems better than SeaMonkey, but doesn't render a lot of things correctly. Also, any edits in the source tag booger all the whitespace in a severe way.</li><li>Implement a <a href="http://packages.python.org/watchdog/">file
 #           change monitor</a> to auto-translate on save.</li>
 #     <li>Fix line numbering -- have the line numbers skip an empty line
 #         on code to HTML; remove line numbers in HTML to code.</li>
@@ -109,8 +109,16 @@
 #         on the number of preceeding characters.</li>
 #     <li>Use a thinner wrap: get rid of &lt;pre&gt; tags, don't wrap comments
 #         in any html. This would, I think, make HTML editors work a bit
-#         better. Don't wrap comment at all; wrap all code (even spaces, crs which become &lt;br&gt; tag).<br /></li><li>Do a better job of matching what HTML shows with the code extracted. There's a lot of ways to shoot yourself in the foot with the present scheme. Examples: &lt;pre&gt;&lt;span class="c"&gt;comment&lt;br&gt;code&lt;/pre&gt; -- Looks right, but parsed as a comment. Parse in a WYSIWYG fashion: pay attention to the innermost tag when converting. Be lienent with whitespace -- ws as a comment followed by code would be marked as all code. One problem: how to show code in a comment?<br /></li><li>Find a way to avoid the font-size: small directive. Code like &lt;h2&gt;&lt;span class="c"&gt;blah&lt;/span&gt;&lt;/h2&gt; produces very small type. If the previous to-do is implemented, then style all code with a font-size: large.<br /></li></ol>
-# 
+#         better. Don't wrap comment at all; wrap all code (even spaces, crs which become &lt;br&gt; tag).<br /></li><li>Do a better job of matching what HTML shows with the code extracted. There's a lot of ways to shoot yourself in the foot with the present scheme. Examples: &lt;pre&gt;&lt;span class="c"&gt;comment&lt;br&gt;code&lt;/pre&gt; -- Looks right, but parsed as a comment. Parse in a WYSIWYG fashion: pay attention to the innermost tag when converting. Be lienent with whitespace -- ws as a comment followed by code would be marked as all code. One problem: how to show code in a comment?<br /></li><li>Find a way to avoid the font-size: small directive. Code like &lt;h2&gt;&lt;span class="c"&gt;blah&lt;/span&gt;&lt;/h2&gt; produces very small type. If the previous to-do is implemented, then style all code with a font-size: large.</li></ol>
+#
+# <h3>Next step</h3>
+# Planning for the next feature: a thin wrap. This addresses items 14 and 16 above.<br /><ol><li>Change _create_stylesheet to inject a&nbsp;<code>white-space: pre; font-size:large;</code> to all non-comment styles.</li><li>Change DefaultStyle.styles[Text]
+# = 'something' so that text (whitespace) will be wrapped. Change
+# DefaultStyle.styles[Comment] = '' so comments won't be styled (or
+# wrapped) at all.</li><li>In _format_lines, remove the &lt;pre&gt; pre-line wrap</li><li>How do I handle newlines? Begin each line of code with
+# a wrapped &lt;br&gt;. If the previous line was code, then we're fine.
+# If the previous line was a comment, then that's what we want, too.</li><ol><li>How to implement? I need knowledge of the next line of code. Perhaps as a _format_lines processing step: if the current line begins with code (a&lt;span class="not comment"&gt;), insert a wrapped &lt;br&gt;.</li></ol></ol>
+#
 # <h1>Code</h1>
 # This section provides documentation of the front-end API for the
 # HTML&lt;-&gt;Code bridge.<br />
