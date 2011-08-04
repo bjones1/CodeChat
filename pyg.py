@@ -182,7 +182,7 @@ def convert(baseFileName):
       if os.path.exists(source_file_name) else 0
     html_time = os.stat(html_file_name).st_mtime \
       if os.path.exists(html_file_name) else 0
-    html_time = 0
+#    html_time = 0
     if source_time > html_time:
         print('Source newer')
         CodeToHtml(baseFileName)
@@ -195,6 +195,6 @@ def convert(baseFileName):
 # Run interface
 if __name__ == '__main__':
     convert('pyg')
-    convert('pyg_module')
-    convert('pyg_test')
+#    convert('pyg_module')
+#    convert('pyg_test')
 #    convert('winclient')

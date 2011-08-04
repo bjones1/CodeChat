@@ -437,13 +437,16 @@ class HtmlToCodeTranslator(object):
             assert(isinstance(soup, Tag))
             L = []
             tags = []
-            # See if this tag will cause a transition
+            # See if this tag will cause a transition.<br />
             # Beautiful Soup stores attrs as a list. Convert to a dict to search easily.
             attrs = dict(soup.attrs)
             if ((state == self.State.outsidePre) and
-                (soup.name == 'pre')):
+                (soup.name == 'span') and
+                ('class' in attrs) and
+                ((attrs['class'] != 'c') and (attrs['class'] != 'c1'))):
                 state = self.State.inPre
             elif ((state == self.State.inPre) and
+                  (soup.name == 'span') and
                   ('class' in attrs) and
                   ((attrs['class'] == 'c') or (attrs['class'] == 'c1'))):
                 state = self.State.inComment

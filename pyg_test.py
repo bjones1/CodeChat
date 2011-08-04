@@ -82,6 +82,11 @@ class TestHtmlToCode(unittest.TestCase):
         s = self.xlate('<pre>  <span class="c">comment1\n  comment2</span></pre>')
         self.assertEquals(s, '  # comment1\n  # comment2')
 
+    def test_4(self):
+        s = self.xlate('<span class="t">code1<br /></span>\n<span class="t">code2<br /></span>\n')
+        print s
+        self.assertEquals(s, '')
+
 from pygments.lexers import PythonLexer, CLexer
 from pygments import highlight
 from pyg_module import CodeToHtmlFormatter, HtmlToCodeTranslator
@@ -177,8 +182,8 @@ one_test = True
 if __name__ == '__main__':
     if one_test:
         ts = unittest.TestSuite()
-        ts.addTest(TestCodeToHtml('test_3'))
-#        ts.addTest(TestHtmlToCode('test_3'))
+#        ts.addTest(TestCodeToHtml('test_3'))
+        ts.addTest(TestHtmlToCode('test_4'))
         unittest.TextTestRunner().run(ts)
     else:
         unittest.main()
