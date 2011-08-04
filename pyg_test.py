@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-<br />
 
-from pyg_module import CodeToHtmlFormatter, HtmlToCodeTranslator, comment_string
 from BeautifulSoup import BeautifulSoup
-from pygments import highlight
 import unittest
 
 # Test the HTML to code translator
@@ -84,21 +82,22 @@ class TestHtmlToCode(unittest.TestCase):
         s = self.xlate('<pre>  <span class="c">comment1\n  comment2</span></pre>')
         self.assertEquals(s, '  # comment1\n  # comment2')
 
-from pygments.lexers import PythonLexer, CLexer, CppLexer
+from pygments.lexers import PythonLexer, CLexer
+from pygments import highlight
+from pyg_module import CodeToHtmlFormatter, HtmlToCodeTranslator
+import pyg_module
 
 class TestCodeToHtml(unittest.TestCase):
     def hilight(self, s):
-        global comment_string
-        comment_string = '# '
+        pyg_module.comment_string = '# '
         formatter = CodeToHtmlFormatter(nobackground=True)
         html = highlight(s, PythonLexer(), formatter)
         return html.replace("<pre>", "").replace("</pre>", "")
         
     def c_hilight(self, s):
-        global comment_string
-        comment_string = '// '
+        pyg_module.comment_string = '// '
         formatter = CodeToHtmlFormatter(nobackground=True)
-        html = highlight(s, CppLexer(), formatter)
+        html = highlight(s, CLexer(), formatter)
         return html
         
     # State machine test: transition from state 0 to 5
