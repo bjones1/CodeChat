@@ -167,11 +167,17 @@ class TestCodeToHtml(unittest.TestCase):
         s = self.c_hilight('// comment1\n// comment2\n')
         self.assertEqual(s, '<pre><span class="c1">comment1\ncomment2</span></pre>\n')
 
-one_test = False        
+    def test_3(self):
+        s = self.hilight('  code\n# comment')
+        print s
+        self.assertEqual(s, '')
+        
+
+one_test = True
 if __name__ == '__main__':
     if one_test:
         ts = unittest.TestSuite()
-        ts.addTest(TestCodeToHtml('test_mlComment7'))
+        ts.addTest(TestCodeToHtml('test_3'))
 #        ts.addTest(TestHtmlToCode('test_3'))
         unittest.TextTestRunner().run(ts)
     else:

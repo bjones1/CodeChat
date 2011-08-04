@@ -28,8 +28,14 @@
 #          steps.</li></ol>
 from pygments.formatters import HtmlFormatter
 from pygments.formatters.html import _escape_html_table
-from pygments.token import Token
+from pygments.token import Token, Text, Comment
+import pygments.token
 import re
+
+# Put all text (whitespace, newlines) in a span
+pygments.token.STANDARD_TYPES[Text] = 't'
+# Keep all comments out of a span
+pygments.token.STANDARD_TYPES[Comment] = ''
 
 # The string indicating a comment in the chosen programming language. This must
 # end in a space for the regular expression in _format_lines1 to work. The space
@@ -47,7 +53,7 @@ source_extension = '.py'
 # states, this uses Pygments to do most of the work, adding only a formatter
 # to that library. Therefore, to use this class, simply select this class
 # as the formatter for Pygments (see an example 
-# <a href="#def_CodeToHtml">below</a>).<br />
+# <a href="#def_CodeToHtml">below</a>).
 class CodeToHtmlFormatter(HtmlFormatter):
     # <a name="typeset_comments_in_a_proportional_font"></a><h3>Typeset comments</h3>
     # The first element of the class introduces a proportional font to the formatter. This sort of change really belongs in a <a href="http://pygments.org/docs/styles/">style</a>, but the current style <a href="http://pygments.org/docs/styles/#style-rules">framework</a> don't provide a way to specify this. Rather than introduce this change, I instead modified the way that the Pygments style was used by the formatter. Specifially, I copied the <code>_create_stylesheet</code>  routine verbatim from Pygments then added <a href="#insertedCode">code</a> to typeset comments in a proportional font. 
@@ -66,8 +72,9 @@ class CodeToHtmlFormatter(HtmlFormatter):
             # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. However, this either grows the right margin by the indent or causes the entire comment to fall on to the next line, making it hard to read. The addition of <code><span class="s">width: 5.5in</span></code> avoid this problem by limiting the max width of a comment. An ideal solution would be to dynamically set this so the width extends to the edge of the screen, but this would require JavaScript (I think).<br /></li>
             # <li> TODO: No multi-line comment support yet.</li></ul>
             if (ttype is Token.Comment) or (ttype is Token.Comment.Single):
-                style += 'font-family: sans-serif; white-space: normal; ' + \
-                  'font-size: small; display: inline-block; width: 5.5in; '
+                pass
+            else:
+                style += 'font-family: monospace; white-space: pre; font-size:large; '
 	    # End of modification.
             if ndef['color']:
                 style += 'color: #%s; ' % ndef['color']
@@ -93,8 +100,9 @@ class CodeToHtmlFormatter(HtmlFormatter):
         merged_token_source = self._merge_comments(nl_token_source)
         source = self._format_lines1(merged_token_source)
         for is_code, line in source:
-            if is_code and line.endswith('\n'):
-                yield is_code, '<pre>' + line[:-1] + '</pre>\n'
+            if is_code and line.startswith('<span class="'):
+                index = line.find('>') + 1
+                yield is_code, line[:index] + '<br />' + line[index:]
             else:
                 yield is_code, line
                 

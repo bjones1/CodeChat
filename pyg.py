@@ -127,13 +127,18 @@
 # <ul><li>The&nbsp;HTML&lt;-&gt;Code bridge <a href="pyg_module.html">module</a></li>
 #     <li>The&nbsp;HTML&lt;-&gt;Code bridge <a href="pyg_test.html">test suite</a></li></ul>
 from pygments.styles.default import DefaultStyle
-from pygments.token import Comment
+from pygments.token import Generic, Literal, Name, Punctuation, Text, Other
 
 # <a name="CodeToHtmlStyle"></a>Define a new style based on the default style, but which
 # places comments in a non-italic font. Because the base class (Styles) is a metaclass, first
 # change the desired member, then inherit (so the metaclass
 # runs on the modified value in the default style).
-DefaultStyle.styles[Comment] = "#408080"
+DefaultStyle.styles[Generic] = '#000000'
+DefaultStyle.styles[Literal] = '#000000'
+DefaultStyle.styles[Name] = '#000000'
+DefaultStyle.styles[Punctuation] = '#000000'
+DefaultStyle.styles[Text] = '#000000'
+DefaultStyle.styles[Other] = '#000000'
 class CodeToHtmlStyle(DefaultStyle):
     pass
 
@@ -152,9 +157,11 @@ def CodeToHtml(baseFileName):
     hi_code = highlight(code, lexer, formatter)
     # Remove a little goop created by the full=True option above
     hi_code = hi_code.replace('\n<h2>' + formatter.title + '</h2>\n\n', '', 1)
-    # Force an &lt;pre&gt; tag to occupy one line, instead of collapsing to an empty element, with <code>min-height: 1em</code>. Make it single spaced instead of the default double spacing with <code>margin: 0px</code>.<br />
+    # Add a body style
     hi_code = hi_code.replace('pre { line-height: 125%; }', 
-                              'pre { line-height: 125%; margin: 0px; min-height: 1em }', 1)
+                              'body { font-family: sans-serif; ' + 
+                              'display: inline-block; width: 5.5in; ' +
+                              'color: #408080 }', 1)
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
 
@@ -175,6 +182,7 @@ def convert(baseFileName):
       if os.path.exists(source_file_name) else 0
     html_time = os.stat(html_file_name).st_mtime \
       if os.path.exists(html_file_name) else 0
+    html_time = 0
     if source_time > html_time:
         print('Source newer')
         CodeToHtml(baseFileName)
