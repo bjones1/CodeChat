@@ -34,7 +34,7 @@ import re
 
 # Put all text (whitespace, newlines) in a span
 pygments.token.STANDARD_TYPES[Text] = 't'
-# Keep all comments out of a span
+# Keep all comments out of a span when empty (easier editing); use the value 'c' to put comment in a span (typesets nicely)
 pygments.token.STANDARD_TYPES[Comment] = ''
 
 # The string indicating a comment in the chosen programming language. This must
@@ -72,7 +72,8 @@ class CodeToHtmlFormatter(HtmlFormatter):
             # nest get smaller!</li><li>By adding the <tt><a href="http://www.w3.org/TR/CSS2/visuren.html#display-prop">display</a>: inline-block</tt> attribute, the entire comment will be indented by whatever spaces preceed it. However, this either grows the right margin by the indent or causes the entire comment to fall on to the next line, making it hard to read. The addition of <code><span class="s">width: 5.5in</span></code> avoid this problem by limiting the max width of a comment. An ideal solution would be to dynamically set this so the width extends to the edge of the screen, but this would require JavaScript (I think).<br /></li>
             # <li> TODO: No multi-line comment support yet.</li></ul>
             if (ttype is Token.Comment) or (ttype is Token.Comment.Single):
-                pass
+                style += 'font-family: sans-serif; ' + \
+                         'display: inline-block; width: 5.5in; '
             else:
                 style += 'font-family: monospace; white-space: pre; font-size:large; '
 	    # End of modification.
@@ -100,12 +101,6 @@ class CodeToHtmlFormatter(HtmlFormatter):
         merged_token_source = self._merge_comments(nl_token_source)
         source = self._format_lines1(merged_token_source)
         return source
-#        for is_code, line in source:
-#            if is_code and line.startswith('<span class="'):
-#                index = line.find('>') + 1
-#                yield is_code, line[:index] + '<br />' + line[index:]
-#            else:
-#                yield is_code, line
                 
     def _expand_nl(self, token_source):
         # Break any comments ending in a newline into two separate tokens

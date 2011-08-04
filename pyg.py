@@ -127,12 +127,13 @@
 # <ul><li>The&nbsp;HTML&lt;-&gt;Code bridge <a href="pyg_module.html">module</a></li>
 #     <li>The&nbsp;HTML&lt;-&gt;Code bridge <a href="pyg_test.html">test suite</a></li></ul>
 from pygments.styles.default import DefaultStyle
-from pygments.token import Generic, Literal, Name, Punctuation, Text, Other
+from pygments.token import Generic, Literal, Name, Punctuation, Text, Other, Comment
 
 # <a name="CodeToHtmlStyle"></a>Define a new style based on the default style, but which
 # places comments in a non-italic font. Because the base class (Styles) is a metaclass, first
 # change the desired member, then inherit (so the metaclass
 # runs on the modified value in the default style).
+DefaultStyle.styles[Comment] = '#408080'
 DefaultStyle.styles[Generic] = '#000000'
 DefaultStyle.styles[Literal] = '#000000'
 DefaultStyle.styles[Name] = '#000000'
@@ -160,7 +161,6 @@ def CodeToHtml(baseFileName):
     # Add a body style
     hi_code = hi_code.replace('pre { line-height: 125%; }', 
                               'body { font-family: sans-serif; ' + 
-                              'display: inline-block; width: 5.5in; ' +
                               'color: #408080 }', 1)
     outfile.write(hi_code)
     print("Wrote " + baseFileName + '.html')
@@ -195,6 +195,6 @@ def convert(baseFileName):
 # Run interface
 if __name__ == '__main__':
     convert('pyg')
-#    convert('pyg_module')
-#    convert('pyg_test')
+    convert('pyg_module')
+    convert('pyg_test')
 #    convert('winclient')
