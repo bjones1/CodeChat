@@ -360,6 +360,9 @@ class CodeToHtmlFormatter(HtmlFormatter):
 # </ol>
 # Beautiful Soup v3.x version
 from BeautifulSoup import BeautifulSoup, Tag, NavigableString
+# Since span tags have the whitespace: pre attribute, require Beautiful Soup to preserve it.
+BeautifulSoup.PRESERVE_WHITESPACE_TAGS.add('span')
+
 # Beautiful Soup v4.x version
 # from bs4 import BeautifulSoup, Tag, NavigableString
 # from bs4.builder import HTMLTreeBuilder
@@ -397,7 +400,7 @@ class HtmlToCodeTranslator(object):
 
     # Translate a chunk of html
     def translateBody(self, soup, state):
-#        print state, soup, ('"%s"' % self.indent), self.at_newline
+        print state, soup, ('"%s"' % self.indent), self.at_newline
         if isinstance(soup, NavigableString):
             if state == self.State.inPre:
                 # Update indent -- empty unless this is a newline followed by spaces
@@ -414,17 +417,24 @@ class HtmlToCodeTranslator(object):
                 # For each line, try to guess an indent before the # character.
                 # If an indent isn't found, just put it at the beginning of the line.
                 s = str(soup)
-                # Only add comment chars to lines 2 and following. The first line is already taken care of when entering the inComment state.
+                # Only add comment chars to the first line if this is a newline
                 lines = s.split('\n')
                 L = [lines.pop(0)]
+                if self.at_newline:
+                    L[0] = comment_string + L[0]
                 for line in lines:
                     if self.indent and line.startswith(self.indent):
                         # If the line begins with an indent, insert the comment char after the indent
                         (indent, comment) = line.split(self.indent, 1)
                         L.append(self.indent + comment_string + comment)
                     else:
-                        # Put a comment char at the beginning of the line, unless the next tag is a pre
-                        if isinstance(soup.next, Tag) and (soup.next.name == 'pre'):
+                        # Put a comment char at the beginning of the line, unless the next tag is code
+                        attrs = dict(soup.next.attrs) if isinstance(soup.next, Tag) else {}
+                        if (isinstance(soup.next, Tag) and 
+                            ((soup.next.name == 'pre') or
+                             ((soup.next.name == 'span') and
+                              ('class' in attrs) and 
+                              ((attrs['class'] != 'c') and (attrs['class'] != 'c1'))))):
                             L.append(line)
                         else:
                             L.append(comment_string + line)
@@ -451,10 +461,14 @@ class HtmlToCodeTranslator(object):
                   ((attrs['class'] == 'c') or (attrs['class'] == 'c1'))):
                 state = self.State.inComment
                 L.append(comment_string)
+                self.at_newline = False
             elif state != self.State.inPre:
             # Output the tag only if we're still outsidePre or if we're still inComment.
                 tags = self.strTag(soup)
                 L.insert(0, tags[0])
+                if self.at_newline:
+                    L[0] = comment_string + L[0]
+                    self.at_newline = False
             for c in soup.contents:
                 L.append(self.translateBody(c, state))
             if tags and (len(tags) > 1):
@@ -497,4 +511,8 @@ def unescape(text):
                 pass
         return text # leave as is
     return re.sub("&#?\w+;", fixup, text)
-# 
+
+
+if __name__ == '__main__':
+    from pyg_test import runAll
+    runAll()
