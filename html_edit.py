@@ -573,7 +573,6 @@ class MyWidget (QtGui.QWidget, form_class):
         QtGui.QWidget.__init__(self, parent, *args)
         self.setupUi(self)
         self.plainTextEdit.setPlainText(rest_text)
-        self.lowercase_text = rest_text.lower()
         str = publish_string(rest_text, writer_name='html')
         self.textEdit.setHtml(str)
         
@@ -594,51 +593,68 @@ class MyWidget (QtGui.QWidget, form_class):
         # In that case, use the last fragment instead.
         if current_fragment is not None:
             text = current_fragment.text()
-            found = self.highlight_plain_text(text)
-            print 'Fragment "%s" %s' % (text, found)
-            
-    def highlight_plain_text(self, text):
-        """Find a snippet of text found in the GUI version of the document
-           in the plain text version.
-           Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
-        """
-        # A zero-length string can't be matched.
-        if len(text) == 0: return False
-        # Check to see how many instances of this snippet we can find.
-        lower_text = str(text).lower()
-        if lower_text.count(u'\u00a0'): print "Warning, non-breaking spaces found."
-        count = self.lowercase_text.count(lower_text)
-        if count == 1:
-            # If there's a unique instance, hilight it.
+            search_loc = (cursor.position(), current_fragment.position(), 
+                          current_fragment.position() + len(text))
+            found = highlight_plain_text(unicode(self.textEdit.toPlainText()),
+                                         search_loc,
+                                         unicode(self.plainTextEdit.toPlainText()))
             # Because the find operation looks forward from the current location,
             # move to the beginning of the document.
-            beginning = QtGui.QTextCursor()
-            beginning.setPosition(0)
-            self.plainTextEdit.setTextCursor(beginning)
-            found = self.plainTextEdit.find(text)
             # To do: set the highlight based on indexes from Python, to work
             # around the a0 space thing.
-            assert found
-            return True
-        else:
-            # If there's multiple matches, give up.
-            if count > 1: return False
-            # If the string is one character, give up. This also avoids
-            # infinite recursion in the following call.
-            length = len(text)
-            if length == 1: return False
-            # If there are no matches, divide and conquer
-            return (self.highlight_plain_text(text[:length/2]) or
-                    self.highlight_plain_text(text[length/2:]))
+            print ('Fragment "%s" (%d, %d, %d) found at %d.' % 
+              (text, search_loc[0], search_loc[1], search_loc[2], found))
+            if found >= 0:
+                beginning = QtGui.QTextCursor()
+                beginning.setPosition(0)
+                self.plainTextEdit.setTextCursor(beginning)
+                found = self.plainTextEdit.find(text)
+            
+# Given a location in the text of an HTML document, finds the corresponding
+# location in a source document.
+#   search_text - The text (with NO markup) composing the HTML document
+#   search_loc - A tuple of (loc, start_loc, end_loc) giving the desired
+#                location in the HTML text, followed by a range of text
+#                that is probably easy to match which contains loc.
+#   source_text - The source document
+#   returns - A location in the source document, or -1 if not found
+
+def highlight_plain_text(search_text, search_loc, plain_text):
+    """Find a snippet of text found in the GUI version of the document
+       in the plain text version.
+       Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
+    """
+    (loc, start_loc, end_loc) = search_loc
+    assert start_loc <= end_loc
+    search_str = search_text[start_loc:end_loc]
+    # A zero-length string can't be matched.
+    if start_loc == end_loc: return -1
+#    if lower_text.count(u'\u00a0'): print "Warning, non-breaking spaces found."
+    # Check to see how many instances of this snippet we can find.
+    count = plain_text.count(search_str)
+    if count == 1:
+        # If there's a unique instance, we're done.
+        return plain_text.index(search_str)
+    else:
+        # If there's multiple matches, give up (for now) -- BUG.
+        if count > 1: return -1
+        # If the string is one character, give up. This also avoids
+        # infinite recursion in the following call.
+        length = end_loc - start_loc
+        if length == 1: return -1
+        # If there are no matches, divide and conquer
+        found_loc = highlight_plain_text(search_text, 
+                                         (loc, start_loc, start_loc + length/2), plain_text)
+        if found_loc >= 0: return found_loc
+        return highlight_plain_text(search_text,
+                                    (loc, start_loc + length/2, end_loc), plain_text)
 
 
 if __name__ == '__main__':
-    # Instantiate the app and GUI
+    # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     form = MyWidget(None)
-    # Run GUI
     form.show()
-    # Place the GUI beside the 3D display
     app.exec_()
 
 
@@ -658,43 +674,3 @@ if __name__ == '__main__1':
     s = difflib.SequenceMatcher(None, "goodger", rest_text)
     print s.get_matching_blocks()
     
-    
-if __name__ == '__main__1':
-    rest_text1 = """
-.. This is a comment. Note how any initial comments are moved by
-   transforms to after the document title, subtitle, and docinfo.
-
-================================
- reStructuredText Demonstration
-================================
-
-.. Above is the document title, and below is the subtitle.
-   They are transformed from section titles after parsing.
-
---------------------------------
- Examples of Syntax Constructs
---------------------------------
-
-.. bibliographic fields (which also require a transform):
-
-:Author: David Goodger
-:Address: 123 Example Street
-          Example, EX  Canada
-          A1B 2C3
-:Contact: goodger@python.org
-:Authors: Me; Myself; I
-:organization: humankind
-:date: $Date: 2006-05-21 22:44:42 +0200 (Son, 21 Mai 2006) $
-:status: This is a "work in progress"
-:revision: $Revision: 4564 $
-:version: 1
-:copyright: This document has been placed in the public domain. You
-            may do with it as you wish. You may copy, modify,
-            redistribute, reattribute, sell, buy, rent, lease,
-            destroy, or improve it, quote it at length, excerpt,
-            incorporate, collate, fold, staple, or mutilate it, or do
-            anything else to it that your or anyone else's heart
-            desires.
-:field name: This is a generic bibliographic field.
-"""
-    print rest_text.lower().count('field name:'.lower())
