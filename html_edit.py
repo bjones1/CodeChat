@@ -562,7 +562,8 @@ section, "Docutils System Messages":
 """
 
 from PyQt4 import QtGui, uic
-from docutils.core import publish_string
+#from docutils.core import publish_string
+from sphinx.cmdline import main
 import sys
 import difflib
 
@@ -572,8 +573,14 @@ class MyWidget (QtGui.QWidget, form_class):
     def __init__(self, parent = None, selected = [], flag = 0, *args):
         QtGui.QWidget.__init__(self, parent, *args)
         self.setupUi(self)
-        self.plainTextEdit.setPlainText(rest_text)
-        str = publish_string(rest_text, writer_name='html')
+#        self.plainTextEdit.setPlainText(rest_text)
+#        str = publish_string(rest_text, writer_name='html')
+        with open('index.rst', 'r') as f:
+            self.plainTextEdit.setPlainText(f.read())
+        main( ('', '-b', 'html', '-d', '_build/doctrees', '.', '_build/html') )
+        str = ''
+        with open('_build/html/index.html', 'r') as f:
+            str = f.read()
         self.textEdit.setHtml(str)
         
     def on_textEdit_cursorPositionChanged(self):
