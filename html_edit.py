@@ -609,13 +609,15 @@ class MyWidget (QtGui.QWidget, form_class):
             # move to the beginning of the document.
             # To do: set the highlight based on indexes from Python, to work
             # around the a0 space thing.
-            print ('Fragment "%s" (%d, %d, %d) found at %d.' % 
-              (text, search_loc[0], search_loc[1], search_loc[2], found))
             if found >= 0:
                 beginning = QtGui.QTextCursor()
                 beginning.setPosition(0)
                 self.plainTextEdit.setTextCursor(beginning)
                 found = self.plainTextEdit.find(text)
+                print ('Fragment "%s" (%d, %d, %d) found at %d.' % 
+                    (text, search_loc[0], search_loc[1], search_loc[2], found))
+            else:
+                print 'Fragment "%s" not found.' % text
             
 # Given a location in the text of an HTML document, finds the corresponding
 # location in a source document.
