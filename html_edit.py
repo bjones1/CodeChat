@@ -14,7 +14,10 @@ class MyWidget (QtGui.QWidget, form_class):
 #        str = publish_string(rest_text, writer_name='html')
         with open('index.rst', 'r') as f:
             self.plainTextEdit.setPlainText(f.read())
-        main( ('', '-b', 'html', '-d', '_build/doctrees', '.', '_build/html') )
+        self.update_html()
+        
+    def update_html(self):
+        main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
         with open('_build/html/index.html', 'r') as f:
             str = f.read()
@@ -71,6 +74,13 @@ class MyWidget (QtGui.QWidget, form_class):
 #                    (text, search_loc[0], search_loc[1], search_loc[2], found))
             else:
                 print 'Fragment "%s" not found.' % text
+                
+    def on_updatePushButton_pressed(self):
+        print "Pressed!"
+        with open('index.rst', 'w') as f:
+            f.write(str(self.plainTextEdit.toPlainText()))
+        self.update_html()
+
             
 # Given a location in the text of one document (the source), finds the corresponding
 # location in a target document.
