@@ -1,0 +1,156 @@
+Input line ID   ECRRDB01   standard; RNA; PRO; 1504 BP.
+None
+Input line XX
+None
+Input line AC   M25588; M24891; M24892; M24893;
+None
+Input line XX
+None
+Input line SV   M25588.1
+None
+Input line XX
+None
+Input line NI   g174378
+None
+Input line XX
+None
+Input line DT   23-NOV-1989 (Rel. 21, Created)
+None
+Input line DT   05-APR-1996 (Rel. 47, Last updated, Version 7)
+None
+Input line XX
+None
+Input line DE   E.coli 16S rRNA.
+None
+Input line XX
+None
+Input line KW   16S ribosomal RNA.
+None
+Input line XX
+None
+Input line OS   Escherichia coli
+None
+Input line OC   Bacteria; Proteobacteria; gamma subdivision; Enterobacteriaceae;
+None
+Input line OC   Escherichia.
+None
+Input line XX
+None
+Input line RN   [1]
+None
+Input line RP   1-1504
+None
+Input line RX   MEDLINE; 75139062.
+None
+Input line RA   Ehresmann C., Stiegler P., Mackie G.A., Zimmermann R.A., Ebel J.P.,
+None
+Input line RA   Fellner P.;
+None
+Input line RT   "Primary sequence of the 16S ribosomal RNA of Escherichia coli";
+None
+Input line RL   Nucleic Acids Res. 2:265-278(1975).
+None
+Input line XX
+None
+Input line RN   [2]
+None
+Input line RX   MEDLINE; 77031699.
+None
+Input line RA   Engelberg H., Schoulaker R.;
+None
+Input line RT   "Sequence homologies between ribosomal and phage RNAs: a proposed
+None
+Input line RT   molecular basis for RNA phage parasitism";
+None
+Input line RL   J. Mol. Biol. 106:709-730(1976).
+None
+Input line XX
+None
+Input line CC   NCBI gi: 174378
+None
+Input line XX
+None
+Input line FH   Key             Location/Qualifiers
+None
+Input line FH
+None
+Input line FT   source          1..1504
+None
+Input line FT                   /db_xref="taxon:562"
+None
+Input line FT                   /organism="Escherichia coli"
+None
+Input line FT   unsure          93..94
+None
+Input line FT                   /note="tt could be c"
+None
+Input line FT   unsure          113
+None
+Input line FT                   /note="t could be g"
+None
+Input line FT   unsure          181
+None
+Input line FT                   /note="t could be c"
+None
+Input line FT   modified_base   530
+None
+Input line FT                   /mod_base=m7g
+None
+Input line FT   unsure          792
+None
+Input line FT                   /note="g could be deleted"
+None
+Input line FT   unsure          911
+None
+Input line FT                   /note="m2g could be g"
+None
+Input line FT   modified_base   911
+None
+Input line FT                   /mod_base=m2g
+None
+Input line FT   modified_base   1059
+None
+Input line FT                   /mod_base=m5c
+None
+Input line FT   unsure          1245
+None
+Input line FT                   /note="t could be g"
+None
+Input line FT   modified_base   1366
+None
+Input line FT                   /note="m4c"
+None
+Input line FT                   /mod_base=OTHER
+None
+Input line FT   unsure          1371
+None
+Input line FT                   /note="t could be c"
+None
+Input line FT   modified_base   1372
+None
+Input line FT                   /mod_base=m5c
+None
+Input line FT   unsure          1372
+None
+Input line FT                   /note="m5c could be c"
+None
+Input line FT   modified_base   1480
+None
+Input line FT                   /note="m26a"
+None
+Input line FT                   /mod_base=OTHER
+None
+Input line FT   modified_base   1481
+None
+Input line FT                   /note="m26a"
+None
+Input line FT                   /mod_base=OTHER
+None
+Input line XX
+None
+Input line SQ   Sequence 1504 BP; 367 A; 354 C; 471 G; 312 T; 0 other;
+None
+Input line >ECRRDB01
+None
+Input line aaattgagagtttgatcatggctcagattgaacgctggcggcaggcctaacacatgcaagtcgaacggtaacagcagaagggcttgctgcttttgacgctggacggcgagtgtgtaatgtctgggaaactgcctggggggagatgataacacttggaaacggtagctaatacgtgcataatgtcgcaagaccgaaagagggggaccttcgggcctcttgccatcggatgcccagatgggattaggggtagctagtaacgagtggctcacctaggcgacgattccagctggtctgagagggatgaccagcaccactggaactgagacacggtccagactcctacgggggcagcagtggggaatattgcacaatgggcgcaagcctgatgcagccatgtgccgtatgaaggaagccttcgggttgtgaagggagtaaagtctaatactttgctcattgttacccgacgcagcgaagaagccacgtactttcagcgagagaagggggggtggctaactccgtgccagcagccgcggtaatacgaggttaatcgcaagcgtgggcggaattactgtaaagcacgagcgcctggtttgttaagtcagatgtgaaatccccgggcctaaccctgggaactgcatctgatactggcaagcttgtaggtctcggagaggtagaattccagtagagatctggggaataccggtggcggaagcccccctggcggactgacgaaagctcaggtgtgcgggggcatactccgccggtagtccacgtaaacgatgtcgtggggtgacttgccccttgaggcgtggccttcgaggcgctaacgttaagtcgcctgacccgggggggtacgccgcaaggttaaaactcaaatcgaattgggggcccggagcacaagacgcatgatgtgcgtttaattcgcaacgaagaaccttacctggtcttgaccatcacggaagtgttttcagagatgagaatgtgcttccgggaaccgagacagctgcatggctgtcaggtcgtgttgtgttgcgaaatgggtcccgttaagttgcctgcaacgagcaacccttatcctttgttgccagcgggaactcaaagagagactgccagccgtccgtggattaaacgagggggggaagtggggatgacgtcaagtcatcatggcccccttcacgaccagggcacacactgtgctacaatggcgcatcacaaagagagcgactcccgcgagagcaagcggatctcataaagtcgtgcgtagtctgaggtccggattgctaaccgactccatgaagtcggaatcgctagtgtaatcggatccagaatgcaccggtgaatacgttcccgggccttgtacacacgccccgtcacaccatggggtggaggtgactgtgggttgatattcgtccaaaagaagtaggtagcttaaccttcgggagggcttaccactttgtcgtaacaaggtaaccgtaggggaacctgcggttggatcacctcctta
+[(41, 62)]

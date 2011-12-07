@@ -1,0 +1,2 @@
+agrepy.compile: The max number of errors must be 1 .. 8
+	The min value (1) assumed

@@ -1,0 +1,28 @@
+Input line ID   A16SRRNA   standard; DNA; PRO; 1497 BP.
+None
+Input line OC   Bacteria, Firmicutes, Actinobacteria, Actinobacteridae, Actinomycetales,
+[(61, 75)]
+Input line OS   Actinomycetaceae  ok
+[(5, 21)]
+Input line OX   Actinimycetaceae  subst i
+[(5, 21)]
+Input line OY   ctinomycetaceae.  front del
+[(4, 20)]
+Input line OZ   Actinomyctaceae"  mid del ct
+[(5, 20)]
+Input line OP   Actinomycetacea"  end del
+[(5, 21)]
+Input line OQ   Actinomycretaceae  ins
+[(5, 22)]
+Input line OR   Actinimycretaceae  subst + ins
+[(5, 22)]
+Input line OS   ActonimycAetaceae  2*subst + ins
+[(5, 22)]
+Input line OT   Actinomycetatinomyctaceae.  front del
+[(15, 30)]
+Input line FT   /organism="ActinomyctaceaeActinomycetacea" abutting
+[(16, 31), (31, 47)]
+Input line FT   /organism="Actinomyctaceae"  or "Actinomycetacea" small separation
+[(16, 31), (38, 54)]
+Input line FT   /organism="Actinomyctaceae" separated by a large space from organism="Actinomycetacea"
+[(16, 31), (75, 91)]

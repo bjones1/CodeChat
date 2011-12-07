@@ -1,0 +1,145 @@
+            AGREPY: PYTHON PORT OF AGREP
+	    Version 1.2  September  2002
+
+INTRODUCTION
+
+These files contain a port, to Python of the inexact string
+matching functionality of agrep.
+
+Agrep, written by Sun Wu and Udi Manber (described in "Fast
+Text Searching Allowing Errors", CACM, 35(10), 1992), is a suite
+of C functions which together perform various string matching
+operations under UNIX (i.e. specified at the commandline). The
+most recent version is 2.04, and is available from
+http://glimpse.cs.arizona.edu/software.html . The suite
+contains functions for exact string matching, matching allowing
+a small maximum number of insertions, deletions or substitutions,
+and functions for matching patterns containing metacharacters
+(i.e. regular expressions). Inexact matching of patterns involving
+regular expressions is also allowed, and another function performs
+matching on a file of input string, rather than just a single
+string specificied on the command-line.  Finally, while the default
+text unit is the \n (or \r) terminated line, multiline matching is
+available through the specification (again on the command-line) of a
+"record" separator. Given an input pattern and a file, agrep prints
+on standard output all records that match the pattern (so a single
+match suffices to have a record printed).
+
+AGREPY
+
+This port takes agrep from its current, user level setting and
+makes it available as a Python module. However, in recent Python
+implementations, much of the functionality described above is already
+covered: exact matching is already found in the string module and
+regular expression matching is in the regsub and re modules. Furthermore,
+in the context of embedded functions (rather than command-line), IO and
+the defintion of a text string are handled by the surrounding application
+and are therefore no longer relevant. Therefore, what this port implements
+are solely those functions relating to inexact matching of text strings
+which contain no metacharacters. (Inexact matching of regular expressions
+has been ignored because the semantics are not clear - at least to me;
+concurrent matching of multiple input patterns is deferred to another day).
+On the other hand, apgrepy extends agrep in the following sense:
+given a pattern and a text string, agrepy and returns a list of all,
+non-overlapping pairs of text indexes such that the start index is the
+first character of the text that matches the earliest pattern character
+exactly, and the end is the last text character that matches exactly. The end
+index of each match is 1 place greater than the actual index so it
+can be immediately used to construct a slice. (agrep itself is
+content with recognizing that the input line contains a match,
+but does not say where or differentiate multiple matches.)
+
+Specifically, AGREPY Pythonizes two functions from file sgrep.c
+of agrep version 2.04. "agrep", now called, sagrep, deals with
+"short" pattern strings (setable by a header constant, currently 24),
+and "a_monkey", now called lagrep, which deals with longer strings.
+Each of these is supported by functions which set up the data structures
+used during matching. SWIG, http://www.swig.org/, is used to create
+the interface module.  As far as possible, the original code of agrep
+has been preserved, except where required by the new circumstances (e.g.
+to support determination of match end-points) or forced by SWIG
+(e.g. move from K&R headers to ANSI prototypes, elimination of
+function-like C preprocessor macros). I also indulged in a little
+tidying up of the code to make it easier to maintain.
+
+MODULE CONTENTS
+
+agrepy contains two functions:
+
+compile(<pattern string>, <pattern length>, <max number of errors>)
+
+Must be called for each new pattern or altered maximum number of errors.
+The pattern must be no longer than 256 chacters and the specified
+maximum number of errors between 1 and 8. (You are far better off using
+one of the conventional string search functions such as `find' if you
+expecting 0 errors!) compile returns a C object which is passed to agrepy.
+
+
+agrepy(<pattern string>, <pattern length>, <text string>, <text length>,
+		<Go-To-Ends>, <pattern compilation object>)
+
+Performs inexact matching on the text string, return a list
+(possibly empty) of pairs of match end-points.  The fourth argument,
+<Go-To-Ends>, is an integer (0 or 1) interpreted as a boolean, which forces
+matching to extend to the end of the pattern, even if it has been satisfied
+already given the number of errors permitted. This gives a better indication
+of the scope of the match in the text string.
+
+
+MANIFEST
+
+Makefile
+README
+agrep.c		Main program
+lagrep.c	Long patterns matching and compilation functions
+sagrep.c	Short patterns matching and compilation functions
+agrep.h
+agrep.i		SWIG input file (generates agrep_wrap.c)
+agrep_wrap.c	Shouldn't need to regenerate this
+
+runtests	A shell test application
+testagrepy.py	Called from runtests, runs various tests
+xxxy1, out1	Data file for test program and sample output
+xxxy2, out2	Data file for test program and sample output
+xxxy3, out3	Data file for test program and sample output
+errs.errs1 out.errs1	Error check output files
+long_pattern errs.errs2 out.errs2	Error check output files
+long_string out.long  Very long  test string
+
+COPYRIGHT.agrep Copyright notice for original agrep implementation
+
+
+COPYRIGHT
+For the copyright on the orginal algorithms see the file COPYRIGHT.agrep.
+Other portions have been written by Michael J. Wise and are copyright
+under the terms of Open Source Definition (http://www.opensource.org/osd.html).
+
+
+Systems Tested
+
+PC/Linux  
+SGI/IRIX
+
+
+Version History
+Version 1.0 July 1999
+  First posting
+
+Version 1.1 September 1999
+  The orginal version had an end-of-text bug (sagrepy.c), and both versions had
+  problems finding the correct ends of a match. There also can be a genuine
+  ambiguity. The methodology now is that sagrepy/lagrepy find the ends of matches
+  fairly accurately, and a separate, recursive function firms up the end position
+  and finds the start position. 
+
+Todo
+  Faced with small, more or less evenly distributed alphabets, e.g. DNA, lagrepy's
+  two character hashing is not particularly effective when the number of mismatches
+  is above 1. It works, but the efficiency suffers. The solution employed by agrep
+  is to treat DNA as a special case after first traversing the pattern to acertain
+  that it just contains members of the alphabet a,c,t,g or n. A better solution would
+  be to recognize that the pattern is from a limited alphabet and change the hashing
+  to cover a larger number of characters (currently just 2).
+
+Version 1.2 Sep 2002
+  A number of small changes, most visibily to the arguments to agrepy.

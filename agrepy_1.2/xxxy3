@@ -1,0 +1,52 @@
+ID   AXD005     standard; DNA; PRO; 1462 BP.
+XX
+AC   D88005;
+XX
+SV   D88005.1
+XX
+NI   d1070555
+XX
+DT   02-NOV-1996 (Rel. 49, Created)
+DT   04-JUN-1999 (Rel. 59, Last updated, Version 2)
+XX
+DE   Alcaligenes xylosoxidans DNA for 16S ribosomal RNA.
+XX
+KW   16S ribosomal RNA.
+XX
+OS   Achromobacter xylosoxidans subsp. xylosoxidans
+OC   Bacteria; Proteobacteria; beta subdivision; Alcaligenaceae;
+OC   Achromobacter; Achromobacter xylosoxidans.
+XX
+RN   [1]
+RP   1-1462
+RA   Kunitho T.;
+RT   ;
+RL   Submitted (25-SEP-1996) to the EMBL/GenBank/DDBJ databases.
+RL   Takashi Kunitho, University of Tokyo, Graduate school of Agriculture and
+RL   Agricultural life science; Yayoi 1-1-1, Bunkyo-ku, Tokyo 113, Japan
+RL   (E-mail:aoyaizu@hongo.ecc.u-tokyo.ac.jp, Tel:81-3-3812-2111,
+RL   Fax:81-3-3812-0544)
+XX
+RN   [2]
+RP   1-1462
+RA   Anzai Y., Koseki Y., Kunito T., Kim H., Shibata S., Kawasaki H.,
+RA   Oyaizu H.;
+RT   "Taxonomic study of metalotorelant strains of genus Ralstonia: Proposal
+RT   for three new species, Ralstonia metalotorelans sp. nov., Ralstonia
+RT   silverii sp. nov., and Ralstonia tsushimaensis sp. nov.";
+RL   Unpublished.
+XX
+FH   Key             Location/Qualifiers
+FH
+FT   source          1..1462
+FT                   /db_xref="taxon:515"
+FT                   /sequenced_mol="DNA"
+FT                   /organism="Achromobacter xylosoxidans subsp. xylosoxidans"
+FT                   /strain="IAM12684"
+FT                   /sub_species="xylosoxidans"
+FT   rRNA            1..1462
+FT                   /product="16S ribosomal RNA"
+XX
+SQ   Sequence 1462 BP; 372 A; 344 C; 460 G; 285 T; 1 other;
+>AXD005
+acgctagcgggatgccttacacatgcaagtcgaacggcagcacggacttcggtctggtggcgagtggcgaacgggtgagtaatgtatcggaacgtgcccagtagcgggggataactacgcgaaagcgtagctaataccgcatacgccctacgggggaaagcaggggatcgcaagaccttgcactattggagcggccgatatcggattagctagttggtggggtaacggctcaccaaggcgacgatccgtagctggtttgagaggacgaccagccacactgggactgagacacggcccagactcctacgggaggcagcagtggggaattttggacaatgggggaaaccctgatccagccatcccgcgtgttcgatgaaggccttcgggttgtaaagcacttttngcaggaaagaacgtcgcgggttaatacctcgcgaacttacggtaccttgcagaataagcaccggctaactacgtgccagcagccgcggtaatacgtagggtgcaagcgttaatcggaattactgggcgtaaagcgtgcgcaggcggttcggaaagaaagatgtgaaatcccagagcttaactttggaactgcatttttaactaccgggctagagtgtgtcagagggaggtggaattccgcgtgtagcagtgaaatgcgtagatatgcggaggaacaccgatggcgaaggcagcctcctgggataacactgacgctcatgcacgaaagcgtggggagcaaacaggattagataccctggtagtccacgccctaaacgatgtcaactagctgttggggccttcgggccttggtagcgcacgtaacgcgtgaagttgaccgcctggggagtacggtcgcaagattaaaactcaaaggaattgacggggacccgcacaagcggtggatgatgtggattaattcgatgcaacgcgaaaaaccttacctacccttgacatgtctggaatgccgaagagatttggcagtgctcgcaagagaaccggaacacaggtgctgcatggctgtcgtcagctcgtgtcgtgagatgttgggttaagtcccgcaacgagcgcaacccttgtcattagttgctacgaaagggcactctaatgagactgccggtgacaaaccggaggaaggtggggatgacgtcaagtcctcatggcccttatgggtagggcttcacacgtcatacaatggtcgggacagagggtcgccaacccgcgagggggagccaatcccagaaacccgatcgtagtccggatcgcagtctgcaactcgactgcgtgaagtcggaatcgctagtaatcgcggatcagcatgtcgcggtgaatacgttcccgggtcttgtacacaccgcccgtcacaaccatgggagtgggtttaccagaagtagttagcctaaccgcaaggggggcgattaccacggtaggattcatgactggggtgaagtcgtaacaaggt
