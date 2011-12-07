@@ -23,8 +23,8 @@ Testing code::
   py = fee()
   stuff += 1
 
-  still code?
+  print 'still code?'
 
 Done. Math: :math:`c^2 = a^2 + b^2`.
 
-Inline: ``inline literal``.
+Inline: ``d = bar()``.
