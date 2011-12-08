@@ -89,8 +89,9 @@ class MyWidget (QtGui.QWidget, form_class):
     def on_plainTextEdit_cursorPositionChanged(self, cursor_pos = -1):
         if not self.ignore_next:
             # A negative pos means use current position
+            cursor = self.plainTextEdit.textCursor()
             if cursor_pos < 0:
-                cursor_pos = self.plainTextEdit.textCursor().position()
+                cursor_pos = cursor.position()
             source_text = str(self.plainTextEdit.toPlainText())
             search_loc = (cursor_pos, max(0, cursor_pos - 5), min(len(source_text), cursor_pos + 5))
             found = find_approx_text_in_target(source_text,
@@ -99,7 +100,11 @@ class MyWidget (QtGui.QWidget, form_class):
             text = source_text[search_loc[1]:search_loc[2]]
             if found >= 0:
                 pos = self.textEdit.textCursor()
-                pos.setPosition(found) #, QtGui.QTextCursor.KeepAnchor)
+                # Grow the selection if necessary; otherwise, just move the cursor.
+                pos.setPosition(found,
+                                QtGui.QTextCursor.MoveAnchor 
+                                if cursor.anchor() == cursor.position()
+                                else QtGui.QTextCursor.KeepAnchor)
                 print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
                       (text, search_loc[0], search_loc[1], search_loc[2], found))
                 self.ignore_next = True
@@ -137,13 +142,14 @@ class MyWidget (QtGui.QWidget, form_class):
                 found = find_approx_text_in_target(str(self.textEdit.toPlainText()),
                                                    search_loc,
                                                    str(self.plainTextEdit.toPlainText()))
-                # Because the find operation looks forward from the current location,
-                # move to the beginning of the document.
-                # To do: set the highlight based on indexes from Python, to work
-                # around the a0 space thing.
+                # Update position in source doc if text was found
                 if found >= 0:
                     pos = self.plainTextEdit.textCursor()
-                    pos.setPosition(found) #, QtGui.QTextCursor.KeepAnchor)
+                    # Grow the selection if necessary; otherwise, just move the cursor.
+                    pos.setPosition(found,
+                                    QtGui.QTextCursor.MoveAnchor 
+                                    if cursor.anchor() == cursor.position()
+                                    else QtGui.QTextCursor.KeepAnchor)
                     self.ignore_next = True
                     self.plainTextEdit.setTextCursor(pos)
                     self.set_html_editable(True)
@@ -163,6 +169,8 @@ class MyWidget (QtGui.QWidget, form_class):
             self.ignore_next = True
             self.update_html()
             self.ignore_next = False
+            # Resync panes. But causes a crash sometimes!
+            self.on_plainTextEdit_cursorPositionChanged()
 
             
 # Given a location in the text of one document (the source), finds the corresponding
