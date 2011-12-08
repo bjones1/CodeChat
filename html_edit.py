@@ -1,15 +1,18 @@
 from PyQt4 import QtGui, uic
 #from docutils.core import publish_string
-from sphinx.cmdline import main
+import sphinx.cmdline
 import sys
+import os
 import agrepy
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
 
 class MyWidget (QtGui.QWidget, form_class):
     def __init__(self, parent = None, selected = [], flag = 0, *args):
+        self.ignore_next = False
         QtGui.QWidget.__init__(self, parent, *args)
         self.setupUi(self)
+        self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
 #        self.plainTextEdit.setPlainText(rest_text)
 #        str = publish_string(rest_text, writer_name='html')
         with open('index.rst', 'r') as f:
@@ -17,63 +20,98 @@ class MyWidget (QtGui.QWidget, form_class):
         self.update_html()
         
     def update_html(self):
-        main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
         with open('_build/html/index.html', 'r') as f:
             str = f.read()
+        # Temporarily change to the HTML directory to load html, so Qt can access all
+        # the HTML resources (style sheets, images, etc.)
+        cur = os.getcwd()
+        os.chdir('_build/html')
         self.textEdit.setHtml(str)
+        os.chdir(cur)
+    
+    def set_html_editable(self, can_edit):
+        # Calling self.textEdit.setReadOnly(False) disables
+        # keyboard navigation. Use this to retain key nav.
+        # Note: I don't know a Python name for
+        # Qt::TextInteractionFlags. Use the values from
+        # http://doc.qt.nokia.com/latest/qt.html#TextInteractionFlag-enum
+        # instead.
+        old_flags = int(self.textEdit.textInteractionFlags())
+        new_flags = old_flags | 16 if can_edit else old_flags & ~16
+        self.textEdit.pyqtConfigure(textInteractionFlags=new_flags)
+        # BUG: the cursor is hidden when this is made uneditable. I'm not
+        # sure how to show it. The line below doesn't help.
+#        self.textEdit.setTextCursor(self.textEdit.textCursor())
+        # This causes a infinite loop.
+#        self.textEdit.moveCursor(QtGui.QTextCursor.NoMove)
         
     def on_plainTextEdit_cursorPositionChanged(self):
-        pos = self.plainTextEdit.textCursor().position()
-        source_text = str(self.plainTextEdit.toPlainText())
-        search_loc = (pos, max(0, pos - 5), min(len(source_text), pos + 5))
-        found = find_approx_text_in_target(source_text,
-                                           search_loc,
-                                           str(self.textEdit.toPlainText()))
-        text = source_text[search_loc[1]:search_loc[2]]
-        if found >= 0:
-            pos = self.textEdit.textCursor()
-            pos.setPosition(found, QtGui.QTextCursor.KeepAnchor)
-            self.textEdit.setTextCursor(pos)
-#            print ('Fragment "%s" (%d, %d, %d) found at %d.' % 
-#                  (text, search_loc[0], search_loc[1], search_loc[2], found))
-        else:
-            print 'Fragment "%s" not found.' % text
-        
-    def on_textEdit_cursorPositionChanged(self):
-        cursor = self.textEdit.textCursor()
-#        print "Cursor position %d, block %d" % (cursor.position(),
-#                                                cursor.blockNumber())
-        # Search for the current fragment in the block.
-        block = cursor.block()
-        iterator = block.begin()
-        current_fragment = None
-        while not iterator.atEnd():
-            current_fragment = iterator.fragment()
-            if current_fragment.contains(cursor.position()):
-                break
-            iterator += 1
-        # When the cursor is at the end of a line, it's not in any fragment.
-        # In that case, use the last fragment instead.
-        if current_fragment is not None:
-            text = current_fragment.text()
-            search_loc = (cursor.position(), current_fragment.position(), 
-                          current_fragment.position() + len(text))
-            found = find_approx_text_in_target(str(self.textEdit.toPlainText()),
+        if not self.ignore_next:
+            pos = self.plainTextEdit.textCursor().position()
+            source_text = str(self.plainTextEdit.toPlainText())
+            search_loc = (pos, max(0, pos - 5), min(len(source_text), pos + 5))
+            found = find_approx_text_in_target(source_text,
                                                search_loc,
-                                               str(self.plainTextEdit.toPlainText()))
-            # Because the find operation looks forward from the current location,
-            # move to the beginning of the document.
-            # To do: set the highlight based on indexes from Python, to work
-            # around the a0 space thing.
+                                               str(self.textEdit.toPlainText()))
+            text = source_text[search_loc[1]:search_loc[2]]
             if found >= 0:
-                pos = self.plainTextEdit.textCursor()
+                pos = self.textEdit.textCursor()
                 pos.setPosition(found, QtGui.QTextCursor.KeepAnchor)
-                self.plainTextEdit.setTextCursor(pos)
-#                print ('Fragment "%s" (%d, %d, %d) found at %d.' % 
-#                    (text, search_loc[0], search_loc[1], search_loc[2], found))
+                print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
+                      (text, search_loc[0], search_loc[1], search_loc[2], found))
+                self.ignore_next = True
+                self.textEdit.setTextCursor(pos)
+                self.set_html_editable(True)
+                self.ignore_next = False
             else:
                 print 'Fragment "%s" not found.' % text
+                self.ignore_next = True
+                self.set_html_editable(False)
+                self.ignore_next = False
+        
+    def on_textEdit_cursorPositionChanged(self):
+        if not self.ignore_next:
+            cursor = self.textEdit.textCursor()
+#            print "Cursor position %d, block %d" % (cursor.position(),
+#                                                    cursor.blockNumber())
+            # Search for the current fragment in the block.
+            block = cursor.block()
+            iterator = block.begin()
+            current_fragment = None
+            while not iterator.atEnd():
+                current_fragment = iterator.fragment()
+                if current_fragment.contains(cursor.position()):
+                    break
+                iterator += 1
+            # When the cursor is at the end of a line, it's not in any fragment.
+            # In that case, use the last fragment instead.
+            if current_fragment is not None:
+                text = current_fragment.text()
+                search_loc = (cursor.position(), current_fragment.position(), 
+                              current_fragment.position() + len(text))
+                found = find_approx_text_in_target(str(self.textEdit.toPlainText()),
+                                                   search_loc,
+                                                   str(self.plainTextEdit.toPlainText()))
+                # Because the find operation looks forward from the current location,
+                # move to the beginning of the document.
+                # To do: set the highlight based on indexes from Python, to work
+                # around the a0 space thing.
+                if found >= 0:
+                    pos = self.plainTextEdit.textCursor()
+                    pos.setPosition(found, QtGui.QTextCursor.KeepAnchor)
+                    self.ignore_next = True
+                    self.plainTextEdit.setTextCursor(pos)
+                    self.set_html_editable(True)
+                    self.ignore_next = False
+                    print ('HTML fragment "%s" (%d, %d, %d) found at %d.' % 
+                        (text, search_loc[0], search_loc[1], search_loc[2], found))
+                else:
+                    print 'Fragment "%s" not found.' % text
+                    self.ignore_next = True
+                    self.set_html_editable(False)
+                    self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
         print "Pressed!"
@@ -103,7 +141,7 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
     # with (I think) a short search string makes this take forever to run.
     # So, pick a number between 1 and 8, such at at least 1/5th of the chars
     # match.
-    mismatches = max(0, min(8, len(search_str)/5))
+    mismatches = max(1, min(8, len(search_str)/5))
 #    print "Searching for %s..." % search_str
     pat = agrepy.compile(search_str, len(search_str), mismatches)
 #    print "pattern compiled...",
