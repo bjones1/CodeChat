@@ -1,3 +1,16 @@
+# To do:
+# - Allow selections, not just cursor movement
+# - Figure out how to make cursor visible when html is changed to read-only
+# - Unit testing
+# - Figure out why searches initially don't work
+# - Get agrepy working with Unicode, use Unicode throughout
+# - Figure out how to get symbolic names for Qt::TextInteractionFlags
+# - Verify that agrep-found string cursor index is accurate
+# - Backsapce in HTML causes wrong char in plain text to be deleted
+# - What to do when a backspace in HTML deletes context not in the plain text?
+# - The obvious: translate code to reST, add GUI
+
+
 from PyQt4 import QtGui, uic
 #from docutils.core import publish_string
 import sphinx.cmdline
@@ -9,7 +22,7 @@ form_class, base_class = uic.loadUiType("html_edit.ui")
 
 class MyWidget (QtGui.QWidget, form_class):
     def __init__(self, parent = None, selected = [], flag = 0, *args):
-        self.ignore_next = False
+        self.ignore_next = True
         QtGui.QWidget.__init__(self, parent, *args)
         self.setupUi(self)
         self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
@@ -18,6 +31,28 @@ class MyWidget (QtGui.QWidget, form_class):
         with open('index.rst', 'r') as f:
             self.plainTextEdit.setPlainText(f.read())
         self.update_html()
+        # Ask for notification when the contents of either editor change
+        self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
+        self.plainTextEdit.document().contentsChange.connect(self.on_plainTextEdit_contentsChange)
+        self.ignore_next = False
+        
+    def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
+        if not self.ignore_next:
+            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+            self.ignore_next = True
+            for i in range(charsRemoved):
+                self.plainTextEdit.textCursor().deleteChar()
+            self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
+            self.ignore_next = False
+        
+    def on_plainTextEdit_contentsChange(self, position, charsRemoved, charsAdded):
+        if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
+            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+            self.ignore_next = True
+            for i in range(charsRemoved):
+                self.textEdit.textCursor().deleteChar()
+            self.textEdit.textCursor().insertText(self.plainTextEdit.toPlainText()[position:position + charsAdded])
+            self.ignore_next = False
         
     def update_html(self):
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
@@ -58,7 +93,7 @@ class MyWidget (QtGui.QWidget, form_class):
             text = source_text[search_loc[1]:search_loc[2]]
             if found >= 0:
                 pos = self.textEdit.textCursor()
-                pos.setPosition(found, QtGui.QTextCursor.KeepAnchor)
+                pos.setPosition(found) #, QtGui.QTextCursor.KeepAnchor)
                 print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
                       (text, search_loc[0], search_loc[1], search_loc[2], found))
                 self.ignore_next = True
@@ -100,7 +135,7 @@ class MyWidget (QtGui.QWidget, form_class):
                 # around the a0 space thing.
                 if found >= 0:
                     pos = self.plainTextEdit.textCursor()
-                    pos.setPosition(found, QtGui.QTextCursor.KeepAnchor)
+                    pos.setPosition(found) #, QtGui.QTextCursor.KeepAnchor)
                     self.ignore_next = True
                     self.plainTextEdit.setTextCursor(pos)
                     self.set_html_editable(True)
@@ -114,10 +149,12 @@ class MyWidget (QtGui.QWidget, form_class):
                     self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
-        print "Pressed!"
-        with open('index.rst', 'w') as f:
-            f.write(str(self.plainTextEdit.toPlainText()))
-        self.update_html()
+        if self.plainTextEdit.document().isModified():
+            with open('index.rst', 'w') as f:
+                f.write(unicode(self.plainTextEdit.toPlainText()))
+            self.ignore_next = True
+            self.update_html()
+            self.ignore_next = False
 
             
 # Given a location in the text of one document (the source), finds the corresponding
