@@ -6,7 +6,6 @@
 # - Get agrepy working with Unicode, use Unicode throughout
 # - Figure out how to get symbolic names for Qt::TextInteractionFlags
 # - Verify that agrep-found string cursor index is accurate
-# - Backsapce in HTML causes wrong char in plain text to be deleted
 # - What to do when a backspace in HTML deletes context not in the plain text?
 # - The obvious: translate code to reST, add GUI
 
@@ -38,8 +37,12 @@ class MyWidget (QtGui.QWidget, form_class):
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
-            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+#            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+            self.on_textEdit_cursorPositionChanged(position)
             self.ignore_next = True
+            if self.textEdit.isReadOnly():
+                print 'Oops -- cannot find changed text!'
+                return
             for i in range(charsRemoved):
                 self.plainTextEdit.textCursor().deleteChar()
             self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
@@ -47,7 +50,8 @@ class MyWidget (QtGui.QWidget, form_class):
         
     def on_plainTextEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
-            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+#            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+            self.on_plainTextEdit_cursorPositionChanged(position)
             self.ignore_next = True
             for i in range(charsRemoved):
                 self.textEdit.textCursor().deleteChar()
@@ -82,11 +86,13 @@ class MyWidget (QtGui.QWidget, form_class):
         # This causes a infinite loop.
 #        self.textEdit.moveCursor(QtGui.QTextCursor.NoMove)
         
-    def on_plainTextEdit_cursorPositionChanged(self):
+    def on_plainTextEdit_cursorPositionChanged(self, cursor_pos = -1):
         if not self.ignore_next:
-            pos = self.plainTextEdit.textCursor().position()
+            # A negative pos means use current position
+            if cursor_pos < 0:
+                cursor_pos = self.plainTextEdit.textCursor().position()
             source_text = str(self.plainTextEdit.toPlainText())
-            search_loc = (pos, max(0, pos - 5), min(len(source_text), pos + 5))
+            search_loc = (cursor_pos, max(0, cursor_pos - 5), min(len(source_text), cursor_pos + 5))
             found = find_approx_text_in_target(source_text,
                                                search_loc,
                                                str(self.textEdit.toPlainText()))
@@ -106,9 +112,11 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.set_html_editable(False)
                 self.ignore_next = False
         
-    def on_textEdit_cursorPositionChanged(self):
+    def on_textEdit_cursorPositionChanged(self, cursor_pos = -1):
         if not self.ignore_next:
             cursor = self.textEdit.textCursor()
+            if cursor_pos < 0:
+                cursor_pos = cursor.position()
 #            print "Cursor position %d, block %d" % (cursor.position(),
 #                                                    cursor.blockNumber())
             # Search for the current fragment in the block.
@@ -124,7 +132,7 @@ class MyWidget (QtGui.QWidget, form_class):
             # In that case, use the last fragment instead.
             if current_fragment is not None:
                 text = current_fragment.text()
-                search_loc = (cursor.position(), current_fragment.position(), 
+                search_loc = (cursor_pos, current_fragment.position(), 
                               current_fragment.position() + len(text))
                 found = find_approx_text_in_target(str(self.textEdit.toPlainText()),
                                                    search_loc,
