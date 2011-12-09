@@ -34,27 +34,70 @@ class MyWidget (QtGui.QWidget, form_class):
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
         self.plainTextEdit.document().contentsChange.connect(self.on_plainTextEdit_contentsChange)
         self.ignore_next = False
+        self.textEdit_cursor_pos = self.textEdit.textCursor().position()
+        self.plainTextEdit_cursor_pos = self.plainTextEdit.textCursor().position()
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
-#            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
-            self.on_textEdit_cursorPositionChanged(position)
+            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
-            if self.textEdit.isReadOnly():
-                print 'Oops -- cannot find changed text!'
-                return
-            for i in range(charsRemoved):
-                self.plainTextEdit.textCursor().deleteChar()
+            # If there are deletions, find out where in the plain text document
+            # we must delete from
+            if charsRemoved > 0:
+                # A range - delete the entire range
+                plainText_cursor = self.plainTextEdit.textCursor()
+                if plainText_cursor.anchor() != plainText_cursor.position():
+                    self.plainTextEdit.textCursor().removeSelectedText()
+                # The delete key - just delete from the current position
+                elif position == self.textEdit_cursor_pos:
+                    assert charsRemoved == 1
+                    self.plainTextEdit.textCursor().deleteChar()
+                # The backspace key - move back 1 char (if possible) and delete
+                elif position == (self.textEdit_cursor_pos - 1):
+                    assert charsRemoved == 1
+                    # Try to move the cursor back
+                    self.ignore_next = False
+                    self.on_textEdit_cursorPositionChanged(position)
+                    self.ignore_next = True
+                    # Signal an error if we can't
+                    if self.textEdit.isReadOnly():
+                        print 'Oops -- cannot find changed text!'
+                        self.textEdit.undo()
+                        return
+                    # Then delete the char
+                    self.plainTextEdit.textCursor().deleteChar()
             self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
         
     def on_plainTextEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
-#            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
-            self.on_plainTextEdit_cursorPositionChanged(position)
+            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
-            for i in range(charsRemoved):
-                self.textEdit.textCursor().deleteChar()
+            # If there are deletions, find out where in the html document
+            # we must delete from
+            if charsRemoved > 0:
+                # A range - delete the entire range
+                text_cursor = self.textEdit.textCursor()
+                if text_cursor.anchor() != text_cursor.position():
+                    self.textEdit.textCursor().removeSelectedText()
+                # The delete key - just delete from the current position
+                elif position == self.plainTextEdit_cursor_pos:
+                    assert charsRemoved == 1
+                    self.textEdit.textCursor().deleteChar()
+                # The backspace key - move back 1 char (if possible) and delete
+                elif position == (self.plainTextEdit_cursor_pos - 1):
+                    assert charsRemoved == 1
+                    # Try to move the cursor back
+                    self.ignore_next = False
+                    self.on_plainTextEdit_cursorPositionChanged(position)
+                    self.ignore_next = True
+                    # Signal an error if we can't
+                    if self.plainTextEdit.isReadOnly():
+                        print 'Oops -- cannot find changed text!'
+                        self.plainTextEdit.undo()
+                        return
+                    # Then delete the char
+                    self.textEdit.textCursor().deleteChar()
             self.textEdit.textCursor().insertText(self.plainTextEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
         
@@ -87,6 +130,8 @@ class MyWidget (QtGui.QWidget, form_class):
 #        self.textEdit.moveCursor(QtGui.QTextCursor.NoMove)
         
     def on_plainTextEdit_cursorPositionChanged(self, cursor_pos = -1):
+        self.plainTextEdit_cursor_pos = self.plainTextEdit.textCursor().position()
+#        print "Plain cursor pos now %d." % self.plainTextEdit_cursor_pos
         if not self.ignore_next:
             # A negative pos means use current position
             cursor = self.plainTextEdit.textCursor()
@@ -118,6 +163,7 @@ class MyWidget (QtGui.QWidget, form_class):
                 self.ignore_next = False
         
     def on_textEdit_cursorPositionChanged(self, cursor_pos = -1):
+        self.textEdit_cursor_pos = self.textEdit.textCursor().position()
         if not self.ignore_next:
             cursor = self.textEdit.textCursor()
             if cursor_pos < 0:
@@ -204,11 +250,18 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
     if (match is None) or (len(match) > 1):
         return -1
     else:
-        # match[0][0] contains the index of the entire search string.
-        # offset from that to pinpoint where in this string we want.
-        # BUG: if there's not an exact match, this may go to the wrong
-        # char!
-        return match[0][0] + loc - start_loc
+        # match[0][0] contains the the index into the target string of the
+        # first matched char
+        pos_in_target = match[0][0]
+        match_len = loc - start_loc
+        # Given that we did an approximate match, make sure the needed
+        # prefix of the string is an exact match.
+        if (target_text[pos_in_target:pos_in_target + match_len] ==
+            search_str[0:match_len]):
+            # offset from that to pinpoint where in this string we want.
+            return pos_in_target + match_len
+        else:
+            return -1
 
 
 if __name__ == '__main__':
