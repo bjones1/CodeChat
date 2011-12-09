@@ -32,7 +32,12 @@ class MyWidget (QtGui.QWidget, form_class):
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
         self.plainTextEdit.document().contentsChange.connect(self.on_plainTextEdit_contentsChange)
+        # Enable/disable the update button when the plain text modification
+        # state changes.
+        self.plainTextEdit.document().modificationChanged.connect(
+            lambda changed: self.updatePushButton.setEnabled(changed))
         self.ignore_next = False
+        # Save initial cursor positions
         self.textEdit_cursor_pos = self.textEdit.textCursor().position()
         self.plainTextEdit_cursor_pos = self.plainTextEdit.textCursor().position()
         
@@ -208,14 +213,14 @@ class MyWidget (QtGui.QWidget, form_class):
                     self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
-        if self.plainTextEdit.document().isModified():
-            with open('index.rst', 'w') as f:
-                f.write(unicode(self.plainTextEdit.toPlainText()))
-            self.ignore_next = True
-            self.update_html()
-            self.ignore_next = False
-            # Resync panes. But causes a crash sometimes!
-            self.on_plainTextEdit_cursorPositionChanged()
+        with open('index.rst', 'w') as f:
+            f.write(unicode(self.plainTextEdit.toPlainText()))
+        self.plainTextEdit.document().setModified(False)
+        self.ignore_next = True
+        self.update_html()
+        self.ignore_next = False
+        # Resync panes. But causes a crash sometimes!
+        self.on_plainTextEdit_cursorPositionChanged()
 
             
 # Given a location in the text of one document (the source), finds the corresponding

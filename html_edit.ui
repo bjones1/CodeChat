@@ -76,6 +76,9 @@
    </property>
   </widget>
   <widget class="QPushButton" name="updatePushButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -86,6 +89,9 @@
    </property>
    <property name="text">
     <string>Update</string>
+   </property>
+   <property name="shortcut">
+    <string/>
    </property>
   </widget>
  </widget>
