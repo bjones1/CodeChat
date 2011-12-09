@@ -1,12 +1,11 @@
 # To do:
-# - Allow selections, not just cursor movement
+# - Backspace when at the left edge of a found block removes the wrong char
+#   in the other pane
+# - Make search more robust
 # - Figure out how to make cursor visible when html is changed to read-only
 # - Unit testing
-# - Figure out why searches initially don't work
 # - Get agrepy working with Unicode, use Unicode throughout
 # - Figure out how to get symbolic names for Qt::TextInteractionFlags
-# - Verify that agrep-found string cursor index is accurate
-# - What to do when a backspace in HTML deletes context not in the plain text?
 # - The obvious: translate code to reST, add GUI
 
 
@@ -230,25 +229,31 @@ class MyWidget (QtGui.QWidget, form_class):
 #   returns - A location in the target document, or -1 if not found
 #
 #   Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
-def find_approx_text_in_target(search_text, search_loc, target_text):
+def find_approx_text_in_target(search_text, search_loc, target_text, mismatches = -1):
     (loc, start_loc, end_loc) = search_loc
     assert start_loc <= end_loc
     search_str = search_text[start_loc:end_loc]
     # A zero-length string can't be matched.
     if start_loc == end_loc: return -1
-    # Note: going too high on the last value (allowed number of mimatches) 
-    # with (I think) a short search string makes this take forever to run.
-    # So, pick a number between 1 and 8, such at at least 1/5th of the chars
-    # match.
-    mismatches = max(1, min(8, len(search_str)/5))
+    if mismatches < 1:
+        # Note: going too high on the last value (allowed number of mimatches) 
+        # with (I think) a short search string makes this take forever to run.
+        # So, pick a number between 1 and 8, such at at least 1/5th of the chars
+        # match.
+        mismatches = max(1, min(8, len(search_str)/5))
 #    print "Searching for %s..." % search_str
     pat = agrepy.compile(search_str, len(search_str), mismatches)
 #    print "pattern compiled...",
     match = agrepy.agrepy(search_str, len(search_str), target_text, 
                           len(target_text), True, pat)
-    # Return success only when there's exactly one match
-    if (match is None) or (len(match) > 1):
+    # Fail on no matches
+    if match is None:
         return -1
+    elif len(match) > 1:
+        # On multiple matches with mismatch > 1, try reducing the mismatch
+        # to see if we can get a single match. Otherwise, fail.
+        return -1 if mismatches < 2 else \
+            find_approx_text_in_target(search_text, search_loc, target_text, mismatches - 1)
     else:
         # match[0][0] contains the the index into the target string of the
         # first matched char
