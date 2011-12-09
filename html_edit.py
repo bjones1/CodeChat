@@ -1,10 +1,11 @@
 # To do:
+# - Python TRE port allows unicode for text to search but not for the search
+#   string, which causes some headaches. Look for a full Unicode solution.
 # - Backspace when at the left edge of a found block removes the wrong char
 #   in the other pane
 # - Make search more robust
 # - Figure out how to make cursor visible when html is changed to read-only
 # - Unit testing
-# - Get agrepy working with Unicode, use Unicode throughout
 # - Figure out how to get symbolic names for Qt::TextInteractionFlags
 # - The obvious: translate code to reST, add GUI
 
@@ -14,7 +15,9 @@ from PyQt4 import QtGui, uic
 import sphinx.cmdline
 import sys
 import os
-import agrepy
+# For approximate pattern matching, use the Python port of TRE. See
+# http://hackerboss.com/approximate-regex-matching-in-python/ for more details.
+import tre
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
 
@@ -234,36 +237,36 @@ class MyWidget (QtGui.QWidget, form_class):
 #   returns - A location in the target document, or -1 if not found
 #
 #   Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
-def find_approx_text_in_target(search_text, search_loc, target_text, mismatches = -1):
+def find_approx_text_in_target(search_text, search_loc, target_text):
     (loc, start_loc, end_loc) = search_loc
     assert start_loc <= end_loc
     search_str = search_text[start_loc:end_loc]
     # A zero-length string can't be matched.
     if start_loc == end_loc: return -1
-    if mismatches < 1:
-        # Note: going too high on the last value (allowed number of mimatches) 
-        # with (I think) a short search string makes this take forever to run.
-        # So, pick a number between 1 and 8, such at at least 1/5th of the chars
-        # match.
-        mismatches = max(1, min(8, len(search_str)/5))
+    # Pick a number such at at least 1/5th of the chars match.
+    mismatches = len(search_str)/5
 #    print "Searching for %s..." % search_str
-    pat = agrepy.compile(search_str, len(search_str), mismatches)
-#    print "pattern compiled...",
-    match = agrepy.agrepy(search_str, len(search_str), target_text, 
-                          len(target_text), True, pat)
+    # tre.LITERAL specifies that search_str is a literal search string, not
+    # a regex.
+    pat = tre.compile(search_str, tre.LITERAL)
+    fz = tre.Fuzzyness(maxerr = mismatches)
+    match = pat.search(target_text, fz)
     # Fail on no matches
-    if match is None:
+    if not match:
         return -1
-    elif len(match) > 1:
-        # On multiple matches with mismatch > 1, try reducing the mismatch
-        # to see if we can get a single match. Otherwise, fail.
-        return -1 if mismatches < 2 else \
-            find_approx_text_in_target(search_text, search_loc, target_text, mismatches - 1)
     else:
-        # match[0][0] contains the the index into the target string of the
+        # match.group()[0][0] contains the the index into the target string of the
         # first matched char
-        pos_in_target = match[0][0]
+        pos_in_target = match.groups()[0][0]
         match_len = loc - start_loc
+        # TRE seems to pick the first match it finds, even if there is
+        # more than one matck with identical error. This is a bad thing!
+        # Must manually call it again with a substring to check.
+        # Search only if we're not at the last char of the target text.
+        assert pos_in_target < (len(target_text) - 1)
+        match_again = pat.search(target_text[pos_in_target + 1:], fz)
+        if match_again and (match_again.cost <= match.cost):
+            return -1
         # Given that we did an approximate match, make sure the needed
         # prefix of the string is an exact match.
         if (target_text[pos_in_target:pos_in_target + match_len] ==
