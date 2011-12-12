@@ -10,6 +10,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
+   html_edit
 
 Indices and tables
 ==================

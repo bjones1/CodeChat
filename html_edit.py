@@ -1,13 +1,18 @@
 # To do:
-# - Python TRE port allows unicode for text to search but not for the search
+#
+# * Save saves to index.rst instead of file name. Need to store base file
+#   name in code.
+# * Figure out how to get syntax highlighting AND correct indentation back
+#   plus how to indent rest text (ugh)
+# * Python TRE port allows unicode for text to search but not for the search
 #   string, which causes some headaches. Look for a full Unicode solution.
-# - Backspace when at the left edge of a found block removes the wrong char
+# * Backspace when at the left edge of a found block removes the wrong char
 #   in the other pane
-# - Make search more robust
-# - Figure out how to make cursor visible when html is changed to read-only
-# - Unit testing
-# - Figure out how to get symbolic names for Qt::TextInteractionFlags
-# - The obvious: translate code to reST, add GUI
+# * Make search more robust
+# * Figure out how to make cursor visible when html is changed to read-only
+# * Unit testing
+# * Figure out how to get symbolic names for Qt::TextInteractionFlags
+# * The obvious: add GUI, test lots
 
 
 from PyQt4 import QtGui, uic
@@ -21,15 +26,16 @@ import tre
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
 
-class MyWidget (QtGui.QWidget, form_class):
-    def __init__(self, parent = None, selected = [], flag = 0, *args):
+class MyWidget(QtGui.QWidget, form_class):
+    def __init__(self, source_file, parent = None, selected = [], flag = 0, *args):
+        self.source_file = source_file
         self.ignore_next = True
         QtGui.QWidget.__init__(self, parent, *args)
         self.setupUi(self)
         self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
 #        self.plainTextEdit.setPlainText(rest_text)
 #        str = publish_string(rest_text, writer_name='html')
-        with open('index.rst', 'r') as f:
+        with open(os.path.splitext(source_file)[0] + '.rst', 'r') as f:
             self.plainTextEdit.setPlainText(f.read())
         self.update_html()
         # Ask for notification when the contents of either editor change
@@ -109,9 +115,11 @@ class MyWidget (QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def update_html(self):
+        CodeToHtml(self.source_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
-        with open('_build/html/index.html', 'r') as f:
+        base = os.path.basename(self.source_file)
+        with open('_build/html/' + os.path.splitext(base)[0] + '.html', 'r') as f:
             str = f.read()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
@@ -157,8 +165,8 @@ class MyWidget (QtGui.QWidget, form_class):
                                 QtGui.QTextCursor.MoveAnchor 
                                 if cursor.anchor() == cursor.position()
                                 else QtGui.QTextCursor.KeepAnchor)
-                print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
-                      (text, search_loc[0], search_loc[1], search_loc[2], found))
+#                print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
+#                      (text, search_loc[0], search_loc[1], search_loc[2], found))
                 self.ignore_next = True
                 self.textEdit.setTextCursor(pos)
                 self.set_html_editable(True)
@@ -207,8 +215,8 @@ class MyWidget (QtGui.QWidget, form_class):
                     self.plainTextEdit.setTextCursor(pos)
                     self.set_html_editable(True)
                     self.ignore_next = False
-                    print ('HTML fragment "%s" (%d, %d, %d) found at %d.' % 
-                        (text, search_loc[0], search_loc[1], search_loc[2], found))
+#                    print ('HTML fragment "%s" (%d, %d, %d) found at %d.' % 
+#                        (text, search_loc[0], search_loc[1], search_loc[2], found))
                 else:
                     print 'Fragment "%s" not found.' % text
                     self.ignore_next = True
@@ -275,9 +283,111 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
             return -1
 
 
+
+from pygments.formatter import Formatter
+from pygments.token import Token
+import re
+
+# The string indicating a comment in the chosen programming language. This must
+# end in a space for the regular expression in _format_lines1 to work. The space
+# also makes the output a bit prettier.
+comment_string = '# '
+# comment_string = '// '
+
+# This class converts from source to to reST. As the <a>overview</a>
+# states, this uses Pygments to do most of the work, adding only a formatter
+# to that library. Therefore, to use this class, simply select this class
+# as the formatter for Pygments (see an example 
+# <a href="#def_CodeToHtml">below</a>).
+class CodeToRestFormatter(Formatter):
+    # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. It also wraps each line in a &lt;pre&gt; tag.<br />
+    def format(self, token_source, out_file):
+        # Store up a series of string which will compose the current line
+        current_line_list = []
+        # Keep track of the type of the last line.
+        last_is_code = False
+        # Determine the type of the current line
+        is_code, is_comment, is_ws = range(3)
+        line_type = is_comment
+        # A regular expression for whitespace not containing a newline
+        ws = re.compile(r'^[ \t\r\f\v]+$')
+        # A regular expression to remove comment chars
+        regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)        
+
+        # Iterate through all tokens in the input file        
+        for ttype, value in token_source:
+            # Check for whitespace
+            if re.search(ws, value):
+                # If so, add it to the stack of tokens on this line
+                current_line_list.append(value)
+            # Check for a comment
+            elif (ttype is Token.Comment) or (ttype is Token.Comment.Single):
+                if line_type != is_code:
+                    line_type = is_comment
+                # If so, add it to the stack of tokens on this line
+                current_line_list.append(value)
+            # On a newline, process the line
+            elif value == '\n':
+                # If the line is whitespace, inherit the type of the previous
+                # line.
+                if line_type == is_ws:
+                    line_type = is_code if last_is_code else is_comment
+                if line_type == is_code:
+                    # Each line of code needs a space at the beginning
+                    current_line_list.insert(0, u' ')
+                    if not last_is_code:
+                        # When transitioning from comment to code, prepend a ::
+                        # to the last line
+                        current_line_list.insert(0, '::\n\n')
+                    else:
+                        # Otherwise, just prepend a newline
+                        current_line_list.insert(0, '\n')
+                else:
+                    # Prepend a newline
+                    current_line_list.insert(0, '\n')
+                    # Add another for a code to comment transition
+                    if last_is_code:
+                        current_line_list.insert(0, '\n')
+                    
+                # Convert to a string
+                line_str = ''.join(current_line_list)
+                current_line_list = []
+                # String comment chars if necessary
+                if line_type == is_comment:
+                    # Remove the comment character (and one space, if it's there)
+                    line_str = re.sub(regexp, r'', line_str)
+                # We're done!
+                #line_str += str(line_type) + str(last_is_code)
+                out_file.write(line_str)
+                last_is_code = line_type == is_code
+                line_type = is_ws
+            # Not a newline, whitespace, or comment char: must be code.
+            else:
+                line_type = is_code
+                current_line_list.append(value)
+
+
+from pygments.lexers import get_lexer_for_filename
+from pygments import highlight
+import codecs
+
+# File extension for the source file
+source_extension = '.py'
+# source_extension = '.cpp'
+
+# <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
+def CodeToHtml(baseFileName):
+    in_file_name = baseFileName + source_extension
+    code = open(in_file_name, 'r').read()
+    formatter = CodeToRestFormatter()
+    outfile = codecs.open(baseFileName + '.rst', mode = 'w', encoding = 'utf-8')
+    lexer = get_lexer_for_filename(in_file_name)
+    hi_code = highlight(code, lexer, formatter)
+    outfile.write(hi_code)
+
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    form = MyWidget(None)
+    form = MyWidget('html_edit')
     form.show()
     app.exec_()
