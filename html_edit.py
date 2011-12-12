@@ -243,13 +243,11 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
     search_str = search_text[start_loc:end_loc]
     # A zero-length string can't be matched.
     if start_loc == end_loc: return -1
-    # Pick a number such at at least 1/5th of the chars match.
-    mismatches = len(search_str)/5
 #    print "Searching for %s..." % search_str
     # tre.LITERAL specifies that search_str is a literal search string, not
     # a regex.
     pat = tre.compile(search_str, tre.LITERAL)
-    fz = tre.Fuzzyness(maxerr = mismatches)
+    fz = tre.Fuzzyness()
     match = pat.search(target_text, fz)
     # Fail on no matches
     if not match:
