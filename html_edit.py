@@ -1,5 +1,6 @@
 # To do:
 #
+# * Bug in the Pygments parser boogers us #macros. How to fix?
 # * Figure out how to get the SCN_MODIFIED signal to connect, rewrite the
 #   on_plainTextEdit_modified routine
 # * Figure out how to get syntax highlighting AND correct indentation back
@@ -152,7 +153,7 @@ class MyWidget(QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def update_html(self):
-        #CodeToHtml(self.source_file, self.rst_file)
+        CodeToHtml(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
         with open(self.html_file, 'r') as f:
@@ -339,7 +340,20 @@ comment_string = '// '
 # <a href="#def_CodeToHtml">below</a>).
 class CodeToRestFormatter(Formatter):
     # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. It also wraps each line in a &lt;pre&gt; tag.<br />
-    def format(self, token_source, out_file):
+    def format_unencoded(self, token_source, out_file):
+        nl_token_source = self._expand_nl(token_source)
+        self._format_body(nl_token_source, out_file)
+
+    def _expand_nl(self, token_source):
+        # Break any comments ending in a newline into two separate tokens
+        for ttype, value in token_source:
+            if (ttype == Token.Comment.Single) and value.endswith('\n'):
+                yield ttype, value[:-1]
+                yield Token.Text, u'\n'
+            else:
+                yield ttype, value
+
+    def _format_body(self, token_source, out_file):  
         # Store up a series of string which will compose the current line
         current_line_list = []
         # Keep track of the type of the last line.
@@ -394,8 +408,9 @@ class CodeToRestFormatter(Formatter):
                 if line_type == is_comment:
                     # Remove the comment character (and one space, if it's there)
                     line_str = re.sub(regexp, r'', line_str)
+                # For debug:
+                # line_str += str(line_type) + str(last_is_code)
                 # We're done!
-                #line_str += str(line_type) + str(last_is_code)
                 out_file.write(line_str)
                 last_is_code = line_type == is_code
                 line_type = is_ws
@@ -408,10 +423,6 @@ class CodeToRestFormatter(Formatter):
 from pygments.lexers import get_lexer_for_filename
 from pygments import highlight
 import codecs
-
-# File extension for the source file
-source_extension = '.py'
-# source_extension = '.cpp'
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToHtml(source_path, rst_path):
