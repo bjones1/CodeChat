@@ -1,7 +1,5 @@
 # To do:
 #
-# * Save saves to index.rst instead of file name. Need to store base file
-#   name in code.
 # * Figure out how to get syntax highlighting AND correct indentation back
 #   plus how to indent rest text (ugh)
 # * Python TRE port allows unicode for text to search but not for the search
@@ -28,14 +26,19 @@ form_class, base_class = uic.loadUiType("html_edit.ui")
 
 class MyWidget(QtGui.QWidget, form_class):
     def __init__(self, source_file, parent = None, selected = [], flag = 0, *args):
+        # Split the source file into a path, base name, and extension
+        head, tail = os.path.split(source_file)
+        name, ext = os.path.splitext(tail)
         self.source_file = source_file
+        self.rst_file = os.path.join(head, name) + '.rst'
+        self.html_file = os.path.join('_build/html/', name) + '.html'
         self.ignore_next = True
         QtGui.QWidget.__init__(self, parent, *args)
         self.setupUi(self)
         self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
 #        self.plainTextEdit.setPlainText(rest_text)
 #        str = publish_string(rest_text, writer_name='html')
-        with open(os.path.splitext(source_file)[0] + '.rst', 'r') as f:
+        with open(self.source_file, 'r') as f:
             self.plainTextEdit.setPlainText(f.read())
         self.update_html()
         # Ask for notification when the contents of either editor change
@@ -115,11 +118,10 @@ class MyWidget(QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def update_html(self):
-        CodeToHtml(self.source_file)
+        CodeToHtml(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
-        base = os.path.basename(self.source_file)
-        with open('_build/html/' + os.path.splitext(base)[0] + '.html', 'r') as f:
+        with open(self.html_file, 'r') as f:
             str = f.read()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
@@ -224,7 +226,7 @@ class MyWidget(QtGui.QWidget, form_class):
                     self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
-        with open('index.rst', 'w') as f:
+        with open(self.source_path, 'w') as f:
             f.write(unicode(self.plainTextEdit.toPlainText()))
         self.plainTextEdit.document().setModified(False)
         self.ignore_next = True
@@ -289,7 +291,7 @@ from pygments.token import Token
 import re
 
 # The string indicating a comment in the chosen programming language. This must
-# end in a space for the regular expression in _format_lines1 to work. The space
+# end in a space for the regular expression in format to work. The space
 # also makes the output a bit prettier.
 comment_string = '# '
 # comment_string = '// '
@@ -376,18 +378,17 @@ source_extension = '.py'
 # source_extension = '.cpp'
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
-def CodeToHtml(baseFileName):
-    in_file_name = baseFileName + source_extension
-    code = open(in_file_name, 'r').read()
+def CodeToHtml(source_path, rst_path):
+    code = open(source_path, 'r').read()
     formatter = CodeToRestFormatter()
-    outfile = codecs.open(baseFileName + '.rst', mode = 'w', encoding = 'utf-8')
-    lexer = get_lexer_for_filename(in_file_name)
+    outfile = codecs.open(rst_path, mode = 'w', encoding = 'utf-8')
+    lexer = get_lexer_for_filename(source_path)
     hi_code = highlight(code, lexer, formatter)
     outfile.write(hi_code)
 
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    form = MyWidget('html_edit')
+    form = MyWidget('./html_edit.py')
     form.show()
     app.exec_()
