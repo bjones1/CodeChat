@@ -1,5 +1,7 @@
 # To do:
 #
+# * Figure out how to get the SCN_MODIFIED signal to connect, rewrite the
+#   on_plainTextEdit_modified routine
 # * Figure out how to get syntax highlighting AND correct indentation back
 #   plus how to indent rest text (ugh)
 # * Python TRE port allows unicode for text to search but not for the search
@@ -10,7 +12,7 @@
 # * Figure out how to make cursor visible when html is changed to read-only
 # * Unit testing
 # * Figure out how to get symbolic names for Qt::TextInteractionFlags
-# * The obvious: add GUI, test lots
+# * The obvious: add GUI, test lots and lots
 
 
 from PyQt4 import QtGui, uic
@@ -21,6 +23,9 @@ import os
 # For approximate pattern matching, use the Python port of TRE. See
 # http://hackerboss.com/approximate-regex-matching-in-python/ for more details.
 import tre
+# Found some docs on QScintilla on Python with Qt at
+# http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
+from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
 
@@ -38,20 +43,48 @@ class MyWidget(QtGui.QWidget, form_class):
         self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
 #        self.plainTextEdit.setPlainText(rest_text)
 #        str = publish_string(rest_text, writer_name='html')
+        # Configure QScintilla
+        # --------------------
+        # Set the default font
+        font = QtGui.QFont()
+        font.setFamily('Courier New')
+        font.setFixedPitch(True)
+        font.setPointSize(10)        
+        # Margin 0 is used for line numbers
+        fontmetrics = QtGui.QFontMetrics(font)
+        self.plainTextEdit.setMarginsFont(font)
+        self.plainTextEdit.setMarginWidth(0, fontmetrics.width("00000") + 6)
+        self.plainTextEdit.setMarginLineNumbers(0, True)
+        self.plainTextEdit.setMarginsBackgroundColor(QtGui.QColor("#cccccc"))
+        # Brace matching: enable for a brace immediately before or after
+        # the current position
+        self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+        # Set Python lexer.
+        # Set style for comments to a fixed-width courier font.
+        lexer = QsciLexerCPP()
+        lexer.setDefaultFont(font)
+        self.plainTextEdit.setLexer(lexer)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.Comment, 'Courier New')
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.CommentLine, 'Courier New')
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.CommentDoc, 'Courier New')
+        
         with open(self.source_file, 'r') as f:
-            self.plainTextEdit.setPlainText(f.read())
+            self.plainTextEdit.setText(f.read())
         self.update_html()
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
-        self.plainTextEdit.document().contentsChange.connect(self.on_plainTextEdit_contentsChange)
+        # Fails, but I don't know why.
+#        self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
+        # This works fine, so the bug doesn't seem to be in the way I'm connecting.
+        #self.plainTextEdit.SCN_MARGINCLICK.connect(self.on_plainTextEdit_modified)
         # Enable/disable the update button when the plain text modification
         # state changes.
-        self.plainTextEdit.document().modificationChanged.connect(
+        self.plainTextEdit.modificationChanged.connect(
             lambda changed: self.updatePushButton.setEnabled(changed))
         self.ignore_next = False
         # Save initial cursor positions
         self.textEdit_cursor_pos = self.textEdit.textCursor().position()
-        self.plainTextEdit_cursor_pos = self.plainTextEdit.textCursor().position()
+        self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
@@ -85,7 +118,8 @@ class MyWidget(QtGui.QWidget, form_class):
             self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
         
-    def on_plainTextEdit_contentsChange(self, position, charsRemoved, charsAdded):
+    def on_plainTextEdit_modified(self, position, charsRemoved, charsAdded):
+        print 'plain text changed'
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
             print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
@@ -105,7 +139,7 @@ class MyWidget(QtGui.QWidget, form_class):
                     assert charsRemoved == 1
                     # Try to move the cursor back
                     self.ignore_next = False
-                    self.on_plainTextEdit_cursorPositionChanged(position)
+                    self.on_plainTextEdit_cursorPositionChanged(0, 0, position)
                     self.ignore_next = True
                     # Signal an error if we can't
                     if self.plainTextEdit.isReadOnly():
@@ -118,7 +152,7 @@ class MyWidget(QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def update_html(self):
-        CodeToHtml(self.source_file, self.rst_file)
+        #CodeToHtml(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
         with open(self.html_file, 'r') as f:
@@ -146,15 +180,14 @@ class MyWidget(QtGui.QWidget, form_class):
         # This causes a infinite loop.
 #        self.textEdit.moveCursor(QtGui.QTextCursor.NoMove)
         
-    def on_plainTextEdit_cursorPositionChanged(self, cursor_pos = -1):
-        self.plainTextEdit_cursor_pos = self.plainTextEdit.textCursor().position()
+    def on_plainTextEdit_cursorPositionChanged(self, line, index, cursor_pos = -1):
+        self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
 #        print "Plain cursor pos now %d." % self.plainTextEdit_cursor_pos
         if not self.ignore_next:
             # A negative pos means use current position
-            cursor = self.plainTextEdit.textCursor()
             if cursor_pos < 0:
-                cursor_pos = cursor.position()
-            source_text = str(self.plainTextEdit.toPlainText())
+                cursor_pos = self.plainTextEdit_cursor_pos
+            source_text = str(self.plainTextEdit.text())
             search_loc = (cursor_pos, max(0, cursor_pos - 5), min(len(source_text), cursor_pos + 5))
             found = find_approx_text_in_target(source_text,
                                                search_loc,
@@ -165,7 +198,7 @@ class MyWidget(QtGui.QWidget, form_class):
                 # Grow the selection if necessary; otherwise, just move the cursor.
                 pos.setPosition(found,
                                 QtGui.QTextCursor.MoveAnchor 
-                                if cursor.anchor() == cursor.position()
+                                if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) == self.plainTextEdit_cursor_pos
                                 else QtGui.QTextCursor.KeepAnchor)
 #                print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
 #                      (text, search_loc[0], search_loc[1], search_loc[2], found))
@@ -204,17 +237,20 @@ class MyWidget(QtGui.QWidget, form_class):
                               current_fragment.position() + len(text))
                 found = find_approx_text_in_target(str(self.textEdit.toPlainText()),
                                                    search_loc,
-                                                   str(self.plainTextEdit.toPlainText()))
+                                                   str(self.plainTextEdit.text()))
                 # Update position in source doc if text was found
                 if found >= 0:
-                    pos = self.plainTextEdit.textCursor()
                     # Grow the selection if necessary; otherwise, just move the cursor.
-                    pos.setPosition(found,
-                                    QtGui.QTextCursor.MoveAnchor 
-                                    if cursor.anchor() == cursor.position()
-                                    else QtGui.QTextCursor.KeepAnchor)
+                    # Note: I tried to use SCI_SETEMPTYSELECTION per
+                    # http://www.scintilla.org/ScintillaDoc.html#SCI_SETEMPTYSELECTION,
+                    # but got AttributeError: type object 'QsciScintilla' has
+                    # no attribute 'SCI_SETEMPTYSELECTION'.
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
+                    if cursor.anchor() == cursor.position():
+                        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, found)
+                    # Scroll cursor into view
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
                     self.ignore_next = True
-                    self.plainTextEdit.setTextCursor(pos)
                     self.set_html_editable(True)
                     self.ignore_next = False
 #                    print ('HTML fragment "%s" (%d, %d, %d) found at %d.' % 
@@ -226,14 +262,14 @@ class MyWidget(QtGui.QWidget, form_class):
                     self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
-        with open(self.source_path, 'w') as f:
-            f.write(unicode(self.plainTextEdit.toPlainText()))
-        self.plainTextEdit.document().setModified(False)
+        with open(self.source_file, 'w') as f:
+            f.write(unicode(self.plainTextEdit.text()))
+        self.plainTextEdit.setModified(False)
         self.ignore_next = True
         self.update_html()
         self.ignore_next = False
-        # Resync panes. But causes a crash sometimes!
-        self.on_plainTextEdit_cursorPositionChanged()
+        # Resync panes.
+        self.on_plainTextEdit_cursorPositionChanged(0, 0)
 
             
 # Given a location in the text of one document (the source), finds the corresponding
@@ -293,8 +329,8 @@ import re
 # The string indicating a comment in the chosen programming language. This must
 # end in a space for the regular expression in format to work. The space
 # also makes the output a bit prettier.
-comment_string = '# '
-# comment_string = '// '
+# comment_string = '# '
+comment_string = '// '
 
 # This class converts from source to to reST. As the <a>overview</a>
 # states, this uses Pygments to do most of the work, adding only a formatter
@@ -389,6 +425,6 @@ def CodeToHtml(source_path, rst_path):
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    form = MyWidget('./html_edit.py')
+    form = MyWidget('./practicum2Summer2011.c')
     form.show()
     app.exec_()

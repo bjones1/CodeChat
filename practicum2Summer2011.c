@@ -1,30 +1,29 @@
-
-// "Copyright (c) 2008 Robert B. Reese, Bryan A. Jones, J. W. Bruce ("AUTHORS")"<br />
-// All rights reserved.<br />
-// &nbsp; (R. Reese, reese_AT_ece.msstate.edu, Mississippi State University)<br />
-// &nbsp; (B. A. Jones, bjones_AT_ece.msstate.edu, Mississippi State University)<br />
-// &nbsp; (J. W. Bruce, jwbruce_AT_ece.msstate.edu, Mississippi State University)<br />
-// <br />
+// "Copyright (c) 2008 Robert B. Reese, Bryan A. Jones, J. W. Bruce ("AUTHORS")"
+// All rights reserved.
+// &nbsp; (R. Reese, reese_AT_ece.msstate.edu, Mississippi State University)
+// &nbsp; (B. A. Jones, bjones_AT_ece.msstate.edu, Mississippi State University)
+// &nbsp; (J. W. Bruce, jwbruce_AT_ece.msstate.edu, Mississippi State University)
+// 
 // Permission to use, copy, modify, and distribute this software and its
 // documentation for any purpose, without fee, and without written agreement is
 // hereby granted, provided that the above copyright notice, the following
-// two paragraphs and the authors appear in all copies of this software.<br />
-// <br />
+// two paragraphs and the authors appear in all copies of this software.
+// 
 // IN NO EVENT SHALL THE "AUTHORS" BE LIABLE TO ANY PARTY FOR
 // DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
 // OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF THE "AUTHORS"
-// HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.<br />
-// <br />
+// HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+// 
 // THE "AUTHORS" SPECIFICALLY DISCLAIMS ANY WARRANTIES,
 // INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 // AND FITNESS FOR A PARTICULAR PURPOSE. THE SOFTWARE PROVIDED HEREUNDER IS
 // ON AN "AS IS" BASIS, AND THE "AUTHORS" HAS NO OBLIGATION TO
-// PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.<br />
-// <br />
+// PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+// 
 // Please maintain this header in its entirety when copying/modifying
 // these files.
 
-// This file provdies a solution to practicum 2. The program consists of two sections: configuration and body code.<br />
+// This file provdies a solution to practicum 2. The program consists of two sections: configuration and body code.
 
 int i; // Dummy declaration to make the lexer happy
 #include <pic24_all.h>
@@ -37,7 +36,7 @@ void config_motor_dir(void) {
   CONFIG_RB1_AS_DIG_OUTPUT();
 }
 
-// This enum gives directions for the motor, per the table below. set_motor_dir directly assigning these values to RB1:0 to set motor direction. <br />
+// This enum gives directions for the motor, per the table below. set_motor_dir directly assigning these values to RB1:0 to set motor direction. 
 enum { 
   MOTOR_STOPL = 0,   // stop with both outputs low
   MOTOR_CW,          // clockwise
@@ -46,7 +45,7 @@ enum {
 };
 
 // Specify the motor's direction. The speed is controlled separately
-// by the PWM.<br />
+// by the PWM.
 void set_motor_dir(uint16_t u16_dir) { 
   // Make sure we've passed a valid motor direction 
   ASSERT(u16_dir <= MOTOR_STOPH);
@@ -55,10 +54,10 @@ void set_motor_dir(uint16_t u16_dir) {
 }
 
 // <h2>State machine</h2>
-// The state machine is given below.<br />
-// <img src="practicum2Summer2011_fsm.png" /><br />
-// <br />
-// This enum specifies the state machine state shown in the diagram above.<br />
+// The state machine is given below.
+// <img src="practicum2Summer2011_fsm.png" />
+// 
+// This enum specifies the state machine state shown in the diagram above.
 typedef enum {
   MOTOR_ON_WFP,	// The motor is on, we're waiting for a pushbutton press (WFP)
   MOTOR_OFF_WFR,        // The motor is off, we're waiting for a pushbutton release (WFR)
@@ -81,7 +80,7 @@ const char* apsz_state[MAX_STATE] = {
 // <h3>Pushbutton</h3>
 // Configure the pushbutton. Since it's a SPST connected between the PIC's
 // pin and groud, enable a pullup and wait for the pullup to take effect
-// before proceeding.<br />
+// before proceeding.
 void config_pb(void) {
   CONFIG_RB13_AS_DIG_INPUT();
   ENABLE_RB13_PULLUP();

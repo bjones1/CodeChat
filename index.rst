@@ -10,7 +10,7 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   html_edit
+   practicum2Summer2011
 
 Indices and tables
 ==================
