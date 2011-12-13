@@ -1,4 +1,4 @@
-// | Copyright (c) 2008 Robert B. Reese, Bryan A. Jones, J. W. Bruce ("AUTHORS")
+// | Copyright (c) 2008 Robert B. Reese, Bryan A. Jones, J. W. Bruce ("AUTHORS").
 //   All rights reserved.
 // |   (R. Reese, reese_AT_ece.msstate.edu, Mississippi State University)
 // |   (B. A. Jones, bjones_AT_ece.msstate.edu, Mississippi State University)
@@ -59,7 +59,6 @@ void set_motor_dir(uint16_t u16_dir) {
 // State machine
 // -------------
 // The state machine is given below.
-//
 // .. image:: practicum2Summer2011_fsm.png
 // 
 // This enum specifies the state machine state shown in the diagram above.
