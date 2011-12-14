@@ -13,7 +13,7 @@
 #include "Python.h"
 #include "structmember.h"
 
-#include <tre/tre.h>
+#include <tre.h>
 
 #define	TRE_MODULE	"tre"
 
@@ -334,12 +334,19 @@ PyTrePattern_search(TrePatternObject *self, PyObject *args)
   size_t nsub;
   int rc;
   regmatch_t *pm;
-  char *targ;
+  Py_UNICODE *u_targ;
+  char* s_targ;
   size_t tlen;
 
-  if (!PyArg_ParseTuple(args, "SO!|i:match", &pstring, &TreFuzzynessType,
+  if (!PyArg_ParseTuple(args, "OO!|i:match", &pstring, &TreFuzzynessType,
 			&fz, &eflags))
     return NULL;
+
+  if (!PyUnicode_Check(pstring) && !PyString_Check(pstring))
+    {
+	  PyErr_SetString(PyExc_TypeError, "Search text must be string or unicode.");
+	  return NULL;
+    }
 
   mo = newTreMatchObject();
   if (mo == NULL)
@@ -359,10 +366,16 @@ PyTrePattern_search(TrePatternObject *self, PyObject *args)
       return NULL;
     }
 
-  targ = PyString_AsString(pstring);
-  tlen = PyString_Size(pstring);
-
-  rc = tre_reganexec(&self->rgx, targ, tlen, &mo->am, fz->ap, eflags);
+  if (PyUnicode_Check(pstring))
+    {
+  	  u_targ = PyUnicode_AsUnicode(pstring);
+	  tlen = PyUnicode_GetSize(pstring);
+      rc = tre_regawnexec(&self->rgx, u_targ, tlen, &mo->am, fz->ap, eflags);
+    } else {
+  	  s_targ = PyString_AsString(pstring);
+	  tlen = PyString_Size(pstring);
+      rc = tre_reganexec(&self->rgx, s_targ, tlen, &mo->am, fz->ap, eflags);
+    }
 
   if (PyErr_Occurred())
     {
@@ -460,23 +473,41 @@ static PyObject *
 PyTre_ncompile(PyObject *self, PyObject *args)
 {
   TrePatternObject *rv;
-  char *pattern;
+  PyObject* po_pattern;
+  Py_UNICODE* u_pattern;
+  char *s_pattern;
   int pattlen;
   int cflags = 0;
   int rc;
 
-  if (!PyArg_ParseTuple(args, "s#|i:compile", &pattern, &pattlen, &cflags))
+  if (!PyArg_ParseTuple(args, "O|i:compile", &po_pattern, &cflags))
     return NULL;
+
+  if (!PyUnicode_Check(po_pattern) && !PyString_Check(po_pattern))
+    {
+	  PyErr_SetString(PyExc_TypeError, "Search pattern must be string or unicode.");
+	  return NULL;
+    }
 
   rv = newTrePatternObject(args);
   if (rv == NULL)
     return NULL;
 
-  rc = tre_regncomp(&rv->rgx, (char*)pattern, pattlen, cflags);
+  if (PyUnicode_Check(po_pattern))
+    {
+  	  u_pattern = PyUnicode_AsUnicode(po_pattern);
+	  pattlen = PyUnicode_GetSize(po_pattern);
+      rc = tre_regwncomp(&rv->rgx, u_pattern, pattlen, cflags);
+    } else {
+  	  s_pattern = PyString_AsString(po_pattern);
+	  pattlen = PyString_Size(po_pattern);
+      rc = tre_regncomp(&rv->rgx, s_pattern, pattlen, cflags);
+    }
+
   if (rc != REG_OK)
     {
       if (!PyErr_Occurred())
-	_set_tre_err(rc, &rv->rgx);
+        _set_tre_err(rc, &rv->rgx);
       Py_DECREF(rv);
       return NULL;
     }
