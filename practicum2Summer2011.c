@@ -59,6 +59,7 @@ void set_motor_dir(uint16_t u16_dir) {
 // State machine
 // -------------
 // The state machine is given below.
+//
 // .. image:: practicum2Summer2011_fsm.png
 // 
 // This enum specifies the state machine state shown in the diagram above.

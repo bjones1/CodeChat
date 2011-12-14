@@ -60,7 +60,7 @@ class MyWidget(QtGui.QWidget, form_class):
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        # Set Python lexer.
+        # Use the C++ lexer.
         # Set style for comments to a fixed-width courier font.
         lexer = QsciLexerCPP()
         lexer.setDefaultFont(font)
@@ -188,11 +188,11 @@ class MyWidget(QtGui.QWidget, form_class):
             # A negative pos means use current position
             if cursor_pos < 0:
                 cursor_pos = self.plainTextEdit_cursor_pos
-            source_text = str(self.plainTextEdit.text())
+            source_text = unicode(self.plainTextEdit.text())
             search_loc = (cursor_pos, max(0, cursor_pos - 5), min(len(source_text), cursor_pos + 5))
             found = find_approx_text_in_target(source_text,
                                                search_loc,
-                                               str(self.textEdit.toPlainText()))
+                                               unicode(self.textEdit.toPlainText()))
             text = source_text[search_loc[1]:search_loc[2]]
             if found >= 0:
                 pos = self.textEdit.textCursor()
@@ -236,9 +236,9 @@ class MyWidget(QtGui.QWidget, form_class):
                 text = current_fragment.text()
                 search_loc = (cursor_pos, current_fragment.position(), 
                               current_fragment.position() + len(text))
-                found = find_approx_text_in_target(str(self.textEdit.toPlainText()),
+                found = find_approx_text_in_target(unicode(self.textEdit.toPlainText()),
                                                    search_loc,
-                                                   str(self.plainTextEdit.text()))
+                                                   unicode(self.plainTextEdit.text()))
                 # Update position in source doc if text was found
                 if found >= 0:
                     # Grow the selection if necessary; otherwise, just move the cursor.
@@ -386,11 +386,13 @@ class CodeToRestFormatter(Formatter):
                     line_type = is_code if last_is_code else is_comment
                 if line_type == is_code:
                     # Each line of code needs a space at the beginning
-                    current_line_list.insert(0, u' ')
+                    current_line_list.insert(0, ' ')
                     if not last_is_code:
                         # When transitioning from comment to code, prepend a ::
-                        # to the last line
-                        current_line_list.insert(0, '::\n\n')
+                        # to the last line.
+                        # Hack: put a . at the beginning of the line so reST
+                        # will preserve all indentation of the block.
+                        current_line_list.insert(0, '::\n\n .\n')
                     else:
                         # Otherwise, just prepend a newline
                         current_line_list.insert(0, '\n')
@@ -399,7 +401,7 @@ class CodeToRestFormatter(Formatter):
                     current_line_list.insert(0, '\n')
                     # Add another for a code to comment transition
                     if last_is_code:
-                        current_line_list.insert(0, '\n')
+                        current_line_list.insert(0, '\n\n..\n')
                     
                 # Convert to a string
                 line_str = ''.join(current_line_list)
@@ -407,7 +409,7 @@ class CodeToRestFormatter(Formatter):
                 # String comment chars if necessary
                 if line_type == is_comment:
                     # Remove the comment character (and one space, if it's there)
-                    line_str = re.sub(regexp, r'', line_str)
+                    line_str = re.sub(regexp, r'\1', line_str)
                 # For debug:
                 # line_str += str(line_type) + str(last_is_code)
                 # We're done!
