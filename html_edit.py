@@ -153,7 +153,7 @@ class MyWidget(QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def update_html(self):
-        CodeToHtml(self.source_file, self.rst_file)
+        CodeToRest(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
         with open(self.html_file, 'r') as f:
@@ -361,6 +361,8 @@ class CodeToRestFormatter(Formatter):
         # Determine the type of the current line
         is_code, is_comment, is_ws = range(3)
         line_type = is_comment
+        # Keep track of the indentation of comment
+        comment_indent = ''
         # A regular expression for whitespace not containing a newline
         ws = re.compile(r'^[ \t\r\f\v]+$')
         # A regular expression to remove comment chars
@@ -386,13 +388,13 @@ class CodeToRestFormatter(Formatter):
                     line_type = is_code if last_is_code else is_comment
                 if line_type == is_code:
                     # Each line of code needs a space at the beginning
-                    current_line_list.insert(0, ' ')
+                    current_line_list.insert(0, ' ' + comment_indent)
                     if not last_is_code:
                         # When transitioning from comment to code, prepend a ::
                         # to the last line.
                         # Hack: put a . at the beginning of the line so reST
                         # will preserve all indentation of the block.
-                        current_line_list.insert(0, '::\n\n .\n')
+                        current_line_list.insert(0, '::\n\n')
                     else:
                         # Otherwise, just prepend a newline
                         current_line_list.insert(0, '\n')
@@ -408,6 +410,10 @@ class CodeToRestFormatter(Formatter):
                 current_line_list = []
                 # String comment chars if necessary
                 if line_type == is_comment:
+                    # Save the number of spaces in this comment
+                    match = re.search(regexp, line_str)
+                    if match:
+                        comment_indent = match.group(1)
                     # Remove the comment character (and one space, if it's there)
                     line_str = re.sub(regexp, r'\1', line_str)
                 # For debug:
@@ -427,7 +433,7 @@ from pygments import highlight
 import codecs
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
-def CodeToHtml(source_path, rst_path):
+def CodeToRest(source_path, rst_path):
     code = open(source_path, 'r').read()
     formatter = CodeToRestFormatter()
     outfile = codecs.open(rst_path, mode = 'w', encoding = 'utf-8')
