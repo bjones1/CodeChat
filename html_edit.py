@@ -76,7 +76,7 @@ class MyWidget(QtGui.QWidget, form_class):
         # Fails, but I don't know why.
 #        self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
         # This works fine, so the bug doesn't seem to be in the way I'm connecting.
-        #self.plainTextEdit.SCN_MARGINCLICK.connect(self.on_plainTextEdit_modified)
+        self.plainTextEdit.SCEN_CHANGE.connect(self.on_plainTextEdit_modified)
         # Enable/disable the update button when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
@@ -118,8 +118,10 @@ class MyWidget(QtGui.QWidget, form_class):
             self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
         
-    def on_plainTextEdit_modified(self, position, charsRemoved, charsAdded):
+    def on_plainTextEdit_modified(self):
         print 'plain text changed'
+        position, charsRemoved, charsAdded = (0, 0, 0)
+        return
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
             print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
@@ -148,7 +150,7 @@ class MyWidget(QtGui.QWidget, form_class):
                         return
                     # Then delete the char
                     self.textEdit.textCursor().deleteChar()
-            self.textEdit.textCursor().insertText(self.plainTextEdit.toPlainText()[position:position + charsAdded])
+            self.textEdit.textCursor().insertText(self.plainTextEdit.text()[position:position + charsAdded])
             self.ignore_next = False
         
     def update_html(self):
