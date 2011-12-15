@@ -3,10 +3,6 @@
 # * Bug in the Pygments parser boogers us #macros. How to fix?
 # * Figure out how to get the SCN_MODIFIED signal to connect, rewrite the
 #   on_plainTextEdit_modified routine
-# * Figure out how to get syntax highlighting AND correct indentation back
-#   plus how to indent rest text (ugh)
-# * Python TRE port allows unicode for text to search but not for the search
-#   string, which causes some headaches. Look for a full Unicode solution.
 # * Backspace when at the left edge of a found block removes the wrong char
 #   in the other pane
 # * Make search more robust
@@ -19,10 +15,10 @@
 from PyQt4 import QtGui, uic
 #from docutils.core import publish_string
 import sphinx.cmdline
-import sys
-import os
+import sys, os
 # For approximate pattern matching, use the Python port of TRE. See
 # http://hackerboss.com/approximate-regex-matching-in-python/ for more details.
+# I modified the Python wrapper code to allow Unicode strings.
 import tre
 # Found some docs on QScintilla on Python with Qt at
 # http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
@@ -32,14 +28,17 @@ form_class, base_class = uic.loadUiType("html_edit.ui")
 
 class MyWidget(QtGui.QWidget, form_class):
     def __init__(self, source_file, parent = None, selected = [], flag = 0, *args):
+        self.ignore_next = True
+        QtGui.QWidget.__init__(self, parent, *args)
         # Split the source file into a path, base name, and extension
         head, tail = os.path.split(source_file)
         name, ext = os.path.splitext(tail)
         self.source_file = source_file
         self.rst_file = os.path.join(head, name) + '.rst'
         self.html_file = os.path.join('_build/html/', name) + '.html'
-        self.ignore_next = True
-        QtGui.QWidget.__init__(self, parent, *args)
+        # Save current dir: HTML loading requires a change to the HTML direcotry,
+        # while Sphinx needs current dir.
+        self.current_dir = os.getcwd()
         self.setupUi(self)
         self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
 #        self.plainTextEdit.setPlainText(rest_text)
@@ -153,6 +152,8 @@ class MyWidget(QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def update_html(self):
+        # Restore current dir
+        os.chdir(self.current_dir)
         CodeToRest(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
         str = ''
@@ -160,10 +161,8 @@ class MyWidget(QtGui.QWidget, form_class):
             str = f.read()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
-        cur = os.getcwd()
         os.chdir('_build/html')
         self.textEdit.setHtml(str)
-        os.chdir(cur)
     
     def set_html_editable(self, can_edit):
         # Calling self.textEdit.setReadOnly(False) disables
@@ -263,6 +262,8 @@ class MyWidget(QtGui.QWidget, form_class):
                     self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
+        # Restore current dir
+        os.chdir(self.current_dir)
         with open(self.source_file, 'w') as f:
             f.write(unicode(self.plainTextEdit.text()))
         self.plainTextEdit.setModified(False)
@@ -298,6 +299,7 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
     match = pat.search(target_text, fz)
     # Fail on no matches
     if not match:
+        print 'No matches.'
         return -1
     else:
         # match.group()[0][0] contains the the index into the target string of the
@@ -311,6 +313,7 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
         assert pos_in_target < (len(target_text) - 1)
         match_again = pat.search(target_text[pos_in_target + 1:], fz)
         if match_again and (match_again.cost <= match.cost):
+            print('Multiple matches')
             return -1
         # Given that we did an approximate match, make sure the needed
         # prefix of the string is an exact match.
@@ -319,6 +322,7 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
             # offset from that to pinpoint where in this string we want.
             return pos_in_target + match_len
         else:
+            print('Wrong prefix')
             return -1
 
 
