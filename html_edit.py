@@ -13,7 +13,6 @@
 
 
 from PyQt4 import QtGui, uic
-#from docutils.core import publish_string
 import sphinx.cmdline
 import sys, os
 # For approximate pattern matching, use the Python port of TRE. See
@@ -41,8 +40,6 @@ class MyWidget(QtGui.QWidget, form_class):
         self.current_dir = os.getcwd()
         self.setupUi(self)
         self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
-#        self.plainTextEdit.setPlainText(rest_text)
-#        str = publish_string(rest_text, writer_name='html')
         # Configure QScintilla
         # --------------------
         # Set the default font
@@ -189,12 +186,9 @@ class MyWidget(QtGui.QWidget, form_class):
             # A negative pos means use current position
             if cursor_pos < 0:
                 cursor_pos = self.plainTextEdit_cursor_pos
-            source_text = unicode(self.plainTextEdit.text())
-            search_loc = (cursor_pos, max(0, cursor_pos - 5), min(len(source_text), cursor_pos + 5))
-            found = find_approx_text_in_target(source_text,
-                                               search_loc,
+            found = find_approx_text_in_target(unicode(self.plainTextEdit.text()),
+                                               cursor_pos,
                                                unicode(self.textEdit.toPlainText()))
-            text = source_text[search_loc[1]:search_loc[2]]
             if found >= 0:
                 pos = self.textEdit.textCursor()
                 # Grow the selection if necessary; otherwise, just move the cursor.
@@ -202,14 +196,11 @@ class MyWidget(QtGui.QWidget, form_class):
                                 QtGui.QTextCursor.MoveAnchor 
                                 if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) == self.plainTextEdit_cursor_pos
                                 else QtGui.QTextCursor.KeepAnchor)
-#                print ('Plain fragment "%s" (%d, %d, %d) found at %d.' % 
-#                      (text, search_loc[0], search_loc[1], search_loc[2], found))
                 self.ignore_next = True
                 self.textEdit.setTextCursor(pos)
                 self.set_html_editable(True)
                 self.ignore_next = False
             else:
-                print 'Fragment "%s" not found.' % text
                 self.ignore_next = True
                 self.set_html_editable(False)
                 self.ignore_next = False
@@ -219,49 +210,29 @@ class MyWidget(QtGui.QWidget, form_class):
         if not self.ignore_next:
             cursor = self.textEdit.textCursor()
             if cursor_pos < 0:
-                cursor_pos = cursor.position()
-#            print "Cursor position %d, block %d" % (cursor.position(),
-#                                                    cursor.blockNumber())
-            # Search for the current fragment in the block.
-            block = cursor.block()
-            iterator = block.begin()
-            current_fragment = None
-            while not iterator.atEnd():
-                current_fragment = iterator.fragment()
-                if current_fragment.contains(cursor.position()):
-                    break
-                iterator += 1
-            # When the cursor is at the end of a line, it's not in any fragment.
-            # In that case, use the last fragment instead.
-            if current_fragment is not None:
-                text = current_fragment.text()
-                search_loc = (cursor_pos, current_fragment.position(), 
-                              current_fragment.position() + len(text))
-                found = find_approx_text_in_target(unicode(self.textEdit.toPlainText()),
-                                                   search_loc,
-                                                   unicode(self.plainTextEdit.text()))
-                # Update position in source doc if text was found
-                if found >= 0:
-                    # Grow the selection if necessary; otherwise, just move the cursor.
-                    # Note: I tried to use SCI_SETEMPTYSELECTION per
-                    # http://www.scintilla.org/ScintillaDoc.html#SCI_SETEMPTYSELECTION,
-                    # but got AttributeError: type object 'QsciScintilla' has
-                    # no attribute 'SCI_SETEMPTYSELECTION'.
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
-                    if cursor.anchor() == cursor.position():
-                        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, found)
-                    # Scroll cursor into view
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
-                    self.ignore_next = True
-                    self.set_html_editable(True)
-                    self.ignore_next = False
-#                    print ('HTML fragment "%s" (%d, %d, %d) found at %d.' % 
-#                        (text, search_loc[0], search_loc[1], search_loc[2], found))
-                else:
-                    print 'Fragment "%s" not found.' % text
-                    self.ignore_next = True
-                    self.set_html_editable(False)
-                    self.ignore_next = False
+                cursor_pos = self.textEdit_cursor_pos
+            found = find_approx_text_in_target(unicode(self.textEdit.toPlainText()),
+                                               cursor_pos,
+                                               unicode(self.plainTextEdit.text()))
+            # Update position in source doc if text was found
+            if found >= 0:
+                # Grow the selection if necessary; otherwise, just move the cursor.
+                # Note: I tried to use SCI_SETEMPTYSELECTION per
+                # http://www.scintilla.org/ScintillaDoc.html#SCI_SETEMPTYSELECTION,
+                # but got AttributeError: type object 'QsciScintilla' has
+                # no attribute 'SCI_SETEMPTYSELECTION'.
+                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
+                if cursor.anchor() == cursor.position():
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, found)
+                # Scroll cursor into view
+                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
+                self.ignore_next = True
+                self.set_html_editable(True)
+                self.ignore_next = False
+            else:
+                self.ignore_next = True
+                self.set_html_editable(False)
+                self.ignore_next = False
                 
     def on_updatePushButton_pressed(self):
         # Restore current dir
@@ -280,20 +251,25 @@ class MyWidget(QtGui.QWidget, form_class):
 # location in a target document.
 #   search_text - The text composing the entire source document in which the search
 #                 string resides
-#   search_loc - A tuple of (loc, start_loc, end_loc) giving the desired
-#                location in the source document, followed by a range of text
-#                that is probably easy to match which contains loc.
+#   search_loc - A location in the source document which should be found in the
+#                target document
 #   target_text - The target document
+#   search_range - Range of characters about the search_loc in which to search.
 #   returns - A location in the target document, or -1 if not found
 #
 #   Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
-def find_approx_text_in_target(search_text, search_loc, target_text):
-    (loc, start_loc, end_loc) = search_loc
-    assert start_loc <= end_loc
-    search_str = search_text[start_loc:end_loc]
-    # A zero-length string can't be matched.
-    if start_loc == end_loc: return -1
-#    print "Searching for %s..." % search_str
+def find_approx_text_in_target(search_text, search_loc, target_text, search_range = None, spaces = 0):
+    if not search_range:
+        search_range = 40
+    # Don't trust results over a very small range
+    if len(search_text) < 5:
+        print(' '*spaces + 'Range too small')
+        return -1
+    # Choose a +/- search_range of chars to search in.
+    begin = max(0, search_loc - search_range)
+    end = min(len(search_text), search_loc + search_range)
+    search_str = search_text[begin:end]
+    print(' '*spaces + "Searching for '%s'" % search_str)
     # tre.LITERAL specifies that search_str is a literal search string, not
     # a regex.
     pat = tre.compile(search_str, tre.LITERAL)
@@ -301,30 +277,51 @@ def find_approx_text_in_target(search_text, search_loc, target_text):
     match = pat.search(target_text, fz)
     # Fail on no matches
     if not match:
-        print 'No matches.'
+        print(' '*spaces + 'No matches.')
         return -1
     else:
         # match.group()[0][0] contains the the index into the target string of the
         # first matched char
-        pos_in_target = match.groups()[0][0]
-        match_len = loc - start_loc
+        begin_in_target, end_in_target = match.groups()[0]
+        print(' '*spaces + "found '" + target_text[begin_in_target:end_in_target] + "'")
         # TRE seems to pick the first match it finds, even if there is
         # more than one matck with identical error. This is a bad thing!
         # Must manually call it again with a substring to check.
-        # Search only if we're not at the last char of the target text.
-        assert pos_in_target < (len(target_text) - 1)
-        match_again = pat.search(target_text[pos_in_target + 1:], fz)
+        match_again = pat.search(target_text[end_in_target:], fz)
         if match_again and (match_again.cost <= match.cost):
-            print('Multiple matches')
+            print(' '*spaces + 'Multiple matches ' + str(match_again.groups()))
             return -1
-        # Given that we did an approximate match, make sure the needed
-        # prefix of the string is an exact match.
-        if (target_text[pos_in_target:pos_in_target + match_len] ==
-            search_str[0:match_len]):
+        # Given that we did an approximate match, narrow down the search range
+        # to get an exact match
+        if (target_text[begin_in_target:end_in_target] ==
+            search_str):
             # offset from that to pinpoint where in this string we want.
-            return pos_in_target + match_len
+            match_len = search_loc - begin
+            print(' '*spaces + 'succeeded')
+            return begin_in_target + match_len
         else:
-            print('Wrong prefix')
+            # Try finding in left substring
+            substr_search_range = search_range / 2
+            substr_search_loc = search_loc - begin
+            substr_middle = len(search_str) / 2
+            found = find_approx_text_in_target(search_str[:substr_middle], 
+                                               substr_search_loc, target_text, substr_search_range, spaces + 2)
+            if found >= 0:
+                return found + begin
+            # Try finding in middle substring
+            print(' '*spaces + 'Middle:')
+            substr_begin = max(0, substr_middle - substr_search_range)
+            substr_end = min(len(search_str), substr_middle + substr_search_range)
+            found = find_approx_text_in_target(search_str[substr_begin:substr_end], 
+                                               substr_search_loc - substr_begin, target_text, substr_search_range, spaces + 2)
+            if found >= 0:
+                return found + begin + substr_begin
+            # Try left substring
+            print(' '*spaces + 'Left:')
+            found = find_approx_text_in_target(search_str[substr_middle:], 
+                                               0, target_text, substr_search_range, spaces + 2)
+            if found >= 0:
+                return found + begin + substr_search_loc
             return -1
 
 
