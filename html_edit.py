@@ -23,8 +23,10 @@ import tre
 # http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 
-form_class, base_class = uic.loadUiType("html_edit.ui")
+# A unique string to mark lines for removal in HTML
+unique_remove_str = '//wokifvzohtdlm'
 
+form_class, base_class = uic.loadUiType("html_edit.ui")
 class MyWidget(QtGui.QWidget, form_class):
     def __init__(self, source_file, parent = None, selected = [], flag = 0, *args):
         self.ignore_next = True
@@ -154,11 +156,13 @@ class MyWidget(QtGui.QWidget, form_class):
         # Restore current dir
         os.chdir(self.current_dir)
         CodeToRest(self.source_file, self.rst_file)
-        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
+                              '.', '_build/html') )
         # Clean up code by removing deletion tags
         with open(self.html_file, 'r+') as f:
             str = f.read()
-            str = str.replace('<span class="c1">//wokifvzohtdlm</span>', '').replace('<p>//wokifvzohtdlm</p>', '')
+            str = str.replace('<span class="c1">' + unique_remove_str + '</span>', '')\
+                .replace('<p>' + unique_remove_str + '</p>', '')
             f.seek(0)
             f.write(str)
             f.truncate()
@@ -374,8 +378,6 @@ class CodeToRestFormatter(Formatter):
         ws = re.compile(r'^[ \t\r\f\v]+$')
         # A regular expression to remove comment chars
         regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)        
-        # A unique string to mark lines for removal in HTML
-        unique_remove_str = '//wokifvzohtdlm'
 
         # Iterate through all tokens in the input file        
         for ttype, value in token_source:
