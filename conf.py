@@ -103,6 +103,9 @@ html_theme = 'traditional'
 # documentation.
 html_theme_options = { "nosidebar" : "true" }
 
+# Choose a custom theme
+html_style = 'html_edit.css'
+
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 

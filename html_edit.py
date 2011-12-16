@@ -116,8 +116,8 @@ class MyWidget(QtGui.QWidget, form_class):
             self.ignore_next = False
         
     def on_plainTextEdit_modified(self):
-        print 'plain text changed'
         position, charsRemoved, charsAdded = (0, 0, 0)
+        # Bug: broken for now.
         return
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
             print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
@@ -155,9 +155,13 @@ class MyWidget(QtGui.QWidget, form_class):
         os.chdir(self.current_dir)
         CodeToRest(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', '.', '_build/html') )
-        str = ''
-        with open(self.html_file, 'r') as f:
+        # Clean up code by removing deletion tags
+        with open(self.html_file, 'r+') as f:
             str = f.read()
+            str = str.replace('<span class="c1">//wokifvzohtdlm</span>', '').replace('<p>//wokifvzohtdlm</p>', '')
+            f.seek(0)
+            f.write(str)
+            f.truncate()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
         os.chdir('_build/html')
@@ -370,6 +374,8 @@ class CodeToRestFormatter(Formatter):
         ws = re.compile(r'^[ \t\r\f\v]+$')
         # A regular expression to remove comment chars
         regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)        
+        # A unique string to mark lines for removal in HTML
+        unique_remove_str = '//wokifvzohtdlm'
 
         # Iterate through all tokens in the input file        
         for ttype, value in token_source:
@@ -385,40 +391,46 @@ class CodeToRestFormatter(Formatter):
                 current_line_list.append(value)
             # On a newline, process the line
             elif value == '\n':
+                # Convert to a string
+                line_str = ''.join(current_line_list)
+                current_line_list = [line_str]
                 # If the line is whitespace, inherit the type of the previous
                 # line.
                 if line_type == is_ws:
                     line_type = is_code if last_is_code else is_comment
                 if line_type == is_code:
                     # Each line of code needs a space at the beginning
-                    current_line_list.insert(0, ' ' + comment_indent)
+                    current_line_list.insert(0, ' ')
                     if not last_is_code:
                         # When transitioning from comment to code, prepend a ::
                         # to the last line.
                         # Hack: put a . at the beginning of the line so reST
                         # will preserve all indentation of the block.
-                        current_line_list.insert(0, '::\n\n')
+                        current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_str + '\n')
                     else:
                         # Otherwise, just prepend a newline
                         current_line_list.insert(0, '\n')
                 else:
-                    # Prepend a newline
-                    current_line_list.insert(0, '\n')
-                    # Add another for a code to comment transition
-                    if last_is_code:
-                        current_line_list.insert(0, '\n\n..\n')
-                    
-                # Convert to a string
-                line_str = ''.join(current_line_list)
-                current_line_list = []
-                # String comment chars if necessary
-                if line_type == is_comment:
                     # Save the number of spaces in this comment
                     match = re.search(regexp, line_str)
                     if match:
                         comment_indent = match.group(1)
                     # Remove the comment character (and one space, if it's there)
-                    line_str = re.sub(regexp, r'\1', line_str)
+                    current_line_list = [re.sub(regexp, r'\1', line_str)]
+                    # Prepend a newline
+                    current_line_list.insert(0, '\n')
+                    # Add in left margin adjustments for a code to comment transition
+                    if last_is_code:
+                        # Get left margin correct by inserting a series of blockquotes
+                        blockquote_indent = []
+                        for i in range(len(comment_indent)):
+                            blockquote_indent.append('\n\n' + ' '*i + unique_remove_str)
+                        blockquote_indent.append('\n\n')
+                        current_line_list.insert(0, ''.join(blockquote_indent))
+                    
+                # Convert to a string
+                line_str = ''.join(current_line_list)
+                current_line_list = []
                 # For debug:
                 # line_str += str(line_type) + str(last_is_code)
                 # We're done!
