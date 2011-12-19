@@ -40,8 +40,7 @@ class MyWidget(QtGui.QWidget, form_class):
         # Save current dir: HTML loading requires a change to the HTML direcotry,
         # while Sphinx needs current dir.
         self.current_dir = os.getcwd()
-        self.setupUi(self)
-        self.updatePushButton.setShortcut(QtGui.QKeySequence('Ctrl+u'))
+        self.setupUi(parent)
         # Configure QScintilla
         # --------------------
         # Set the default font
@@ -79,7 +78,7 @@ class MyWidget(QtGui.QWidget, form_class):
         # Enable/disable the update button when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
-            lambda changed: self.updatePushButton.setEnabled(changed))
+            lambda changed: self.action_Save_and_update.setEnabled(changed))
         self.ignore_next = False
         # Save initial cursor positions
         self.textEdit_cursor_pos = self.textEdit.textCursor().position()
@@ -242,7 +241,7 @@ class MyWidget(QtGui.QWidget, form_class):
                 self.set_html_editable(False)
                 self.ignore_next = False
                 
-    def on_updatePushButton_pressed(self):
+    def on_action_Save_and_update_triggered(self):
         # Restore current dir
         os.chdir(self.current_dir)
         with open(self.source_file, 'w') as f:
@@ -465,10 +464,18 @@ def CodeToRest(source_path, rst_path):
     lexer = get_lexer_for_filename(source_path)
     hi_code = highlight(code, lexer, formatter)
     outfile.write(hi_code)
+    
+class Main(QtGui.QMainWindow):
+    def __init__(self):
+         QtGui.QMainWindow.__init__(self)
+         self.form = MyWidget('./practicum2Summer2011.c', self)
+
+    def on_action_Save_and_update_triggered(self):
+        self.form.on_action_Save_and_update_triggered()
 
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    form = MyWidget('./practicum2Summer2011.c')
-    form.show()
-    app.exec_()
+    window = Main()
+    window.show()
+    sys.exit(app.exec_())
