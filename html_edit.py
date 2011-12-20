@@ -22,6 +22,7 @@ import tre
 # Found some docs on QScintilla on Python with Qt at
 # http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
+import codecs
 
 # A unique string to mark lines for removal in HTML
 unique_remove_str = '//wokifvzohtdlm'
@@ -66,7 +67,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.CommentLine, 'Courier New')
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.CommentDoc, 'Courier New')
         
-        with open(self.source_file, 'r') as f:
+        with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
             self.plainTextEdit.setText(f.read())
         self.update_html()
         # Ask for notification when the contents of either editor change
@@ -158,7 +159,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', '_build/html') )
         # Clean up code by removing deletion tags
-        with open(self.html_file, 'r+') as f:
+        with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
             str = str.replace('<span class="c1">' + unique_remove_str + '</span>', '')\
                 .replace('<p>' + unique_remove_str + '</p>', '')
@@ -244,7 +245,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
     def on_action_Save_and_update_triggered(self):
         # Restore current dir
         os.chdir(self.current_dir)
-        with open(self.source_file, 'w') as f:
+        with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(unicode(self.plainTextEdit.text()))
         self.plainTextEdit.setModified(False)
         self.ignore_next = True
@@ -454,11 +455,10 @@ class CodeToRestFormatter(Formatter):
 
 from pygments.lexers import get_lexer_for_filename
 from pygments import highlight
-import codecs
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToRest(source_path, rst_path):
-    code = open(source_path, 'r').read()
+    code = codecs.open(source_path, 'r', encoding = 'utf-8').read()
     formatter = CodeToRestFormatter()
     outfile = codecs.open(rst_path, mode = 'w', encoding = 'utf-8')
     lexer = get_lexer_for_filename(source_path)
