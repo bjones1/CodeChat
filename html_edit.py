@@ -27,10 +27,10 @@ from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 unique_remove_str = '//wokifvzohtdlm'
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
-class MyWidget(QtGui.QWidget, form_class):
-    def __init__(self, source_file, parent = None, selected = [], flag = 0, *args):
+class MyQMainWindow(QtGui.QMainWindow, form_class):
+    def __init__(self, source_file):
         self.ignore_next = True
-        QtGui.QWidget.__init__(self, parent, *args)
+        QtGui.QMainWindow.__init__(self)
         # Split the source file into a path, base name, and extension
         head, tail = os.path.split(source_file)
         name, ext = os.path.splitext(tail)
@@ -40,7 +40,7 @@ class MyWidget(QtGui.QWidget, form_class):
         # Save current dir: HTML loading requires a change to the HTML direcotry,
         # while Sphinx needs current dir.
         self.current_dir = os.getcwd()
-        self.setupUi(parent)
+        self.setupUi(self)
         # Configure QScintilla
         # --------------------
         # Set the default font
@@ -465,17 +465,9 @@ def CodeToRest(source_path, rst_path):
     hi_code = highlight(code, lexer, formatter)
     outfile.write(hi_code)
     
-class Main(QtGui.QMainWindow):
-    def __init__(self):
-         QtGui.QMainWindow.__init__(self)
-         self.form = MyWidget('./practicum2Summer2011.c', self)
-
-    def on_action_Save_and_update_triggered(self):
-        self.form.on_action_Save_and_update_triggered()
-
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    window = Main()
+    window = MyQMainWindow('./practicum2Summer2011.c')
     window.show()
     sys.exit(app.exec_())
