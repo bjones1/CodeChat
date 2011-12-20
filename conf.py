@@ -91,6 +91,11 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
 
+# If true, keep warnings as “system message” paragraphs in the built documents.
+# Regardless of this setting, warnings are always written to the standard error
+# stream when sphinx-build is run.
+keep_warnings = True
+
 
 # -- Options for HTML output ---------------------------------------------------
 
