@@ -1,0 +1,5 @@
+syntax: glob
+_build
+practicum2Summer2011.rst
+tre.pyd
+tre.dll
