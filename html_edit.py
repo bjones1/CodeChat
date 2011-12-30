@@ -1,15 +1,9 @@
 # To do:
 #
-# * Bug in the Pygments parser boogers us #macros. How to fix?
 # * Figure out how to get the SCN_MODIFIED signal to connect, rewrite the
 #   on_plainTextEdit_modified routine
-# * Backspace when at the left edge of a found block removes the wrong char
-#   in the other pane
-# * Make search more robust
-# * Figure out how to make cursor visible when html is changed to read-only
 # * Unit testing
 # * Figure out how to get symbolic names for Qt::TextInteractionFlags
-# * The obvious: add GUI, test lots and lots
 
 
 from PyQt4 import QtGui, uic
