@@ -11,6 +11,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   README
    practicum2Summer2011
 
 Indices and tables
