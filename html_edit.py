@@ -3,10 +3,9 @@
 # * Figure out how to get the SCN_MODIFIED signal to connect, rewrite the
 #   on_plainTextEdit_modified routine
 # * Unit testing
-# * Figure out how to get symbolic names for Qt::TextInteractionFlags
 
 
-from PyQt4 import QtGui, uic
+from PyQt4 import QtGui, QtCore, uic
 import sphinx.cmdline
 import sys, os
 # For approximate pattern matching, use the Python port of TRE. See
@@ -168,13 +167,9 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
     def set_html_editable(self, can_edit):
         # Calling self.textEdit.setReadOnly(False) disables
         # keyboard navigation. Use this to retain key nav.
-        # Note: I don't know a Python name for
-        # Qt::TextInteractionFlags. Use the values from
-        # http://doc.qt.nokia.com/latest/qt.html#TextInteractionFlag-enum
-        # instead.
         old_flags = int(self.textEdit.textInteractionFlags())
-        new_flags = old_flags | 16 if can_edit else old_flags & ~16
-        self.textEdit.pyqtConfigure(textInteractionFlags=new_flags)
+        new_flags = old_flags | QtCore.Qt.TextEditable if can_edit else old_flags & ~QtCore.Qt.TextEditable
+        self.textEdit.pyqtConfigure(textInteractionFlags = new_flags)
         # BUG: the cursor is hidden when this is made uneditable. I'm not
         # sure how to show it. The line below doesn't help.
 #        self.textEdit.setTextCursor(self.textEdit.textCursor())
@@ -463,5 +458,6 @@ if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     window = MyQMainWindow('./practicum2Summer2011.c')
+    window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
