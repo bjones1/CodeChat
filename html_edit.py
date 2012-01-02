@@ -15,7 +15,7 @@ import codecs
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 
-from CodeChat.FindLongestMatchingString import find_approx_text_in_target
+from FindLongestMatchingString import find_approx_text_in_target
 
 # A tuple of language-specific options, indexed by the parser which Pygments
 # selects.
@@ -25,7 +25,7 @@ language_specific_options = {
  PythonLexer : ('# ', QsciLexerPython)
 }
 
-language = CLexer
+language = PythonLexer
 
 # The string indicating a comment in the chosen programming language. This must
 # end in a space for the regular expression in format to work. The space
@@ -385,7 +385,7 @@ def CodeToRest(source_path, rst_path):
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    window = MyQMainWindow('./practicum2Summer2011.c')
+    window = MyQMainWindow('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())

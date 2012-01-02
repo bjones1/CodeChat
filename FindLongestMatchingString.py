@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+# ===========================
+# Find longest maching string
+# ===========================
+#
 # These functions find the longest matching string in another string.
 
 # For approximate pattern matching, use the Python port of TRE. See
@@ -31,13 +36,23 @@ def find_approx_text(search_text, target_text, cost = None):
             
 # Given a location in the text of one document (the source), finds the corresponding
 # location in a target document.
-#   search_text - The text composing the entire source document in which the search
-#                 string resides
-#   search_loc - A location in the source document which should be found in the
-#                target document
-#   target_text - The target document
-#   search_range - Range of characters about the search_loc in which to search.
-#   returns - A location in the target document, or -1 if not found
+#
+#   search_text
+#     The text composing the entire source document in which the search
+#     string resides
+#
+#   search_loc
+#     A location in the source document which should be found in the
+#     target document
+#
+#   target_text
+#     The target document
+#
+#   search_range
+#     Range of characters about the search_loc in which to search.
+#
+#   returns
+#     A location in the target document, or -1 if not found
 #
 #   Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
 def find_approx_text_in_target(search_text, search_loc, target_text):

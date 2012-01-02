@@ -13,6 +13,7 @@ Contents:
 
    README
    practicum2Summer2011
+   FindLongestMatchingString
 
 Indices and tables
 ==================
