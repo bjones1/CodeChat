@@ -14,11 +14,28 @@ import sys, os
 import tre
 # Found some docs on QScintilla on Python with Qt at
 # http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
-from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
+from PyQt4.Qsci import QsciScintilla, QsciLexerCPP, QsciLexerPython
 import codecs
+from pygments.lexers.compiled import CLexer, CppLexer
+from pygments.lexers.agile import PythonLexer
+
+# A tuple of language-specific options, indexed by the parser which Pygments
+# selects.
+language_specific_options = {
+ CLexer : ('// ', QsciLexerCPP),
+ CppLexer : ('// ', QsciLexerCPP),
+ PythonLexer : ('# ', QsciLexerPython)
+}
+
+language = CLexer
+
+# The string indicating a comment in the chosen programming language. This must
+# end in a space for the regular expression in format to work. The space
+# also makes the output a bit prettier.
+comment_string = language_specific_options[language][0]
 
 # A unique string to mark lines for removal in HTML
-unique_remove_str = '//wokifvzohtdlm'
+unique_remove_str = 'wokifvzohtdlm'
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
 class MyQMainWindow(QtGui.QMainWindow, form_class):
@@ -53,7 +70,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         # Use the C++ lexer.
         # Set style for comments to a fixed-width courier font.
-        lexer = QsciLexerCPP()
+        lexer = language_specific_options[language][1]()
         lexer.setDefaultFont(font)
         self.plainTextEdit.setLexer(lexer)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.Comment, 'Courier New')
@@ -154,8 +171,9 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         # Clean up code by removing deletion tags
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
-            str = str.replace('<span class="c1">' + unique_remove_str + '</span>', '')\
-                .replace('<p>' + unique_remove_str + '</p>', '')
+            unique_remove_comment = comment_string + unique_remove_str
+            str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '')\
+                .replace('<p>' + unique_remove_comment + '</p>', '')
             f.seek(0)
             f.write(str)
             f.truncate()
@@ -335,12 +353,6 @@ from pygments.formatter import Formatter
 from pygments.token import Token
 import re
 
-# The string indicating a comment in the chosen programming language. This must
-# end in a space for the regular expression in format to work. The space
-# also makes the output a bit prettier.
-# comment_string = '# '
-comment_string = '// '
-
 # This class converts from source to to reST. As the <a>overview</a>
 # states, this uses Pygments to do most of the work, adding only a formatter
 # to that library. Therefore, to use this class, simply select this class
@@ -374,7 +386,10 @@ class CodeToRestFormatter(Formatter):
         # A regular expression for whitespace not containing a newline
         ws = re.compile(r'^[ \t\r\f\v]+$')
         # A regular expression to remove comment chars
-        regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)        
+        regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)
+        # A comment which can be removed later, used to trick reST / Sphinx into
+        # generating the correct indention        
+        unique_remove_comment = comment_string + unique_remove_str
 
         # Iterate through all tokens in the input file        
         for ttype, value in token_source:
@@ -405,7 +420,7 @@ class CodeToRestFormatter(Formatter):
                         # to the last line.
                         # Hack: put a . at the beginning of the line so reST
                         # will preserve all indentation of the block.
-                        current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_str + '\n')
+                        current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
                     else:
                         # Otherwise, just prepend a newline
                         current_line_list.insert(0, '\n')
@@ -423,7 +438,7 @@ class CodeToRestFormatter(Formatter):
                         # Get left margin correct by inserting a series of blockquotes
                         blockquote_indent = []
                         for i in range(len(comment_indent)):
-                            blockquote_indent.append('\n\n' + ' '*i + unique_remove_str)
+                            blockquote_indent.append('\n\n' + ' '*i + unique_remove_comment)
                         blockquote_indent.append('\n\n')
                         current_line_list.insert(0, ''.join(blockquote_indent))
                     
@@ -451,6 +466,7 @@ def CodeToRest(source_path, rst_path):
     formatter = CodeToRestFormatter()
     outfile = codecs.open(rst_path, mode = 'w', encoding = 'utf-8')
     lexer = get_lexer_for_filename(source_path)
+    print lexer.__class__
     hi_code = highlight(code, lexer, formatter)
     outfile.write(hi_code)
     
