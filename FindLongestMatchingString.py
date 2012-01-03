@@ -11,7 +11,6 @@
 # I modified the Python wrapper code to allow Unicode strings.
 import tre
 
-# Search for a string
 def find_approx_text(search_text, target_text, cost = None):
     print("Searching for '%s'" % search_text)
     # tre.LITERAL specifies that search_str is a literal search string, not
@@ -34,28 +33,55 @@ def find_approx_text(search_text, target_text, cost = None):
     else:
         return match, begin_in_target, end_in_target
             
-# Given a location in the text of one document (the source), finds the corresponding
-# location in a target document.
+# This routine finds the a substring in the target document which contains an exact,
+# unique match for a substring taken from the source document, anchored at the
+# search location in the source document.
 #
-#   search_text
-#     The text composing the entire source document in which the search
-#     string resides
+# search_text
+#   The text composing the entire source document in which the search
+#   string resides
 #
-#   search_loc
-#     A location in the source document which should be found in the
-#     target document
+# search_loc
+#   A location in the source document which should be found in the
+#   target document
 #
-#   target_text
-#     The target document
+# target_text
+#   The target document
 #
-#   search_range
-#     Range of characters about the search_loc in which to search.
+# search_range
+#   Range of characters about the search_loc in which to search.
 #
-#   returns
-#     A location in the target document, or -1 if not found
+# returns
+#   An exactly matching location in the target document, or -1 if not found
 #
-#   Bugs: Sometimes spaces get replaced by \u00a0, a no-break space.
+# Method:
+#
+# #. Look for the best approximate match within the target document of the source 
+#    substring composed of characters within a radius of the anchor.
+#
+#    * If no unique match if found, give up (for now -- this could be improved).
+#
+# #. Record this cost (the difference between the source and target substrings)
+#    and the left and right search radii.
+#    Perform all future searches only within the source and target substrings
+#    found in this search.
+#
+# #. While the search radius to the left of the anchor > 0 and the cost > 0:
+#
+#    #. Decrease the left search radius by half and approximate search again.
+#
+#    #. If there are multiple matches, undo this search radius change and exit.
+#       This is the lowest achievable cost.
+#
+#    #. If the cost has decreased, record this new cost and its associated left
+#       search radius.
+#
+# #. Now, repeat this process for the right search radius.
+#
+# #. If the cost is zero, report the location in the target; otherwise, return
+#    a failure to match.
 def find_approx_text_in_target(search_text, search_loc, target_text):
+    return -1
     search_range = 40
     # Choose a +/- search_range of chars to search in.
     begin = max(0, search_loc - search_range)
