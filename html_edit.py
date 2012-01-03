@@ -81,9 +81,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
         # Fails, but I don't know why.
-#        self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
-        # This works fine, so the bug doesn't seem to be in the way I'm connecting.
-        self.plainTextEdit.SCEN_CHANGE.connect(self.on_plainTextEdit_modified)
+        self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
         # Enable/disable the update button when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
@@ -127,6 +125,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         
     def on_plainTextEdit_modified(self):
         position, charsRemoved, charsAdded = (0, 0, 0)
+        print "hi"
         # Bug: broken for now.
         return
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
