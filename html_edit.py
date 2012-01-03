@@ -17,12 +17,15 @@ from pygments.lexers.agile import PythonLexer
 
 from FindLongestMatchingString import find_approx_text_in_target
 
+# A unique string to mark lines for removal in HTML
+unique_remove_str = 'wokifvzohtdlm'
+
 # A tuple of language-specific options, indexed by the parser which Pygments
 # selects.
 language_specific_options = {
- CLexer : ('// ', QsciLexerCPP),
- CppLexer : ('// ', QsciLexerCPP),
- PythonLexer : ('# ', QsciLexerPython)
+ CLexer      : ('// ', '// ' + unique_remove_str,       QsciLexerCPP),
+ CppLexer    : ('// ', '// ' + unique_remove_str,       QsciLexerCPP),
+ PythonLexer : ('# ' , 'if ' + unique_remove_str + ':', QsciLexerPython)
 }
 
 language = PythonLexer
@@ -31,9 +34,6 @@ language = PythonLexer
 # end in a space for the regular expression in format to work. The space
 # also makes the output a bit prettier.
 comment_string = language_specific_options[language][0]
-
-# A unique string to mark lines for removal in HTML
-unique_remove_str = 'wokifvzohtdlm'
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
 class MyQMainWindow(QtGui.QMainWindow, form_class):
@@ -68,7 +68,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         # Use the C++ lexer.
         # Set style for comments to a fixed-width courier font.
-        lexer = language_specific_options[language][1]()
+        lexer = language_specific_options[language][2]()
         lexer.setDefaultFont(font)
         self.plainTextEdit.setLexer(lexer)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.Comment, 'Courier New')
@@ -169,9 +169,10 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         # Clean up code by removing deletion tags
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
-            unique_remove_comment = comment_string + unique_remove_str
-            str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '')\
-                .replace('<p>' + unique_remove_comment + '</p>', '')
+            unique_remove_comment = language_specific_options[language][1]
+            str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '') \
+                     .replace('<span class="k">if</span> <span class="n">wokifvzohtdlm</span><span class="p">:</span>', '') \
+                     .replace('<p>' + unique_remove_comment + '</p>', '')
             f.seek(0)
             f.write(str)
             f.truncate()
@@ -302,7 +303,7 @@ class CodeToRestFormatter(Formatter):
         regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)
         # A comment which can be removed later, used to trick reST / Sphinx into
         # generating the correct indention        
-        unique_remove_comment = comment_string + unique_remove_str
+        unique_remove_comment = language_specific_options[language][1]
 
         # Iterate through all tokens in the input file        
         for ttype, value in token_source:
