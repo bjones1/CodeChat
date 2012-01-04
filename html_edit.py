@@ -80,8 +80,12 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         self.update_html()
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
-        # Fails, but I don't know why.
         self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
+        # However, send only inserts and deletes for plain text. See
+        # http://www.scintilla.org/ScintillaDoc.html#SCI_SETMODEVENTMASK.
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETMODEVENTMASK, 
+                                         QsciScintilla.SC_MOD_INSERTTEXT |
+                                         QsciScintilla.SC_MOD_DELETETEXT)
         # Enable/disable the update button when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
@@ -123,10 +127,23 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
         
-    def on_plainTextEdit_modified(self):
-        position, charsRemoved, charsAdded = (0, 0, 0)
-        # Bug: broken for now.
-        return
+    def on_plainTextEdit_modified(self, position, modificationType, text,
+                                  length, linesAdded, line, foldLevelNow,
+                                  foldLevelPrev, token, annotationLinesAdded):
+        # See the SCN_MODIFIED_ message for a description of the above 
+        # parameters; the notifications_ section contains more info. We're
+        # primarily interested in translating the modificationType into
+        # QTextEdit-like charAdded and charRemoved (for now)
+        #
+        # .. _SCN_MODIFIED: http://www.scintilla.org/ScintillaDoc.html#SCN_MODIFIED
+        # .. _notifications: http://www.scintilla.org/ScintillaDoc.html#Notifications
+        (charsAdded, charsRemoved) = (0, 0)
+        if modificationType & QsciScintilla.SC_MOD_INSERTTEXT:
+            charsAdded = length
+        if modificationType & QsciScintilla.SC_MOD_DELETETEXT:
+            charsRemoved = length
+        # Shouldn't have both chars added and deleted at the same time.
+        assert (charsAdded == 0) or (charsRemoved == 0)
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
             print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
