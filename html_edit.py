@@ -23,9 +23,9 @@ unique_remove_str = 'wokifvzohtdlm'
 # A tuple of language-specific options, indexed by the parser which Pygments
 # selects.
 language_specific_options = {
- CLexer      : ('// ', '// ' + unique_remove_str,       QsciLexerCPP),
- CppLexer    : ('// ', '// ' + unique_remove_str,       QsciLexerCPP),
- PythonLexer : ('# ' , 'if ' + unique_remove_str + ':', QsciLexerPython)
+ CLexer      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+ CppLexer    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+ PythonLexer : ('# ' , '# '  + unique_remove_str, QsciLexerPython)
 }
 
 language = PythonLexer
@@ -169,7 +169,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
             str = f.read()
             unique_remove_comment = language_specific_options[language][1]
             str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '') \
-                     .replace('<span class="k">if</span> <span class="n">wokifvzohtdlm</span><span class="p">:</span>', '') \
+                     .replace('<span class="c">'  + unique_remove_comment + '</span>', '') \
                      .replace('<p>' + unique_remove_comment + '</p>', '')
             f.seek(0)
             f.write(str)

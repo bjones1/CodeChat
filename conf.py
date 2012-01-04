@@ -83,7 +83,7 @@ exclude_patterns = ['_build']
 # The default language to highlight source code in. The default is 'python'. 
 # The value should be a valid Pygments lexer name, see 
 # Showing code examples for more details.
-highlight_language = 'python'
+highlight_language = 'python3'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
