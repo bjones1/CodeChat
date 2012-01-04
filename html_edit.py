@@ -125,7 +125,6 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         
     def on_plainTextEdit_modified(self):
         position, charsRemoved, charsAdded = (0, 0, 0)
-        print "hi"
         # Bug: broken for now.
         return
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
