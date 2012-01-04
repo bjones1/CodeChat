@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CodeChat</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -64,6 +64,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
+    <addaction name="action_Reopen"/>
     <addaction name="action_Save_and_update"/>
     <addaction name="action_Quit"/>
    </widget>
@@ -95,6 +96,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="action_Reopen">
+   <property name="text">
+    <string>&amp;Reopen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
  </widget>

@@ -40,16 +40,10 @@ language = RstLexer
 comment_string = language_specific_options[language][0]
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
-class MyQMainWindow(QtGui.QMainWindow, form_class):
-    def __init__(self, source_file):
+class CodeChatWindow(QtGui.QMainWindow, form_class):
+    def __init__(self):
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self)
-        # Split the source file into a path, base name, and extension
-        head, tail = os.path.split(source_file)
-        name, ext = os.path.splitext(tail)
-        self.source_file = source_file
-        self.rst_file = os.path.join(head, name) + '.rst'
-        self.html_file = os.path.join('_build/html/', name) + '.html'
         # Save current dir: HTML loading requires a change to the HTML direcotry,
         # while Sphinx needs current dir.
         self.current_dir = os.getcwd()
@@ -84,9 +78,6 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
                                              QsciLexerCPP.CommentDoc, 'Courier New')
         
-        with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
-            self.plainTextEdit.setText(f.read())
-        self.update_html()
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
         self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
@@ -207,7 +198,9 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
         os.chdir('_build/html')
+        self.ignore_next = True
         self.textEdit.setHtml(str)
+        self.ignore_next = False
     
     def set_html_editable(self, can_edit):
         # Calling self.textEdit.setReadOnly(False) disables
@@ -276,7 +269,37 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
                 self.ignore_next = True
                 self.set_html_editable(False)
                 self.ignore_next = False
-                
+
+    # Open a new source file
+    def open(self, source_file):
+        # Split the source file into a path, base name, and extension
+        head, tail = os.path.split(source_file)
+        name, ext = os.path.splitext(tail)
+        self.source_file = source_file
+        self.rst_file = os.path.join(head, name) + '.rst'
+        self.html_file = os.path.join('_build/html/', name) + '.html'
+        self.reopen()
+         
+    # Reload the source file then regenerate the HTML file from it.
+    def reopen(self):
+        # Restore current dir
+        os.chdir(self.current_dir)
+        with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
+            self.plainTextEdit.setText(f.read())
+        self.update_html()
+        self.plainTextEdit.setModified(False)
+        
+    def on_action_Reopen_triggered(self):
+        self.reopen()
+        
+    def on_action_Open_triggered(self):
+        print('open')
+        # Restore current dir
+        os.chdir(self.current_dir)
+        source_file = QtGui.QFileDialog.getOpenFileName()
+        if source_file:
+            self.open(unicode(source_file))
+               
     def on_action_Save_and_update_triggered(self):
         # Restore current dir
         os.chdir(self.current_dir)
@@ -415,7 +438,8 @@ def CodeToRest(source_path, rst_path):
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    window = MyQMainWindow('README.rst')
+    window = CodeChatWindow()
+    window.open('README.rst')
 #    window = MyQMainWindow('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
