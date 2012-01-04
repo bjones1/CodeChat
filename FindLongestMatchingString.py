@@ -21,7 +21,7 @@ def find_approx_text(search_text, target_text, cost = None):
     # match.group()[0][0] contains the the index into the target string of the
     # first matched char
     begin_in_target, end_in_target = match.groups()[0]
-    print("found '%s' (cost = %d)" % (target_text[begin_in_target:end_in_target], match.cost))
+##    print("found '%s' (cost = %d)" % (target_text[begin_in_target:end_in_target], match.cost))
     
     # TRE picks the first match it finds, even if there is
     # more than one matck with identical error. So,
@@ -106,7 +106,7 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
 
     # #. While the search radius to the left of the anchor > 0 and the cost > 0:
 #    print('Searching right radius')
-    while (end > search_anchor) and (match.cost > 0):
+    while (end > search_anchor) and (min_cost > 0):
 
         #    #. Decrease the left search radius by half and approximate search again.
         #
@@ -131,7 +131,7 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
 
     # #. Repeat the above loop for the right search radius
 #    print('Searching left radius')
-    while (begin < search_anchor) and (match.cost > 0):
+    while (begin < search_anchor) and (min_cost > 0):
 
         #    #. Decrease the right search radius by half and approximate search again.
         begin += max((search_anchor - begin)/2, 1)
