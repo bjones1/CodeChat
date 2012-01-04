@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# ===========================
-# Find longest maching string
-# ===========================
+# ============================
+# Find longest matching string
+# ============================
 #
 # These functions find the longest matching string in another string.
 
@@ -32,7 +32,9 @@ def find_approx_text(search_text, target_text, cost = None):
         return None, 0, 0
     else:
         return match, begin_in_target, end_in_target
-            
+
+# find_approx_text_in_target
+# ==========================
 # This routine finds the a substring in the target document which contains an exact,
 # unique match for a substring taken from the source document, anchored at the
 # search location in the source document.
@@ -89,7 +91,9 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
     # First, choose a radius of chars about the anchor to search in.
     begin = max(0, search_anchor - search_range)
     end = min(len(search_text), search_anchor + search_range)
-    assert end > begin
+    # Empty documents are easy to search
+    if end <= begin:
+        return 0
     # Look for a match; record left and right search radii
     match, begin_in_target, end_in_target = find_approx_text(search_text[begin:end], target_text)
     #    * If no unique match if found, give up (for now -- this could be improved).
@@ -103,6 +107,9 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
     min_cost = match.cost
     min_cost_begin = begin
     min_cost_end = end
+    
+    # For an exact match, need to define this, since the while loops won't.
+    begin_in_target_substr = begin_in_target
 
     # #. While the search radius to the left of the anchor > 0 and the cost > 0:
 #    print('Searching right radius')

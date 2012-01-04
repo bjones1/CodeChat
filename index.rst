@@ -12,7 +12,6 @@ Contents:
    :maxdepth: 2
 
    README
-   practicum2Summer2011
    FindLongestMatchingString
 
 Indices and tables

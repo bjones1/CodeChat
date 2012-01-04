@@ -237,9 +237,10 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
                 pos = self.textEdit.textCursor()
                 # Grow the selection if necessary; otherwise, just move the cursor.
                 pos.setPosition(found,
-                                QtGui.QTextCursor.MoveAnchor 
-                                if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) == self.plainTextEdit_cursor_pos
-                                else QtGui.QTextCursor.KeepAnchor)
+                    QtGui.QTextCursor.MoveAnchor 
+                    if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) ==
+                        self.plainTextEdit_cursor_pos
+                    else QtGui.QTextCursor.KeepAnchor)
                 self.ignore_next = True
                 self.textEdit.setTextCursor(pos)
                 self.set_html_editable(True)
