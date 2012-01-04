@@ -14,6 +14,7 @@ from PyQt4.Qsci import QsciScintilla, QsciLexerCPP, QsciLexerPython
 import codecs
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
+from pygments.lexers.text import RstLexer
 
 from FindLongestMatchingString import find_approx_text_in_target
 
@@ -23,12 +24,17 @@ unique_remove_str = 'wokifvzohtdlm'
 # A tuple of language-specific options, indexed by the parser which Pygments
 # selects.
 language_specific_options = {
+# Pygments  lexer
+# |             Comment string
+# |             |      Removal string (should be a comment)
+# |             |      |                         QScintilla lexer
  CLexer      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
  CppLexer    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
- PythonLexer : ('# ' , '# '  + unique_remove_str, QsciLexerPython)
+ PythonLexer : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
+ RstLexer    : (None ,  None                    , None)
 }
 
-language = PythonLexer
+language = RstLexer
 
 # The string indicating a comment in the chosen programming language. This must
 # end in a space for the regular expression in format to work. The space
@@ -68,12 +74,17 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         # Use the C++ lexer.
         # Set style for comments to a fixed-width courier font.
-        lexer = language_specific_options[language][2]()
-        lexer.setDefaultFont(font)
-        self.plainTextEdit.setLexer(lexer)
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.Comment, 'Courier New')
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.CommentLine, 'Courier New')
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, QsciLexerCPP.CommentDoc, 'Courier New')
+        lexer_class = language_specific_options[language][2]
+        if lexer_class is not None:
+            lexer = lexer_class()
+            lexer.setDefaultFont(font)
+            self.plainTextEdit.setLexer(lexer)
+            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+                                             QsciLexerCPP.Comment, 'Courier New')
+            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+                                             QsciLexerCPP.CommentLine, 'Courier New')
+            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+                                             QsciLexerCPP.CommentDoc, 'Courier New')
         
         with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
             self.plainTextEdit.setText(f.read())
@@ -97,7 +108,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
-            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+#            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
             # If there are deletions, find out where in the plain text document
             # we must delete from
@@ -145,7 +156,7 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
         # Shouldn't have both chars added and deleted at the same time.
         assert (charsAdded == 0) or (charsRemoved == 0)
         if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
-            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
+#            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
             # If there are deletions, find out where in the html document
             # we must delete from
@@ -178,19 +189,23 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
     def update_html(self):
         # Restore current dir
         os.chdir(self.current_dir)
-        CodeToRest(self.source_file, self.rst_file)
+        # Only translate from code to rest if we should
+        if language_specific_options[language][0] is not None:
+            CodeToRest(self.source_file, self.rst_file)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', '_build/html') )
-        # Clean up code by removing deletion tags
+        # Load in the updated html
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
-            unique_remove_comment = language_specific_options[language][1]
-            str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '') \
-                     .replace('<span class="c">'  + unique_remove_comment + '</span>', '') \
-                     .replace('<p>' + unique_remove_comment + '</p>', '')
-            f.seek(0)
-            f.write(str)
-            f.truncate()
+            # Clean up code if the code to reST process ran.
+            if language_specific_options[language][0] is not None:
+                unique_remove_comment = language_specific_options[language][1]
+                str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '') \
+                         .replace('<span class="c">'  + unique_remove_comment + '</span>', '') \
+                         .replace('<p>' + unique_remove_comment + '</p>', '')
+                f.seek(0)
+                f.write(str)
+                f.truncate()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
         os.chdir('_build/html')
@@ -401,7 +416,8 @@ def CodeToRest(source_path, rst_path):
 if __name__ == '__main__':
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    window = MyQMainWindow('FindLongestMatchingString.py')
+    window = MyQMainWindow('README.rst')
+#    window = MyQMainWindow('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
