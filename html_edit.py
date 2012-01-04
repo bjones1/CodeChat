@@ -1,7 +1,5 @@
 # To do:
 #
-# * Figure out how to get the SCN_MODIFIED signal to connect, rewrite the
-#   on_plainTextEdit_modified routine
 # * Unit testing
 
 
@@ -114,13 +112,13 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
             # we must delete from
             if charsRemoved > 0:
                 # A range - delete the entire range
-                plainText_cursor = self.plainTextEdit.textCursor()
-                if plainText_cursor.anchor() != plainText_cursor.position():
-                    self.plainTextEdit.textCursor().removeSelectedText()
+                if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) != \
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS):
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
                 # The delete key - just delete from the current position
                 elif position == self.textEdit_cursor_pos:
                     assert charsRemoved == 1
-                    self.plainTextEdit.textCursor().deleteChar()
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
                 # The backspace key - move back 1 char (if possible) and delete
                 elif position == (self.textEdit_cursor_pos - 1):
                     assert charsRemoved == 1
@@ -134,8 +132,8 @@ class MyQMainWindow(QtGui.QMainWindow, form_class):
                         self.textEdit.undo()
                         return
                     # Then delete the char
-                    self.plainTextEdit.textCursor().deleteChar()
-            self.plainTextEdit.textCursor().insertText(self.textEdit.toPlainText()[position:position + charsAdded])
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
+            self.plainTextEdit.insert(self.textEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
         
     def on_plainTextEdit_modified(self, position, modificationType, text,
