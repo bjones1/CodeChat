@@ -289,9 +289,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.update_html()
         self.plainTextEdit.setModified(False)
         
+    # The decorator below prevents this method from being called twice, per
+    # http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name
+    @QtCore.pyqtSlot()
     def on_action_Reopen_triggered(self):
         self.reopen()
         
+    @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
         print('open')
         # Restore current dir
@@ -300,6 +304,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if source_file:
             self.open(unicode(source_file))
                
+    @QtCore.pyqtSlot()
     def on_action_Save_and_update_triggered(self):
         # Restore current dir
         os.chdir(self.current_dir)
