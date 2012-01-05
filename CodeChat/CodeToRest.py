@@ -13,8 +13,8 @@ import codecs
 # as the formatter for Pygments (see an example 
 # <a href="#def_CodeToHtml">below</a>).
 class CodeToRestFormatter(Formatter):
-    def __init__(self, language_specific_options):
-        Formatter.__init__()
+    def __init__(self, language_specific_options, *args, **kwargs):
+        Formatter.__init__(self, *args, **kwargs)
         self.comment_string = language_specific_options.comment_string
         self.unique_remove_comment = \
             language_specific_options.unique_remove_comment
@@ -117,7 +117,7 @@ class CodeToRestFormatter(Formatter):
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToRest(source_path, rst_path, language_specific_options):
     code = codecs.open(source_path, 'r', encoding = 'utf-8').read()
-    formatter = CodeToRestFormatter()
+    formatter = CodeToRestFormatter(language_specific_options)
     outfile = codecs.open(rst_path, mode = 'w', encoding = 'utf-8')
     lexer = get_lexer_for_filename(source_path)
     hi_code = highlight(code, lexer, formatter)

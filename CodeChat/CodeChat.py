@@ -3,16 +3,18 @@
 # * Unit testing
 
 
-from PyQt4 import QtGui, QtCore, uic
-import sphinx.cmdline
 import sys, os
+import codecs
+
+from PyQt4 import QtGui, QtCore, uic
 # Found some docs on QScintilla on Python with Qt at
 # http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP, QsciLexerPython
-import codecs
+import sphinx.cmdline
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
+from pygments.lexers import get_lexer_for_filename
 
 from FindLongestMatchingString import find_approx_text_in_target
 from CodeToRest import CodeToRest
@@ -27,16 +29,17 @@ class LanguageSpecificOptions(object):
     # selects.
     language_specific_options = {
     # Pygments  lexer
-    # |             Comment string
-    # |             |      Removal string (should be a comment)
-    # |             |      |                         QScintilla lexer
-     CLexer      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
-     CppLexer    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
-     PythonLexer : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
-     RstLexer    : (None ,  None                    , None)
+    # |                         Comment string
+    # |                         |      Removal string (should be a comment)
+    # |                         |      |                         QScintilla lexer
+     CLexer().__class__      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+     CppLexer().__class__    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+     PythonLexer().__class__ : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
+     RstLexer().__class__    : (None ,  None                    , None)
     }
     
-    def set_language(self, language):
+    def set_language(self, language_):
+        language = language_.__class__
         # The string indicating a comment in the chosen programming language. This must
         # end in a space for the regular expression in format to work. The space
         # also makes the output a bit prettier.
@@ -62,35 +65,19 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Configure QScintilla
         # --------------------
         # Set the default font
-        font = QtGui.QFont()
-        font.setFamily('Courier New')
-        font.setFixedPitch(True)
-        font.setPointSize(10)        
+        self.font = QtGui.QFont()
+        self.font.setFamily('Courier New')
+        self.font.setFixedPitch(True)
+        self.font.setPointSize(10)        
         # Margin 0 is used for line numbers
-        fontmetrics = QtGui.QFontMetrics(font)
-        self.plainTextEdit.setMarginsFont(font)
+        fontmetrics = QtGui.QFontMetrics(self.font)
+        self.plainTextEdit.setMarginsFont(self.font)
         self.plainTextEdit.setMarginWidth(0, fontmetrics.width("00000") + 6)
         self.plainTextEdit.setMarginLineNumbers(0, True)
         self.plainTextEdit.setMarginsBackgroundColor(QtGui.QColor("#cccccc"))
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        # Choose a language
-        self.language_specific_options = LanguageSpecificOptions()
-        self.language_specific_options.set_language(RstLexer)
-        # Choose a lexer
-        # Set style for comments to a fixed-width courier font.
-        lexer_class = self.language_specific_options.lexer
-        if lexer_class is not None:
-            lexer = lexer_class()
-            lexer.setDefaultFont(font)
-            self.plainTextEdit.setLexer(lexer)
-            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
-                                             QsciLexerCPP.Comment, 'Courier New')
-            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
-                                             QsciLexerCPP.CommentLine, 'Courier New')
-            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
-                                             QsciLexerCPP.CommentDoc, 'Courier New')
         
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
@@ -291,6 +278,22 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.source_file = source_file
         self.rst_file = os.path.join(head, name) + '.rst'
         self.html_file = os.path.join('_build/html/', name) + '.html'
+        # Choose a language
+        self.language_specific_options = LanguageSpecificOptions()
+        self.language_specific_options.set_language(get_lexer_for_filename(source_file))
+        # Choose a lexer
+        # Set style for comments to a fixed-width courier font.
+        lexer_class = self.language_specific_options.lexer
+        if lexer_class is not None:
+            lexer = lexer_class()
+            lexer.setDefaultFont(self.font)
+            self.plainTextEdit.setLexer(lexer)        
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+                                         QsciLexerCPP.Comment, 'Courier New')
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+                                         QsciLexerCPP.CommentLine, 'Courier New')
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+                                         QsciLexerCPP.CommentDoc, 'Courier New')
         self.reopen()
          
     # Reload the source file then regenerate the HTML file from it.
@@ -331,14 +334,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.on_plainTextEdit_cursorPositionChanged(0, 0)
 
 
-
-
 def run():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow()
-    window.open('README.rst')
-#    window = MyQMainWindow('FindLongestMatchingString.py')
+#    window.open('README.rst')
+    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
