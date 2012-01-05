@@ -4,7 +4,6 @@ from pygments.formatter import Formatter
 from pygments.token import Token
 from pygments.lexers import get_lexer_for_filename
 from pygments import highlight
-from CodeChat import comment_string, unique_remove_comment
 import re
 import codecs
 
@@ -14,6 +13,12 @@ import codecs
 # as the formatter for Pygments (see an example 
 # <a href="#def_CodeToHtml">below</a>).
 class CodeToRestFormatter(Formatter):
+    def __init__(self, language_specific_options):
+        Formatter.__init__()
+        self.comment_string = language_specific_options.comment_string
+        self.unique_remove_comment = \
+            language_specific_options.unique_remove_comment
+        
     # Pygments <a href="http://pygments.org/docs/formatters/#formatter-classes">calls this routine</a> (see the HtmlFormatter) to transform tokens to first-pass formatted lines. We need a two-pass process: first, merge comments; second, transform tokens to lines. This wrapper creates that pipeline, yielding its results as a generator must. It also wraps each line in a &lt;pre&gt; tag.<br />
     def format_unencoded(self, token_source, out_file):
         nl_token_source = self._expand_nl(token_source)
@@ -41,7 +46,7 @@ class CodeToRestFormatter(Formatter):
         # A regular expression for whitespace not containing a newline
         ws = re.compile(r'^[ \t\r\f\v]+$')
         # A regular expression to remove comment chars
-        regexp = re.compile(r'(^[ \t]*)' + comment_string + '?', re.MULTILINE)
+        regexp = re.compile(r'(^[ \t]*)' + self.comment_string + '?', re.MULTILINE)
 
         # Iterate through all tokens in the input file        
         for ttype, value in token_source:
@@ -72,7 +77,7 @@ class CodeToRestFormatter(Formatter):
                         # to the last line.
                         # Hack: put a . at the beginning of the line so reST
                         # will preserve all indentation of the block.
-                        current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
+                        current_line_list.insert(0, '\n\n::\n\n ' + self.unique_remove_comment + '\n')
                     else:
                         # Otherwise, just prepend a newline
                         current_line_list.insert(0, '\n')
@@ -90,7 +95,7 @@ class CodeToRestFormatter(Formatter):
                         # Get left margin correct by inserting a series of blockquotes
                         blockquote_indent = []
                         for i in range(len(comment_indent)):
-                            blockquote_indent.append('\n\n' + ' '*i + unique_remove_comment)
+                            blockquote_indent.append('\n\n' + ' '*i + self.unique_remove_comment)
                         blockquote_indent.append('\n\n')
                         current_line_list.insert(0, ''.join(blockquote_indent))
                     
@@ -110,7 +115,7 @@ class CodeToRestFormatter(Formatter):
 
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
-def CodeToRest(source_path, rst_path):
+def CodeToRest(source_path, rst_path, language_specific_options):
     code = codecs.open(source_path, 'r', encoding = 'utf-8').read()
     formatter = CodeToRestFormatter()
     outfile = codecs.open(rst_path, mode = 'w', encoding = 'utf-8')

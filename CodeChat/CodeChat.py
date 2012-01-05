@@ -15,34 +15,39 @@ from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
 
 from FindLongestMatchingString import find_approx_text_in_target
-from CodeToRest import *
+from CodeToRest import CodeToRest
 
-# A unique string to mark lines for removal in HTML
-unique_remove_str = 'wokifvzohtdlm'
-
-# A tuple of language-specific options, indexed by the parser which Pygments
-# selects.
-language_specific_options = {
-# Pygments  lexer
-# |             Comment string
-# |             |      Removal string (should be a comment)
-# |             |      |                         QScintilla lexer
- CLexer      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
- CppLexer    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
- PythonLexer : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
- RstLexer    : (None ,  None                    , None)
-}
-
-language = RstLexer
-
-# The string indicating a comment in the chosen programming language. This must
-# end in a space for the regular expression in format to work. The space
-# also makes the output a bit prettier.
-comment_string = language_specific_options[language][0]
-
-# A comment which can be removed later, used to trick reST / Sphinx into
-# generating the correct indention        
-unique_remove_comment = language_specific_options[language][1]
+# An instance of this class provides a set of options for the language with
+# which it was constructed.
+class LanguageSpecificOptions(object):
+    # A unique string to mark lines for removal in HTML
+    unique_remove_str = 'wokifvzohtdlm'
+    
+    # A tuple of language-specific options, indexed by the parser which Pygments
+    # selects.
+    language_specific_options = {
+    # Pygments  lexer
+    # |             Comment string
+    # |             |      Removal string (should be a comment)
+    # |             |      |                         QScintilla lexer
+     CLexer      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+     CppLexer    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+     PythonLexer : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
+     RstLexer    : (None ,  None                    , None)
+    }
+    
+    def set_language(self, language):
+        # The string indicating a comment in the chosen programming language. This must
+        # end in a space for the regular expression in format to work. The space
+        # also makes the output a bit prettier.
+        self.comment_string = self.language_specific_options[language][0]
+        
+        # A comment which can be removed later, used to trick reST / Sphinx into
+        # generating the correct indention        
+        self.unique_remove_comment = self.language_specific_options[language][1]
+        
+        # The QScintilla lexer for this language
+        self.lexer = self.language_specific_options[language][2]
 
 
 form_class, base_class = uic.loadUiType("html_edit.ui")
@@ -70,9 +75,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        # Use the C++ lexer.
+        # Choose a language
+        self.language_specific_options = LanguageSpecificOptions()
+        self.language_specific_options.set_language(RstLexer)
+        # Choose a lexer
         # Set style for comments to a fixed-width courier font.
-        lexer_class = language_specific_options[language][2]
+        lexer_class = self.language_specific_options.lexer
         if lexer_class is not None:
             lexer = lexer_class()
             lexer.setDefaultFont(font)
@@ -185,18 +193,18 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Restore current dir
         os.chdir(self.current_dir)
         # Only translate from code to rest if we should
-        if comment_string is not None:
-            CodeToRest(self.source_file, self.rst_file)
+        if self.language_specific_options.comment_string is not None:
+            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', '_build/html') )
         # Load in the updated html
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
             # Clean up code if the code to reST process ran.
-            if comment_string is not None:
-                str = str.replace('<span class="c1">' + unique_remove_comment + '</span>', '') \
-                         .replace('<span class="c">'  + unique_remove_comment + '</span>', '') \
-                         .replace('<p>' + unique_remove_comment + '</p>', '')
+            if self.language_specific_options.comment_string is not None:
+                str = str.replace('<span class="c1">' + self.language_specific_options.unique_remove_comment + '</span>', '') \
+                         .replace('<span class="c">'  + self.language_specific_options.unique_remove_comment + '</span>', '') \
+                         .replace('<p>' + self.language_specific_options.unique_remove_comment + '</p>', '')
                 f.seek(0)
                 f.write(str)
                 f.truncate()
@@ -325,7 +333,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
 
 
-if __name__ == '__main__':
+def run():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow()
@@ -334,3 +342,6 @@ if __name__ == '__main__':
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
+
+if __name__ == '__main__':
+    run()
