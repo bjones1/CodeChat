@@ -4,13 +4,41 @@
 # Find longest matching string
 # ============================
 #
-# These functions find the longest matching string in another string.
-
-# For approximate pattern matching, use the Python port of TRE. See
-# http://hackerboss.com/approximate-regex-matching-in-python/ for more details.
-# I modified the Python wrapper code to allow Unicode strings.
+# The find_approx_text_in_target_ function in this module searches a target string for the best match to characters about an anchor point in a source string. In particular, it first locates a block of target text which forms the closest approximate match for source characters about the anchor. Then, it looks for the (almost) longest possible exact match between source characters about the anchor and the block of target text found in the first step.
+#
+# Implementation
+# =============================================================================
+#
+# For approximate pattern matching, this module uses the Python port of TRE. See  http://hackerboss.com/approximate-regex-matching-in-python/ for more details. I modified the Python wrapper code to allow Unicode strings.
 import tre
 
+# .. _find_approx_text:
+#
+# find_approx_text
+# ------------------------------------------------------------------------------
+# The find_approx_text function performs a single approximate match; find_approx_text_in_target_ calls this repeatedly. Its parameters:
+#
+# search_text
+#   Text to search for
+#
+# target_text
+#   Text in which to find the search_text
+#
+# cost
+#   Maximum allowable cost for an approximate match.
+#
+# Return value:
+#   - If there is no unique value, (None, 0, 0)
+#   - Otherwise, it returns (match, begin_in_target, end_in_target) where:
+#
+#     match
+#       A TRE match object.
+#
+#     begin_in_target
+#       The index into the target string at which the approximate match begins.
+#
+#     end_in_target
+#       The index into the target string at which the approximate match ends.
 def find_approx_text(search_text, target_text, cost = None):
 #    print("Searching for '%s'" % search_text)
     # tre.LITERAL specifies that search_str is a literal search string, not
@@ -33,6 +61,7 @@ def find_approx_text(search_text, target_text, cost = None):
     else:
         return match, begin_in_target, end_in_target
 
+# .. _find_approx_text_in_target:
 # find_approx_text_in_target
 # ==========================
 # This routine finds the a substring in the target document which contains an exact,

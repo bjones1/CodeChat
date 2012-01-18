@@ -62,6 +62,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # while Sphinx needs current dir.
         self.current_dir = os.getcwd()
         self.setupUi(self)
+        # Select a larger font for the HTML editor
+        self.textEdit.zoomIn(2)
         # Configure QScintilla
         # --------------------
         # Set the default font
@@ -78,6 +80,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+        # Enable word wrap
+        self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
         
         # Ask for notification when the contents of either editor change
         self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
