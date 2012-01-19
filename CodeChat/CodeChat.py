@@ -1,6 +1,16 @@
 # To do:
 #
 # * Unit testing
+#
+# What's next? That is, what can I do that's most effective? Ideas:
+#
+# - Run Sphinx in the background. This makes the plain text area a more effective word processor.
+# - Do unit testing on the matching algorithm and focus on fixing that. This makes the right side a better editor.
+#
+#   - The biggest case I see: editing at the end of the line confuses the match pretty badly.
+# - Performance testing. It's really slow on this document. Why?
+#
+# My goal is to find the low-hanging fruit. What gives me the most bang for the time I invest? First, I want a usable editor. Just a working left pane would help a lot.
 
 
 import sys, os
@@ -338,15 +348,16 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.on_plainTextEdit_cursorPositionChanged(0, 0)
 
 
-def run():
+def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow()
 #    window.open('README.rst')
-    window.open('FindLongestMatchingString.py')
+    window.open('CodeChat.py')
+#    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    run()
+    main()
