@@ -59,5 +59,11 @@ class TestFindLongestMatchingString(unittest.TestCase):
                   target_text = 'The CodeChat user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.')
         self.assertEqual(index, 66-34)
 
+def run_one_test(test_name):
+    suite = unittest.TestSuite()
+    suite.addTest(TestFindLongestMatchingString(test_name))
+    unittest.TextTestRunner().run(suite)
+
 if __name__ == '__main__':
-    unittest.main()
+    run_one_test('test_6')
+#    unittest.main()
