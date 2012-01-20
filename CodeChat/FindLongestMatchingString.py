@@ -40,7 +40,6 @@ import tre
 #     end_in_target
 #       The index into the target string at which the approximate match ends.
 def find_approx_text(search_text, target_text, cost = None):
-#    print("Searching for '%s'" % search_text)
     # tre.LITERAL specifies that search_str is a literal search string, not
     # a regex.
     pat = tre.compile(search_text, tre.LITERAL)
@@ -49,7 +48,6 @@ def find_approx_text(search_text, target_text, cost = None):
     # match.group()[0][0] contains the the index into the target string of the
     # first matched char
     begin_in_target, end_in_target = match.groups()[0]
-##    print("found '%s' (cost = %d)" % (target_text[begin_in_target:end_in_target], match.cost))
     
     # TRE picks the first match it finds, even if there is
     # more than one matck with identical error. So,
@@ -59,6 +57,7 @@ def find_approx_text(search_text, target_text, cost = None):
 #        print('Multiple matches ' + str(match_again.groups()))
         return None, 0, 0
     else:
+#        print(search_text + '\n' + target_text[begin_in_target:end_in_target])
         return match, begin_in_target, end_in_target
 
 # .. _find_approx_text_in_target:
@@ -112,7 +111,6 @@ def find_approx_text(search_text, target_text, cost = None):
 # #. If the cost is zero, report the location in the target; otherwise, return
 #    a failure to match.
 def find_approx_text_in_target(search_text, search_anchor, target_text):
-#    print('\n')
     search_range = 20
     step_size = 4
     # #. Look for the best approximate match within the target document of the source 
@@ -139,7 +137,9 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
     min_cost_end = end
     
     # For an exact match, need to define this, since the while loops won't.
-    begin_in_target_substr = begin_in_target
+    # We're 0 characters forward from the begin_in_target point before we
+    # do any additional search refinements.
+    begin_in_target_substr = 0
 
     # #. While the search radius to the left of the anchor > 0 and the cost > 0:
 #    print('Searching right radius')
@@ -193,4 +193,14 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
 #        print('Failed -- no exact match (cost was %d)' % min_cost)
         return -1
     else:
+#        print('''
+#begin_in_target %d
+#begin_in_target_substr %d
+#search_anchor %d
+#min_cost_begin %d''' % (begin_in_target, begin_in_target_substr, search_anchor, min_cost_begin))
         return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
+
+
+if __name__ == '__main__':
+    from CodeChatTest import main
+    main()
