@@ -1,6 +1,29 @@
+# ==============================================================================
+# CodeChat module
+# ==============================================================================
+#
+# This document discusses the implementation specifics of the CodeChat system; the :doc:`README` user manual gives a broad overview of this system.
+#
+# Overall structure
+# ==============================================================================
+#
+# What it is should be:
+#
+# - GUI (the view) in this module
+#
+# - Routines to transform source files (reST or code) to HTML: CodeToHtml
+#
+#   - I need to factor out update_html and rename CodeToRest
+#
+# - Routines to jointly edit two strings and synchronize a cursor/selection between them: CodeChatJointStrings
+#
+#   - I need to factor these out of CodeChat.
+#
+# - Unit tests: CodeChatTest
+#
 # To do:
 #
-# * Unit testing
+# * More unit testing
 #
 # What's next? That is, what can I do that's most effective? Ideas:
 #
