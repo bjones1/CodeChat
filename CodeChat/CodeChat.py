@@ -2,7 +2,7 @@
 # CodeChat module
 # ==============================================================================
 #
-# This document discusses the implementation specifics of the CodeChat system; the :doc:`README` user manual gives a broad overview of this system.
+# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.
 #
 # Overall structure
 # ==============================================================================

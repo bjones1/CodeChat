@@ -5,14 +5,18 @@
 import unittest
 from FindLongestMatchingString import find_approx_text_in_target as f
 
+# A diagnostic function to match then print the returned match.
+def p(search_text, search_anchor, target_text):
+    index = f(search_text, search_anchor, target_text)
+    print(search_text[search_anchor:] + '\n' + target_text[index:])
+    return index
+
+
 # Find a location in a source file based on a given location in the resulting
 # html.
 class TestFindLongestMatchingString(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         unittest.TestCase.__init__(self, *args, **kwargs)
-        
-    def setUp(self):
-        pass
         
     # Show that we can match identical text
     def test_1(self):
@@ -48,6 +52,12 @@ class TestFindLongestMatchingString(unittest.TestCase):
                   search_text = '# test\n# test',
                   target_text = 'test\ntest')
         self.assertEqual(index, 4)
+
+    def test_6(self):
+        index = p(search_anchor = 73-34,
+                  search_text = '# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.',
+                  target_text = 'The CodeChat user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.')
+        self.assertEqual(index, 66-34)
 
 if __name__ == '__main__':
     unittest.main()
