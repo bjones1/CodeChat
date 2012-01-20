@@ -11,8 +11,9 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
+   CodeChat
    README
-   FindLongestMatchingString
+..   FindLongestMatchingString
 
 Indices and tables
 ==================
@@ -20,14 +21,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-Testing code::
-
-  py = fee()
-  stuff += 1
-
-  print 'still code?'
-
-Done. Math: :math:`c^2 = a^2 + b^2`.
-
-Inline: ``d = bar()``.
