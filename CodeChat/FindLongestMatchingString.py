@@ -113,7 +113,8 @@ def find_approx_text(search_text, target_text, cost = None):
 #    a failure to match.
 def find_approx_text_in_target(search_text, search_anchor, target_text):
 #    print('\n')
-    search_range = 40
+    search_range = 20
+    step_size = 4
     # #. Look for the best approximate match within the target document of the source 
     #    substring composed of characters within a radius of the anchor.
     #
@@ -149,7 +150,7 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
         # Note that when (end - search_anchor)/2 == 0 when
         # end = search_anchor + 1, causing infinite looping. The max fixes
         # this case.
-        end -= max((end - search_anchor)/2, 1)
+        end -= max((end - search_anchor) - step_size, 1)
         match, begin_in_target_substr, end_in_target_substr = \
             find_approx_text(search_text[begin:end], 
                              target_text[begin_in_target:end_in_target])
@@ -170,7 +171,7 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
     while (begin < search_anchor) and (min_cost > 0):
 
         #    #. Decrease the right search radius by half and approximate search again.
-        begin += max((search_anchor - begin)/2, 1)
+        begin += max((search_anchor - begin) - step_size, 1)
         match, begin_in_target_substr, end_in_target_substr = \
             find_approx_text(search_text[begin:min_cost_end],
                              target_text[begin_in_target:end_in_target])

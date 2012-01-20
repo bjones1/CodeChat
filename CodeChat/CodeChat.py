@@ -5,10 +5,12 @@
 # What's next? That is, what can I do that's most effective? Ideas:
 #
 # - Run Sphinx in the background. This makes the plain text area a more effective word processor.
+#
 # - Do unit testing on the matching algorithm and focus on fixing that. This makes the right side a better editor.
 #
 #   - The biggest case I see: editing at the end of the line confuses the match pretty badly.
-# - Performance testing. It's really slow on this document. Why?
+#
+# - Performance testing. It's really slow on this document. Looks like matching a big chunk of text is pretty painful. In the future, I need to make this a background call, perhaps cache last results, etc.
 #
 # My goal is to find the low-hanging fruit. What gives me the most bang for the time I invest? First, I want a usable editor. Just a working left pane would help a lot.
 
@@ -327,7 +329,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
-        print('open')
         # Restore current dir
         os.chdir(self.current_dir)
         source_file = QtGui.QFileDialog.getOpenFileName()
@@ -358,6 +359,14 @@ def main():
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
+    
+def profile():
+    import cProfile
+    import pstats
+    cProfile.run('main()', 'mainprof')
+    p = pstats.Stats('mainprof')
+    p.strip_dirs().sort_stats('time').print_stats(10)
 
 if __name__ == '__main__':
     main()
+#    profile()
