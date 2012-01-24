@@ -6,3 +6,4 @@ tre.dll
 *.pyc
 FindLongestMatchingString.rst
 CodeChat/CodeChat.rst
+CodeChat/CodeToRest.rst

@@ -13,7 +13,8 @@ Contents:
 
    CodeChat
    README
-..   FindLongestMatchingString
+   FindLongestMatchingString
+   CodeToRest
 
 Indices and tables
 ==================

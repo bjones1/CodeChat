@@ -23,35 +23,47 @@
 #
 # To do:
 #
-# * More unit testing
-#
-# What's next? That is, what can I do that's most effective? Ideas:
-#
+# - Refactor code (see plan above)
+# - Document what I've got
+# - Idea: carry around a two-character selection in inactive pane to highlight cursor location
+# - More unit testing
 # - Run Sphinx in the background. This makes the plain text area a more effective word processor.
-#
-# - Do unit testing on the matching algorithm and focus on fixing that. This makes the right side a better editor.
-#
-#   - The biggest case I see: editing at the end of the line confuses the match pretty badly.
-#
-# - Performance testing. It's really slow on this document. Looks like matching a big chunk of text is pretty painful. In the future, I need to make this a background call, perhaps cache last results, etc.
 #
 # My goal is to find the low-hanging fruit. What gives me the most bang for the time I invest? First, I want a usable editor. Just a working left pane would help a lot.
 
 
+# External dependencies
+# =====================
 import sys, os
+# We need to read and write in Unicode.
 import codecs
 
+# The excellent `PyQt4 library`_ provides the GUI for this module.
+#
+# .. _`PyQt4 library`: http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html
 from PyQt4 import QtGui, QtCore, uic
-# Found some docs on QScintilla on Python with Qt at
-# http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
+# Scintilla_ (wrapped in Python) provides the text editor. However, the `Python documentation`_ for it was poor at best. Here's a `quick tutorial`_ I found helpful. 
+#
+# .. _Scintilla: http://www.scintilla.org/ScintillaDoc.html
+# .. _`Python documentation`: http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html
+# .. _`quick tutorial`: http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP, QsciLexerPython
+# Sphinx_ transforms reST_ to HTML, a core capability of this tool.
+#
+# .. _Sphinx: http://sphinx.pocoo.org/
+# .. _reST: http://docutils.sourceforge.net/docs/index.html
 import sphinx.cmdline
+# Pygments_ performs syntax highlighting. Its lexer also enables the code-to-reST process (see :doc:`CodeToRest`).
+#
+# .. _Pygments: http://pygments.org/
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
+# It also helps recognize a language by looking at a file extension.
 from pygments.lexers import get_lexer_for_filename
-
+# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
 from FindLongestMatchingString import find_approx_text_in_target
+# The ability to transform source code directly to HTML represents another core strength. See :doc:`CodeToRest`.
 from CodeToRest import CodeToRest
 
 # An instance of this class provides a set of options for the language with
