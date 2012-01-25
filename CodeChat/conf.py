@@ -109,7 +109,7 @@ html_theme = 'traditional'
 html_theme_options = { "nosidebar" : "true" }
 
 # Choose a custom theme
-html_style = 'html_edit.css'
+html_style = 'CodeChat.css'
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []

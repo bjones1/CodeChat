@@ -100,11 +100,13 @@ class LanguageSpecificOptions(object):
         self.lexer = self.language_specific_options[language][2]
 
 
-form_class, base_class = uic.loadUiType("html_edit.ui")
+form_class, base_class = uic.loadUiType("CodeChat.ui")
 class CodeChatWindow(QtGui.QMainWindow, form_class):
-    def __init__(self):
+    def __init__(self, app, *args, **kwargs):
+        # Store a reference to this window's containing application
+        self.app = app
         self.ignore_next = True
-        QtGui.QMainWindow.__init__(self)
+        QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # Save current dir: HTML loading requires a change to the HTML direcotry,
         # while Sphinx needs current dir.
         self.current_dir = os.getcwd()
@@ -260,11 +262,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         new_flags = old_flags | QtCore.Qt.TextEditable if can_edit \
                else old_flags & ~QtCore.Qt.TextEditable
         self.textEdit.pyqtConfigure(textInteractionFlags = new_flags)
-        # BUG: the cursor is hidden when this is made uneditable. I'm not
-        # sure how to show it. The line below doesn't help.
-#        self.textEdit.setTextCursor(self.textEdit.textCursor())
-        # This causes a infinite loop.
-#        self.textEdit.moveCursor(QtGui.QTextCursor.NoMove)
         
     def on_plainTextEdit_cursorPositionChanged(self, line, index, cursor_pos = -1):
         self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
@@ -278,12 +275,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                                                unicode(self.textEdit.toPlainText()))
             if found >= 0:
                 pos = self.textEdit.textCursor()
-                # Grow the selection if necessary; otherwise, just move the cursor.
-                pos.setPosition(found,
-                    QtGui.QTextCursor.MoveAnchor 
-                    if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) ==
-                        self.plainTextEdit_cursor_pos
-                    else QtGui.QTextCursor.KeepAnchor)
+                # Is there a selection in the text pane?
+                if (self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) ==
+                    self.plainTextEdit_cursor_pos):
+                    # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
+                    pos.setPosition(found - 1,
+                        QtGui.QTextCursor.MoveAnchor)
+                    pos.setPosition(found + 1,
+                        QtGui.QTextCursor.KeepAnchor)
+                else:
+                    # Yes, so change the HTML pane selection to match the text pane selection.
+                    pos.setPosition(found, QtGui.QTextCursor.MoveAnchor)
                 self.ignore_next = True
                 self.textEdit.setTextCursor(pos)
                 self.set_html_editable(True)
@@ -310,21 +312,26 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                                                unicode(self.plainTextEdit.text()))
             # Update position in source doc if text was found
             if found >= 0:
-                # Grow the selection if necessary; otherwise, just move the cursor.
-                # Note: I tried to use SCI_SETEMPTYSELECTION per
-                # http://www.scintilla.org/ScintillaDoc.html#SCI_SETEMPTYSELECTION,
-                # but got AttributeError: type object 'QsciScintilla' has
-                # no attribute 'SCI_SETEMPTYSELECTION'.
-                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
+                self.ignore_next = True
+                # Is there a selection in the HTML pane?
                 if cursor.anchor() == cursor.position():
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, found)
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found - 1)
+                    # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, found + 1)
+                else:
+                    # Yes, so change the HTML pane selection to match the text pane selection.
+                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
                 # Scroll cursor into view
                 self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
-                self.ignore_next = True
+                # The above messages won't be process now, so the self.ignore_next fails to prevent the text pane from attempting to process these cursor changes. Therefore, we must process all messages (particuarly these just sent to the text pane) now, while self.ignore_next is still False.
+                self.app.processEvents()
                 self.set_html_editable(True)
                 self.ignore_next = False
             else:
+                # If there's a selection, clear it, since we can't determine the cursor location of at least one side of the selection.
                 self.ignore_next = True
+                plain_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, plain_cursor_pos)
                 self.set_html_editable(False)
                 self.ignore_next = False
 
@@ -394,7 +401,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    window = CodeChatWindow()
+    window = CodeChatWindow(app)
 #    window.open('README.rst')
     window.open('CodeChat.py')
 #    window.open('FindLongestMatchingString.py')
