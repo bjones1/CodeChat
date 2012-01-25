@@ -1,40 +1,38 @@
 # ==============================================================================
-# CodeChat module
+# CodeChat
 # ==============================================================================
 #
-# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.
+# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflect changes needed to make this happen.
 #
-# Overall structure
-# ==============================================================================
+# ==========================   ===================
+# Functionality                Module
+# ==========================   ===================
+# GUI                          CodeChat
+# Source code to HTML          CodeToHtml
+# Synchronize code and HTML    CodeSync
+# Unit test                    CodeChatTest
+# ==========================   ===================
 #
-# What it is should be:
+# .. contents::
 #
-# - GUI (the view) in this module
+# To do
+# ------------------------------------------------------------------------------
 #
-# - Routines to transform source files (reST or code) to HTML: CodeToHtml
-#
-#   - I need to factor out update_html and rename CodeToRest
-#
-# - Routines to jointly edit two strings and synchronize a cursor/selection between them: CodeChatJointStrings
-#
-#   - I need to factor these out of CodeChat.
-#
-# - Unit tests: CodeChatTest
-#
-# To do:
-#
-# - Refactor code (see plan above)
+# - Factor out update_html and rename CodeToRest
+# - Factor out sync code into CodeSync
 # - Document what I've got
 # - Idea: carry around a two-character selection in inactive pane to highlight cursor location
 # - More unit testing
 # - Run Sphinx in the background. This makes the plain text area a more effective word processor.
+# - Looks at using QWebKit, since the QTextEdit doesn't render Sphinx's HTML well.
 #
-# My goal is to find the low-hanging fruit. What gives me the most bang for the time I invest? First, I want a usable editor. Just a working left pane would help a lot.
+# Imports
+# ==============================================================================
 
+# We begin by importing necessary functionality.
 
-# External dependencies
-# =====================
 import sys, os
+
 # We need to read and write in Unicode.
 import codecs
 
@@ -42,17 +40,20 @@ import codecs
 #
 # .. _`PyQt4 library`: http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html
 from PyQt4 import QtGui, QtCore, uic
+
 # Scintilla_ (wrapped in Python) provides the text editor. However, the `Python documentation`_ for it was poor at best. Here's a `quick tutorial`_ I found helpful. 
 #
 # .. _Scintilla: http://www.scintilla.org/ScintillaDoc.html
 # .. _`Python documentation`: http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html
 # .. _`quick tutorial`: http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP, QsciLexerPython
-# Sphinx_ transforms reST_ to HTML, a core capability of this tool.
+
+# Sphinx_ transforms reST_ to HTML, a core element of this tool.
 #
 # .. _Sphinx: http://sphinx.pocoo.org/
 # .. _reST: http://docutils.sourceforge.net/docs/index.html
 import sphinx.cmdline
+
 # Pygments_ performs syntax highlighting. Its lexer also enables the code-to-reST process (see :doc:`CodeToRest`).
 #
 # .. _Pygments: http://pygments.org/
@@ -61,46 +62,58 @@ from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
 # It also helps recognize a language by looking at a file extension.
 from pygments.lexers import get_lexer_for_filename
+
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
 from FindLongestMatchingString import find_approx_text_in_target
+
 # The ability to transform source code directly to HTML represents another core strength. See :doc:`CodeToRest`.
 from CodeToRest import CodeToRest
 
-# An instance of this class provides a set of options for the language with
-# which it was constructed.
+# LanguageSpecificOptions
+# ==============================================================================
+# For each programming language supported, we need to know:
+#  :self.comment_string:
+#    The string indicating the beginning of a comment in the chosen programming language, or None if the CodeToRest process isn't supported. This must end in a space for the regular expression in format to work. The space also makes the output a bit prettier.
+#  :self.unique_remove_comment:
+#    A unique comment used to mark a line which will be removed later, or None if the CodeToRest process isn't supported. This is used to trick reST / Sphinx into generating the correct indention.
+#  :self.lexer:
+#    The QScintilla lexer to use, or None to disable syntax highlighting in the text pane
+#
+# set_language_ assigns these values based on the language specified.
 class LanguageSpecificOptions(object):
-    # A unique string to mark lines for removal in HTML
+    # A unique string to mark lines for removal in HTML.
     unique_remove_str = 'wokifvzohtdlm'
     
-    # A tuple of language-specific options, indexed by the parser which Pygments
+    # A tuple of language-specific options, indexed by the class of the parser which Pygments
     # selects.
     language_specific_options = {
-    # Pygments  lexer
-    # |                         Comment string
-    # |                         |      Removal string (should be a comment)
-    # |                         |      |                         QScintilla lexer
-     CLexer().__class__      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
-     CppLexer().__class__    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
-     PythonLexer().__class__ : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
-     RstLexer().__class__    : (None ,  None                    , None)
+    # ::
+    # 
+    #  Pygments  lexer
+    #  |                            Comment string
+    #  |                            |        Removal string (should be a comment)
+    #  |                            |        |                              QScintilla lexer
+      CLexer().__class__      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+      CppLexer().__class__    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+      PythonLexer().__class__ : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
+      RstLexer().__class__    : (None ,  None                    , None)
     }
-    
+
+# set_language
+# ------------------------------------------------------------------------------
+# This function sets the LanguageSpecificOptions_ offered.
+#
+# :language\_: The Pygments lexer for the desired language.
     def set_language(self, language_):
         language = language_.__class__
-        # The string indicating a comment in the chosen programming language. This must
-        # end in a space for the regular expression in format to work. The space
-        # also makes the output a bit prettier.
-        self.comment_string = self.language_specific_options[language][0]
-        
-        # A comment which can be removed later, used to trick reST / Sphinx into
-        # generating the correct indention        
+        self.comment_string = self.language_specific_options[language][0]        
         self.unique_remove_comment = self.language_specific_options[language][1]
-        
-        # The QScintilla lexer for this language
         self.lexer = self.language_specific_options[language][2]
 
 
 form_class, base_class = uic.loadUiType("CodeChat.ui")
+# CodeChatWindow
+# ==============================================================================
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
         # Store a reference to this window's containing application
@@ -113,8 +126,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
-        # Configure QScintilla
-        # --------------------
+# Configure QScintilla
+# --------------------
         # Set the default font
         self.font = QtGui.QFont()
         self.font.setFamily('Courier New')

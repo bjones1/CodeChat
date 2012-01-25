@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+#
+# ==============================================================================
+# CodeToRest
+# ==============================================================================
 
 from pygments.formatter import Formatter
 from pygments.token import Token
