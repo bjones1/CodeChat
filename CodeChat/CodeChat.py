@@ -257,7 +257,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Calling self.textEdit.setReadOnly(False) disables
         # keyboard navigation. Use this to retain key nav.
         old_flags = int(self.textEdit.textInteractionFlags())
-        new_flags = old_flags | QtCore.Qt.TextEditable if can_edit else old_flags & ~QtCore.Qt.TextEditable
+        new_flags = old_flags | QtCore.Qt.TextEditable if can_edit \
+               else old_flags & ~QtCore.Qt.TextEditable
         self.textEdit.pyqtConfigure(textInteractionFlags = new_flags)
         # BUG: the cursor is hidden when this is made uneditable. I'm not
         # sure how to show it. The line below doesn't help.
@@ -289,7 +290,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 self.ignore_next = False
             else:
                 self.ignore_next = True
+                # There's no matching location in the HTML pane, so mark that pane as uneditable.
                 self.set_html_editable(False)
+                # If there's a selection, clear it, since we can't determine the cursor location of at least one side of the selection.
+                cursor = self.textEdit.textCursor()
+                if cursor.hasSelection():
+                    cursor.clearSelection()
+                    self.textEdit.setTextCursor(cursor)
                 self.ignore_next = False
         
     def on_textEdit_cursorPositionChanged(self, cursor_pos = -1):
