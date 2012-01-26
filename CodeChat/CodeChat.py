@@ -1,30 +1,33 @@
-# ==============================================================================
-# CodeChat
+# :mod:`CodeChat` -- a conversational coding system
 # ==============================================================================
 #
-# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflect changes needed to make this happen.
+# .. module:: CodeChat
+#    :synopsis: a conversational coding system
+# .. moduleauthor::  Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
+# .. sectionauthor:: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
+#
+# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
 #
 # ==========================   ===================
 # Functionality                Module
 # ==========================   ===================
-# GUI                          CodeChat
-# Source code to HTML          CodeToHtml
-# Synchronize code and HTML    CodeSync
-# Unit test                    CodeChatTest
+# GUI                          :mod:`CodeChat`
+# Source code to HTML          :mod:`CodeToHtml`
+# Synchronize code and HTML    :mod:`CodeSync`
+# Unit test                    :mod:`CodeChatTest`
 # ==========================   ===================
 #
 # .. contents::
 #
 # To do
-# ------------------------------------------------------------------------------
+# ==============================================================================
 #
 # - Factor out update_html and rename CodeToRest
 # - Factor out sync code into CodeSync
 # - Document what I've got
-# - Idea: carry around a two-character selection in inactive pane to highlight cursor location
 # - More unit testing
 # - Run Sphinx in the background. This makes the plain text area a more effective word processor.
-# - Looks at using QWebKit, since the QTextEdit doesn't render Sphinx's HTML well.
+# - Look at using QWebKit, since the QTextEdit doesn't render Sphinx's HTML well.
 #
 # Imports
 # ==============================================================================
@@ -69,23 +72,32 @@ from FindLongestMatchingString import find_approx_text_in_target
 # The ability to transform source code directly to HTML represents another core strength. See :doc:`CodeToRest`.
 from CodeToRest import CodeToRest
 
-# LanguageSpecificOptions
+# Language Specific Options
 # ==============================================================================
-# For each programming language supported, we need to know:
-#  :self.comment_string:
+# For each programming language supported, :meth:`set_language` specifies:
+#
+# .. attribute:: comment_string
+#
 #    The string indicating the beginning of a comment in the chosen programming language, or None if the CodeToRest process isn't supported. This must end in a space for the regular expression in format to work. The space also makes the output a bit prettier.
-#  :self.unique_remove_comment:
+#
+# .. attribute:: unique_remove_comment
+#
 #    A unique comment used to mark a line which will be removed later, or None if the CodeToRest process isn't supported. This is used to trick reST / Sphinx into generating the correct indention.
-#  :self.lexer:
+#
+# .. attribute:: lexer
+#
 #    The QScintilla lexer to use, or None to disable syntax highlighting in the text pane
 #
-# set_language_ assigns these values based on the language specified.
+# .. class:: LanguageSpecificOptions()
 class LanguageSpecificOptions(object):
-    # A unique string to mark lines for removal in HTML.
+    # .. attribute:: unique_remove_str
+    #
+    #    A unique string to mark lines for removal in HTML.
     unique_remove_str = 'wokifvzohtdlm'
     
-    # A tuple of language-specific options, indexed by the class of the parser which Pygments
-    # selects.
+    # .. attribute:: language_specific_options
+    #
+    #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.
     language_specific_options = {
     # ::
     # 
@@ -99,11 +111,9 @@ class LanguageSpecificOptions(object):
       RstLexer().__class__    : (None ,  None                    , None)
     }
 
-# set_language
-# ------------------------------------------------------------------------------
-# This function sets the LanguageSpecificOptions_ offered.
-#
-# :language\_: The Pygments lexer for the desired language.
+    # .. method:: set_language(language_)
+    #
+    #    Sets the :class:`LanguageSpecificOptions` offered, where *language_* gives the Pygments lexer for the desired language.
     def set_language(self, language_):
         language = language_.__class__
         self.comment_string = self.language_specific_options[language][0]        
