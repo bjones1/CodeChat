@@ -64,16 +64,17 @@ import sphinx.cmdline
 # Pygments_ performs syntax highlighting. Its lexer also enables the code-to-reST process (see :doc:`CodeToRest`).
 #
 # .. _Pygments: http://pygments.org/
+from pygments.lexers import get_lexer_for_filename
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
-from pygments.lexers.asm import NasmLexer
+from pygments.lexers.math import SLexer
 
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
 # The ability to transform source code directly to HTML represents another core strength. See :doc:`CodeToRest`.
-from CodeToRest import CodeToRest, get_lexer_for_filename
+from CodeToRest import CodeToRest
 
 import re
 
@@ -110,11 +111,11 @@ class LanguageSpecificOptions(object):
     #  |                            Comment string
     #  |                            |        Removal string (should be a comment)
     #  |                            |        |                              QScintilla lexer
-      CLexer().__class__      : ('//', '// ' + unique_remove_str, QsciLexerCPP),
+      CLexer().__class__      : ('//', '// '  + unique_remove_str, QsciLexerCPP),
       CppLexer().__class__    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
       PythonLexer().__class__ : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
       RstLexer().__class__    : (None ,  None                    , None),
-      NasmLexer().__class__   : ('; ' , '; '  + unique_remove_str, None),
+      SLexer().__class__      : ('; ' , '; '  + unique_remove_str, None),
     }
 
     # .. method:: set_language(language_)
@@ -430,11 +431,11 @@ def main():
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow(app)
 #    window.open('README.rst')
-#    window.open('CodeChat.py')
+    window.open('CodeChat.py')
 #    window.open('mptst_word.s')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
-    window.open('asm_ch3.rst')
+#    window.open('asm_ch3.rst')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())

@@ -15,6 +15,8 @@ Contents:
    README
    FindLongestMatchingString
    CodeToRest
+   mptst_word
+   asm_ch3
 
 Indices and tables
 ==================
