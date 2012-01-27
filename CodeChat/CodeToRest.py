@@ -6,7 +6,9 @@
 
 from pygments.formatter import Formatter
 from pygments.token import Token
-from pygments.lexers import get_lexer_for_filename
+import pygments.lexers
+from pygments.lexers.math import SLexer
+from pygments.lexers.asm import LlvmLexer
 from pygments import highlight
 import re
 import codecs
@@ -117,6 +119,11 @@ class CodeToRestFormatter(Formatter):
                 line_type = is_code
                 current_line_list.append(value)
 
+def get_lexer_for_filename(name):
+    lexer = pygments.lexers.get_lexer_for_filename(name)
+    if lexer.__class__ is SLexer:
+        lexer = LlvmLexer()
+    return lexer
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
 def CodeToRest(source_path, rst_path, language_specific_options):
