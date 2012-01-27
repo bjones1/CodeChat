@@ -86,10 +86,6 @@ import re
 #
 #    The string indicating the beginning of a comment in the chosen programming language, or None if the CodeToRest process isn't supported. This must end in a space for the regular expression in format to work. The space also makes the output a bit prettier.
 #
-# .. attribute:: unique_remove_comment
-#
-#    A unique comment used to mark a line which will be removed later, or None if the CodeToRest process isn't supported. This is used to trick reST / Sphinx into generating the correct indention.
-#
 # .. attribute:: lexer
 #
 #    The QScintilla lexer to use, or None to disable syntax highlighting in the text pane
@@ -105,17 +101,13 @@ class LanguageSpecificOptions(object):
     #
     #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.
     language_specific_options = {
-    # ::
-    # 
-    #  Pygments  lexer
-    #  |                            Comment string
-    #  |                            |        Removal string (should be a comment)
-    #  |                            |        |                              QScintilla lexer
-      CLexer().__class__      : ('//', '// '  + unique_remove_str, QsciLexerCPP),
-      CppLexer().__class__    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
-      PythonLexer().__class__ : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
-      RstLexer().__class__    : (None ,  None                    , None),
-      SLexer().__class__      : ('; ' , '; '  + unique_remove_str, None),
+    ##  Pygments  lexer
+    ##  |                        Comment string, comment regex, QScintilla lexer
+      CLexer().__class__      : ('// ',          '//[^/] ?',    QsciLexerCPP),
+      CppLexer().__class__    : ('// ',          '//[^/] ?',    QsciLexerCPP),
+      PythonLexer().__class__ : ('# ',           '#[^#] ?',     QsciLexerPython),
+      RstLexer().__class__    : (None,           None,          None),
+      SLexer().__class__      : ('; ',           ';[^;] ?',     None),
     }
 
     # .. method:: set_language(language_)
@@ -123,9 +115,8 @@ class LanguageSpecificOptions(object):
     #    Sets the :class:`LanguageSpecificOptions` offered, where *language_* gives the Pygments lexer for the desired language.
     def set_language(self, language_):
         language = language_.__class__
-        self.comment_string = self.language_specific_options[language][0]        
-        self.unique_remove_comment = self.language_specific_options[language][1]
-        self.lexer = self.language_specific_options[language][2]
+        (self.comment_string, self.comment_regex, self.lexer) = \
+          self.language_specific_options[language]
 
 
 form_class, base_class = uic.loadUiType("CodeChat.ui")
@@ -271,8 +262,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
             # Clean up code from any code to reST goo
-            str = re.sub('<span class="c1?">.?.?\s*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str, re.MULTILINE)
-            str = re.sub('<p>.?.?\s*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str, re.MULTILINE)
+            str = re.sub('<span class="c1?">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str)
+            str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
             f.seek(0)
             f.write(str)
             f.truncate()
@@ -431,8 +422,8 @@ def main():
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow(app)
 #    window.open('README.rst')
-    window.open('CodeChat.py')
-#    window.open('mptst_word.s')
+#    window.open('CodeChat.py')
+    window.open('mptst_word.s')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
 #    window.open('asm_ch3.rst')

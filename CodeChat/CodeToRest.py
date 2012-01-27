@@ -13,8 +13,9 @@ import codecs
 # as the formatter for Pygments (see an example 
 # <a href="#def_CodeToHtml">below</a>).
 def code_to_rest(language_specific_options, in_file, out_file):
-    comment_string = language_specific_options.comment_string
-    unique_remove_comment = language_specific_options.unique_remove_comment
+    comment_re = language_specific_options.comment_regex
+    unique_remove_comment = language_specific_options.comment_string + \
+      language_specific_options.unique_remove_str
     
     # Keep track of the type of the last line.
     last_is_code = False
@@ -26,7 +27,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
     # A regular expression for whitespace not containing a newline
     ws_re = re.compile(r'^\s*$')
     # A regular expression to remove comment chars
-    comment_re = re.compile(r'(^\s*)' + comment_string + '?')
+    comment_re = re.compile(r'(^\s*)' + comment_re)
 
     # Iterate through all tokens in the input file        
     for line in in_file:
@@ -44,10 +45,9 @@ def code_to_rest(language_specific_options, in_file, out_file):
             line_type = is_code
             
         # Now, process this line.
-        # Convert to a string
+        # Convert to a string, stripping off the trailing newline
         line = line[:-1]
         current_line_list = [line]
-#                print(('==>', current_line_list, line_type, last_is_code))
         if line_type == is_code:
             # Each line of code needs a space at the beginning
             current_line_list.insert(0, ' ')
@@ -63,8 +63,11 @@ def code_to_rest(language_specific_options, in_file, out_file):
         else:
             # Save the number of spaces in this comment
             match = re.search(comment_re, line)
-            if match:
-                comment_indent = match.group(1)
+            new_comment_indent = match.group(1) if match else ''
+            # If indent changes, then re-do indent by treating it as if it were code
+            if new_comment_indent != comment_indent:
+                last_is_code = True
+            comment_indent = new_comment_indent
             # Remove the comment character (and one space, if it's there)
             current_line_list = [re.sub(comment_re, r'\1', line)]
             # Prepend a newline
