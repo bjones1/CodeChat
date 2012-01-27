@@ -8,7 +8,7 @@ from pygments.formatter import Formatter
 from pygments.token import Token
 import pygments.lexers
 from pygments.lexers.math import SLexer
-from pygments.lexers.asm import LlvmLexer
+from pygments.lexers.asm import NasmLexer
 from pygments import highlight
 import re
 import codecs
@@ -33,7 +33,7 @@ class CodeToRestFormatter(Formatter):
     def _expand_nl(self, token_source):
         # Break any comments ending in a newline into two separate tokens
         for ttype, value in token_source:
-            if (ttype == Token.Comment.Single) and value.endswith('\n'):
+            if (ttype is not Token.Text) and value.endswith('\n'):
                 yield ttype, value[:-1]
                 yield Token.Text, u'\n'
             else:
@@ -56,6 +56,7 @@ class CodeToRestFormatter(Formatter):
 
         # Iterate through all tokens in the input file        
         for ttype, value in token_source:
+#            print((ttype, value))
             # Check for whitespace
             if re.search(ws, value):
                 # If so, add it to the stack of tokens on this line
@@ -66,8 +67,8 @@ class CodeToRestFormatter(Formatter):
                     line_type = is_comment
                 # If so, add it to the stack of tokens on this line
                 current_line_list.append(value)
-            # On a newline, process the line
-            elif value == '\n':
+            # On a newline(s), process the line
+            elif value.count('\n') == len(value):
                 # Convert to a string
                 line_str = ''.join(current_line_list)
                 current_line_list = [line_str]
@@ -75,6 +76,7 @@ class CodeToRestFormatter(Formatter):
                 # line.
                 if line_type == is_ws:
                     line_type = is_code if last_is_code else is_comment
+#                print(('==>', current_line_list, line_type, last_is_code))
                 if line_type == is_code:
                     # Each line of code needs a space at the beginning
                     current_line_list.insert(0, ' ')
@@ -122,7 +124,7 @@ class CodeToRestFormatter(Formatter):
 def get_lexer_for_filename(name):
     lexer = pygments.lexers.get_lexer_for_filename(name)
     if lexer.__class__ is SLexer:
-        lexer = LlvmLexer()
+        lexer = NasmLexer()
     return lexer
 
 # <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
@@ -133,3 +135,7 @@ def CodeToRest(source_path, rst_path, language_specific_options):
     lexer = get_lexer_for_filename(source_path)
     hi_code = highlight(code, lexer, formatter)
     outfile.write(hi_code)
+
+if __name__ == '__main__':
+    from CodeChat import main
+    main()

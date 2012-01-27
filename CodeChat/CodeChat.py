@@ -67,13 +67,15 @@ import sphinx.cmdline
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
-from pygments.lexers.asm import LlvmLexer
+from pygments.lexers.asm import NasmLexer
 
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
 # The ability to transform source code directly to HTML represents another core strength. See :doc:`CodeToRest`.
 from CodeToRest import CodeToRest, get_lexer_for_filename
+
+import re
 
 # Language Specific Options
 # ==============================================================================
@@ -108,11 +110,11 @@ class LanguageSpecificOptions(object):
     #  |                            Comment string
     #  |                            |        Removal string (should be a comment)
     #  |                            |        |                              QScintilla lexer
-      CLexer().__class__      : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
+      CLexer().__class__      : ('//', '// ' + unique_remove_str, QsciLexerCPP),
       CppLexer().__class__    : ('// ', '// ' + unique_remove_str, QsciLexerCPP),
       PythonLexer().__class__ : ('# ' , '# '  + unique_remove_str, QsciLexerPython),
       RstLexer().__class__    : (None ,  None                    , None),
-      LlvmLexer().__class__   : ('; ' , '; '  + unique_remove_str, None),
+      NasmLexer().__class__   : ('; ' , '; '  + unique_remove_str, None),
     }
 
     # .. method:: set_language(language_)
@@ -267,14 +269,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Load in the updated html
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
-            # Clean up code if the code to reST process ran.
-            if self.language_specific_options.comment_string is not None:
-                str = str.replace('<span class="c1">' + self.language_specific_options.unique_remove_comment + '</span>', '') \
-                         .replace('<span class="c">'  + self.language_specific_options.unique_remove_comment + '</span>', '') \
-                         .replace('<p>' + self.language_specific_options.unique_remove_comment + '</p>', '')
-                f.seek(0)
-                f.write(str)
-                f.truncate()
+            # Clean up code from any code to reST goo
+            str = re.sub('<span class="c1?">.?.?\s*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str, re.MULTILINE)
+            str = re.sub('<p>.?.?\s*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str, re.MULTILINE)
+            f.seek(0)
+            f.write(str)
+            f.truncate()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
         os.chdir('_build/html')
@@ -431,7 +431,8 @@ def main():
     window = CodeChatWindow(app)
 #    window.open('README.rst')
 #    window.open('CodeChat.py')
-    window.open('mptst_word.s')
+#    window.open('mptst_word.s')
+    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
