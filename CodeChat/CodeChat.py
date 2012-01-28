@@ -174,6 +174,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if not self.ignore_next:
 #            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
             self.ignore_next = True
+            # To make the inactive "cursor" visible when no selection is made in the html window, the plain text pane cursor is replaced by a two-character selection, which will confuse any edits made. Go back to a cursor if there's no selection in the html window.
+            old_text_cursor_pos = self.textEdit_cursor_pos
+            cursor = self.textEdit.textCursor()
+            self.textEdit_cursor_pos = cursor.position()
+            if cursor.anchor() == self.textEdit_cursor_pos:
+                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, self.plainTextEdit_cursor_pos)
             # If there are deletions, find out where in the plain text document
             # we must delete from
             if charsRemoved > 0:
@@ -182,15 +188,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                     self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS):
                     self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
                 # The delete key - just delete from the current position
-                elif position == self.textEdit_cursor_pos:
+                elif position == old_text_cursor_pos:
                     assert charsRemoved == 1
                     self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
                 # The backspace key - move back 1 char (if possible) and delete
-                elif position == (self.textEdit_cursor_pos - 1):
+                elif position == (old_text_cursor_pos - 1):
                     assert charsRemoved == 1
                     # Try to move the cursor back
                     self.ignore_next = False
-                    self.on_textEdit_cursorPositionChanged()
+                    self.on_textEdit_cursorPositionChanged(False)
                     self.ignore_next = True
                     # Signal an error if we can't
                     if self.textEdit.isReadOnly():
@@ -299,12 +305,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 if (self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) ==
                     self.plainTextEdit_cursor_pos):
                     if select_html_pane == True:
-                    # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
+                        # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
                         pos.setPosition(found - 1,
                             QtGui.QTextCursor.MoveAnchor)
                         pos.setPosition(found + 1,
                             QtGui.QTextCursor.KeepAnchor)
                     else:
+                        # Just place the cursor at the found location
                         pos.setPosition(found,
                             QtGui.QTextCursor.MoveAnchor)
                     # Save the original cursor location
@@ -329,22 +336,24 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         
     def on_textEdit_cursorPositionChanged(self, select_plain_text = True):
         if not self.ignore_next:
-            self.textEdit_cursor_pos = self.textEdit.textCursor().position()
             cursor = self.textEdit.textCursor()
-            cursor_pos = self.textEdit_cursor_pos
+            self.textEdit_cursor_pos = cursor.position()
             found = find_approx_text_in_target(unicode(self.textEdit.toPlainText()),
-                                               cursor_pos,
+                                               self.textEdit_cursor_pos,
                                                unicode(self.plainTextEdit.text()))
             # Update position in source doc if text was found
             if found >= 0:
                 self.ignore_next = True
                 # Is there a selection in the HTML pane?
-                if (cursor.anchor() == cursor.position()) and select_plain_text:
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found - 1)
-                    # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, found + 1)
+                if (cursor.anchor() == cursor.position()):
+                    if select_plain_text:
+                        # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
+                        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, found - 1, found + 1)
+                    else:
+                        # Just place the cursor at the found location
+                        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, found)
                     # Save the original cursor location
-                    self.textEdit_cursor_pos = found
+                    self.plainTextEdit_cursor_pos = found
                 else:
                     # Yes, so change the HTML pane selection to match the text pane selection.
                     self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
