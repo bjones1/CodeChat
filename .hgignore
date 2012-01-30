@@ -1,10 +1,10 @@
 syntax: glob
 _build
-practicum2Summer2011.rst
+micro/practicum/practicum2Summer2011.rst
 tre.pyd
 tre.dll
 *.pyc
-FindLongestMatchingString.rst
+CodeChat/FindLongestMatchingString.rst
 CodeChat/CodeChat.rst
 CodeChat/CodeToRest.rst
-CodeChat/mptst_word.rst
+micro/ch3/mptst_word.rst

@@ -128,9 +128,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.app = app
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
-        # Save current dir: HTML loading requires a change to the HTML direcotry,
-        # while Sphinx needs current dir.
-        self.current_dir = os.getcwd()
+        # For debug ease, change to project directory
+        os.chdir('../micro')
+        # Temporary hack: assume the project directory is the startup directory
+        # Save project dir: HTML loading requires a change to the HTML direcotry,
+        # while all else is relative to the project directory.
+        self.project_dir = os.getcwd()
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
@@ -252,7 +255,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         
     def update_html(self):
         # Restore current dir
-        os.chdir(self.current_dir)
+        os.chdir(self.project_dir)
         # Only translate from code to rest if we should
         if self.language_specific_options.comment_string is not None:
             CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
@@ -356,12 +359,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     # Open a new source file
     def open(self, source_file):
-        # Split the source file into a path, base name, and extension
-        head, tail = os.path.split(source_file)
+        # Split the source file into a path relative to the project direcotry, a base name, and an extension
+        self.source_file = os.path.relpath(source_file)
+        head, tail = os.path.split(self.source_file)
         name, ext = os.path.splitext(tail)
-        self.source_file = source_file
         self.rst_file = os.path.join(head, name) + '.rst'
-        self.html_file = os.path.join('_build/html/', name) + '.html'
+        self.html_file = os.path.join('_build/html/', head, name) + '.html'
         # Choose a language
         self.language_specific_options = LanguageSpecificOptions()
         self.language_specific_options.set_language(get_lexer_for_filename(source_file))
@@ -383,7 +386,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     # Reload the source file then regenerate the HTML file from it.
     def reopen(self):
         # Restore current dir
-        os.chdir(self.current_dir)
+        os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
             self.plainTextEdit.setText(f.read())
         self.update_html()
@@ -398,7 +401,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
         # Restore current dir
-        os.chdir(self.current_dir)
+        os.chdir(self.project_dir)
         source_file = QtGui.QFileDialog.getOpenFileName()
         if source_file:
             self.open(unicode(source_file))
@@ -406,7 +409,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_Save_and_update_triggered(self):
         # Restore current dir
-        os.chdir(self.current_dir)
+        os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(unicode(self.plainTextEdit.text()))
         self.plainTextEdit.setModified(False)
@@ -423,7 +426,7 @@ def main():
     window = CodeChatWindow(app)
 #    window.open('README.rst')
 #    window.open('CodeChat.py')
-    window.open('mptst_word.s')
+    window.open('ch3/mptst_word.s')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
 #    window.open('asm_ch3.rst')

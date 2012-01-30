@@ -1,0 +1,16 @@
+/*
+ * html_edit.css
+ * ~~~~~~~~~~~~~~~
+ *
+ * Sphinx stylesheet -- tweaks for html_edit system
+ *
+ * :copyright: Copyright 2011 by Bryan A. Jones.
+ * :license: BSD, see LICENSE for details.
+ *
+ */
+
+@import url('default.css');
+
+blockquote {
+  margin-left: 0.65em;
+}
