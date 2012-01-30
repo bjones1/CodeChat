@@ -11,12 +11,20 @@ Chapter x: An introduction to PIC24 assembly
 
    mptst_word
 
-The first assembly-language program
+Exploring an assembly-language program
 =================================================================================
 
-Let's begin by looking at the heart of a simple assembly-language program. In :doc:`mptst_word` section :ref:`mptst_word_code`, we have:
+Let's begin by looking at the heart of a simple assembly-language program. In :doc:`asm_template` section :ref:`asm_template_code`, we have:
 
-.. include:: mptst_word.rst
+.. include:: asm_template.rst
    :start-after: .. begin_clip
    :end-before: .. end_clip
 
+.. todo: Point to MPLAB IDE video tutorials
+
+Load :download:`asm_template.mcp` into the Microchip IDE, then run the program. Answer the following questions:
+
+#. What value does W0 contain?
+#. What value does memory location ``0x0800`` contain?
+
+In this brie

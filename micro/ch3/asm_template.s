@@ -1,12 +1,12 @@
-; mptst_word
+; asm_template
 ; =======================================================================
-; This is an introductory PIC24 assembly language program, illustrating the syntax needed to write a simple program.
+; This program provides a template for writing a program in PIC24 assembly. To use this template, replace the `User code`_ section with your code.
 ;
 ; License
 ; -----------------------------------------------------------------------
 ; | Copyright (c) 2012 Bryan A. Jones, ("AUTHOR")
 ; | All rights reserved.
-; | (B. A. Jones, bjones_AT_ece.msstate.edu, Mississippi State University)
+; | (B. A. Jones, bjones AT ece.msstate.edu, Mississippi State University)
 ;
 ; Permission to use, copy, modify, and distribute this software and its
 ; documentation for any purpose, without fee, and without written agreement is
@@ -43,8 +43,6 @@
 
 ; Here, we name each variable and specify its size in bytes.
 u16_a:  .space 2
-u16_b:  .space 2
-u16_c:  .space 2
 
 ; Code setup
 ; -----------------------------------------------------------------------
@@ -55,28 +53,20 @@ u16_c:  .space 2
 __reset:
 
 ; Before writing any other code, we first set up the stack; see :ref:`xxx` for more information.
-    mov #__SP_init, w15
-    mov #__SPLIM_init,W0   
-    mov W0, SPLIM
+        mov #__SP_init, w15
+        mov #__SPLIM_init,W0   
+        mov W0, SPLIM
 
 
-; .. _mptst_word_code:
+; .. _asm_template_code:
 ;
 ; User code
 ; -----------------------------------------------------------------------
-; At last, we're ready to write code. We'll use an (almost) three step process. After giving a line of `C` code to translate, we'll first specify a register assignment in comments below and possibly above the line of `C`. Next, data will be input from memory into working registers, then processed within these registers, then output from these registers back to memory. Here's an example:
+; At last, we're ready to write code. Let's begin by executing two lines of assembly, the observing the results.
 
 ; .. begin_clip
-    ; \0. Register assignment
-    ;;  u16_a = u16_b + u16_c
-    ;;   W0      W1      W2
-    ; \1. Input
-    mov u16_b, W1
-    mov u16_c, W2
-    ; \2. Process
-    add W1, W2, W0
-    ; \3. Output
-    mov u16_a, W0
+    mov #0x1234, W0
+    mov W0, u16_a
 ; .. end_clip
 
 ; Finishing up
