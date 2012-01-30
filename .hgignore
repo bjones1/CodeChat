@@ -1,10 +1,20 @@
 syntax: glob
 _build
-micro/practicum/practicum2Summer2011.rst
-tre.pyd
-tre.dll
 *.pyc
-CodeChat/FindLongestMatchingString.rst
+FindLongestMatchingString.rst
 CodeChat/CodeChat.rst
 CodeChat/CodeToRest.rst
+CodeChat/FindLongestMatchingString.rst
+CodeChat/tre.pyd
+CodeChat/tre.dll
+micro/practicum/practicum2Summer2011.rst
+micro/*/*.mcs
+micro/*/*.mcw
+micro/*/*.map
+micro/*/*.o
+micro/*/*.hex
+micro/*/*.cof
+micro/*/*.tagsrc
+micro/*/*.mptags
 micro/ch3/mptst_word.rst
+micro/ch3/asm_template.rst
