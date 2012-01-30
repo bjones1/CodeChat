@@ -7,7 +7,6 @@ Contents:
    :maxdepth: 5
 
    ch3/asm_ch3
-   ch3/mptst_word
    practicum/practicum2Summer2011
 
 Indices and tables
