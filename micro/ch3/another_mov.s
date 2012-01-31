@@ -1,6 +1,6 @@
-; ch3/asm_template
+; ch3/another_mov
 ; =======================================================================
-; This program provides a template for writing a program in PIC24 assembly. To use this template, replace the `User code`_ section with your code.
+; This program illustrates the use of the ``mov memory_address, Wdest`` instruction. Unlike :doc:`asm_template`, most of the explanation has been removed to focus on the core of the program in the :ref:`another_mov_code` section.
 ;
 ; License
 ; -----------------------------------------------------------------------
@@ -30,47 +30,32 @@
 ;
 ; Preliminaries
 ; -----------------------------------------------------------------------
-; First, we need to tell the assembler about all the special function registers specific to the chip we're using.
 .include "p24Hxxxx.inc"
-
-; Next, the linker will automatically jump to the label ``__reset``; we need to make this label globally visible so the linker can find it. By default, labels are visible only to the current file.
 .global __reset
 
 ; Variables
 ; -----------------------------------------------------------------------
-; Now, we set aside space for any variables we need. The ``.bss`` directive refers to uninitialized memory, the correct location for our variables. These variables will begin at address ``0x0800``, since special function registers occupy addresses ``0x0000`` to ``0x07FF``.
 .bss
-
-; Here, we name each variable and specify its size in bytes. The variable below isn't directly used in the code, but does provide an example (for template use) of setting aside space in which to store user data.
 u16_a:  .space 2
 
 ; Code setup
 ; -----------------------------------------------------------------------
-; Before we can write code, we notify the assembler to place the following instructions in program memory, which begins at ``0x0200``.
 .text
-
-; As notied in the Preliminaries_, we must label the beginning of our program ``__reset``.
 __reset:
-
-; Before writing any other code, we first set up the stack; see :ref:`xxx` for more information.
     mov #__SP_init, w15
     mov #__SPLIM_init,W0   
     mov W0, SPLIM
 
-
-; .. _asm_template_code:
+; .. _another_mov_code:
 ;
 ; User code
 ; -----------------------------------------------------------------------
-; At last, we're ready to write code. Let's begin by executing two lines of assembly, the observing the results.
 
 ; .. begin_clip
     mov #0x1234, W0     ; line (1)
     mov W0, 0x0800      ; line (2)
+    mov 0x0800, W1      ; line (3)
 ; .. end_clip
 
-; Finishing up
-; -----------------------------------------------------------------------
-; After our user code finishes, the processor still needs something to do. Have it run in an infinite loop, rather than executing whatever unknown instructions which happen to follow our program.
 done:
     goto done
