@@ -41,7 +41,7 @@
 ; Now, we set aside space for any variables we need. The ``.bss`` directive refers to uninitialized memory, the correct location for our variables. These variables will begin at address ``0x0800``, since special function registers occupy addresses ``0x0000`` to ``0x07FF``.
 .bss
 
-; Here, we name each variable and specify its size in bytes.
+; Here, we name each variable and specify its size in bytes. The variable below isn't directly used in the code, but does provide an example (for template use) of setting aside space in which to store user data.
 u16_a:  .space 2
 
 ; Code setup
@@ -53,9 +53,9 @@ u16_a:  .space 2
 __reset:
 
 ; Before writing any other code, we first set up the stack; see :ref:`xxx` for more information.
-        mov #__SP_init, w15
-        mov #__SPLIM_init,W0   
-        mov W0, SPLIM
+    mov #__SP_init, w15
+    mov #__SPLIM_init,W0   
+    mov W0, SPLIM
 
 
 ; .. _asm_template_code:
@@ -66,7 +66,7 @@ __reset:
 
 ; .. begin_clip
     mov #0x1234, W0
-    mov W0, u16_a
+    mov W0, 0x0800
 ; .. end_clip
 
 ; Finishing up
