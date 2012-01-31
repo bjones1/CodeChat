@@ -54,7 +54,7 @@ __reset:
 ; .. begin_clip
     ; \1. Input
     mov #0x1234, W0     ; line (1)
-    mov #0x8765, W1      ; line (2)
+    mov #0x8765, W1     ; line (2)
     ; \2. Process
     add W0, W1, W2
     ; \3. Output

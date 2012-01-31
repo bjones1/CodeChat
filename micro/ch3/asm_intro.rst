@@ -1,21 +1,3 @@
-##################################################################################
-Part x: PIC24 assembly
-##################################################################################
-
-**********************************************************************************
-Chapter x: An introduction to PIC24 assembly
-**********************************************************************************
- 
-.. toctree::
-   :maxdepth: 5
-
-   asm_template
-   another_mov
-   three_steps
-   mptst_word
-
-This document takes a hands-on, breadth-first approach to introducing assembly langauge. Rather than explain all concepts before they're used, this document enables you to experiment with then to find out what really works, then reinforces thae hands-on intuition you've developed with a minimal amount of explanation. Perform the exercises, or you'll lose much of the available learning.
-
 Exploring an assembly-language program
 =================================================================================
 
@@ -33,7 +15,7 @@ Let's begin by looking at the heart of a simple assembly-language program. In :d
 
 .. _`data memory map`: ../../documents/24H_FRM/Section_03._Data_Memory-PIC24H_FRM_(70237A).pdf#page=3
 .. _`programmer's reference manual`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf
-.. _`mov #literal, Wdest`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=284
+.. _`mov #number, Wdest`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=284
 .. _`mov Wsource, memory_address`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=282
 
 Load ``ch3/asm_template.mcp`` into the Microchip IDE, then run the program.
@@ -47,7 +29,7 @@ This brief snippet of code illustrates several important concepts. First, workin
 
 Another ``mov``
 =================================================================================
-Let's explore the use of another ``mov`` instruction. Compile and run :doc:`another_mov`; the code in section :ref:`another_mov_code` is:
+Let's explore the use of another ``mov`` instruction by adding line (3) below. Compile and run :doc:`another_mov`; the code in section :ref:`another_mov_code` is:
 
 .. include:: another_mov.rst
    :start-after: .. begin_clip
@@ -66,12 +48,31 @@ Input                             Output
 ``mov memory_address, Wdest``     ``mov Wsource, memory_address``
 ===============================   ============================
 
-Input instructions bring data in to the working registers, while output intructions push data out from working registers to memory. What's missing is the ability to process data once we've input it and before we've output the results.
+Input instructions bring data in to the working registers, while output intructions push data out from working registers to memory. What's missing is the ability to process data once it's been input and before the results have been outputed.
 
 Three steps for assembly language programs
 =================================================================================
+.. sidebar:: Simplicity versus efficiency
+
+   The approach taken in this book is to introduce the smallest possible portion of the PIC24 instruction set which covers all the capabilities of the PIC24. The many instructions which aren't covered can reduce the number of assembly instructions in a program. An example:
+
+   | The ``mov Wsource1, Wsource2, Wdest`` used in this document is but one of several other forms of the instruction:
+   |
+   |   ``add f, {WREG}``
+   |   ``add Wsource, #5_bit_number, Wdest``
+   |   ``add Wsource_dest, #10_bit_number``
+
+   Follow the links above for more information on these forms of the add intruction.
+
+.. _`add f, {WREG}`: www.google.com
+
 Compile and run :doc:`three_steps`; the code in section :ref:`three_steps_code` is:
 
 .. include:: three_steps.rst
    :start-after: .. begin_clip
    :end-before: .. end_clip
+
+Exercise:
+
+#. What value does ``0x0800`` contain? Explain the behavior of the ``add`` instruction by replacing the question marks: W? = W? + W?.
+

@@ -6,7 +6,7 @@ Contents:
 .. toctree::
    :maxdepth: 5
 
-   ch3/asm_ch3
+   part_pic24_assembly
    practicum/practicum2Summer2011
 
 Indices and tables

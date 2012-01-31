@@ -443,22 +443,30 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     @QtCore.pyqtSlot()
     def on_action1_triggered(self):
-        self.open('index.rst')
+        self.open('contents.rst')
 
     @QtCore.pyqtSlot()
     def on_action2_triggered(self):
-        self.open('ch3/asm_ch3.rst')
+        self.open('part_pic24_assembly.rst')
 
     @QtCore.pyqtSlot()
     def on_action3_triggered(self):
-        self.open('ch3/asm_template.s')
+        self.open('ch3/asm_chapter.rst')
 
     @QtCore.pyqtSlot()
     def on_action4_triggered(self):
-        self.open('ch3/another_mov.s')
+        self.open('ch3/asm_intro.rst')
 
     @QtCore.pyqtSlot()
     def on_action5_triggered(self):
+        self.open('ch3/asm_template.s')
+
+    @QtCore.pyqtSlot()
+    def on_action6_triggered(self):
+        self.open('ch3/another_mov.s')
+
+    @QtCore.pyqtSlot()
+    def on_action7_triggered(self):
         self.open('ch3/three_steps.s')
 
 
@@ -468,9 +476,9 @@ def main():
     window = CodeChatWindow(app)
 #    window.open('README.rst')
 #    window.open('CodeChat.py')
-    window.open('ch3/asm_ch3.rst')
+#    window.open('ch3/asm_ch3.rst')
 #    window.open('ch3/mptst_word.s')
-#    window.open('ch3/asm_template.s')
+    window.open('ch3/asm_template.s')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
