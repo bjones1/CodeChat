@@ -134,6 +134,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
+        # A path to the generated HTML files, relative to the project directory
+        self.html_dir = '_build/html'
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
@@ -270,19 +272,20 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.language_specific_options.comment_string is not None:
             CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
-                              '.', '_build/html') )
+                              '.', self.html_dir) )
         # Load in the updated html
         with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
             str = f.read()
             # Clean up code from any code to reST goo
             str = re.sub('<span class="c1?">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str)
             str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
+            str = re.sub('<pre>[^<]*' + LanguageSpecificOptions.unique_remove_str + '\n', '<pre>', str)
             f.seek(0)
             f.write(str)
             f.truncate()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
-        os.chdir('_build/html')
+        os.chdir(self.html_dir)
         self.ignore_next = True
         self.textEdit.setHtml(str)
         self.ignore_next = False
@@ -381,7 +384,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         head, tail = os.path.split(self.source_file)
         name, ext = os.path.splitext(tail)
         self.rst_file = os.path.join(head, name) + '.rst'
-        self.html_file = os.path.join('_build/html/', head, name) + '.html'
+        self.html_file = os.path.join(self.html_dir, head, name) + '.html'
         # Choose a language
         self.language_specific_options = LanguageSpecificOptions()
         self.language_specific_options.set_language(get_lexer_for_filename(source_file))
@@ -445,8 +448,9 @@ def main():
     window = CodeChatWindow(app)
 #    window.open('README.rst')
 #    window.open('CodeChat.py')
-    window.open('ch3/asm_ch3.rst')
+#    window.open('ch3/asm_ch3.rst')
 #    window.open('ch3/mptst_word.s')
+    window.open('ch3/asm_template.s')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
