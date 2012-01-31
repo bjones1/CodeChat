@@ -1,5 +1,6 @@
 syntax: glob
 _build
+html
 *.pyc
 FindLongestMatchingString.rst
 CodeChat/CodeChat.rst
@@ -18,3 +19,5 @@ micro/*/*.tagsrc
 micro/*/*.mptags
 micro/ch3/mptst_word.rst
 micro/ch3/asm_template.rst
+micro/ch3/another_mov.rst
+micro/ch3/three_steps.rst

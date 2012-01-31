@@ -441,6 +441,26 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Resync panes.
         self.on_plainTextEdit_cursorPositionChanged(0, 0)
 
+    @QtCore.pyqtSlot()
+    def on_action1_triggered(self):
+        self.open('index.rst')
+
+    @QtCore.pyqtSlot()
+    def on_action2_triggered(self):
+        self.open('ch3/asm_ch3.rst')
+
+    @QtCore.pyqtSlot()
+    def on_action3_triggered(self):
+        self.open('ch3/asm_template.s')
+
+    @QtCore.pyqtSlot()
+    def on_action4_triggered(self):
+        self.open('ch3/another_mov.s')
+
+    @QtCore.pyqtSlot()
+    def on_action5_triggered(self):
+        self.open('ch3/three_steps.s')
+
 
 def main():
     # Instantiate the app and GUI then run them
@@ -448,9 +468,9 @@ def main():
     window = CodeChatWindow(app)
 #    window.open('README.rst')
 #    window.open('CodeChat.py')
-#    window.open('ch3/asm_ch3.rst')
+    window.open('ch3/asm_ch3.rst')
 #    window.open('ch3/mptst_word.s')
-    window.open('ch3/asm_template.s')
+#    window.open('ch3/asm_template.s')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
