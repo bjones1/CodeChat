@@ -135,7 +135,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
         # A path to the generated HTML files, relative to the project directory
-        self.html_dir = '_build/html'
+        self.html_dir = 'html'
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
