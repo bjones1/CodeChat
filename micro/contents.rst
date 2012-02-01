@@ -1,4 +1,4 @@
-Introduction to the PIC24 in C and Assembly
+Introduction to the PIC24 in `C` and Assembly
 ================================================================================
 
 Contents:
@@ -7,7 +7,7 @@ Contents:
    :maxdepth: 5
 
    part_pic24_assembly
-   practicum/practicum2Summer2011
+   part_appendicies
 
 Indices and tables
 ================================================================================
