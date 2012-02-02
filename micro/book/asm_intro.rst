@@ -9,9 +9,9 @@ Exploring an assembly-language program
 .. _`mov #number, Wdest`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=284
 .. _`mov Wsource, memory_address`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=282
 
-Let's begin by looking at the heart of a simple assembly-language program. In :doc:`asm_template` section :ref:`asm_template_code`, we have:
+Let's begin by looking at the heart of a simple assembly-language program. In :doc:`../ch3/asm_template` section :ref:`asm_template_code`, we have:
 
-.. include:: asm_template.rst
+.. include:: ../ch3/asm_template.rst
    :start-after: .. begin_clip
    :end-before: .. end_clip
 
@@ -28,7 +28,7 @@ This brief snippet of code illustrates several important concepts. First, workin
 
 Instruction encoding and limitations
 =================================================================================
-The code in the previous section used two instructions to place a number (``0x1234``) in memory location ``0x0800``. The :doc:`move_num_to_mem` program, section :ref:`move_num_to_mem_code`, proposes just this. Compile it.
+The code in the previous section used two instructions to place a number (``0x1234``) in memory location ``0x0800``. The :doc:`../ch3/move_num_to_mem` program, section :ref:`move_num_to_mem_code`, proposes just this. Compile it.
 
 Exercise:
 
@@ -38,9 +38,9 @@ To explain this error, let's examine how an assembly language intstruction becom
 
 Another ``mov``
 =================================================================================
-Let's explore the use of another ``mov`` instruction by adding line (3) below. Compile and run :doc:`another_mov`; the code in section :ref:`another_mov_code` is:
+Let's explore the use of another ``mov`` instruction by adding line (3) below. Compile and run :doc:`../ch3/another_mov`; the code in section :ref:`another_mov_code` is:
 
-.. include:: another_mov.rst
+.. include:: /ch3/another_mov.rst
    :start-after: .. begin_clip
    :end-before: .. end_clip
 
@@ -63,7 +63,7 @@ Three steps for assembly language programs
 =================================================================================
 .. sidebar:: Simplicity versus efficiency
 
-   The approach taken in this book is to introduce the smallest possible portion of the PIC24 instruction set which covers all the capabilities of the PIC24. In particular, the ``mov Wsource1, Wsource2, Wdest`` instruction used in this document is but one of several other forms of the instruction:
+   | The approach taken in this book is to introduce the smallest possible portion of the PIC24 instruction set which covers all the capabilities of the PIC24. In particular, the ``mov Wsource1, Wsource2, Wdest`` instruction used in this document is but one of several other forms of the instruction:
    |
    |   ``add f, {WREG}``
    |   ``add Wsource, #5_bit_number, Wdest``
@@ -74,9 +74,9 @@ Three steps for assembly language programs
 .. todo:
    The links in the add instructions above
 
-Compile and run :doc:`three_steps`; the code in section :ref:`three_steps_code` is:
+Compile and run :doc:`../ch3/three_steps`; the code in section :ref:`three_steps_code` is:
 
-.. include:: three_steps.rst
+.. include:: /ch3/three_steps.rst
    :start-after: .. begin_clip
    :end-before: .. end_clip
 

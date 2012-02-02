@@ -7,5 +7,5 @@ Contents:
 .. toctree::
    :maxdepth: 5
 
-   ch3/asm_chapter
+   asm_chapter
 

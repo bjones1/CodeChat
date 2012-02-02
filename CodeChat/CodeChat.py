@@ -447,15 +447,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     @QtCore.pyqtSlot()
     def on_action2_triggered(self):
-        self.open('part_pic24_assembly.rst')
+        self.open('book/part_pic24_assembly.rst')
 
     @QtCore.pyqtSlot()
     def on_action3_triggered(self):
-        self.open('ch3/asm_chapter.rst')
+        self.open('book/asm_chapter.rst')
 
     @QtCore.pyqtSlot()
     def on_action4_triggered(self):
-        self.open('ch3/asm_intro.rst')
+        self.open('book/asm_intro.rst')
 
     @QtCore.pyqtSlot()
     def on_action5_triggered(self):
