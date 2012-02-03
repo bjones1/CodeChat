@@ -336,10 +336,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def open(self, source_file):
         # Split the source file into a path relative to the project direcotry, a base name, and an extension
         self.source_file = os.path.relpath(source_file)
-        self.html_file = os.path.join(self.html_dir, self.source_file) + '.html'
         # Choose a language
         self.language_specific_options = LanguageSpecificOptions()
         self.language_specific_options.set_language(get_lexer_for_filename(source_file))
+        # If this is a code-to-reST file, append .html to the filename
+        if self.language_specific_options.comment_string:
+            self.html_file = os.path.join(self.html_dir, self.source_file) + '.html'
+        # Otherwise, replace the extension with .html
+        else:
+            head, tail = os.path.split(self.source_file)
+            name, ext = os.path.splitext(tail)
+            self.html_file = os.path.join(self.html_dir, head, name) + '.html'        
         # Choose a lexer
         # Set style for comments to a fixed-width courier font.
         lexer_class = self.language_specific_options.lexer
