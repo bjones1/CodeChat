@@ -71,8 +71,6 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
-import re
-
 
 form_class, base_class = uic.loadUiType("CodeChat.ui")
 # CodeChatWindow
@@ -229,18 +227,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
         # Load in the updated html
-        with codecs.open(self.html_file, 'r+', encoding = 'utf-8') as f:
+        with codecs.open(self.html_file, 'r', encoding = 'utf-8') as f:
             str = f.read()
-            # Clean up code from any code to reST goo
-            str = re.sub('<span class="c1?">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str)
-            str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
-            str = re.sub('<pre>[^<]*' + LanguageSpecificOptions.unique_remove_str + '\n', '<pre>', str)
-            f.seek(0)
-            f.write(str)
-            f.truncate()
         # Temporarily change to the HTML directory to load html, so Qt can access all
         # the HTML resources (style sheets, images, etc.)
-        os.chdir(self.html_dir)
+        head, tail = os.path.split(self.html_file)
+        os.chdir(head)
+        print(os.getcwd())
         self.ignore_next = True
         self.textEdit.setHtml(str)
         self.ignore_next = False
@@ -437,7 +430,8 @@ def main():
 #    window.open('CodeChat.py')
 #    window.open('ch3/asm_ch3.rst')
 #    window.open('ch3/mptst_word.s')
-    window.open('ch3/asm_template.s')
+#    window.open('ch3/asm_template.s')
+    window.open('book/asm_intro.rst')
 #    window.open('index.rst')
 #    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
