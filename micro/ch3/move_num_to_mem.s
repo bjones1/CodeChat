@@ -1,6 +1,6 @@
-; ch3/move_num_to_mem
+; ch3/move_num_to_mem.s
 ; =======================================================================
-; This program illustrates two approaches to copying data from memory to memory. See :doc:`asm_template` for a detailed explanation of the statements not in the `User code`_ section.
+; This program illustrates two approaches to copying data from memory to memory. See :doc:`asm_template.s` for a detailed explanation of the statements not in the `User code`_ section.
 ;
 ; License
 ; -----------------------------------------------------------------------

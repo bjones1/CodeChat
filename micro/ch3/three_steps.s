@@ -1,6 +1,6 @@
-; ch3/three_steps
+; ch3/three_steps.s
 ; =======================================================================
-; This program illustrates the three step process for writing fragments of assembly langauge code. Unlike :doc:`asm_template`, most of the explanation has been removed to focus on the core of the program in the :ref:`three_steps_code` section.
+; This program illustrates the three step process for writing fragments of assembly langauge code. Unlike :doc:`asm_template.s`, most of the explanation has been removed to focus on the core of the program in the :ref:`three_steps_code` section.
 ;
 ; License
 ; -----------------------------------------------------------------------

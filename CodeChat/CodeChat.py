@@ -53,7 +53,7 @@ from PyQt4 import QtGui, QtCore, uic
 # .. _Scintilla: http://www.scintilla.org/ScintillaDoc.html
 # .. _`Python documentation`: http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html
 # .. _`quick tutorial`: http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
-from PyQt4.Qsci import QsciScintilla, QsciLexerCPP, QsciLexerPython
+from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 
 # Sphinx_ transforms reST_ to HTML, a core element of this tool.
 #
@@ -65,58 +65,13 @@ import sphinx.cmdline
 #
 # .. _Pygments: http://pygments.org/
 from pygments.lexers import get_lexer_for_filename
-from pygments.lexers.compiled import CLexer, CppLexer
-from pygments.lexers.agile import PythonLexer
-from pygments.lexers.text import RstLexer
-from pygments.lexers.math import SLexer
+
+from LanguageSpecificOptions import LanguageSpecificOptions
 
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
-# The ability to transform source code directly to HTML represents another core strength. See :doc:`CodeToRest`.
-from CodeToRest import CodeToRest
-
 import re
-
-# Language Specific Options
-# ==============================================================================
-# For each programming language supported, :meth:`set_language` specifies:
-#
-# .. attribute:: comment_string
-#
-#    The string indicating the beginning of a comment in the chosen programming language, or None if the CodeToRest process isn't supported. This must end in a space for the regular expression in format to work. The space also makes the output a bit prettier.
-#
-# .. attribute:: lexer
-#
-#    The QScintilla lexer to use, or None to disable syntax highlighting in the text pane
-#
-# .. class:: LanguageSpecificOptions()
-class LanguageSpecificOptions(object):
-    # .. attribute:: unique_remove_str
-    #
-    #    A unique string to mark lines for removal in HTML.
-    unique_remove_str = 'wokifvzohtdlm'
-    
-    # .. attribute:: language_specific_options
-    #
-    #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.
-    language_specific_options = {
-    ##  Pygments  lexer
-    ##  |                        Comment string, comment regex, QScintilla lexer
-      CLexer().__class__      : ('// ',          '//[^/] ?',    QsciLexerCPP),
-      CppLexer().__class__    : ('// ',          '//[^/] ?',    QsciLexerCPP),
-      PythonLexer().__class__ : ('# ',           '#[^#] ?',     QsciLexerPython),
-      RstLexer().__class__    : (None,           None,          None),
-      SLexer().__class__      : ('; ',           ';[^;] ?',     None),
-    }
-
-    # .. method:: set_language(language_)
-    #
-    #    Sets the :class:`LanguageSpecificOptions` offered, where *language_* gives the Pygments lexer for the desired language.
-    def set_language(self, language_):
-        language = language_.__class__
-        (self.comment_string, self.comment_regex, self.lexer) = \
-          self.language_specific_options[language]
 
 
 form_class, base_class = uic.loadUiType("CodeChat.ui")
@@ -269,8 +224,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Restore current dir
         os.chdir(self.project_dir)
         # Only translate from code to rest if we should
-        if self.language_specific_options.comment_string is not None:
-            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
+#        if self.language_specific_options.comment_string is not None:
+#            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
         # Load in the updated html
@@ -381,10 +336,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def open(self, source_file):
         # Split the source file into a path relative to the project direcotry, a base name, and an extension
         self.source_file = os.path.relpath(source_file)
-        head, tail = os.path.split(self.source_file)
-        name, ext = os.path.splitext(tail)
-        self.rst_file = os.path.join(head, name) + '.rst'
-        self.html_file = os.path.join(self.html_dir, head, name) + '.html'
+        self.html_file = os.path.join(self.html_dir, self.source_file) + '.html'
         # Choose a language
         self.language_specific_options = LanguageSpecificOptions()
         self.language_specific_options.set_language(get_lexer_for_filename(source_file))

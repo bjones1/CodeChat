@@ -1,6 +1,6 @@
-; ch3/another_mov
+; ch3/another_mov.s
 ; =======================================================================
-; This program illustrates the use of the ``mov memory_address, Wdest`` instruction. Unlike :doc:`asm_template`, most of the explanation has been removed to focus on the core of the program in the :ref:`another_mov_code` section.
+; This program illustrates the use of the ``mov memory_address, Wdest`` instruction. Unlike :doc:`asm_template.s`, most of the explanation has been removed to focus on the core of the program in the :ref:`another_mov_code` section.
 ;
 ; License
 ; -----------------------------------------------------------------------

@@ -12,8 +12,8 @@ Contents:
 .. toctree::
    :maxdepth: 5
 
-   ../ch3/move_num_to_mem
-   ../ch3/another_mov
-   ../ch3/three_steps
-   ../ch3/mptst_word
-   ../practicum/practicum2Summer2011
+   ../ch3/move_num_to_mem.s
+   ../ch3/another_mov.s
+   ../ch3/three_steps.s
+   ../ch3/mptst_word.s
+   ../practicum/practicum2Summer2011.c

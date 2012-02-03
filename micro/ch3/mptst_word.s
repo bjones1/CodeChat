@@ -1,4 +1,4 @@
-; mptst_word
+; mptst_word.s
 ; =======================================================================
 ; This is an introductory PIC24 assembly language program, illustrating the syntax needed to write a simple program.
 ;

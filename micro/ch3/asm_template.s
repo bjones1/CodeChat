@@ -1,4 +1,4 @@
-; ch3/asm_template
+; ch3/asm_template.s
 ; =======================================================================
 ; This program provides a template for writing a program in PIC24 assembly. To use this template, replace the `User code`_ section with your code.
 ;

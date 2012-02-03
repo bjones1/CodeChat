@@ -2,13 +2,8 @@ syntax: glob
 _build
 html
 *.pyc
-FindLongestMatchingString.rst
-CodeChat/CodeChat.rst
-CodeChat/CodeToRest.rst
-CodeChat/FindLongestMatchingString.rst
 CodeChat/tre.pyd
 CodeChat/tre.dll
-micro/practicum/practicum2Summer2011.rst
 micro/*/*.mcs
 micro/*/*.mcw
 micro/*/*.map
@@ -17,8 +12,5 @@ micro/*/*.hex
 micro/*/*.cof
 micro/*/*.tagsrc
 micro/*/*.mptags
-micro/ch3/mptst_word.rst
-micro/ch3/asm_template.rst
-micro/ch3/another_mov.rst
-micro/ch3/three_steps.rst
-micro/ch3/move_num_to_mem.rst
+*.s.rst
+*.c.rst

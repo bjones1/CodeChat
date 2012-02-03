@@ -96,6 +96,63 @@ def CodeToRest(source_path, rst_path, language_specific_options):
     with codecs.open(source_path, 'r', encoding = 'utf-8') as in_file:
         with codecs.open(rst_path, mode = 'w', encoding = 'utf-8') as out_file:
             code_to_rest(language_specific_options, in_file, out_file)
+            
+
+
+# .. function:: sphinx_builder_inited(app)
+#
+# This function searches for source code and transforms it to reST before Sphinx searches for reST source.
+#
+# To do so, we need to search for source files. Sphinx has some utils to help with that.
+from sphinx.util.matching import compile_matchers
+from sphinx.util import get_matching_docs
+import os.path
+from LanguageSpecificOptions import LanguageSpecificOptions
+
+def sphinx_builder_inited(app):
+    # Look for every extension of every supported langauge
+    lso = LanguageSpecificOptions()
+    for lang in lso.language_specific_options.keys():
+        lso.set_language(lang())
+        for source_suffix in lso.extensions:
+            # Find all source files with the given extension. This was copied almost verabtim from sphinx.environment.BuildEnvironment.find_files.
+            matchers = compile_matchers(
+                app.config.exclude_patterns[:] +
+                app.config.exclude_trees +
+                [d + app.config.source_suffix for d in app.config.unused_docs] +
+                ['**/' + d for d in app.config.exclude_dirnames] +
+                ['**/_sources', '.#*']
+            )
+            docs = set(get_matching_docs(
+                app.srcdir, source_suffix, exclude_matchers=matchers))
+            # Now, translate any old or missing files
+            for source_file_noext in docs:
+                source_file = source_file_noext + source_suffix
+                rest_file = source_file + app.config.source_suffix
+                if ( (not os.path.exists(rest_file)) or
+                     (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
+                    print('Old file: %s' % source_file)
+                    CodeToRest(source_file, rest_file, lso)
+                else:
+                    print('Current file: %s' % source_file)
+    
+
+# Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.
+def sphinx_html_page_context(app, pagename, templatename, context, doctree):
+    if 'body' in context.keys():
+        str = context['body']
+        # Clean up code from any code to reST goo
+        str = re.sub('<span class="c1?">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str)
+        str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
+        str = re.sub('<pre>[^<]*' + LanguageSpecificOptions.unique_remove_str + '\n', '<pre>', str)
+        context['body'] = str
+
+# This routine defines the entry point called by Sphinx to initialize this extension, per http://sphinx.pocoo.org/ext/appapi.htm.
+def setup(app):
+    # See sphinx_source_read() for more info.
+    app.connect('html-page-context', sphinx_html_page_context)
+    app.connect('builder-inited', sphinx_builder_inited)
+    
 
 if __name__ == '__main__':
     from CodeChat import main
