@@ -72,6 +72,34 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 from FindLongestMatchingString import find_approx_text_in_target
 
 
+# A class to keep track of the most recently used files
+class MruFiles(object):
+    mru_list_key = "MRU list"
+    max_files = 10
+    
+    def __init__(self):
+        self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
+        
+    def get_mru_list(self):
+        mru_list = self.settings.value(self.mru_list_key).toPyObject()
+        if not mru_list:
+            mru_list = []
+            self.settings.setValue(self.mru_list_key, mru_list)
+            return mru_list
+        else:
+            return list(mru_list)
+            
+    def add_file(self, file_name):
+        mru_list = self.get_mru_list()
+        if file_name in mru_list:
+            mru_list.remove(file_name)
+        mru_list.insert(0, file_name)
+        self.settings.setValue(self.mru_list_key, mru_list)
+        print(mru_list)
+        
+    def update_gui(self, mru_file_actions):
+        pass
+
 form_class, base_class = uic.loadUiType("CodeChat.ui")
 # CodeChatWindow
 # ==============================================================================
@@ -127,6 +155,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Save initial cursor positions
         self.textEdit_cursor_pos = self.textEdit.textCursor().position()
         self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+        # Set up the file MRU from the registry
+        self.mru_files = MruFiles()
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
@@ -364,6 +394,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.ignore_next = False
         self.update_html()
         self.plainTextEdit.setModified(False)
+        self.mru_files.add_file(self.source_file)
         
     # The decorator below prevents this method from being called twice, per
     # http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name
