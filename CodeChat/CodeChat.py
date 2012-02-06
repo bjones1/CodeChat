@@ -233,7 +233,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # the HTML resources (style sheets, images, etc.)
         head, tail = os.path.split(self.html_file)
         os.chdir(head)
-        print(os.getcwd())
         self.ignore_next = True
         self.textEdit.setHtml(str)
         self.ignore_next = False
