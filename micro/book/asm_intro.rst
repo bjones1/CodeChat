@@ -34,7 +34,7 @@ Exercise:
 
 #. What error does the assembler report?
 
-To explain this error, let's examine how an assembly language intstruction becomes the bits which compose a machine-language instruction.
+To explain this error, let's examine how an assembly language intstruction becomes the bits which compose a machine-language instruction. We'll begin by looking at the machine code generated for the previous program.
 
 Another ``mov``
 =================================================================================
