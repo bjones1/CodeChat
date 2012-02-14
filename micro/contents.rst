@@ -6,7 +6,7 @@ Contents:
 .. toctree::
    :maxdepth: 5
 
-   book/part_pic24_assembly
+   book/part_assembly
    book/part_appendicies
 
 Indices and tables
