@@ -77,9 +77,37 @@ class MruFiles(object):
     mru_list_key = "MRU list"
     max_files = 10
     
-    def __init__(self):
+    # Initialize the mru list and the File menu's MRU items
+    def __init__(self, parent):
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
+        self.parent = parent
+        # Create max_files QActions for mru entries and place them (hidden) in the File menu.
+        self.mru_action_list = []
+        for index in range(self.max_files):
+            mru_item = QtGui.QAction(parent)
+            mru_item.setVisible(False)
+            mru_item.setShortcut(QtGui.QKeySequence('Ctrl+' + str(index)))
+            mru_item.triggered.connect(self.mru_triggered)
+            parent.menu_File.addAction(mru_item)
+            self.mru_action_list.append(mru_item)
+            
+    def open_last(self):
+        # Open the last file automatically
+        mru_list = self.get_mru_list()
+        if mru_list:
+            self.parent.open(str(mru_list[0]))
+
+    # Called when an mru file is triggered
+    @QtCore.pyqtSlot()
+    def mru_triggered(self):
+        # Determine which action sent this signal
+        mru_action = self.parent.sender()
+        if mru_action:
+            # Get the file name stored within that action
+            file_name = str(mru_action.data().toPyObject())
+            self.parent.open(file_name)
         
+    # Returns the mru list as a lit
     def get_mru_list(self):
         mru_list = self.settings.value(self.mru_list_key).toPyObject()
         if not mru_list:
@@ -89,16 +117,33 @@ class MruFiles(object):
         else:
             return list(mru_list)
             
+    # Adds a file to the mru list
     def add_file(self, file_name):
+        # Add file_name to the mru list, moving it to the top if it's already in the list
         mru_list = self.get_mru_list()
         if file_name in mru_list:
             mru_list.remove(file_name)
         mru_list.insert(0, file_name)
+        # Trim the list if it is too long
+        if len(mru_list) > self.max_files:
+            mru_list.pop()
+        # Update the stored mru list
         self.settings.setValue(self.mru_list_key, mru_list)
-        print(mru_list)
+        # Update the GUI
+        self.update_gui()
         
-    def update_gui(self, mru_file_actions):
-        pass
+    def update_gui(self):
+        # For each elemnt in the mru list, update the menu item
+        mru_list = self.get_mru_list()
+        for index in range(len(mru_list)):
+            mru_action = self.mru_action_list[index]
+            mru_action.setText('&%d %s' % (index, mru_list[index]))
+            mru_action.setData(mru_list[index])
+            mru_action.setVisible(True)
+        # Hide the rest of the actions
+        for index in range(len(mru_list), self.max_files):
+            self.mru_action_list[index].setVisible(False)
+
 
 form_class, base_class = uic.loadUiType("CodeChat.ui")
 # CodeChatWindow
@@ -156,7 +201,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.textEdit_cursor_pos = self.textEdit.textCursor().position()
         self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         # Set up the file MRU from the registry
-        self.mru_files = MruFiles()
+        self.mru_files = MruFiles(self)
+        self.mru_files.open_last()
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
@@ -423,47 +469,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Resync panes.
         self.on_plainTextEdit_cursorPositionChanged(0, 0)
 
-    @QtCore.pyqtSlot()
-    def on_action1_triggered(self):
-        self.open('contents.rst')
-
-    @QtCore.pyqtSlot()
-    def on_action2_triggered(self):
-        self.open('book/part_pic24_assembly.rst')
-
-    @QtCore.pyqtSlot()
-    def on_action3_triggered(self):
-        self.open('book/asm_chapter.rst')
-
-    @QtCore.pyqtSlot()
-    def on_action4_triggered(self):
-        self.open('book/asm_intro.rst')
-
-    @QtCore.pyqtSlot()
-    def on_action5_triggered(self):
-        self.open('ch3/asm_template.s')
-
-    @QtCore.pyqtSlot()
-    def on_action6_triggered(self):
-        self.open('ch3/another_mov.s')
-
-    @QtCore.pyqtSlot()
-    def on_action7_triggered(self):
-        self.open('ch3/three_steps.s')
-
 
 def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow(app)
-#    window.open('README.rst')
-#    window.open('CodeChat.py')
-#    window.open('ch3/asm_ch3.rst')
-#    window.open('ch3/mptst_word.s')
-#    window.open('ch3/asm_template.s')
-    window.open('book/asm_intro.rst')
-#    window.open('index.rst')
-#    window.open('FindLongestMatchingString.py')
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())

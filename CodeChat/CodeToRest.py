@@ -131,10 +131,11 @@ def sphinx_builder_inited(app):
                 rest_file = source_file + app.config.source_suffix
                 if ( (not os.path.exists(rest_file)) or
                      (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                    print('Old file: %s' % source_file)
+#                    print('Old file: %s' % source_file)
                     CodeToRest(source_file, rest_file, lso)
                 else:
-                    print('Current file: %s' % source_file)
+#                    print('Current file: %s' % source_file)
+                    pass
     
 
 # Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.

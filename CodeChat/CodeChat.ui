@@ -160,13 +160,6 @@
     <addaction name="action_Save_and_update"/>
     <addaction name="action_Quit"/>
     <addaction name="separator"/>
-    <addaction name="action1"/>
-    <addaction name="action2"/>
-    <addaction name="action3"/>
-    <addaction name="action4"/>
-    <addaction name="action5"/>
-    <addaction name="action6"/>
-    <addaction name="action7"/>
    </widget>
    <addaction name="menu_File"/>
   </widget>
