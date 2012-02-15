@@ -815,5 +815,10 @@ div.viewcode-block:target {
 
 /* My edits */
 blockquote {
-  margin-left: 0.65em;
+  margin-left: 0.5em;
+}
+
+
+pre {
+    padding-left: 0px;
 }

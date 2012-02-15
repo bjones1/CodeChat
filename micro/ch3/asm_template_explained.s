@@ -1,6 +1,6 @@
-; ch3/asm_template.s
+; ch3/asm_template_explained.s
 ; ===============================================================================================
-; The program presents a template for writing assembly language programs for the ARM Cortex-M3 and discusses all the relevant syntax.
+; This program presents a template for writing assembly language programs for the ARM Cortex-M3 and discusses all the relevant syntax.
 ;
 ; License
 ; -----------------------------------------------------------------------------------------------
@@ -31,11 +31,11 @@
 ;
 ; Setup
 ; -----------------------------------------------------------------------------------------------
-; First, we define four sections: for the Stack_, the `Interrupt vector table`_, `Global data`_, and Code_.
+; We begin by defining four sections: for the stack_, the `interrupt vector table`_, `global data`_, and code_. First, however, we must define global labels.
 
         ; The linker requires this public_ label by default_.
         PUBLIC  __iar_program_start
-        ; If any data is defined, the linker requires this routine.
+        ; If any data is defined, the linker requires this label.
         PUBLIC  __iar_zero_init3
 
 ; Stack
@@ -51,7 +51,7 @@
 ; Interrupt vector table
 ; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        
         ; This section_ defines a interrupt vector table_ (IVT) containing a minimal set of interrupt vectors: an initial value for the stack and an entry point for the code.
-	;; (a)      (b)    (c) (d)
+        ;; (a)      (b)    (c) (d)
         SECTION .intvec : CODE (2)
         ; (a) Declare a separate section of this program to contain the interrupt vectors.
         ; (b) Name the section ``.intvec``, to agree with the `IAR build tools`_' naming of the IVT.
@@ -70,7 +70,7 @@ __vector_table:
 ; Global data
 ; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        
         ; This section allocates storage for global variables used in the program.
-	;; (a)   (b)    (c) (d)
+        ;; (a)   (b)    (c) (d)
         SECTION .noinit : DATA (0)
         ; (a) Declare a separate section_ of this program to contain the data for the program.
         ; (b) Name the section ``.noinit``, to agree with the `IAR build tools`_' naming of uninitialized data.
@@ -83,7 +83,7 @@ u32_a:  DS32 1
 ; Code
 ; ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        
         ; This section contains the code for the program.
-	;; (a)    (b)    (c) (d)
+        ;; (a)    (b)    (c) (d)
         SECTION .text : CODE (2)
         ; (a) Declare a separate section_ of this program to contain the code for the program.
         ; (b) Name the section ``.text``, to agree with the `IAR build tools`_' naming of the code.

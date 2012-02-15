@@ -1,14 +1,5 @@
 Exploring an assembly-language program
 =================================================================================
-.. sidebar:: More on ``mov``
-
-   See the `programmer's reference manual`_ for more information on what the `mov #number, Wdest`_ and `mov Wsource, memory_address`_ instructions.
-
-.. _`data memory map`: ../../documents/24H_FRM/Section_03._Data_Memory-PIC24H_FRM_(70237A).pdf#page=3
-.. _`programmer's reference manual`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf
-.. _`mov #number, Wdest`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=284
-.. _`mov Wsource, memory_address`: ../../documents/16-bit_MCU_and_DSC_Programmer's_Reference_Manual_(70157F).pdf#page=282
-
 Let's begin by looking at the heart of a simple assembly-language program. In :doc:`../ch3/asm_template.s` section :ref:`asm_template_code`, we have:
 
 .. include:: ../ch3/asm_template.s.rst
@@ -17,14 +8,30 @@ Let's begin by looking at the heart of a simple assembly-language program. In :d
 
 .. todo: Point to MPLAB IDE video tutorials; figure out how to nicely link to a file to be opened by an external applicaiton.
 
-Load ``ch3/asm_template.mcp`` into the Microchip IDE, then run the program.
+Load ``ch3/asm_template.mcp`` into the IAR IDE, then run the program.
 
 Exercise:
 
-#. What value does W0 contain?
-#. What value does memory location ``0x0800`` contain?
+#. What value does R0 contain?
+#. What value does R1 contain?
+#. What value does u32_a contain?
+#. What value does the PC contain?
 
-This brief snippet of code illustrates several important concepts. First, working registers such as ``W0`` above provide temporary storage locations; although the processor contains sixteen (``W0`` through ``W15``), ``W15`` is reserved for use with the stack. Second, user memory, termed "X Data RAM" in the PIC24's `data memory map`_, begins at location ``0x0800``. This explains the second operand in line (2) above. Third, the ``mov`` (move) instruction is a misnomer: even after executing line (2), the value ``0x1234`` assigned to ``W0`` in line (1) remains there after executing line (2) -- it's copied, not moved. Finally, note that all data is 16 bits (4 hexadecimal digits) wide; because the PIC24 is a 16-bit processor, this is the most natural size of data for it to work on.
+.. sidebar:: Registers ``R13`` through ``R15``
+
+   These registers have specific names and uses_:
+
+   ========  ======  =======================
+   Register  Name    Use
+   ========  ======  =======================
+   ``R13``   ``SP``  Stack pointer
+   ``R14``   ``LR``  Link register
+   ``R15``   ``PC``  Program counter
+   ========  ======  =======================
+
+This brief snippet of code illustrates several important concepts. First, working registers such as ``R0`` above provide temporary storage locations; the processor contains sixteen_ (``R0`` through ``R15``), but reservers the last three for specific uses (see the sidebar). Finally, note that all data is 32 bits (8 hexadecimal digits) wide; because the ARM is a 32-bit processor, this is the most natural size of data for it to work on.
+
+.. _uses: 46
 
 Instruction encoding and limitations
 =================================================================================
