@@ -95,7 +95,9 @@ class MruFiles(object):
         # Open the last file automatically
         mru_list = self.get_mru_list()
         if mru_list:
-            self.parent.open(str(mru_list[0]))
+            file_name = str(mru_list[0])
+            if os.path.exists(file_name):
+                self.parent.open(file_name)
 
     # Called when an mru file is triggered
     @QtCore.pyqtSlot()
@@ -155,13 +157,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # For debug ease, change to project directory
-        os.chdir('../micro')
+#        os.chdir('../micro')
+        os.chdir('C:\\robotics_research\\rc_car\\an3268\\stm32vldiscovery_package\\Project\\Examples\\GPIOToggle')
         # Temporary hack: assume the project directory is the startup directory
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
         # A path to the generated HTML files, relative to the project directory
-        self.html_dir = 'html'
+#        self.html_dir = 'html'
+        self.html_dir = 'build_/html'
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
@@ -300,7 +304,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Only translate from code to rest if we should
 #        if self.language_specific_options.comment_string is not None:
 #            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
-        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', 'build_/doctrees', '-q', 
                               '.', self.html_dir) )
         # Load in the updated html
         with codecs.open(self.html_file, 'r', encoding = 'utf-8') as f:
