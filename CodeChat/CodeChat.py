@@ -157,13 +157,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # For debug ease, change to project directory
 #        os.chdir('../micro')
-        os.chdir('C:\\robotics_research\\rc_car\\GPIOToggle')
+        os.chdir('..\\class-updates')
         # Temporary hack: assume the project directory is the startup directory
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
         # A path to the generated HTML files, relative to the project directory
-#        self.html_dir = 'html'
         self.html_dir = '_build/html'
         self.setupUi(self)
         # Select a larger font for the HTML editor
