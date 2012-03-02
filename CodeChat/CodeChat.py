@@ -37,7 +37,6 @@
 # ==============================================================================
 
 # We begin by importing necessary functionality.
-
 import sys, os
 
 # We need to read and write in Unicode.
@@ -158,14 +157,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # For debug ease, change to project directory
 #        os.chdir('../micro')
-        os.chdir('C:\\robotics_research\\rc_car\\an3268\\stm32vldiscovery_package\\Project\\Examples\\GPIOToggle')
+        os.chdir('C:\\robotics_research\\rc_car\\GPIOToggle')
         # Temporary hack: assume the project directory is the startup directory
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
         # A path to the generated HTML files, relative to the project directory
 #        self.html_dir = 'html'
-        self.html_dir = 'build_/html'
+        self.html_dir = '_build/html'
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
@@ -304,7 +303,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Only translate from code to rest if we should
 #        if self.language_specific_options.comment_string is not None:
 #            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
-        sphinx.cmdline.main( ('', '-b', 'html', '-d', 'build_/doctrees', '-q', 
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
         # Load in the updated html
         with codecs.open(self.html_file, 'r', encoding = 'utf-8') as f:
