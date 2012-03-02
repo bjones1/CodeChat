@@ -302,6 +302,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Only translate from code to rest if we should
 #        if self.language_specific_options.comment_string is not None:
 #            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
+        print('\n\n')
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
         # Load in the updated html
