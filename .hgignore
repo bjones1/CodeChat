@@ -1,16 +1,4 @@
 syntax: glob
-_build
-html
 *.pyc
 CodeChat/tre.pyd
 CodeChat/tre.dll
-micro/*/*.mcs
-micro/*/*.mcw
-micro/*/*.map
-micro/*/*.o
-micro/*/*.hex
-micro/*/*.cof
-micro/*/*.tagsrc
-micro/*/*.mptags
-*.s.rst
-*.c.rst
