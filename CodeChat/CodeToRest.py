@@ -36,7 +36,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
         if re.search(ws_re, line):
             # If the line is whitespace, inherit the type of the previous
             # line.
-            line_type = is_code if last_is_code else is_comment
+            line_type = is_code
         # Check for a comment
         elif re.search(comment_re, line):
             line_type = is_comment
@@ -54,7 +54,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
             if not last_is_code:
                 # When transitioning from comment to code, prepend a ::
                 # to the last line.
-                # Hack: put a . at the beginning of the line so reST
+                # Put a marker at the beginning of the line so reST
                 # will preserve all indentation of the block.
                 current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
             else:
@@ -64,22 +64,25 @@ def code_to_rest(language_specific_options, in_file, out_file):
             # Save the number of spaces in this comment
             match = re.search(comment_re, line)
             new_comment_indent = match.group(1) if match else ''
-            # If indent changes, then re-do indent by treating it as if it were code
-            if new_comment_indent != comment_indent:
-                last_is_code = True
+            # If indent changes or we were just in code, re-do it.
+            redo_indent = True if ((new_comment_indent != comment_indent) or 
+                                   last_is_code) else False
             comment_indent = new_comment_indent
             # Remove the comment character (and one space, if it's there)
             current_line_list = [re.sub(comment_re, r'\1', line)]
             # Prepend a newline
             current_line_list.insert(0, '\n')
             # Add in left margin adjustments for a code to comment transition
-            if last_is_code:
+            if redo_indent:
                 # Get left margin correct by inserting a series of blockquotes
                 blockquote_indent = []
                 for i in range(len(comment_indent)):
                     blockquote_indent.append('\n\n' + ' '*i + unique_remove_comment)
                 blockquote_indent.append('\n\n')
                 current_line_list.insert(0, ''.join(blockquote_indent))
+            if last_is_code:
+                # Finish code off with a newline-preserving marker
+                current_line_list.insert(0, ' ' + unique_remove_comment + '\n')
             
         # Convert to a string
         line_str = ''.join(current_line_list)
@@ -131,10 +134,8 @@ def sphinx_builder_inited(app):
                 rest_file = source_file + app.config.source_suffix
                 if ( (not os.path.exists(rest_file)) or
                      (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-#                    print('Old file: %s' % source_file)
                     CodeToRest(source_file, rest_file, lso)
                 else:
-#                    print('Current file: %s' % source_file)
                     pass
     
 
@@ -142,10 +143,11 @@ def sphinx_builder_inited(app):
 def sphinx_html_page_context(app, pagename, templatename, context, doctree):
     if 'body' in context.keys():
         str = context['body']
-        # Clean up code from any code to reST goo
-        str = re.sub('<span class="c1?">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>', '', str)
+        # Clean markers injected by code_to_rest.
+        str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)  # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
+        str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
         str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
-        str = re.sub('<pre>[^<]*' + LanguageSpecificOptions.unique_remove_str + '\n', '<pre>', str)
+        str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
         context['body'] = str
 
 # This routine defines the entry point called by Sphinx to initialize this extension, per http://sphinx.pocoo.org/ext/appapi.htm.
