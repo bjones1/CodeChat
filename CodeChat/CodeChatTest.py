@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+# Testing
+# -------
 # This test bench exercises the FindLongestMatchingString module.
 
 import unittest

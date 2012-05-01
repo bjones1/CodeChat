@@ -4,6 +4,9 @@
 # CodeToRest
 # ==============================================================================
 
+# .. module:: CodeChat
+
+
 import re
 import codecs
 

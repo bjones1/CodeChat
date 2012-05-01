@@ -61,6 +61,7 @@ def find_approx_text(search_text, target_text, cost = None):
         return match, begin_in_target, end_in_target
 
 # .. _find_approx_text_in_target:
+#
 # find_approx_text_in_target
 # ==========================
 # This routine finds the a substring in the target document which contains an exact,
@@ -86,15 +87,11 @@ def find_approx_text(search_text, target_text, cost = None):
 #
 # Method:
 #
-# #. Look for the best approximate match within the target document of the source 
-#    substring composed of characters within a radius of the anchor.
+# #. Look for the best approximate match within the target document of the source substring composed of characters within a radius of the anchor.
 #
 #    * If no unique match if found, give up (for now -- this could be improved).
 #
-# #. Record this cost (the difference between the source and target substrings)
-#    and the left and right search radii.
-#    Perform all future searches only within the source and target substrings
-#    found in this search.
+# #. Record this cost (the difference between the source and target substrings) and the left and right search radii. Perform all future searches only within the source and target substrings found in this search.
 #
 # #. While the search radius to the left of the anchor > 0 and the cost > 0:
 #
@@ -108,13 +105,11 @@ def find_approx_text(search_text, target_text, cost = None):
 #
 # #. Now, repeat this process for the right search radius.
 #
-# #. If the cost is zero, report the location in the target; otherwise, return
-#    a failure to match.
+# #. If the cost is zero, report the location in the target; otherwise, return a failure to match.
 def find_approx_text_in_target(search_text, search_anchor, target_text):
     search_range = 20
     step_size = 4
-    # #. Look for the best approximate match within the target document of the source 
-    #    substring composed of characters within a radius of the anchor.
+    # #. Look for the best approximate match within the target document of the source substring composed of characters within a radius of the anchor.
     #
     # First, choose a radius of chars about the anchor to search in.
     begin = max(0, search_anchor - search_range)
@@ -129,9 +124,7 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
 #        print("No unique match found.")
         return -1
     
-    # #. Record this cost (the difference between the source and target substrings)
-    #    Perform all future searches only within the source and target substrings
-    #    found in this search.
+    # #. Record this cost (the difference between the source and target substrings). Perform all future searches only within the source and target substrings found in this search.
     min_cost = match.cost
     min_cost_begin = begin
     min_cost_end = end
@@ -187,17 +180,16 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
             min_cost = match.cost
             min_cost_begin = begin
 
-    # #. If the cost is zero, report the location in the target; otherwise, return
-    #    a failure to match.
+    # #. If the cost is zero, report the location in the target; otherwise, return a failure to match.
     if min_cost > 0:
 #        print('Failed -- no exact match (cost was %d)' % min_cost)
         return -1
     else:
-#        print('''
-#begin_in_target %d
-#begin_in_target_substr %d
-#search_anchor %d
-#min_cost_begin %d''' % (begin_in_target, begin_in_target_substr, search_anchor, min_cost_begin))
+##        print('''
+##begin_in_target %d
+##begin_in_target_substr %d
+##search_anchor %d
+##min_cost_begin %d''' % (begin_in_target, begin_in_target_substr, search_anchor, min_cost_begin))
         return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
 
 

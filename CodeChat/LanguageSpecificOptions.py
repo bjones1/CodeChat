@@ -30,7 +30,7 @@ class LanguageSpecificOptions(object):
     language_specific_options = {
     ##  Pygments  lexer
     ##  |                        Comment string, comment regex, QScintilla lexer, extension list
-      CLexer().__class__      : ('// ',          '//[^/] ?',    QsciLexerCPP,     ('.c',)),
+      CLexer().__class__      : ('// ',          '//[^/] ?',    QsciLexerCPP,     ('.c', '.h')),
       CppLexer().__class__    : ('// ',          '//[^/] ?',    QsciLexerCPP,     ('.cpp',)),
       PythonLexer().__class__ : ('# ',           '#[^#] ?',     QsciLexerPython,  ('.py',)),
       RstLexer().__class__    : (None,           None,          None,             ()),

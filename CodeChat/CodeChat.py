@@ -12,7 +12,7 @@
 # Functionality                Module
 # ==========================   ===================
 # GUI                          :mod:`CodeChat`
-# Source code to HTML          :mod:`CodeToHtml`
+# Source code to reST          :mod:`CodeToRest`
 # Synchronize code and HTML    :mod:`CodeSync`
 # Unit test                    :mod:`CodeChatTest`
 # ==========================   ===================
@@ -21,17 +21,37 @@
 #
 # To do
 # ==============================================================================
+# I've now used my system for a while and I find it very helpful, but also filled with bugs and msising features. Where is the most effective place to begin working? I'll start by listing the problems I'm aware of.
 #
-# - Factor out update_html and rename CodeToRest
+# Useability:
+#
+# - Ask the user to save if necessary
+# - An auto-save / auto-build feature.
+# - Add a "choose home directory" feature
+# - Fix home to go to beginning of line, not beginning of paragraph.
+# - Do a better job of restoring the old cursor location after a save and build
+# - Synchronize scrolling / position within window
+# - Support multiple open docs
+# - Fix editor to render better HTML (long term -- probably QWebKit)
+# - Fix / improve false positives on inexact matches
+# - Fix sync bugs where an update in one pane doesn't update in the other pane
+# - Fix broken regexps for comments
+#
+# Development:
+#
+# - Make this into an installable package
+# - Separate GUI code from core update / match code
+# - Unit testing
+# - Figure out how to document / explain this program
+# - Fix extensions in LanguageSpecificOptions
+#
+# Old:
+#
 # - Factor out sync code into CodeSync
 # - Document what I've got
 # - More unit testing
 # - Run Sphinx in the background. This makes the plain text area a more effective word processor.
 # - Look at using QWebKit, since the QTextEdit doesn't render Sphinx's HTML well.
-#
-# .. includes:: CodeChat.rst
-#    :start-after: LanguageSpecificOptions
-#    :end-before: CodeChatWindow
 #
 # Imports
 # ==============================================================================
@@ -60,14 +80,14 @@ from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 # .. _reST: http://docutils.sourceforge.net/docs/index.html
 import sphinx.cmdline
 
-# Pygments_ performs syntax highlighting. Its lexer also enables the code-to-reST process (see :doc:`CodeToRest`).
+# Pygments_ performs syntax highlighting. Its lexer also enables the code-to-reST process (see :doc:`CodeToRest.py`).
 #
 # .. _Pygments: http://pygments.org/
 from pygments.lexers import get_lexer_for_filename
 
 from LanguageSpecificOptions import LanguageSpecificOptions
 
-# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString` for details.
+# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
 
@@ -156,9 +176,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # For debug ease, change to project directory
-#        os.chdir('../micro')
-        os.chdir('..\\class-updates')
-        # Temporary hack: assume the project directory is the startup directory
+#        os.chdir('C:\\Users\\bjones\\Documents\\micro_book')
+#        os.chdir('C:\\Users\\bjones\\Documents\\ece3724\\ece3724-private\\test_solutions')
+#        os.chdir('C:\\robotics_research\moisture_meter')
+         # Temporary hack: assume the project directory is the startup directory
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
