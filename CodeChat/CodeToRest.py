@@ -131,6 +131,8 @@ def sphinx_builder_inited(app):
             )
             docs = set(get_matching_docs(
                 app.srcdir, source_suffix, exclude_matchers=matchers))
+            # This can return an empty filename; remove it.
+            docs -= set([''])
             # Now, translate any old or missing files
             for source_file_noext in docs:
                 source_file = source_file_noext + source_suffix
@@ -144,6 +146,7 @@ def sphinx_builder_inited(app):
 
 # Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.
 def sphinx_html_page_context(app, pagename, templatename, context, doctree):
+    env = app.builder.env
     if 'body' in context.keys():
         str = context['body']
         # Clean markers injected by code_to_rest.
@@ -151,7 +154,43 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
         str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
         str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
         str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
+        if hasattr(env, "codelinks"):
+            for codelink in env.codelinks:
+                print(codelink)
+                str = re.sub('<span class="n">' + codelink['search'] + '</span>', 
+                             '<span class="n"><a href="' + codelink['replace'] + '">' +  codelink['search'] + '</a></span>',
+                             str)
         context['body'] = str
+
+# Playing with creating a new codelink directive to embed hyperlinks in code.
+from sphinx.util.compat import Directive
+class CodelinkDirective(Directive):
+    # this enables content in the directive
+    required_arguments = 1
+    optional_arguments = 100000
+
+    # When we encounter a codelink directive, save its args in the environment.
+    def run(self):
+        env = self.state.document.settings.env
+        if not hasattr(env, 'codelinks'):
+            env.codelinks = []
+        # The codelink directive's arguments give a search and replace string, in the format search=replace.
+        for arg in self.arguments:
+            search_replace = arg.split('=', 1)
+            sr_len = len(search_replace)
+#            print(arg, sr_len, search_replace)
+            assert sr_len <= 2
+            if sr_len == 2:
+                env.codelinks.append({'search' : search_replace[0],
+                                      'replace' : search_replace[1],
+                                     'docname' : env.docname})
+        return []
+
+def purge_codelinks(app, env, docname):
+    if not hasattr(env, 'codelinks'):
+        return
+    env.todo_all_todos = [codelink for codelink in env.codelinks
+                          if codelink['docname'] != docname]
 
 # This routine defines the entry point called by Sphinx to initialize this extension, per http://sphinx.pocoo.org/ext/appapi.htm.
 def setup(app):
@@ -159,6 +198,8 @@ def setup(app):
     app.connect('html-page-context', sphinx_html_page_context)
     app.connect('builder-inited', sphinx_builder_inited)
     
+    app.add_directive('codelink', CodelinkDirective)
+    app.connect('env-purge-doc', purge_codelinks)
 
 if __name__ == '__main__':
     from CodeChat import main

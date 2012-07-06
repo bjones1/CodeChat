@@ -1,8 +1,9 @@
-from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython
+from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
 from pygments.lexers.math import SLexer
+from pygments.lexers.shell import BashLexer
 
 
 # Language Specific Options
@@ -35,6 +36,7 @@ class LanguageSpecificOptions(object):
       PythonLexer().__class__ : ('# ',           '#[^#] ?',     QsciLexerPython,  ('.py',)),
       RstLexer().__class__    : (None,           None,          None,             ()),
       SLexer().__class__      : ('; ',           ';[^;] ?',     None,             ('.s',)),
+      BashLexer().__class__   : ('# ',           '#[^#] ?',     QsciLexerBash,    ('.bash',)),
     }
 
     # .. method:: set_language(language_)

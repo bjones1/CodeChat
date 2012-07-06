@@ -176,10 +176,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # For debug ease, change to project directory
+        os.chdir('C:\\Users\\bjones\\Documents\\modbus\\snort')
 #        os.chdir('C:\\Users\\bjones\\Documents\\micro_book')
 #        os.chdir('C:\\Users\\bjones\\Documents\\ece3724\\ece3724-private\\test_solutions')
 #        os.chdir('C:\\robotics_research\moisture_meter')
-         # Temporary hack: assume the project directory is the startup directory
+#        os.chdir('C:\\robotics_research\\rc_car\\GPIOToggle')
+        # Temporary hack: assume the project directory is the startup directory
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
@@ -320,19 +322,20 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def update_html(self):
         # Restore current dir
         os.chdir(self.project_dir)
-        # Only translate from code to rest if we should
-#        if self.language_specific_options.comment_string is not None:
-#            CodeToRest(self.source_file, self.rst_file, self.language_specific_options)
         print('\n\n')
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
-        # Load in the updated html
-        with codecs.open(self.html_file, 'r', encoding = 'utf-8') as f:
-            str = f.read()
-        # Temporarily change to the HTML directory to load html, so Qt can access all
-        # the HTML resources (style sheets, images, etc.)
-        head, tail = os.path.split(self.html_file)
-        os.chdir(head)
+        # Load in the updated html, if we can
+        try:
+            with codecs.open(self.html_file, 'r', encoding = 'utf-8') as f:
+                str = f.read()
+            # Temporarily change to the HTML directory to load html, so Qt can access all
+            # the HTML resources (style sheets, images, etc.)
+            head, tail = os.path.split(self.html_file)
+            os.chdir(head)
+        except IOError:
+            # If we can't open the file, make it empty
+            str = ''
         self.ignore_next = True
         self.textEdit.setHtml(str)
         self.ignore_next = False
