@@ -30,13 +30,13 @@ class LanguageSpecificOptions(object):
     #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.
     language_specific_options = {
     ##  Pygments  lexer
-    ##  |                        Comment string, comment regex, QScintilla lexer, extension list
-      CLexer().__class__      : ('// ',          '//[^/] ?',    QsciLexerCPP,     ('.c', '.h')),
-      CppLexer().__class__    : ('// ',          '//[^/] ?',    QsciLexerCPP,     ('.cpp',)),
-      PythonLexer().__class__ : ('# ',           '#[^#] ?',     QsciLexerPython,  ('.py',)),
-      RstLexer().__class__    : (None,           None,          None,             ()),
-      SLexer().__class__      : ('; ',           ';[^;] ?',     None,             ('.s',)),
-      BashLexer().__class__   : ('# ',           '#[^#] ?',     QsciLexerBash,    ('.bash',)),
+    ##  |                        Comment string, QScintilla lexer, extension list
+      CLexer().__class__      : ('// ',          QsciLexerCPP,     ('.c', '.h')),
+      CppLexer().__class__    : ('// ',          QsciLexerCPP,     ('.cpp',)),
+      PythonLexer().__class__ : ('# ',           QsciLexerPython,  ('.py',)),
+      RstLexer().__class__    : (None,           None,             ()),
+      SLexer().__class__      : ('; ',           None,             ('.s',)),
+      BashLexer().__class__   : ('# ',           QsciLexerBash,    ('.bash',)),
     }
 
     # .. method:: set_language(language_)
@@ -44,7 +44,7 @@ class LanguageSpecificOptions(object):
     #    Sets the :class:`LanguageSpecificOptions` offered, where *language_* gives the Pygments lexer for the desired language.
     def set_language(self, language_):
         language = language_.__class__
-        (self.comment_string, self.comment_regex, self.lexer, self.extensions) = \
+        (self.comment_string, self.lexer, self.extensions) = \
           self.language_specific_options[language]
 
 

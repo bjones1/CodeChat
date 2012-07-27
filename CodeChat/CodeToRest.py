@@ -10,66 +10,55 @@
 import re
 import codecs
 
-# This class converts from source to to reST. As the <a>overview</a>
-# states, this uses Pygments to do most of the work, adding only a formatter
-# to that library. Therefore, to use this class, simply select this class
-# as the formatter for Pygments (see an example 
-# <a href="#def_CodeToHtml">below</a>).
+# Add in junk comments to force indentation to work when trasitioning between code and comments or vice versa.
 def code_to_rest(language_specific_options, in_file, out_file):
-    comment_re = language_specific_options.comment_regex
     unique_remove_comment = language_specific_options.comment_string + \
       language_specific_options.unique_remove_str
     
     # Keep track of the type of the last line.
     last_is_code = False
     # Determine the type of the current line
-    is_code, is_comment, is_ws = range(3)
+    is_code, is_comment = range(2)
     line_type = is_comment
     # Keep track of the indentation of comment
     comment_indent = ''
     # A regular expression for whitespace not containing a newline
     ws_re = re.compile(r'^\s*$')
     # A regular expression to remove comment chars
-    comment_re = re.compile(r'(^\s*)' + comment_re)
+    comment_re = re.compile(r'(^\s*)' + language_specific_options.comment_string)
 
-    # Iterate through all tokens in the input file        
+    # Iterate through all lines in the input file
     for line in in_file:
         # Determine the line type
         # Check for whitespace
         if re.search(ws_re, line):
-            # If the line is whitespace, inherit the type of the previous
-            # line.
+            # If the line is whitespace, treat it as code.
             line_type = is_code
         # Check for a comment
         elif re.search(comment_re, line):
             line_type = is_comment
-        # On a newline(s), process the line
+        # All other types (including blank lines) are code.
         else:
             line_type = is_code
             
-        # Now, process this line.
-        # Convert to a string, stripping off the trailing newline
-        line = line[:-1]
+        # Now, process this line. Strip of the trailing newline
+        line = line.rstrip('\n')
         current_line_list = [line]
         if line_type == is_code:
-            # Each line of code needs a space at the beginning
+            # Each line of code needs a space at the beginning, to indent it inside a literal block.
             current_line_list.insert(0, ' ')
             if not last_is_code:
-                # When transitioning from comment to code, prepend a ::
-                # to the last line.
-                # Put a marker at the beginning of the line so reST
-                # will preserve all indentation of the block.
-                current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
+                # When transitioning from comment to code, prepend a :: to the last line. Put a marker at the beginning of the line so reST will preserve all indentation of the block.
+                current_line_list.insert(0, ' ::\n\n ' + unique_remove_comment + '\n')
             else:
                 # Otherwise, just prepend a newline
                 current_line_list.insert(0, '\n')
         else:
-            # Save the number of spaces in this comment
+            # This is a comment. Save the number of spaces in this comment
             match = re.search(comment_re, line)
             new_comment_indent = match.group(1) if match else ''
             # If indent changes or we were just in code, re-do it.
-            redo_indent = True if ((new_comment_indent != comment_indent) or 
-                                   last_is_code) else False
+            redo_indent = ((new_comment_indent != comment_indent) or last_is_code)
             comment_indent = new_comment_indent
             # Remove the comment character (and one space, if it's there)
             current_line_list = [re.sub(comment_re, r'\1', line)]
@@ -85,7 +74,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
                 current_line_list.insert(0, ''.join(blockquote_indent))
             if last_is_code:
                 # Finish code off with a newline-preserving marker
-                current_line_list.insert(0, ' ' + unique_remove_comment + '\n')
+                current_line_list.insert(0, '\n ' + unique_remove_comment + '\n')
             
         # Convert to a string
         line_str = ''.join(current_line_list)
@@ -95,9 +84,11 @@ def code_to_rest(language_specific_options, in_file, out_file):
         # We're done!
         out_file.write(line_str)
         last_is_code = line_type == is_code
-        line_type = is_ws
+        
+    # At the end of the file, include a final newline
+    out_file.write('\n')
 
-# <a name="CodeToHtml"></a>Use Pygments with the CodeToHtmlFormatter to translate a source file to an HTML file.
+# Wrap code_to_rest by opening in and out files.
 def CodeToRest(source_path, rst_path, language_specific_options):
     with codecs.open(source_path, 'r', encoding = 'utf-8') as in_file:
         with codecs.open(rst_path, mode = 'w', encoding = 'utf-8') as out_file:
@@ -130,7 +121,7 @@ def sphinx_builder_inited(app):
                 ['**/_sources', '.#*']
             )
             docs = set(get_matching_docs(
-                app.srcdir, source_suffix, exclude_matchers=matchers))
+                app.srcdir, source_suffix, exclude_matchers = matchers))
             # This can return an empty filename; remove it.
             docs -= set([''])
             # Now, translate any old or missing files
@@ -146,7 +137,7 @@ def sphinx_builder_inited(app):
 
 # Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.
 def sphinx_html_page_context(app, pagename, templatename, context, doctree):
-    env = app.builder.env
+    env = app and app.builder.env
     if 'body' in context.keys():
         str = context['body']
         # Clean markers injected by code_to_rest.
