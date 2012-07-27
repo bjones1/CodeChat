@@ -17,46 +17,31 @@ def code_to_rest(language_specific_options, in_file, out_file):
     
     # Keep track of the type of the last line.
     last_is_code = False
-    # Determine the type of the current line
-    is_code, is_comment = range(2)
-    line_type = is_comment
     # Keep track of the indentation of comment
     comment_indent = ''
-    # A regular expression for whitespace not containing a newline
-    ws_re = re.compile(r'^\s*$')
-    # A regular expression to remove comment chars
-    comment_re = re.compile(r'(^\s*)' + language_specific_options.comment_string)
+    # A regular expression to recognize a comment, storing the whitespace before the comment in group 1. There are two recognized forms of comments:
+    #
+    # <optional whitespace> [ <comment string> <end of line> OR <comment string> <a space> <anything to end of line> ]
+    comment_re = re.compile(r'(^\s*)((' + language_specific_options.comment_string[0:-1] + '$)|(' + language_specific_options.comment_string + '))')
 
     # Iterate through all lines in the input file
     for line in in_file:
-        # Determine the line type
-        # Check for whitespace
-        if re.search(ws_re, line):
-            # If the line is whitespace, treat it as code.
-            line_type = is_code
-        # Check for a comment
-        elif re.search(comment_re, line):
-            line_type = is_comment
-        # All other types (including blank lines) are code.
-        else:
-            line_type = is_code
-            
-        # Now, process this line. Strip of the trailing newline
+        # Determine the line type by looking for a comment. If this is a comment, save the number of spaces in this comment
+        comment_match = re.search(comment_re, line)
+        # Now, process this line. Strip off the trailing newline.
         line = line.rstrip('\n')
         current_line_list = [line]
-        if line_type == is_code:
+        if not comment_match:
             # Each line of code needs a space at the beginning, to indent it inside a literal block.
             current_line_list.insert(0, ' ')
             if not last_is_code:
-                # When transitioning from comment to code, prepend a :: to the last line. Put a marker at the beginning of the line so reST will preserve all indentation of the block.
-                current_line_list.insert(0, ' ::\n\n ' + unique_remove_comment + '\n')
+                # When transitioning from comment to code, prepend a \n\n:: after the last line. Put a marker at the beginning of the line so reST will preserve all indentation of the block. (Can't just prepend a <space>::, since this boogers up title underlines, which become ------ ::)
+                current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
             else:
                 # Otherwise, just prepend a newline
                 current_line_list.insert(0, '\n')
         else:
-            # This is a comment. Save the number of spaces in this comment
-            match = re.search(comment_re, line)
-            new_comment_indent = match.group(1) if match else ''
+            new_comment_indent = comment_match.group(1)
             # If indent changes or we were just in code, re-do it.
             redo_indent = ((new_comment_indent != comment_indent) or last_is_code)
             comment_indent = new_comment_indent
@@ -83,7 +68,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
         # line_str += str(line_type) + str(last_is_code)
         # We're done!
         out_file.write(line_str)
-        last_is_code = line_type == is_code
+        last_is_code = not comment_match
         
     # At the end of the file, include a final newline
     out_file.write('\n')

@@ -99,17 +99,17 @@ class TestHtmlCleanup(object):
     # A single line of code, without an ending \n
     def test_1(self):
         ret, comment = self.t('testing')
-        assert ret ==  ' ::\n\n ' + comment + ' testing\n'
+        assert ret ==  '\n\n::\n\n ' + comment + ' testing\n'
 
     # A single line of code, with an ending \n.
     def test_2(self):
         ret, comment = self.t('testing\n')
-        assert ret == ' ::\n\n ' + comment + ' testing\n'
+        assert ret == '\n\n::\n\n ' + comment + ' testing\n'
 
     # Several lines of code, with arbitrary indents
     def test_3(self):
         ret, comment = self.t('testing\n  test 1\n test 2\n   test 3')
-        assert ret == ' ::\n\n ' + comment + ' testing\n   test 1\n  test 2\n    test 3\n'
+        assert ret == '\n\n::\n\n ' + comment + ' testing\n   test 1\n  test 2\n    test 3\n'
 
     # A single line comment, no trailing \n
     def test_4(self):
@@ -129,7 +129,7 @@ class TestHtmlCleanup(object):
     # A single line comment with no space after the comment should be treated like code
     def test_6(self):
         ret, comment = self.t('//testing')
-        assert ret == ' ::\n\n ' + comment + ' //testing\n'
+        assert ret == '\n\n::\n\n ' + comment + ' //testing\n'
 
     # A singly indented single-line comment
     def test_7(self):
@@ -145,6 +145,12 @@ class TestHtmlCleanup(object):
     def test_9(self):
         ret, comment = self.t('  // testing\n  // more testing')
         assert ret == '\n\n' + comment + '\n ' + comment + '\n  testing\n  more testing\n'
+
+    # A line with just the comment char, but no trailing space.
+    def test_10(self):
+        ret, comment = self.t('//')
+        # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
+        assert ret == '\n\n'
 
 def main():
     pytest.main()
