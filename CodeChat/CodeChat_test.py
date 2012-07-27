@@ -121,10 +121,30 @@ class TestHtmlCleanup(object):
         ret, comment = self.t('// testing\n')
         assert ret == '\ntesting\n'
 
+    # A multi line comment
+    def test_5a(self):
+        ret, comment = self.t('// testing\n// more testing')
+        assert ret == '\ntesting\nmore testing\n'
+
     # A single line comment with no space after the comment should be treated like code
     def test_6(self):
         ret, comment = self.t('//testing')
         assert ret == ' ::\n\n ' + comment + ' //testing\n'
+
+    # A singly indented single-line comment
+    def test_7(self):
+        ret, comment = self.t(' // testing')
+        assert ret == '\n\n' + comment + '\n testing\n'
+
+    # A doubly indented single-line comment
+    def test_8(self):
+        ret, comment = self.t('  // testing')
+        assert ret == '\n\n' + comment + '\n ' + comment + '\n  testing\n'
+
+    # A doubly indented multi-line comment
+    def test_9(self):
+        ret, comment = self.t('  // testing\n  // more testing')
+        assert ret == '\n\n' + comment + '\n ' + comment + '\n  testing\n  more testing\n'
 
 def main():
     pytest.main()

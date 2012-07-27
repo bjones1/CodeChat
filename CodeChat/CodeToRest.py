@@ -70,11 +70,11 @@ def code_to_rest(language_specific_options, in_file, out_file):
                 blockquote_indent = []
                 for i in range(len(comment_indent)):
                     blockquote_indent.append('\n\n' + ' '*i + unique_remove_comment)
-                blockquote_indent.append('\n\n')
+                blockquote_indent.append('\n')
                 current_line_list.insert(0, ''.join(blockquote_indent))
             if last_is_code:
                 # Finish code off with a newline-preserving marker
-                current_line_list.insert(0, '\n ' + unique_remove_comment + '\n')
+                current_line_list.insert(0, '\n ' + unique_remove_comment)
             
         # Convert to a string
         line_str = ''.join(current_line_list)
