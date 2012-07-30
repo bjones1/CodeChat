@@ -6,11 +6,49 @@
 
 # .. module:: CodeChat
 
-
 import re
 import codecs
 
-# Add in junk comments to force indentation to work when trasitioning between code and comments or vice versa.
+# code_to_rest
+# ============
+# This routine transforms source code to reST, preserving all indentations of both source code and comments. To do so, the comment characters are stripped from comments and all code is placed inside literal blocks. In addition to this processing, several other difficulies arise: preserving the indentation of both source code and comments; preserving empty lines of code at the beginning or end of a block of code. In the following examples, examine both the source code and the resulting HTML to get the full picture, since the text below is (after all) in reST, and will be therefore be transformed to HTML.
+# 
+# Preserving empty lines of code
+# ------------------------------
+# First, consider a method to preserve empty lines of code. Consider, for example, the following:
+# 
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      + Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | ::                       | Do something::          | ::                                |
+# |                          |                         |                                   |
+# |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
+# |  foo = 1                 |                         |  <pre>foo = 1                     |
+# |                          |                         |  </pre>                           |
+# |  # Do something else     | Do something else::     |  <p>Do something else:</p>        |
+# |  bar = 2                 |                         |  <pre>bar = 2                     |
+# |                          |  bar = 2                |  </pre>                           |
+# +--------------------------+-------------------------+-----------------------------------+
+# 
+# In this example, the blank line is lost, since reST allows the literal bock containing ``foo = 1`` to end with multiple blank lines; the resulting HTML contains only one newline between each of these lines. To solve this, some CSS hackery helps tighten up spacing between lines. In addition, this routine adds a marker, removed during post-processing, at the end of each code block to preserve blank lines. The new translation becomes:
+# 
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      + Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | ::                       | Do something::          | ::                                |
+# |                          |                         |                                   |
+# |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
+# |  foo = 1                 |                         |  <pre>foo = 1                     |
+# |                          |  # wokifvzohtdlm        |                                   |
+# |  # Do something else     |                         |  </pre>                           |
+# |  bar = 2                 | Do something else::     |  <p>Do something else:</p>        |
+# |                          |                         |  <pre>bar = 2                     |
+# |                          |  bar = 2                |  </pre>                           |
+# +--------------------------+-------------------------+-----------------------------------+
+# 
+# Preserving indentation
+# ----------------------
+# To do.
 def code_to_rest(language_specific_options, in_file, out_file):
     unique_remove_comment = language_specific_options.comment_string + \
       language_specific_options.unique_remove_str

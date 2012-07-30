@@ -11,7 +11,7 @@ Contents:
    FindLongestMatchingString.py
    CodeToRest.py
    LanguageSpecificOptions.py
-   CodeChatTest.py
+   CodeChat_test.py
 
 Indices and tables
 ==================

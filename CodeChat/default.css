@@ -854,7 +854,7 @@ pre {
       This is actually a bad thing: the spacing between dissimilar elements may
       not be correct. However, I can't find a CSS rule to modify the
       margins of elements which preceed code, so I just change them all. */
-p, blockquote, div.boy h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6 {
+p, blockquote, div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6 {
     margin-bottom: 0px;
 }
 
@@ -865,9 +865,11 @@ p, blockquote, div.boy h1, div.body h2, div.body h3, div.body h4, div.body h5, d
       Also, note that this will need to be duplicated for all highlighted 
       languages (yuck). I can't find a CSS rule to select class named using a
       regular expression. */
+div.highlight-none + *,
 div.highlight-nasm + *,
 div.highlight-c + *,
-div.highlight-python + * {
+div.highlight-python + *,
+div.highlight-python3 + * {
   margin-top: 0px;
 }
 
