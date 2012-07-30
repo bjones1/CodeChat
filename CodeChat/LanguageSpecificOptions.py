@@ -31,12 +31,12 @@ class LanguageSpecificOptions(object):
     language_specific_options = {
     ##  Pygments  lexer
     ##  |                        Comment string, QScintilla lexer, extension list
-      CLexer().__class__      : ('// ',          QsciLexerCPP,     ('.c', '.h')),
-      CppLexer().__class__    : ('// ',          QsciLexerCPP,     ('.cpp',)),
-      PythonLexer().__class__ : ('# ',           QsciLexerPython,  ('.py',)),
-      RstLexer().__class__    : (None,           None,             ()),
-      SLexer().__class__      : ('; ',           None,             ('.s',)),
-      BashLexer().__class__   : ('# ',           QsciLexerBash,    ('.bash',)),
+      CLexer().__class__      : ('//',          QsciLexerCPP,     ('.c', '.h')),
+      CppLexer().__class__    : ('//',          QsciLexerCPP,     ('.cpp',)),
+      PythonLexer().__class__ : ('#',           QsciLexerPython,  ('.py',)),
+      RstLexer().__class__    : (None,          None,             ()),
+      SLexer().__class__      : (';',           None,             ('.s',)),
+      BashLexer().__class__   : ('#',           QsciLexerBash,    ('.bash',)),
     }
 
     # .. method:: set_language(language_)

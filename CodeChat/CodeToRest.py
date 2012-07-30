@@ -12,11 +12,11 @@ import codecs
 # code_to_rest
 # ============
 # This routine transforms source code to reST, preserving all indentations of both source code and comments. To do so, the comment characters are stripped from comments and all code is placed inside literal blocks. In addition to this processing, several other difficulies arise: preserving the indentation of both source code and comments; preserving empty lines of code at the beginning or end of a block of code. In the following examples, examine both the source code and the resulting HTML to get the full picture, since the text below is (after all) in reST, and will be therefore be transformed to HTML.
-# 
+#
 # Preserving empty lines of code
 # ------------------------------
 # First, consider a method to preserve empty lines of code. Consider, for example, the following:
-# 
+#
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
@@ -29,9 +29,9 @@ import codecs
 # |  bar = 2                 |                         |  <pre>bar = 2                     |
 # |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
-# 
+#
 # In this example, the blank line is lost, since reST allows the literal bock containing ``foo = 1`` to end with multiple blank lines; the resulting HTML contains only one newline between each of these lines. To solve this, some CSS hackery helps tighten up spacing between lines. In addition, this routine adds a marker, removed during post-processing, at the end of each code block to preserve blank lines. The new translation becomes:
-# 
+#
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
@@ -45,22 +45,92 @@ import codecs
 # |                          |                         |  <pre>bar = 2                     |
 # |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
-# 
+#
 # Preserving indentation
 # ----------------------
-# To do.
+# Preserving indentation in code blocks is relatively straightforward. reST eats all whitespace common to a literal block, using that to set the indent. For example:
+#
+# +--------------------------+-------------------------+
+# + Python source            + Translated to reST      +
+# +==========================+=========================+
+# | ::                       | One space indent::      |
+# |                          |                         |
+# |  # One space indent      |   foo = 1               |
+# |   foo = 1                |                         |
+# |                          |                         |
+# |  # No indent             | No indent::             |
+# |  bar = 2                 |                         |
+# |                          |  bar = 2                |
+# +--------------------------+-------------------------+
+#
+# To fix this, code_to_rest adds an unindented marker (also removed during post-processing) at the beginning of each code block to preserve indents:
+#
+# +--------------------------+-------------------------+
+# + Python source            + Translated to reST      +
+# +==========================+=========================+
+# | ::                       | One space indent::      |
+# |                          |                         |
+# |  # One space indent      |  # wokifvzohtdlm        |
+# |   foo = 1                |   foo = 1               |
+# |                          |                         |
+# |  # No indent             |                         |
+# |  bar = 2                 | No indent::             |
+# |                          |                         |
+# |                          |  bar = 2                |
+# +--------------------------+-------------------------+
+#
+# Preserving indentation for comments is more difficult. Blockquotes in reST are definted by common indentation, so that any number of (common) spaces define a blockquote:
+#
+# +--------------------------+-------------------------+
+# + Python source            + Translated to reST      +
+# +==========================+=========================+
+# | ::                       |   Two space indent      |
+# |                          |                         |
+# |    # Two space indent    |     Four space indent   |
+# |      # Four space indent |                         |
+# +--------------------------+-------------------------+
+#
+# To reproduce this, the blockquote indent is defined in CSS to be one character. In addition, removed markers (one per space of indent) define a series of nested blockquotes. As the indent increases, additional markers must be inserted:
+#
+# +--------------------------+-------------------------+
+# + Python source            + Translated to reST      +
+# +==========================+=========================+
+# | ::                       |  # wokifvzohtdlm        |
+# |                          |                         |
+# |  # wokifvzohtdlm         |   # wokifvzohtdlm       |
+# |                          |                         |
+# |   # wokifvzohtdlm        |    Two space indent     |
+# |                          |                         |
+# |    # Two space indent    |     # wokifvzohtdlm     |
+# |                          |                         |
+# |                          |      Four space indent  |
+# +--------------------------+-------------------------+
+#
+# Summary and implementation
+# --------------------------
+# This boils down to two basic rules:
+#
+# #. Code blocks must be preceeded and followed by a removed marker.
+#
+# #. Comments must be preeceded by a series of indented markers, one per space of indentation.
+#
+# Therefore, the (future -- need to rewrite this mess) implemtation consists of a state machine which classifies each line as either comment or code. State transitions, such as code to comment or small comment indent to larger comment indent, provide an opportunity to apply the two rules above. Specifically, the state machine first reads a line, classifies it as code or comment, and updates the state. It then takes a state transition action as defined below. Finally, it outputs the transformed line.
+#
+# .. digraph:: code_to_rest
+#
+#     "code" -> "comment" [ label = "closing code marker\lnewline\lcomment indent marker(s)" ];
+#     "comment" -> "code" [ label = "newline\l::\lnewline\lopening code marker" ];
+#     "comment" -> "comment" [ label = "newline\lif indent increases:\l  comment indent marker(s)" ];
 def code_to_rest(language_specific_options, in_file, out_file):
-    unique_remove_comment = language_specific_options.comment_string + \
-      language_specific_options.unique_remove_str
+    unique_remove_comment = (language_specific_options.comment_string + ' ' +
+      language_specific_options.unique_remove_str)
     
     # Keep track of the type of the last line.
     last_is_code = False
     # Keep track of the indentation of comment
     comment_indent = ''
-    # A regular expression to recognize a comment, storing the whitespace before the comment in group 1. There are two recognized forms of comments:
-    #
-    # <optional whitespace> [ <comment string> <end of line> OR <comment string> <a space> <anything to end of line> ]
-    comment_re = re.compile(r'(^\s*)((' + language_specific_options.comment_string[0:-1] + '$)|(' + language_specific_options.comment_string + '))')
+    # A regular expression to recognize a comment, storing the whitespace before the comment in group 1. There are two recognized forms of comments: <optional whitespace> [ <comment string> <end of line> OR <comment string> <one char of whitespace> <anything to end of line> ].
+    comment_re = re.compile(r'(^\s*)((' + language_specific_options.comment_string + '$)|(' + language_specific_options.comment_string + '\s))')
 
     # Iterate through all lines in the input file
     for line in in_file:

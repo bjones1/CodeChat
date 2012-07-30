@@ -93,7 +93,7 @@ class TestHtmlCleanup(object):
         out_stringIO = StringIO()
         code_to_rest(lso, in_stringIO, out_stringIO)
         # For convenience, create the removal string for the chosen language
-        unique_remove_comment = lso.comment_string + lso.unique_remove_str + '\n'
+        unique_remove_comment = lso.comment_string + ' ' + lso.unique_remove_str + '\n'
         return out_stringIO.getvalue(), unique_remove_comment
         
     # A single line of code, without an ending \n
@@ -149,6 +149,12 @@ class TestHtmlCleanup(object):
     # A line with just the comment char, but no trailing space.
     def test_10(self):
         ret, comment = self.t('//')
+        # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
+        assert ret == '\n\n'
+
+    # A line with just the comment char, with a Microsoft-style line end
+    def test_11(self):
+        ret, comment = self.t('//\r\n')
         # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
         assert ret == '\n\n'
 
