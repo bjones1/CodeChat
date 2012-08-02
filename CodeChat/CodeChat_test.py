@@ -146,6 +146,11 @@ class TestHtmlCleanup(object):
         ret, comment = self.t('  // testing\n  // more testing')
         assert ret == '\n\n' + comment + '\n ' + comment + '\n  testing\n  more testing\n'
 
+    # Code to comment transition
+    def test_9a(self):
+        ret, comment = self.t('testing\n// test')
+        assert ret == '\n\n::\n\n ' + comment + ' testing\n ' + comment + '\ntest\n'
+
     # A line with just the comment char, but no trailing space.
     def test_10(self):
         ret, comment = self.t('//')
@@ -159,7 +164,10 @@ class TestHtmlCleanup(object):
         assert ret == '\n\n'
 
 def main():
+    # Run all tests -- see http://pytest.org/latest/usage.html#calling-pytest-from-python-code.
     pytest.main()
+    # Run a specifically-named test -- see above link plus http://pytest.org/latest/usage.html#specifying-tests-selecting-tests.
+    #pytest.main('-k test_11')
 
 if __name__ == '__main__':
     main()

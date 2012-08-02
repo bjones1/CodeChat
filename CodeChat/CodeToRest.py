@@ -114,13 +114,15 @@ import codecs
 #
 # #. Comments must be preeceded by a series of indented markers, one per space of indentation.
 #
-# Therefore, the (future -- need to rewrite this mess) implemtation consists of a state machine which classifies each line as either comment or code. State transitions, such as code to comment or small comment indent to larger comment indent, provide an opportunity to apply the two rules above. Specifically, the state machine first reads a line, classifies it as code or comment, and updates the state. It then takes a state transition action as defined below. Finally, it outputs the transformed line.
+# Therefore, the (future -- need to rewrite this mess) implemtation consists of a state machine. State transitions, such as code to comment or small comment indent to larger comment indent, provide an opportunity to apply the two rules above. Specifically, the state machine first reads a line, classifies it as code or comment with indent n, and updates the state. It then takes a state transition action as defined below, prepending the resulting string and transforming the line. Finally, it outputs the prepended string and the line.
 #
 # .. digraph:: code_to_rest
 #
-#     "code" -> "comment" [ label = "closing code marker\lnewline\lcomment indent marker(s)" ];
-#     "comment" -> "code" [ label = "newline\l::\lnewline\lopening code marker" ];
-#     "comment" -> "comment" [ label = "newline\lif indent increases:\l  comment indent marker(s)" ];
+#     "code" -> "comment" [ label = "closing code marker\l<newline>\lcomment indent marker(s)\lstrip comment string\l" ];
+#     "comment" -> "code" [ label = "<newline>\l::\l<newline>\lopening code marker\l<one space>\l" ];
+#     "comment" -> "comment" [ label = "<newline>\lif indent increases:\l  comment indent marker(s)\lstrip comment string\l" ];
+#     "code" -> "code" [ label = "<one space>" ];
+#     "comment" [ label = "comment,\nindent = n" ]
 def code_to_rest(language_specific_options, in_file, out_file):
     unique_remove_comment = (language_specific_options.comment_string + ' ' +
       language_specific_options.unique_remove_str)

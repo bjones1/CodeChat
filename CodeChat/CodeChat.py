@@ -176,10 +176,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # For debug ease, change to project directory
-        os.chdir('C:\\Users\\bjones\\Documents\\modbus\\snort')
+        #os.chdir('C:\\Users\\bjones\\Documents\\modbus\\snort')
 #        os.chdir('C:\\Users\\bjones\\Documents\\micro_book')
+        os.chdir('C:\\Users\\bjones\\Documents\\documentation\\CodeChat')
 #        os.chdir('C:\\Users\\bjones\\Documents\\ece3724\\ece3724-private\\test_solutions')
-#        os.chdir('C:\\robotics_research\moisture_meter')
+#        os.chdir('C:\\Users\\bjones\\Documents\\robotics_research\moisture_meter')
 #        os.chdir('C:\\robotics_research\\rc_car\\GPIOToggle')
         # Temporary hack: assume the project directory is the startup directory
         # Save project dir: HTML loading requires a change to the HTML direcotry,
