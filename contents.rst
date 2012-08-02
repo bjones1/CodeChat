@@ -7,11 +7,11 @@ Contents:
    :maxdepth: 2
 
    README
-   CodeChat.py
-   FindLongestMatchingString.py
-   CodeToRest.py
-   LanguageSpecificOptions.py
-   CodeChat_test.py
+   CodeChat/CodeChat.py
+   CodeChat/FindLongestMatchingString.py
+   CodeChat/CodeToRest.py
+   CodeChat/LanguageSpecificOptions.py
+   CodeChat/CodeChat_test.py
 
 Indices and tables
 ==================

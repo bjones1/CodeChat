@@ -1,6 +1,4 @@
 syntax: glob
 *.pyc
-CodeChat/tre.pyd
-CodeChat/tre.dll
-CodeChat/_build
 *.py.rst
+_build

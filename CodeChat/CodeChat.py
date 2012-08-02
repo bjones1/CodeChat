@@ -6,7 +6,7 @@
 # .. moduleauthor::  Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
 # .. sectionauthor:: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
 #
-# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
+# The :doc:`../README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
 #
 # ==========================   ===================
 # Functionality                Module
@@ -178,7 +178,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # For debug ease, change to project directory
         #os.chdir('C:\\Users\\bjones\\Documents\\modbus\\snort')
 #        os.chdir('C:\\Users\\bjones\\Documents\\micro_book')
-        os.chdir('C:\\Users\\bjones\\Documents\\documentation\\CodeChat')
+        os.chdir('C:\\Users\\bjones\\Documents\\documentation')
 #        os.chdir('C:\\Users\\bjones\\Documents\\ece3724\\ece3724-private\\test_solutions')
 #        os.chdir('C:\\Users\\bjones\\Documents\\robotics_research\moisture_meter')
 #        os.chdir('C:\\robotics_research\\rc_car\\GPIOToggle')
