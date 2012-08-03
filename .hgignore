@@ -4,3 +4,5 @@ syntax: glob
 _build
 MANIFEST
 dist
+tre-0.8.0-src/win32/Release
+build

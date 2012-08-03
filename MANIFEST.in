@@ -1,1 +1,2 @@
 include conf.py contents.rst default.css
+include tre/*.h tre/tre.lib

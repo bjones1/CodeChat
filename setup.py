@@ -2,14 +2,9 @@
 #
 # Copyright (c) 2012 Bryan A. Jones <bjones AT ece.msstate.edu>
 #
+# This only works for Windows -- Unix compiles of the tre library will need some patching.
 
 from distutils.core import setup, Extension
-import sys
-
-data_files = []
-
-if sys.platform == "win32":
-    data_files = ["tre.dll"]
 
 setup(name = "CodeChat",
       version = '0.0.0',
@@ -33,12 +28,19 @@ setup(name = "CodeChat",
                   'Pygments (>= 1.5)',
                   ],
       packages = ['CodeChat'],
-      data_files = data_files,
+      package_dir = {'CodeChat' : 'CodeChat'},
+      package_data = {'CodeChat' : ['CodeChat.ui']},
+      scripts = ['code_chat.py'],
+      data_files = [('.', ['tre/tre.dll'])],
       ext_modules = [Extension("tre",
                                sources = ["tre/tre-python.c"],
                                include_dirs = ['tre'],
                                define_macros = [("HAVE_CONFIG_H", None)],
-                               libraries = 'tre'
+                               libraries = ['tre'],
+                               library_dirs = ['./tre'],
+                               depends = ['tre/tre.h', 
+                                          'tre/tre-config.h', 
+                                         ],
                                ),
                      ],
       )

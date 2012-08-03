@@ -166,7 +166,12 @@ class MruFiles(object):
             self.mru_action_list[index].setVisible(False)
 
 
-form_class, base_class = uic.loadUiType("CodeChat.ui")
+# If imported, find the path to the .ui file; if run directly, assume it's in the current directory.
+try:
+    ui_path = os.path.dirname(__file__)
+except NameError:
+    ui_path = '.'
+form_class, base_class = uic.loadUiType(ui_path + "/CodeChat.ui")
 # CodeChatWindow
 # ==============================================================================
 class CodeChatWindow(QtGui.QMainWindow, form_class):
