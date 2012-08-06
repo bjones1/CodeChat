@@ -25,7 +25,7 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.pngmath', 'sphinx.ext.graphviz', 'CodeToRest']
+extensions = ['sphinx.ext.pngmath', 'sphinx.ext.graphviz', 'CodeChat.CodeToRest']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -64,18 +64,7 @@ release = 'version 0.0'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['build', 
-                    'dist', 
-                    '_build', 
-                    'conf.py', 
-                    '*/__init__.py.rst', 
-                    'tre-0.8.0-src', 
-                    'tre', 
-                    'CodeChat_test_env',
-                    'distribute_setup.py',
-                    'CodeChat/example',
-                    'CodeChat/Doc',
-                    ]
+exclude_patterns = ['build', 'dist', '_build', 'conf.py', '*/__init__.py.rst', 'tre-0.8.0-src', 'tre']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 #default_role = None

@@ -6,3 +6,8 @@ MANIFEST
 dist
 tre-0.8.0-src/win32/Release
 build
+CodeChat/Doc
+CodeChat_test_env
+tre/tre.lib
+tre.pyd
+CodeChat/tre.dll
