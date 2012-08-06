@@ -1,4 +1,4 @@
 include distribute_setup.py
-include tre/*.h tre/tre.lib
-include CodeChat/tre.dll CodeChat/CodeChat.ui CodeChat/example/*
+include tre.dll tre/*.h tre/tre.lib
+include CodeChat/CodeChat.ui CodeChat/example/*
 recursive-include CodeChat/Doc *

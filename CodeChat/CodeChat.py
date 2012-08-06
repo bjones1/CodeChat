@@ -170,8 +170,8 @@ class MruFiles(object):
 try:
     ui_path = os.path.dirname(__file__)
 except NameError:
-    ui_path = '.'
-form_class, base_class = uic.loadUiType(ui_path + "/CodeChat.ui")
+    ui_path = ''
+form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
 # CodeChatWindow
 # ==============================================================================
 class CodeChatWindow(QtGui.QMainWindow, form_class):
