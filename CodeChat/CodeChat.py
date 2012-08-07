@@ -166,12 +166,31 @@ class MruFiles(object):
             self.mru_action_list[index].setVisible(False)
 
 
-# If imported, find the path to the .ui file; if run directly, assume it's in the current directory.
+# Load in the .ui file. It could be in three possible locations:
+#
+# #. In the current directory, if this module is executed directly.
+#
+# #. In the directory which this module lives in, if imported the usual way.
+#
+# #. In the sys.executable directory, if run from the frozen PyInstaller.
+#
+# To get the correct directory, first check to see if we're `frozen <http://www.pyinstaller.org/export/develop/project/doc/Manual.html?format=raw#adapting-to-being-frozen>`_. Next, if ``__file__`` is defined, we were imported; otherwise, we're executed directly.
+ui_path = ''
 try:
-    ui_path = os.path.dirname(__file__)
-except NameError:
-    ui_path = ''
-form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
+    assert sys.frozen
+    ui_path = os.path.dirname(sys.executable)
+except AttributeError:
+    try:
+        ui_path = os.path.dirname(__file__)
+    except NameError:
+        pass
+    
+# Workaround: when frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module.
+try: 
+    form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
+except ImportError:
+    from CodeChat_ui import Ui_MainWindow as form_class
+
 # CodeChatWindow
 # ==============================================================================
 class CodeChatWindow(QtGui.QMainWindow, form_class):
