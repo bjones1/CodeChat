@@ -378,9 +378,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 #        print "Plain cursor pos now %d." % self.plainTextEdit_cursor_pos
         if not self.ignore_next:
             self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
-            found = find_approx_text_in_target(unicode(self.plainTextEdit.text()),
+            found = find_approx_text_in_target(self.plainTextEdit.text(),
                                                self.plainTextEdit_cursor_pos,
-                                               unicode(self.textEdit.toPlainText()))
+                                               self.textEdit.toPlainText())
             if found >= 0:
                 pos = self.textEdit.textCursor()
                 # Is there a selection in the text pane?
@@ -420,9 +420,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if not self.ignore_next:
             cursor = self.textEdit.textCursor()
             self.textEdit_cursor_pos = cursor.position()
-            found = find_approx_text_in_target(unicode(self.textEdit.toPlainText()),
+            found = find_approx_text_in_target(self.textEdit.toPlainText(),
                                                self.textEdit_cursor_pos,
-                                               unicode(self.plainTextEdit.text()))
+                                               self.plainTextEdit.text())
             # Update position in source doc if text was found
             if found >= 0:
                 self.ignore_next = True
@@ -516,14 +516,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         os.chdir(self.project_dir)
         source_file = QtGui.QFileDialog.getOpenFileName()
         if source_file:
-            self.open(unicode(source_file))
+            self.open(source_file)
                
     @QtCore.pyqtSlot()
     def on_action_Save_and_update_triggered(self):
         # Restore current dir
         os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
-            f.write(unicode(self.plainTextEdit.text()))
+            f.write(self.plainTextEdit.text())
         self.plainTextEdit.setModified(False)
         self.ignore_next = True
         self.update_html()
