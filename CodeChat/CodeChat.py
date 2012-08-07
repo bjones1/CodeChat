@@ -62,6 +62,11 @@ import sys, os
 # We need to read and write in Unicode.
 import codecs
 
+# Use auto conversion from QString to a Python unicode string; see http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/incompatible_apis.html.
+import sip
+sip.setapi('QString', 2)
+sip.setapi('QVariant', 2)
+
 # The excellent `PyQt4 library`_ provides the GUI for this module.
 #
 # .. _`PyQt4 library`: http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html
@@ -90,15 +95,14 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
-
 # A class to keep track of the most recently used files
 class MruFiles(object):
     mru_list_key = "MRU list"
     max_files = 10
     
     # Initialize the mru list and the File menu's MRU items
-    def __init__(self, parent):
-        self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
+    def __init__(self, parent, settings):
+        self.settings = settings
         self.parent = parent
         # Create max_files QActions for mru entries and place them (hidden) in the File menu.
         self.mru_action_list = []
@@ -125,12 +129,12 @@ class MruFiles(object):
         mru_action = self.parent.sender()
         if mru_action:
             # Get the file name stored within that action
-            file_name = str(mru_action.data().toPyObject())
+            file_name = mru_action.data()
             self.parent.open(file_name)
         
-    # Returns the mru list as a lit
+    # Returns the mru list as a list
     def get_mru_list(self):
-        mru_list = self.settings.value(self.mru_list_key).toPyObject()
+        mru_list = self.settings.value(self.mru_list_key)
         if not mru_list:
             mru_list = []
             self.settings.setValue(self.mru_list_key, mru_list)
@@ -185,7 +189,7 @@ except AttributeError:
     except NameError:
         pass
     
-# Workaround: when frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module.
+# Workaround: when frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module. Oh, well.
 try: 
     form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
 except ImportError:
@@ -199,14 +203,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.app = app
         self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
-        # For debug ease, change to project directory
-        #os.chdir('C:\\Users\\bjones\\Documents\\modbus\\snort')
-#        os.chdir('C:\\Users\\bjones\\Documents\\micro_book')
-        os.chdir('C:\\Users\\bjones\\Documents\\documentation')
-#        os.chdir('C:\\Users\\bjones\\Documents\\ece3724\\ece3724-private\\test_solutions')
-#        os.chdir('C:\\Users\\bjones\\Documents\\robotics_research\moisture_meter')
-#        os.chdir('C:\\robotics_research\\rc_car\\GPIOToggle')
-        # Temporary hack: assume the project directory is the startup directory
+        # Load in the last used project directory, defaulting to the current directory.
+        self.project_dir_key = 'project directory'
+        self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
+        self.project_dir = self.settings.value(self.project_dir_key, os.getcwd())
+        os.chdir(self.project_dir)
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
@@ -251,7 +252,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.textEdit_cursor_pos = self.textEdit.textCursor().position()
         self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         # Set up the file MRU from the registry
-        self.mru_files = MruFiles(self)
+        self.mru_files = MruFiles(self, self.settings)
         self.mru_files.open_last()
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
@@ -501,6 +502,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.reopen()
         
     @QtCore.pyqtSlot()
+    def on_action_Choose_project_dir_triggered(self):
+        project_dir = QtGui.QFileDialog.getExistingDirectory()
+        if project_dir:
+            self.project_dir = project_dir
+            self.settings.setValue(self.project_dir_key, self.project_dir)
+            os.chdir(self.project_dir)
+            # TODO: close the current file
+        
+    @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
         # Restore current dir
         os.chdir(self.project_dir)
@@ -538,5 +548,6 @@ def profile():
     p.strip_dirs().sort_stats('time').print_stats(10)
 
 if __name__ == '__main__':
-    main()
+    import code_chat
+    code_chat.main()
 #    profile()

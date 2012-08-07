@@ -155,6 +155,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="action_Choose_project_dir"/>
     <addaction name="action_Open"/>
     <addaction name="action_Reopen"/>
     <addaction name="action_Save_and_update"/>
@@ -253,6 +254,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+3</string>
+   </property>
+  </action>
+  <action name="action_Choose_project_dir">
+   <property name="text">
+    <string>Choose project &amp;dir</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

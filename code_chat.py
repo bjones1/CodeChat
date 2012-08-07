@@ -1,5 +1,12 @@
+# code_chat script
+# ================
+#
 # This script runs the CodeChat GUI.
 
-if __name__ == '__main__':
-    import CodeChat.CodeChat
+import CodeChat.CodeChat
+
+def main():
     CodeChat.CodeChat.main()
+    
+if __name__ == '__main__':
+    main()

@@ -73,8 +73,10 @@ exclude_patterns = ['build',
                     'tre', 
                     'CodeChat_test_env',
                     'distribute_setup.py',
+                    'copy_docs.py',
                     'CodeChat/example',
                     'CodeChat/Doc',
+                    'CodeChat/CodeChat_ui.py',
                     ]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
