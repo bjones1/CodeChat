@@ -95,6 +95,9 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
+import CodeToRest, jinja2.ext, docutils.languages.en
+from docutils.languages import *
+
 # A class to keep track of the most recently used files
 class MruFiles(object):
     mru_list_key = "MRU list"
@@ -192,7 +195,7 @@ except AttributeError:
 # Workaround: when frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module. Oh, well.
 try: 
     form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
-except ImportError:
+except (ImportError, IOError):
     from CodeChat_ui import Ui_MainWindow as form_class
 
 # CodeChatWindow
