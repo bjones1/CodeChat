@@ -1,6 +1,3 @@
-# code_chat script
-# ================
-#
 # This script runs the CodeChat GUI.
 
 import CodeChat.CodeChat
@@ -10,3 +7,5 @@ def main():
     
 if __name__ == '__main__':
     main()
+    
+import pyinstaller_force_imports
