@@ -179,15 +179,13 @@ class MruFiles(object):
 # #. In the sys.executable directory, if run from the frozen PyInstaller.
 #
 # To get the correct directory, first check to see if we're `frozen <http://www.pyinstaller.org/export/develop/project/doc/Manual.html?format=raw#adapting-to-being-frozen>`_. Next, if ``__file__`` is defined, we were imported; otherwise, we're executed directly.
-ui_path = ''
-try:
-    assert sys.frozen
+if hasattr(sys, 'frozen') and sys.frozen:
     ui_path = os.path.dirname(sys.executable)
-except AttributeError:
+else:
     try:
         ui_path = os.path.dirname(__file__)
     except NameError:
-        pass
+        ui_path = ''
     
 # Workaround: when frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module. Oh, well.
 try: 
