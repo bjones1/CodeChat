@@ -200,62 +200,6 @@
     <string>Ctrl+R</string>
    </property>
   </action>
-  <action name="action1">
-   <property name="text">
-    <string>&amp;1 - contents.rst</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+1</string>
-   </property>
-  </action>
-  <action name="action4">
-   <property name="text">
-    <string>&amp;4 - ch3/asm_intro.rst</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+4</string>
-   </property>
-  </action>
-  <action name="action5">
-   <property name="text">
-    <string>&amp;5 - ch3/asm_template.s</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+5</string>
-   </property>
-  </action>
-  <action name="action6">
-   <property name="text">
-    <string>&amp;6 - ch3/another_mov.s</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+6</string>
-   </property>
-  </action>
-  <action name="action7">
-   <property name="text">
-    <string>&amp;7 - ch3/three_steps.s</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+7</string>
-   </property>
-  </action>
-  <action name="action2">
-   <property name="text">
-    <string>&amp;2 - part_pic24_assembly.rst</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+2</string>
-   </property>
-  </action>
-  <action name="action3">
-   <property name="text">
-    <string>&amp;3 - ch3/asm_chapter.rst</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+3</string>
-   </property>
-  </action>
   <action name="action_Choose_project_dir">
    <property name="text">
     <string>Choose project &amp;dir</string>
