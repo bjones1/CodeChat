@@ -253,6 +253,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.mru_files = MruFiles(self, self.settings)
         self.mru_files.open_last()
         
+    # Look for a switch to this application to check for an updated file. This is installed in main().
+    def eventFilter(self, obj, event):
+        if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
+            print('Hooray!')
+        return QtGui.QMainWindow.eventFilter(self, obj, event)
+        
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
         if not self.ignore_next:
 #            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
@@ -290,7 +296,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                     self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
             self.plainTextEdit.insert(self.textEdit.toPlainText()[position:position + charsAdded])
             self.ignore_next = False
-        
+
     def on_plainTextEdit_modified(self, position, modificationType, text,
                                   length, linesAdded, line, foldLevelNow,
                                   foldLevelPrev, token, annotationLinesAdded):
@@ -534,6 +540,8 @@ def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow(app)
+    # Install an event filter to catch ApplicationActivate events (see CodeChatWindow.eventFilter)
+    app.installEventFilter(window)
     window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
