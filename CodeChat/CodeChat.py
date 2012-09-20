@@ -253,10 +253,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.mru_files = MruFiles(self, self.settings)
         self.mru_files.open_last()
         
-    # Look for a switch to this application to check for an updated file. This is installed in main().
+    # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
     def eventFilter(self, obj, event):
         if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
-            print('Hooray!')
+            pass
+#            print('Hooray!')
         return QtGui.QMainWindow.eventFilter(self, obj, event)
         
     def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
