@@ -10,4 +10,4 @@ xcopy /E /I ..\..\template template
 copy ..\..\default.css template
 del template\conf.py.rst
 cd ..\..
-start installer.aip
+start CodeChat.iss
