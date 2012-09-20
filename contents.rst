@@ -7,6 +7,7 @@ Contents:
    :maxdepth: 2
 
    README
+   conf.py
    code_chat.py
    CodeChat/CodeChat.py
    CodeChat/FindLongestMatchingString.py
