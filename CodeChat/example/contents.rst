@@ -1,19 +1,13 @@
-Welcome to CodeChat's documentation!
-====================================
+Template for a project using CodeChat
+=====================================
+The table of content below currently includes one source file. Add more files as your project grows.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
 
-   README
-   setup.py
-   code_chat.py
-   CodeChat/CodeChat.py
-   CodeChat/FindLongestMatchingString.py
-   CodeChat/CodeToRest.py
-   CodeChat/LanguageSpecificOptions.py
-   CodeChat/CodeChat_test.py
+   conf.py
 
 Indices and tables
 ==================
