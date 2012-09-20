@@ -9,6 +9,5 @@ xcopy /E /I ..\..\_build\html doc
 xcopy /E /I ..\..\template template
 copy ..\..\default.css template
 del template\conf.py.rst
-copy ..\..\installer.aip .
-installer.aip
 cd ..\..
+start installer.aip
