@@ -13,7 +13,7 @@ DefaultGroupName={#PRODUCT_NAME}
 UninstallDisplayIcon={app}\bin\code_chat.exe
 Compression=lzma2
 SolidCompression=yes
-OutputBaseFilename="Install {#PRODUCT_NAME}"
+OutputBaseFilename="Install_{#PRODUCT_NAME}"
 OutputDir=.
 
 [Files]

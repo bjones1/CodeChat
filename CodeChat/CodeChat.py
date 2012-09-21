@@ -1,5 +1,5 @@
-# :mod:`CodeChat` -- a conversational coding system
-# ==============================================================================
+# CodeChat
+# ========
 #
 # .. module:: CodeChat
 #    :synopsis: a conversational coding system
@@ -20,14 +20,13 @@
 # .. contents::
 #
 # To do
-# ==============================================================================
+# -----
 # I've now used my system for a while and I find it very helpful, but also filled with bugs and msising features. Where is the most effective place to begin working? I'll start by listing the problems I'm aware of.
 #
 # Useability:
 #
 # - Ask the user to save if necessary
 # - An auto-save / auto-build feature.
-# - Add a "choose home directory" feature
 # - Fix home to go to beginning of line, not beginning of paragraph.
 # - Do a better job of restoring the old cursor location after a save and build
 # - Synchronize scrolling / position within window
@@ -39,22 +38,13 @@
 #
 # Development:
 #
-# - Make this into an installable package
 # - Separate GUI code from core update / match code
 # - Unit testing
 # - Figure out how to document / explain this program
 # - Fix extensions in LanguageSpecificOptions
 #
-# Old:
-#
-# - Factor out sync code into CodeSync
-# - Document what I've got
-# - More unit testing
-# - Run Sphinx in the background. This makes the plain text area a more effective word processor.
-# - Look at using QWebKit, since the QTextEdit doesn't render Sphinx's HTML well.
-#
 # Imports
-# ==============================================================================
+# -------
 
 # We begin by importing necessary functionality.
 import sys, os
@@ -194,7 +184,7 @@ except (ImportError, IOError):
     from CodeChat_ui import Ui_MainWindow as form_class
 
 # CodeChatWindow
-# ==============================================================================
+# --------------
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
         # Store a reference to this window's containing application
@@ -215,7 +205,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Select a larger font for the HTML editor
         self.textEdit.zoomIn(2)
 # Configure QScintilla
-# --------------------
+# ^^^^^^^^^^^^^^^^^^^^
         # Set the default font
         self.font = QtGui.QFont()
         self.font.setFamily('Courier New')
@@ -557,4 +547,4 @@ def profile():
 if __name__ == '__main__':
     import code_chat
     code_chat.main()
-#    profile()
+##    profile()

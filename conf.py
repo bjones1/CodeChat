@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# Testing documentation build configuration file, created by
-# sphinx-quickstart on Thu Dec 01 13:58:15 2011.
+# CodeChat Configuration
+# ======================
+# This file supplies configuration information for Sphinx, which CodeChat uses to produces its documentation. It was originally created by sphinx-quickstart on Thu Dec 01 13:58:15 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -98,7 +99,7 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 ##modindex_common_prefix = []
 
-# If true, keep warnings as “system message” paragraphs in the built documents.
+# If true, keep warnings as ?system message? paragraphs in the built documents.
 # Regardless of this setting, warnings are always written to the standard error
 # stream when sphinx-build is run.
 keep_warnings = True
@@ -159,7 +160,7 @@ html_use_smartypants = True
 ##html_additional_pages = {}
 
 # If false, no module index is generated.
-##html_domain_indices = True
+html_domain_indices = False
 
 # If false, no index is generated.
 ##html_use_index = True
