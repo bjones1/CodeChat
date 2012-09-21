@@ -10,4 +10,8 @@ xcopy /E /I ..\..\template template
 copy ..\..\default.css template
 del template\conf.py.rst
 cd ..\..
-start CodeChat.iss
+"\Program Files (x86)\Inno Setup 5\ISCC.exe" CodeChat.iss
+set WEB=C:\Users\bjones\Documents\Dropbox\Public\CodeChat
+copy Install_CodeChat.exe %WEB%
+rmdir /q /s %WEB%\doc
+xcopy /E /I dist\all\doc %WEB%\doc
