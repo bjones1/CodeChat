@@ -160,24 +160,13 @@ class MruFiles(object):
             self.mru_action_list[index].setVisible(False)
 
 
-# Load in the .ui file. It could be in three possible locations:
-#
-# #. In the current directory, if this module is executed directly.
-#
-# #. In the directory which this module lives in, if imported the usual way.
-#
-# #. In the sys.executable directory, if run from the frozen PyInstaller.
-#
-# To get the correct directory, first check to see if we're `frozen <http://www.pyinstaller.org/export/develop/project/doc/Manual.html?format=raw#adapting-to-being-frozen>`_. Next, if ``__file__`` is defined, we were imported; otherwise, we're executed directly.
-if hasattr(sys, 'frozen') and sys.frozen:
-    ui_path = os.path.dirname(sys.executable)
-else:
-    try:
-        ui_path = os.path.dirname(__file__)
-    except NameError:
-        ui_path = ''
+# Load in the .ui file. It could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
+try:
+    ui_path = os.path.dirname(__file__)
+except NameError:
+    ui_path = ''
     
-# Workaround: when frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module. Oh, well.
+# When frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the ui to a .py module. Oh, well.
 try: 
     form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
 except (ImportError, IOError):
