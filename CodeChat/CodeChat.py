@@ -508,12 +508,20 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(self.plainTextEdit.text())
+        cursor = self.textEdit.textCursor()
+        position = cursor.position()
+        anchor = cursor.anchor()
         self.plainTextEdit.setModified(False)
         self.ignore_next = True
         self.update_html()
+        # Restore previous cursor position in reloaded HTML document
+        cursor = self.textEdit.textCursor()
+        cursor.setPosition(anchor, QtGui.QTextCursor.MoveAnchor)
+        cursor.setPosition(position, QtGui.QTextCursor.KeepAnchor)
+        self.textEdit.setTextCursor(cursor)
         self.ignore_next = False
-        # Resync panes.
-        self.on_plainTextEdit_cursorPositionChanged(0, 0)
+        # Resync panes, if possible.
+        #self.on_plainTextEdit_cursorPositionChanged(0, 0)
 
 
 def main():
