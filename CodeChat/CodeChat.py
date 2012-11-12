@@ -184,7 +184,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.project_dir_key = 'project directory'
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
         self.project_dir = self.settings.value(self.project_dir_key, os.getcwd())
-        os.chdir(self.project_dir)
+        try:
+            os.chdir(self.project_dir)
+        except OSError as e:
+            print('Error opening project directory %s: %s' % (e.strerror, e.filename))
         # Save project dir: HTML loading requires a change to the HTML direcotry,
         # while all else is relative to the project directory.
         self.project_dir = os.getcwd()
