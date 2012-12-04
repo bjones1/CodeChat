@@ -37,10 +37,25 @@
 #
 # Development:
 #
-# - Separate GUI code from core update / match code
 # - Unit testing
-# - Figure out how to document / explain this program
 # - Fix extensions in LanguageSpecificOptions
+#
+# New ideas:
+#
+# I want to improve the reliability, ease of use, and code complexity of the program. My idea: keep the two panes, but don't sync between them except on a double-click / hotkey. So, typical usage would be to edit in the left, then save/switch to right. After looking at the right, a double-click would locate the cursor in the left. Some questions:
+#
+# - Should I keep both views open? I can see that being helpful for debug, or when trying to get some reST to work (lots of edit, save, look, repeat cycles). If so, should I keep the two sides synced (hard to do well)?
+# - If not, then need some way to get text under a double-click. But much simpler. How to make it easy to switch back to support edit, check output cycles? Need a switch-back hotkey.
+#
+# The second seems better. Basic design:
+#
+# - Show left or right pane, but not both.
+# - A double-click in the left pane goes to the corresponding location in the right. A hotkey just switches to the right but doesn't move the cursor.
+# - Saving in the right auto-switches to corresponding location in the left. There's no way to save in the left; the only way to open it is via a save.
+#
+# Approach:
+#
+# - Keep around the find corresponding location code, but throw away to keystroke update code. For now, still have both windows. Bind save to one, a double-click to the other. Make the left read-only.
 #
 # Imports
 # -------
@@ -544,6 +559,8 @@ def profile():
     p.strip_dirs().sort_stats('time').print_stats(10)
 
 if __name__ == '__main__':
-    import code_chat
-    code_chat.main()
+    # Make Python think we're running from the parent directory, so Sphinx will find the CodeChat.CodeToRest extension.
+    sys.path[0] = os.path.abspath('..')
+##    print(sys.path)
+    main()
 ##    profile()
