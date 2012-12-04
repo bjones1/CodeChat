@@ -1,20 +1,20 @@
+# .. -*- coding: utf-8 -*-
+#
 # CodeChat
 # ========
 #
 # .. module:: CodeChat
-#    :synopsis: a conversational coding system
-# .. moduleauthor::  Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
-# .. sectionauthor:: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
+#
+# Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
 #
 # The :doc:`../README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
 #
 # ==========================   ===================
 # Functionality                Module
 # ==========================   ===================
-# GUI                          :mod:`CodeChat`
-# Source code to reST          :mod:`CodeToRest`
-# Synchronize code and HTML    :mod:`CodeSync`
-# Unit test                    :mod:`CodeChatTest`
+# GUI                          :doc:`CodeChat.py`
+# Source code to reST          :doc:`CodeToRest.py`
+# Unit test                    :doc:`CodeChat_test.py`
 # ==========================   ===================
 #
 # .. contents::
@@ -25,15 +25,14 @@
 #
 # Useability:
 #
+# - Switch between two views instead of showing both at once. Allow edits only in code view until I get the GUI view edit working much better.
 # - Ask the user to save if necessary
 # - An auto-save / auto-build feature.
 # - Fix home to go to beginning of line, not beginning of paragraph.
-# - Do a better job of restoring the old cursor location after a save and build
-# - Synchronize scrolling / position within window
+# - Do a better job of restoring the old cursor location after a save and build.
 # - Support multiple open docs
 # - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Fix / improve false positives on inexact matches
-# - Fix sync bugs where an update in one pane doesn't update in the other pane
 # - Fix broken regexps for comments
 #
 # Development:

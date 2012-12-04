@@ -4,7 +4,6 @@
 # -------
 # This test bench exercises the FindLongestMatchingString module.
 
-import pytest
 from FindLongestMatchingString import find_approx_text_in_target as f
 
 # A diagnostic function to match then print the returned match.
@@ -163,6 +162,7 @@ class TestHtmlCleanup(object):
         # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
         assert ret == '\n\n'
 
+import pytest
 def main():
     # Run all tests -- see http://pytest.org/latest/usage.html#calling-pytest-from-python-code.
     pytest.main()

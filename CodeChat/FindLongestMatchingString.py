@@ -7,7 +7,7 @@
 # The find_approx_text_in_target_ function in this module searches a target string for the best match to characters about an anchor point in a source string. In particular, it first locates a block of target text which forms the closest approximate match for source characters about the anchor. Then, it looks for the (almost) longest possible exact match between source characters about the anchor and the block of target text found in the first step.
 #
 # Implementation
-# =============================================================================
+# ==============
 #
 # For approximate pattern matching, this module uses the Python port of TRE. See  http://hackerboss.com/approximate-regex-matching-in-python/ for more details. I modified the Python wrapper code to allow Unicode strings.
 import tre
@@ -194,5 +194,5 @@ def find_approx_text_in_target(search_text, search_anchor, target_text):
 
 
 if __name__ == '__main__':
-    from CodeChatTest import main
+    from CodeChat_test import main
     main()
