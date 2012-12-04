@@ -165,7 +165,7 @@ class TestHtmlCleanup(object):
 import pytest
 def main():
     # Run all tests -- see http://pytest.org/latest/usage.html#calling-pytest-from-python-code.
-    pytest.main()
+    pytest.main('CodeChat_test.py')
     # Run a specifically-named test -- see above link plus http://pytest.org/latest/usage.html#specifying-tests-selecting-tests.
     #pytest.main('-k test_11')
 
