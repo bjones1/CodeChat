@@ -192,7 +192,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
         # Store a reference to this window's containing application
         self.app = app
-        self.ignore_next = True
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         # Load in the last used project directory, defaulting to the current directory.
         self.project_dir_key = 'project directory'
@@ -229,22 +228,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Enable word wrap
         self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
         
-        # Ask for notification when the contents of either editor change
-        self.textEdit.document().contentsChange.connect(self.on_textEdit_contentsChange)
-        self.plainTextEdit.SCN_MODIFIED.connect(self.on_plainTextEdit_modified)
-        # However, send only inserts and deletes for plain text. See
-        # http://www.scintilla.org/ScintillaDoc.html#SCI_SETMODEVENTMASK.
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETMODEVENTMASK, 
-                                         QsciScintilla.SC_MOD_INSERTTEXT |
-                                         QsciScintilla.SC_MOD_DELETETEXT)
         # Enable/disable the update button when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
             lambda changed: self.action_Save_and_update.setEnabled(changed))
-        self.ignore_next = False
-        # Save initial cursor positions
-        self.textEdit_cursor_pos = self.textEdit.textCursor().position()
-        self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
         self.mru_files.open_last()
@@ -255,97 +243,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             pass
 #            print('Hooray!')
         return QtGui.QMainWindow.eventFilter(self, obj, event)
-        
-    def on_textEdit_contentsChange(self, position, charsRemoved, charsAdded):
-        if not self.ignore_next:
-#            print 'HTML position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
-            self.ignore_next = True
-            # To make the inactive "cursor" visible when no selection is made in the html window, the plain text pane cursor is replaced by a two-character selection, which will confuse any edits made. Go back to a cursor if there's no selection in the html window.
-            old_text_cursor_pos = self.textEdit_cursor_pos
-            cursor = self.textEdit.textCursor()
-            self.textEdit_cursor_pos = cursor.position()
-            if cursor.anchor() == self.textEdit_cursor_pos:
-                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, self.plainTextEdit_cursor_pos)
-            # If there are deletions, find out where in the plain text document
-            # we must delete from
-            if charsRemoved > 0:
-                # A range - delete the entire range
-                if self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) != \
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS):
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
-                # The delete key - just delete from the current position
-                elif position == old_text_cursor_pos:
-                    assert charsRemoved == 1
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
-                # The backspace key - move back 1 char (if possible) and delete
-                elif position == (old_text_cursor_pos - 1):
-                    assert charsRemoved == 1
-                    # Try to move the cursor back
-                    self.ignore_next = False
-                    self.on_textEdit_cursorPositionChanged(False)
-                    self.ignore_next = True
-                    # Signal an error if we can't
-                    if self.textEdit.isReadOnly():
-                        print 'Oops -- cannot find changed text!'
-                        self.textEdit.undo()
-                        return
-                    # Then delete the char
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_CLEAR)
-            self.plainTextEdit.insert(self.textEdit.toPlainText()[position:position + charsAdded])
-            self.ignore_next = False
-
-    def on_plainTextEdit_modified(self, position, modificationType, text,
-                                  length, linesAdded, line, foldLevelNow,
-                                  foldLevelPrev, token, annotationLinesAdded):
-        # See the SCN_MODIFIED_ message for a description of the above 
-        # parameters; the notifications_ section contains more info. We're
-        # primarily interested in translating the modificationType into
-        # QTextEdit-like charAdded and charRemoved (for now)
-        #
-        # .. _SCN_MODIFIED: http://www.scintilla.org/ScintillaDoc.html#SCN_MODIFIED
-        # .. _notifications: http://www.scintilla.org/ScintillaDoc.html#Notifications
-        (charsAdded, charsRemoved) = (0, 0)
-        if modificationType & QsciScintilla.SC_MOD_INSERTTEXT:
-            charsAdded = length
-        if modificationType & QsciScintilla.SC_MOD_DELETETEXT:
-            charsRemoved = length
-        # Shouldn't have both chars added and deleted at the same time.
-        assert (charsAdded == 0) or (charsRemoved == 0)
-        if (not self.ignore_next) and (not self.textEdit.isReadOnly()):
-#            print 'Plain position %d change: %d chars removed, %d chars added.' % (position, charsRemoved, charsAdded)
-            self.ignore_next = True
-            # To make the inactive "cursor" visible when no selection is made in the plain text window, the html pane cursor is replaced by a two-character selection, which will confuse any edits made. Go back to a cursor if there's no selection in the plain text window.
-            old_plain_text_cursor_pos = self.plainTextEdit_cursor_pos
-            self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
-            plainTextEdit_sel_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR)
-            if self.plainTextEdit_cursor_pos == plainTextEdit_sel_pos:
-                text_cursor = self.textEdit.textCursor()
-                text_cursor.setPosition(self.textEdit_cursor_pos)
-                self.textEdit.setTextCursor(text_cursor)
-            # If there are deletions, find out where in the html document
-            # we must delete from
-            if charsRemoved > 0:
-                # A range - delete the entire range
-                text_cursor = self.textEdit.textCursor()
-                if text_cursor.anchor() != text_cursor.position():
-                    self.textEdit.textCursor().removeSelectedText()
-                # The delete key - just delete from the current position
-                elif position == old_plain_text_cursor_pos:
-                    assert charsRemoved == 1
-                    self.textEdit.textCursor().deleteChar()
-                # The backspace key - move back 1 char (if possible) and delete
-                elif position == (old_plain_text_cursor_pos - 1):
-                    assert charsRemoved == 1
-                    # Resync the cursor in the other pane, but don't place a highlight there.
-                    self.ignore_next = False
-                    self.on_plainTextEdit_cursorPositionChanged(0, 0, False)
-                    self.ignore_next = True
-                    # Then delete the char
-                    self.textEdit.textCursor().deleteChar()
-            # Insert text in html pane added to the plain text pane
-            self.textEdit.textCursor().insertText(self.plainTextEdit.text()[position:position + charsAdded])
-            self.ignore_next = False
-        
+               
     def update_html(self):
         # Restore current dir
         os.chdir(self.project_dir)
@@ -363,96 +261,36 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         except IOError:
             # If we can't open the file, make it empty
             str = ''
-        self.ignore_next = True
         self.textEdit.setHtml(str)
-        self.ignore_next = False
     
-    def set_html_editable(self, can_edit):
-        # Calling self.textEdit.setReadOnly(False) disables
-        # keyboard navigation. Use this to retain key nav.
-        old_flags = int(self.textEdit.textInteractionFlags())
-        new_flags = old_flags | QtCore.Qt.TextEditable if can_edit \
-               else old_flags & ~QtCore.Qt.TextEditable
-        self.textEdit.pyqtConfigure(textInteractionFlags = new_flags)
+    def plain_text_to_html_sync(self):
+        print("plain text to html sync")
+        self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+        found = find_approx_text_in_target(self.plainTextEdit.text(),
+                                           self.plainTextEdit_cursor_pos,
+                                           self.textEdit.toPlainText())
+        if found >= 0:
+            pos = self.textEdit.textCursor()
+            # Is there a selection in the text pane?
+            # Just place the cursor at the found location
+            pos.setPosition(found,
+                QtGui.QTextCursor.MoveAnchor)
+            # Save the original cursor location
+            self.textEdit_cursor_pos = found
         
-    def on_plainTextEdit_cursorPositionChanged(self, line, index, select_html_pane = True):
-#        print "Plain cursor pos now %d." % self.plainTextEdit_cursor_pos
-        if not self.ignore_next:
-            self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
-            found = find_approx_text_in_target(self.plainTextEdit.text(),
-                                               self.plainTextEdit_cursor_pos,
-                                               self.textEdit.toPlainText())
-            if found >= 0:
-                pos = self.textEdit.textCursor()
-                # Is there a selection in the text pane?
-                if (self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETANCHOR) ==
-                    self.plainTextEdit_cursor_pos):
-                    if select_html_pane == True:
-                        # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
-                        pos.setPosition(found - 1,
-                            QtGui.QTextCursor.MoveAnchor)
-                        pos.setPosition(found + 1,
-                            QtGui.QTextCursor.KeepAnchor)
-                    else:
-                        # Just place the cursor at the found location
-                        pos.setPosition(found,
-                            QtGui.QTextCursor.MoveAnchor)
-                    # Save the original cursor location
-                    self.textEdit_cursor_pos = found
-                else:
-                    # Yes, so change the HTML pane selection to match the text pane selection.
-                    pos.setPosition(found, QtGui.QTextCursor.MoveAnchor)
-                self.ignore_next = True
-                self.textEdit.setTextCursor(pos)
-                self.set_html_editable(True)
-                self.ignore_next = False
-            else:
-                self.ignore_next = True
-                # There's no matching location in the HTML pane, so mark that pane as uneditable.
-                self.set_html_editable(False)
-                # If there's a selection, clear it, since we can't determine the cursor location of at least one side of the selection.
-                cursor = self.textEdit.textCursor()
-                if cursor.hasSelection():
-                    cursor.clearSelection()
-                    self.textEdit.setTextCursor(cursor)
-                self.ignore_next = False
-        
-    def on_textEdit_cursorPositionChanged(self, select_plain_text = True):
-        if not self.ignore_next:
-            cursor = self.textEdit.textCursor()
-            self.textEdit_cursor_pos = cursor.position()
-            found = find_approx_text_in_target(self.textEdit.toPlainText(),
-                                               self.textEdit_cursor_pos,
-                                               self.plainTextEdit.text())
-            # Update position in source doc if text was found
-            if found >= 0:
-                self.ignore_next = True
-                # Is there a selection in the HTML pane?
-                if (cursor.anchor() == cursor.position()):
-                    if select_plain_text:
-                        # There's no selection, so create a two-character selection around the cursor so that it's visible, because a cursor with no selection is hidden in widgets without focus.
-                        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, found - 1, found + 1)
-                    else:
-                        # Just place the cursor at the found location
-                        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, found)
-                    # Save the original cursor location
-                    self.plainTextEdit_cursor_pos = found
-                else:
-                    # Yes, so change the HTML pane selection to match the text pane selection.
-                    self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCURRENTPOS, found)
-                # Scroll cursor into view
-                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
-                # The above messages won't be process now, so the self.ignore_next fails to prevent the text pane from attempting to process these cursor changes. Therefore, we must process all messages (particuarly these just sent to the text pane) now, while self.ignore_next is still False.
-                self.app.processEvents()
-                self.set_html_editable(True)
-                self.ignore_next = False
-            else:
-                # If there's a selection, clear it, since we can't determine the cursor location of at least one side of the selection.
-                self.ignore_next = True
-                plain_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
-                self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETANCHOR, plain_cursor_pos)
-                self.set_html_editable(False)
-                self.ignore_next = False
+    def html_to_plain_text_sync(self):
+        cursor = self.textEdit.textCursor()
+        self.textEdit_cursor_pos = cursor.position()
+        found = find_approx_text_in_target(self.textEdit.toPlainText(),
+                                           self.textEdit_cursor_pos,
+                                           self.plainTextEdit.text())
+        # Update position in source doc if text was found
+        if found >= 0:
+            # Is there a selection in the HTML pane?
+            # Just place the cursor at the found location
+            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, found)
+            # Scroll cursor into view
+            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
 
     # Open a new source file
     def open(self, source_file):
@@ -489,9 +327,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Restore current dir
         os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
-            self.ignore_next = True
             self.plainTextEdit.setText(f.read())
-            self.ignore_next = False
         self.update_html()
         self.plainTextEdit.setModified(False)
         self.mru_files.add_file(self.source_file)
@@ -525,20 +361,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(self.plainTextEdit.text())
-        cursor = self.textEdit.textCursor()
-        position = cursor.position()
-        anchor = cursor.anchor()
         self.plainTextEdit.setModified(False)
-        self.ignore_next = True
         self.update_html()
-        # Restore previous cursor position in reloaded HTML document
-        cursor = self.textEdit.textCursor()
-        cursor.setPosition(anchor, QtGui.QTextCursor.MoveAnchor)
-        cursor.setPosition(position, QtGui.QTextCursor.KeepAnchor)
-        self.textEdit.setTextCursor(cursor)
-        self.ignore_next = False
-        # Resync panes, if possible.
-        #self.on_plainTextEdit_cursorPositionChanged(0, 0)
+        # Find location in html pane
+        self.plain_text_to_html_sync()
 
 
 def main():
@@ -551,13 +377,6 @@ def main():
     window.show()
     sys.exit(app.exec_())
     
-def profile():
-    import cProfile
-    import pstats
-    cProfile.run('main()', 'mainprof')
-    p = pstats.Stats('mainprof')
-    p.strip_dirs().sort_stats('time').print_stats(10)
-
 if __name__ == '__main__':
     # Make Python think we're running from the parent directory, so Sphinx will find the CodeChat.CodeToRest extension.
     sys.path[0] = os.path.abspath('..')
