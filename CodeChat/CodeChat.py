@@ -22,7 +22,6 @@
 #
 # To do
 # -----
-# - Provide a quick reference for rest, Sphinx
 # - Ask the user to save if necessary (on reload into a modified document, on exit, on open of another document)
 # - Auto-reload modified code
 # - Fix / improve false positives on inexact matches
@@ -32,8 +31,9 @@
 # - Menu command to load current page in external browser
 # - Fix extensions in LanguageSpecificOptions
 # - Show Sphinx build progress as a progress bar / in a text window
+# - Create a short how-to video
 # - Some way to display Sphinx errors then find the offending source line
-# - Support multiple open docs
+# - Support multiple open docs (QMdiArea)
 # - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Rewrite documentation in this program
 # - More unit testing
@@ -388,6 +388,18 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             self.html_to_plain_text_switch()
 
+    @QtCore.pyqtSlot()
+    # TODO: This is an ugly cheat sheet. I like https://github.com/ralsina/rst-cheatsheet better, but it downloads, instead of displaying in the browser.
+    def on_action_ReST_cheat_sheet_triggered(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://docutils.sourceforge.net/docs/user/rst/cheatsheet.txt'))
+        
+    def on_action_Sphinx_reST_primer_triggered(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/rest.html'))
+        
+    @QtCore.pyqtSlot()
+    def on_action_Sphinx_markup_triggered(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/markup/index.html'))
+        
 def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)

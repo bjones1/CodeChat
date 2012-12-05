@@ -158,12 +158,21 @@
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <addaction name="action_Toggle_pane"/>
    </widget>
+   <widget class="QMenu" name="menu_Help">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="action_ReST_cheat_sheet"/>
+    <addaction name="action_Sphinx_reST_primer"/>
+    <addaction name="action_Sphinx_markup"/>
+   </widget>
    <addaction name="menu_File"/>
    <addaction name="menuView"/>
+   <addaction name="menu_Help"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -215,6 +224,21 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>
+   </property>
+  </action>
+  <action name="action_ReST_cheat_sheet">
+   <property name="text">
+    <string>reST cheat sheet</string>
+   </property>
+  </action>
+  <action name="action_Sphinx_reST_primer">
+   <property name="text">
+    <string>Sphinx reST primer</string>
+   </property>
+  </action>
+  <action name="action_Sphinx_markup">
+   <property name="text">
+    <string>Sphinx markup</string>
    </property>
   </action>
  </widget>
