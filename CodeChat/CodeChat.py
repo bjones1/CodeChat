@@ -28,7 +28,6 @@
 # - Fix broken regexps for comments
 # - Add a create new project option
 # - Clicks on hyperlinks open in external browser.
-# - Menu command to load current page in external browser
 # - Fix extensions in LanguageSpecificOptions
 # - Show Sphinx build progress as a progress bar / in a text window
 # - Create a short how-to video
@@ -251,11 +250,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # If we can't open the file, make it empty
             str = ''
         self.textEdit.setHtml(str)
-
-    # To swith, do a save and update if modified. Then, find the same text under the plain text cursor in the htmnl document and select around it to show the user where on the screen the equivalent content is.
-    def plain_text_to_html_switch(self):
+        
+    def save_and_build_if_modified(self):
         if self.plainTextEdit.isModified():
             self.save()
+            self.update_html()
+
+    # To switch, do a save and update if modified. Then, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
+    def plain_text_to_html_switch(self):
+        self.save_and_build_if_modified()
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
@@ -350,7 +353,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(self.plainTextEdit.text())
         self.plainTextEdit.setModified(False)
-        self.update_html()
         
     # The decorator below prevents this method from being called twice, per
     # http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name
@@ -399,6 +401,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_Sphinx_markup_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/markup/index.html'))
+        
+    @QtCore.pyqtSlot()
+    def on_action_in_browser_triggered(self):
+        self.save_and_build_if_modified()
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file)))
         
 def main():
     # Instantiate the app and GUI then run them

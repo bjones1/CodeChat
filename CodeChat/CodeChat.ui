@@ -161,6 +161,7 @@
      <string>&amp;View</string>
     </property>
     <addaction name="action_Toggle_pane"/>
+    <addaction name="action_in_browser"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
     <property name="title">
@@ -239,6 +240,11 @@
   <action name="action_Sphinx_markup">
    <property name="text">
     <string>Sphinx markup</string>
+   </property>
+  </action>
+  <action name="action_in_browser">
+   <property name="text">
+    <string>&amp;In browser</string>
    </property>
   </action>
  </widget>
