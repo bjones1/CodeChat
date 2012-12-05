@@ -27,7 +27,6 @@
 # - Fix / improve false positives on inexact matches
 # - Fix broken regexps for comments
 # - Add a create new project option
-# - Clicks on hyperlinks open in external browser.
 # - Fix extensions in LanguageSpecificOptions
 # - Show Sphinx build progress as a progress bar / in a text window
 # - Create a short how-to video
@@ -188,7 +187,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.html_dir = '_build/html'
         self.setupUi(self)
         # Select a larger font for the HTML editor
-        self.textEdit.zoomIn(2)
+        self.textBrowser.zoomIn(2)
 # Configure QScintilla
 # ^^^^^^^^^^^^^^^^^^^^
         # Set the default font
@@ -219,7 +218,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             lambda changed: self.action_Save.setEnabled(changed))
             
         # Start in the plain text pane
-        self.textEdit.setVisible(False)
+        self.textBrowser.setVisible(False)
 
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
@@ -233,23 +232,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         return QtGui.QMainWindow.eventFilter(self, obj, event)
                
     def update_html(self):
-        # Restore current dir
-        os.chdir(self.project_dir)
-        print('\n\n')
+        print('\n\nSphinx running...')
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
-        # Load in the updated html, if we can
-        try:
-            with codecs.open(self.html_file, 'r', encoding = 'utf-8') as f:
-                str = f.read()
-            # Temporarily change to the HTML directory to load html, so Qt can access all
-            # the HTML resources (style sheets, images, etc.)
-            head, tail = os.path.split(self.html_file)
-            os.chdir(head)
-        except IOError:
-            # If we can't open the file, make it empty
-            str = ''
-        self.textEdit.setHtml(str)
+        print('...done.')
+        self.textBrowser.clearHistory()
+        self.textBrowser.setSource(self.html_url())
+        # If the source doesn't change, but the file it points to does, a reload is needed or QT won't update itself.
+        self.textBrowser.reload()
+        
+    def html_url(self):
+        return QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file).replace('\\', '/'))
         
     def save_and_build_if_modified(self):
         if self.plainTextEdit.isModified():
@@ -260,23 +253,25 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def plain_text_to_html_switch(self):
         self.save_and_build_if_modified()
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+        # In case the user browsed to some other url, come back to the source document.
+        self.textBrowser.home()
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
-                                           self.textEdit.toPlainText())
+                                           self.textBrowser.toPlainText())
         if found >= 0:
             # Select the line containing the found location
-            cursor = self.textEdit.textCursor()
+            cursor = self.textBrowser.textCursor()
             cursor.setPosition(found, QtGui.QTextCursor.MoveAnchor)
             cursor.select(QtGui.QTextCursor.LineUnderCursor)
-            self.textEdit.setTextCursor(cursor)
+            self.textBrowser.setTextCursor(cursor)
         self.plainTextEdit.setVisible(False)
-        self.textEdit.setVisible(True)
+        self.textBrowser.setVisible(True)
         
     def html_to_plain_text_switch(self):
-        cursor = self.textEdit.textCursor()
-        textEdit_cursor_pos = cursor.position()
-        found = find_approx_text_in_target(self.textEdit.toPlainText(),
-                                           textEdit_cursor_pos,
+        cursor = self.textBrowser.textCursor()
+        textBrowser_cursor_pos = cursor.position()
+        found = find_approx_text_in_target(self.textBrowser.toPlainText(),
+                                           textBrowser_cursor_pos,
                                            self.plainTextEdit.text())
         # Update position in source doc if text was found
         if found >= 0:
@@ -286,7 +281,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # Scroll cursor into view
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
         self.plainTextEdit.setVisible(True)
-        self.textEdit.setVisible(False)
+        self.textBrowser.setVisible(False)
 
     # Open a new source file
     def open(self, source_file):
@@ -326,11 +321,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.plainTextEdit.isVisible():
             pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         else:
-            cursor = self.textEdit.textCursor()
+            cursor = self.textBrowser.textCursor()
             pos = cursor.position()
         # Restore current dir then reload file
-        # TODO: Is this really necessary?
-        os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
             self.plainTextEdit.setText(f.read())
         self.plainTextEdit.setModified(False)
@@ -344,12 +337,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # Then restore cursor position
             cursor.setPosition(pos, QtGui.QTextCursor.MoveAnchor)
             cursor.select(QtGui.QTextCursor.LineUnderCursor)
-            self.textEdit.setTextCursor(cursor)
+            self.textBrowser.setTextCursor(cursor)
         
     def save(self):
-        # Restore current dir
-        # TODO: Is this really necessary?
-        os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(self.plainTextEdit.text())
         self.plainTextEdit.setModified(False)
@@ -371,8 +361,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
-        # Restore current dir
-        os.chdir(self.project_dir)
         source_file = QtGui.QFileDialog.getOpenFileName()
         if source_file:
             self.open(source_file)
@@ -384,7 +372,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_Toggle_pane_triggered(self):
         # Only one pane should be active at a time
-        assert self.plainTextEdit.isVisible() != self.textEdit.isVisible()
+        assert self.plainTextEdit.isVisible() != self.textBrowser.isVisible()
         if self.plainTextEdit.isVisible():
             self.plain_text_to_html_switch()
         else:
@@ -405,7 +393,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_in_browser_triggered(self):
         self.save_and_build_if_modified()
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file)))
+        QtGui.QDesktopServices.openUrl(self.html_url())
         
 def main():
     # Instantiate the app and GUI then run them
