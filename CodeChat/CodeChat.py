@@ -25,7 +25,6 @@
 # - Provide a quick reference for rest, Sphinx
 # - Ask the user to save if necessary (on reload into a modified document, on exit, on open of another document)
 # - Auto-reload modified code
-# - Fix home to go to beginning of line, not beginning of paragraph.
 # - Fix / improve false positives on inexact matches
 # - Fix broken regexps for comments
 # - Add a create new project option
@@ -209,6 +208,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         # Enable word wrap
         self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
+        # Make home and end go to the beginning and end of the line, not the end of the word-wrapped paragraph.
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_HOMEDISPLAY)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)        
         # Try at removing ctrl-T key binding (use as toggle panes instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         # self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
         
