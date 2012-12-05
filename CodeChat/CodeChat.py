@@ -340,29 +340,54 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.textBrowser.setTextCursor(cursor)
         
     def save(self):
-        with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
-            f.write(self.plainTextEdit.text())
-        self.plainTextEdit.setModified(False)
+        if self.source_file:
+            with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
+                f.write(self.plainTextEdit.text())
+            self.plainTextEdit.setModified(False)
+        else:
+            # TODO: Ask for a name to save into
+            pass
+
+    # If necessary, ask the user to save the current file assuming a new file will be opened. Returns True unless the user cancels.
+    def save_if_modified(self):
+        if self.plainTextEdit.isModified():
+            ret = QtGui.QMessageBox.warning(self, 'CodeChat', 'The file ' + self.source_file + ' had been modified. Do you want to save your changes?',
+ QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel, QtGui.QMessageBox.Save)
+            if ret == QtGui.QMessageBox.Save:
+                self.save()
+                return True
+            elif ret == QtGui.QMessageBox.Discard:
+                return True
+            elif ret ==  QtGui.QMessageBox.Cancel:
+                return False
+            else:
+                assert False
+        else:
+            return True
         
     # The decorator below prevents this method from being called twice, per
     # http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name
     @QtCore.pyqtSlot()
     def on_action_Reload_triggered(self):
-        self.reload()
+        if self.save_if_modified():
+            self.reload()
         
     @QtCore.pyqtSlot()
     def on_action_Choose_project_dir_triggered(self):
         project_dir = QtGui.QFileDialog.getExistingDirectory()
-        if project_dir:
+        if project_dir and project_dir != self.project_dir and self.save_if_modified():
             self.project_dir = project_dir
             self.settings.setValue(self.project_dir_key, self.project_dir)
             os.chdir(self.project_dir)
-            # TODO: close the current file
+            # Make the current file empty and unnamed
+            self.plainTextEdit.setText('')
+            self.textBrowser.setPlainText('')
+            self.source_file = None
         
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
         source_file = QtGui.QFileDialog.getOpenFileName()
-        if source_file:
+        if source_file and self.save_if_modified():
             self.open(source_file)
                
     @QtCore.pyqtSlot()
@@ -394,6 +419,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def on_action_in_browser_triggered(self):
         self.save_and_build_if_modified()
         QtGui.QDesktopServices.openUrl(self.html_url())
+        
+    def closeEvent(self, e):
+        # If the user cancels, don't close.
+        if not self.save_if_modified():
+            e.ignore()
         
 def main():
     # Instantiate the app and GUI then run them
