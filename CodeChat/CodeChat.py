@@ -9,53 +9,35 @@
 #
 # The :doc:`../README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
 #
-# ==========================   ===================
-# Functionality                Module
-# ==========================   ===================
-# GUI                          :doc:`CodeChat.py`
-# Source code to reST          :doc:`CodeToRest.py`
-# Unit test                    :doc:`CodeChat_test.py`
-# ==========================   ===================
+# ==============================    ===================
+# Functionality                     Module
+# ==============================    ===================
+# GUI                               :doc:`CodeChat.py`
+# Source code to reST               :doc:`CodeToRest.py`
+# Matching between text and HTML    :doc:`FindLongestMatchingString.py`
+# Unit test                         :doc:`CodeChat_test.py`
+# ==============================    ===================
 #
 # .. contents::
 #
 # To do
 # -----
-# I've now used my system for a while and I find it very helpful, but also filled with bugs and msising features. Where is the most effective place to begin working? I'll start by listing the problems I'm aware of.
-#
-# Useability:
-#
-# - Switch between two views instead of showing both at once. Allow edits only in code view until I get the GUI view edit working much better.
-# - Ask the user to save if necessary
-# - An auto-save / auto-build feature.
+# - Provide a quick reference for rest, Sphinx
+# - Ask the user to save if necessary (on reload into a modified document, on exit, on open of another document)
+# - Auto-reload modified code
 # - Fix home to go to beginning of line, not beginning of paragraph.
-# - Do a better job of restoring the old cursor location after a save and build.
-# - Support multiple open docs
-# - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Fix / improve false positives on inexact matches
 # - Fix broken regexps for comments
-#
-# Development:
-#
-# - Unit testing
+# - Add a create new project option
+# - Clicks on hyperlinks open in external browser.
+# - Menu command to load current page in external browser
 # - Fix extensions in LanguageSpecificOptions
-#
-# New ideas:
-#
-# I want to improve the reliability, ease of use, and code complexity of the program. My idea: keep the two panes, but don't sync between them except on a double-click / hotkey. So, typical usage would be to edit in the left, then save/switch to right. After looking at the right, a double-click would locate the cursor in the left. Some questions:
-#
-# - Should I keep both views open? I can see that being helpful for debug, or when trying to get some reST to work (lots of edit, save, look, repeat cycles). If so, should I keep the two sides synced (hard to do well)?
-# - If not, then need some way to get text under a double-click. But much simpler. How to make it easy to switch back to support edit, check output cycles? Need a switch-back hotkey.
-#
-# The second seems better. Basic design:
-#
-# - Show left or right pane, but not both.
-# - A double-click in the left pane goes to the corresponding location in the right. A hotkey just switches to the right but doesn't move the cursor.
-# - Saving in the right auto-switches to corresponding location in the left. There's no way to save in the left; the only way to open it is via a save.
-#
-# Approach:
-#
-# - Keep around the find corresponding location code, but throw away to keystroke update code. For now, still have both windows. Bind save to one, a double-click to the other. Make the left read-only.
+# - Show Sphinx build progress as a progress bar / in a text window
+# - Some way to display Sphinx errors then find the offending source line
+# - Support multiple open docs
+# - Fix editor to render better HTML (long term -- probably QWebKit)
+# - Rewrite documentation in this program
+# - More unit testing
 #
 # Imports
 # -------
