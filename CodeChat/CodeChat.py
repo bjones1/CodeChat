@@ -227,11 +227,16 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         # Enable word wrap
         self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
+        # Try at removing ctrl-T key binding (use as toggle panes instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
+        # self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
         
         # Enable/disable the update button when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
-            lambda changed: self.action_Save_and_update.setEnabled(changed))
+            lambda changed: self.action_Save.setEnabled(changed))
+            
+        # Start in the plain text pane
+        self.textEdit.setVisible(False)
 
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
@@ -262,27 +267,29 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # If we can't open the file, make it empty
             str = ''
         self.textEdit.setHtml(str)
-    
-    def plain_text_to_html_sync(self):
-        print("plain text to html sync")
-        self.plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+
+    # To swith, do a save and update if modified. Then, find the same text under the plain text cursor in the htmnl document and select around it to show the user where on the screen the equivalent content is.
+    def plain_text_to_html_switch(self):
+        if self.plainTextEdit.isModified():
+            self.save()
+        plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
-                                           self.plainTextEdit_cursor_pos,
+                                           plainTextEdit_cursor_pos,
                                            self.textEdit.toPlainText())
         if found >= 0:
-            pos = self.textEdit.textCursor()
-            # Is there a selection in the text pane?
-            # Just place the cursor at the found location
-            pos.setPosition(found,
-                QtGui.QTextCursor.MoveAnchor)
-            # Save the original cursor location
-            self.textEdit_cursor_pos = found
+            # Select the line containing the found location
+            cursor = self.textEdit.textCursor()
+            cursor.setPosition(found, QtGui.QTextCursor.MoveAnchor)
+            cursor.select(QtGui.QTextCursor.LineUnderCursor)
+            self.textEdit.setTextCursor(cursor)
+        self.plainTextEdit.setVisible(False)
+        self.textEdit.setVisible(True)
         
-    def html_to_plain_text_sync(self):
+    def html_to_plain_text_switch(self):
         cursor = self.textEdit.textCursor()
-        self.textEdit_cursor_pos = cursor.position()
+        textEdit_cursor_pos = cursor.position()
         found = find_approx_text_in_target(self.textEdit.toPlainText(),
-                                           self.textEdit_cursor_pos,
+                                           textEdit_cursor_pos,
                                            self.plainTextEdit.text())
         # Update position in source doc if text was found
         if found >= 0:
@@ -291,6 +298,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, found)
             # Scroll cursor into view
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SCROLLCARET)
+        self.plainTextEdit.setVisible(True)
+        self.textEdit.setVisible(False)
 
     # Open a new source file
     def open(self, source_file):
@@ -320,23 +329,50 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                                          QsciLexerCPP.CommentLine, 'Courier New')
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
                                          QsciLexerCPP.CommentDoc, 'Courier New')
-        self.reopen()
+        self.reload()
          
     # Reload the source file then regenerate the HTML file from it.
-    def reopen(self):
-        # Restore current dir
+    # TODO: Rethink this -- need a refresh, which either just updates the plain text when in that view, or updates plain text and rebuilds HTML if in that view, plus keeps the cursor position consistent.
+    def reload(self):
+        # Save the cursor position from the current view.
+        # TODO: save selection, not just cursor position.
+        if self.plainTextEdit.isVisible():
+            pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+        else:
+            cursor = self.textEdit.textCursor()
+            pos = cursor.position()
+        # Restore current dir then reload file
+        # TODO: Is this really necessary?
         os.chdir(self.project_dir)
         with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
             self.plainTextEdit.setText(f.read())
-        self.update_html()
         self.plainTextEdit.setModified(False)
         self.mru_files.add_file(self.source_file)
+        # Restore the cursor position
+        if self.plainTextEdit.isVisible():
+            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, pos)
+        else:
+            # Update HTML from reloaded text, also.
+            self.update_html()
+            # Then restore cursor position
+            cursor.setPosition(pos, QtGui.QTextCursor.MoveAnchor)
+            cursor.select(QtGui.QTextCursor.LineUnderCursor)
+            self.textEdit.setTextCursor(cursor)
+        
+    def save(self):
+        # Restore current dir
+        # TODO: Is this really necessary?
+        os.chdir(self.project_dir)
+        with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
+            f.write(self.plainTextEdit.text())
+        self.plainTextEdit.setModified(False)
+        self.update_html()
         
     # The decorator below prevents this method from being called twice, per
     # http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name
     @QtCore.pyqtSlot()
-    def on_action_Reopen_triggered(self):
-        self.reopen()
+    def on_action_Reload_triggered(self):
+        self.reload()
         
     @QtCore.pyqtSlot()
     def on_action_Choose_project_dir_triggered(self):
@@ -356,16 +392,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.open(source_file)
                
     @QtCore.pyqtSlot()
-    def on_action_Save_and_update_triggered(self):
-        # Restore current dir
-        os.chdir(self.project_dir)
-        with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
-            f.write(self.plainTextEdit.text())
-        self.plainTextEdit.setModified(False)
-        self.update_html()
-        # Find location in html pane
-        self.plain_text_to_html_sync()
+    def on_action_Save_triggered(self):
+        self.save()
 
+    @QtCore.pyqtSlot()
+    def on_action_Toggle_pane_triggered(self):
+        # Only one pane should be active at a time
+        assert self.plainTextEdit.isVisible() != self.textEdit.isVisible()
+        if self.plainTextEdit.isVisible():
+            self.plain_text_to_html_switch()
+        else:
+            self.html_to_plain_text_switch()
 
 def main():
     # Instantiate the app and GUI then run them
@@ -373,7 +410,6 @@ def main():
     window = CodeChatWindow(app)
     # Install an event filter to catch ApplicationActivate events (see CodeChatWindow.eventFilter)
     app.installEventFilter(window)
-    window.setWindowState(QtCore.Qt.WindowMaximized)
     window.show()
     sys.exit(app.exec_())
     
