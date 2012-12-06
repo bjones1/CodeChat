@@ -23,7 +23,6 @@
 # To do
 # -----
 # - Rewrite documentation in this program
-# - Auto-reload modified code
 # - Preserve last cursor position in MRU list
 # - Fix / improve false positives on inexact matches
 # - Fix broken regexps for comments
@@ -37,7 +36,7 @@
 #
 # MRU list
 # --------
-# This class provides a most-recently-used (where "used" is updated when a document is saved) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry.
+# This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry.
 
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/incompatible_apis.html for more information.
 import sip
@@ -272,6 +271,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Restore current dir then reload file
         with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
             self.plainTextEdit.setText(f.read())
+        # Update modification time
+        self.source_file_time = os.path.getmtime(self.source_file)
         self.plainTextEdit.setModified(False)
         self.mru_files.add_file(self.source_file)
         # Restore the cursor position. Why not test plainTextEdit.isVisible? On init, window.show() hasn't run (isVisile is false for both plainTextEdit and textBrowser) and we always start in text mode. Don't update html in this case.
@@ -290,20 +291,26 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if os.path.exists(self.source_file):
             self.open(self.source_file)
         else:
-            # It's a new file, so make it empty.
+            # It's a new file, so make it empty and give it a modification time in the past.
             self.plainTextEdit.setText('')
-            self.textBrowser.setPlainText('')            
+            self.textBrowser.setPlainText('')
+            self.source_file_time = 0
         
     # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
     def eventFilter(self, obj, event):
         if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
-            pass
-#            print('Hooray!')
+            try:
+                if os.path.getmtime(self.source_file) != self.source_file_time:
+                    self.reload()
+            except os.error:
+                # Ignore if the file no longer exists.
+                pass
         return QtGui.QMainWindow.eventFilter(self, obj, event)
                
     def save(self):
         with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
             f.write(self.plainTextEdit.text())
+        self.source_file_time = os.path.getmtime(self.source_file)            
         self.plainTextEdit.setModified(False)
 
     # If necessary, ask the user to save the current file before closing it. Returns True unless the user cancels.
