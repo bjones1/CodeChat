@@ -104,6 +104,8 @@ class MruFiles(object):
             file_name = str(mru_list[0])
             if os.path.exists(file_name):
                 self.parent.open(file_name)
+                return True
+        return False
 
     # Called when an mru file is triggered
     @QtCore.pyqtSlot()
@@ -222,7 +224,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
-        self.mru_files.open_last()
+        # Load the last open, or choose a default file name and open it if it exists.
+        if not self.mru_files.open_last():
+            self.open_untitled()
+            
+    def open_untitled(self):
+        self.source_file = 'untitled.rst'
+        if os.path.exists(self.source_file):
+            self.open(self.source_file)
         
     # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
     def eventFilter(self, obj, event):
@@ -340,13 +349,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.textBrowser.setTextCursor(cursor)
         
     def save(self):
-        if self.source_file:
-            with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
-                f.write(self.plainTextEdit.text())
-            self.plainTextEdit.setModified(False)
-        else:
-            # TODO: Ask for a name to save into
-            pass
+        with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
+            f.write(self.plainTextEdit.text())
+        self.plainTextEdit.setModified(False)
 
     # If necessary, ask the user to save the current file assuming a new file will be opened. Returns True unless the user cancels.
     def save_if_modified(self):
@@ -382,7 +387,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # Make the current file empty and unnamed
             self.plainTextEdit.setText('')
             self.textBrowser.setPlainText('')
-            self.source_file = None
+            self.open_untitled()
         
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
