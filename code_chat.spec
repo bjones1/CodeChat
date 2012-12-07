@@ -3,8 +3,7 @@
 a = Analysis(['code_chat.py'],
              pathex=['C:\\Users\\bjones\\Documents\\documentation'],
              hiddenimports=[],
-             hookspath=['pyinstaller_hooks'],
-             excludes=['_tkinter'])
+             hookspath=['pyinstaller_hooks'])
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
           a.scripts, # + [('v', '', 'OPTION')], # for extra run-time debug
