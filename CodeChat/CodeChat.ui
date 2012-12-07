@@ -167,9 +167,12 @@
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="action_CodeChat_documentation"/>
     <addaction name="action_ReST_cheat_sheet"/>
     <addaction name="action_Sphinx_reST_primer"/>
     <addaction name="action_Sphinx_markup"/>
+    <addaction name="separator"/>
+    <addaction name="action_About"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menuView"/>
@@ -245,6 +248,16 @@
   <action name="action_in_browser">
    <property name="text">
     <string>&amp;In browser</string>
+   </property>
+  </action>
+  <action name="action_CodeChat_documentation">
+   <property name="text">
+    <string>&amp;CodeChat documentation</string>
+   </property>
+  </action>
+  <action name="action_About">
+   <property name="text">
+    <string>&amp;About</string>
    </property>
   </action>
  </widget>

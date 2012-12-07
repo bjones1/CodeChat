@@ -448,6 +448,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.save_then_update_html()
         QtGui.QDesktopServices.openUrl(self.html_url())
 
+    def on_action_CodeChat_documentation_triggered(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://bitbucket.org/bjones/documentation'))
+        
     @QtCore.pyqtSlot()
     # TODO: This is an ugly cheat sheet. I like https://github.com/ralsina/rst-cheatsheet better, but it downloads, instead of displaying in the browser.
     def on_action_ReST_cheat_sheet_triggered(self):
@@ -459,6 +462,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_Sphinx_markup_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/markup/index.html'))
+        
+    @QtCore.pyqtSlot()
+    def on_action_About_triggered(self):
+        QtGui.QMessageBox.about(self, 'CodeChat', 
+          u'CodeChat, a conversational coding system,\n' +
+          u'was last revised on 8-Dec-2012.\n\n' +
+          u'\u00A9 Copyright 2012 by Bryan A. Jones')
         
     # Before closing the application, check to see if the user's work should be saved.        
     def closeEvent(self, e):
