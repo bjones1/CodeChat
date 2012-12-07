@@ -297,6 +297,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # It's a new file, so make it empty and give it a modification time in the past.
             self.plainTextEdit.setText('')
             self.textBrowser.setPlainText('')
+            self.plainTextEdit.setModified(False)
             self.source_file_time = 0
         
     # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
@@ -468,7 +469,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QMessageBox.about(self, 'CodeChat', 
           u'CodeChat, a conversational coding system,\n' +
           u'was last revised on 8-Dec-2012.\n\n' +
-          u'\u00A9 Copyright 2012 by Bryan A. Jones')
+          u'\u00A9 Copyright 2012 by Bryan A. Jones.')
         
     # Before closing the application, check to see if the user's work should be saved.        
     def closeEvent(self, e):

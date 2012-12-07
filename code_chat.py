@@ -1,6 +1,6 @@
 # Run CodeChat
 # ============
-# This script runs the CodeChat GUI.
+# This script runs the CodeChat application.
 
 import CodeChat.CodeChat
 
