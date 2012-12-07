@@ -78,7 +78,7 @@ def find_approx_text_in_target(
     # The target document.
     #
     # Range of characters about the search_anchor in which to search.
-    search_range = 20
+    search_range = 40
     step_size = 1
     # **Look for the best approximate match within the target document of the source substring composed of characters within a radius of the anchor.**
     #
@@ -150,7 +150,7 @@ def find_approx_text_in_target(
             min_cost = match.cost
             min_cost_begin = begin
 
-    # **If the cost is zero, report the location in the target; otherwise, return a failure to match.**
+    # Return the match. It's not perfect if the cost > 0.
     if min_cost > 0:
         print('Failed -- no exact match (cost was %d).' % min_cost)
         with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
@@ -159,9 +159,7 @@ def find_approx_text_in_target(
               search_text[begin:min_cost_end] + '\n\n' +
               target_text[begin_in_target:end_in_target] + '\n\n' + 
               target_text)
-        return -1
-    else:
-        return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
+    return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
 
 
 if __name__ == '__main__':
