@@ -25,7 +25,6 @@
 # - Rewrite documentation in this program
 # - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
-# - Fix / improve failures on inexact matches
 # - Fix broken regexps for comments
 # - Add a create new project option
 # - Fix extensions in LanguageSpecificOptions
@@ -216,7 +215,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_HOMEDISPLAY)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)        
         # Try at removing ctrl-T key binding (use as toggle panes instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
-        # self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
+        ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
         
         # Enable/disable the save menu item when the plain text modification
         # state changes.
