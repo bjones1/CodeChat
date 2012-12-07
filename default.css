@@ -827,9 +827,10 @@ div.viewcode-block:target {
    comments and code to have identical horizontal alignment.
 
    The implementation:
-   1. Fix the blockquote left margin to be one <pre> space. */
+   1. Fix the blockquote left margin to be one <pre> space; use no right margin. */
 blockquote {
   margin-left: 0.5em;
+  margin-right: 0em;
 }
 
 /* 2. Remove all top and bottom space around <pre>, making it single-spaced. 
