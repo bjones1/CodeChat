@@ -23,8 +23,9 @@
 # To do
 # -----
 # - Rewrite documentation in this program
+# - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
-# - Fix / improve false positives on inexact matches
+# - Fix / improve failures on inexact matches
 # - Fix broken regexps for comments
 # - Add a create new project option
 # - Fix extensions in LanguageSpecificOptions
@@ -32,7 +33,6 @@
 # - Create a short how-to video
 # - Some way to display Sphinx errors then find the offending source line
 # - Fix editor to render better HTML (long term -- probably QWebKit)
-# - More unit testing
 #
 # MRU list
 # --------
@@ -42,6 +42,8 @@
 import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
+# Not sure what this does -- I still have to use QtCore.QUrl to build urls. ???
+sip.setapi('QUrl', 2)
 
 # The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package.
 from PyQt4 import QtGui, QtCore, uic
