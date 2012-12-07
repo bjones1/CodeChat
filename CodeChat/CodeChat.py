@@ -189,6 +189,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(2)
+        # Start in the plain text pane
+        self.textBrowser.setVisible(False)
+        # Clicking on an external link produces a blank screen. I'm not sure why; I think Qt expects me to do this on anchorClicked signals, but I'm not sure. For simplicity, just use an external browswer.
+        self.textBrowser.setOpenExternalLinks(True)
+
         
         # | --Configure QScintilla--
         # | Set the default font
@@ -218,9 +223,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.modificationChanged.connect(
             lambda changed: self.action_Save.setEnabled(changed))
             
-        # Start in the plain text pane
-        self.textBrowser.setVisible(False)
-
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
