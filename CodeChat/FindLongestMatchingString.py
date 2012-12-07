@@ -79,7 +79,7 @@ def find_approx_text_in_target(
     #
     # Range of characters about the search_anchor in which to search.
     search_range = 20
-    step_size = 4
+    step_size = 1
     # **Look for the best approximate match within the target document of the source substring composed of characters within a radius of the anchor.**
     #
     # First, choose a radius of chars about the anchor to search in.
@@ -90,17 +90,20 @@ def find_approx_text_in_target(
         return 0
     # Look for a match; record left and right search radii
     match, begin_in_target, end_in_target = find_approx_text(search_text[begin:end], target_text)
-    with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
-        f.write(search_text[begin:end] + '\n\n\n\n' + target_text)
     # If no unique match is found, give up (for now -- this could be improved).
     if not match:
         print("No unique match found.")
+        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
+            f.write("No unique match found.\n" + search_text[begin:end] + '\n\n\n\n' + target_text)
         return -1
     
     # **Record this cost (the difference between the source and target substrings). Perform all future searches only within the source and target substrings found in this search.**
     min_cost = match.cost
     min_cost_begin = begin
     min_cost_end = end
+    # For debug logging
+    log_begin = begin
+    log_end = end
     
     # For an exact match, need to define this, since the while loops won't. We're 0 characters forward from the begin_in_target point before we do any additional search refinements.
     begin_in_target_substr = 0
@@ -149,14 +152,15 @@ def find_approx_text_in_target(
 
     # **If the cost is zero, report the location in the target; otherwise, return a failure to match.**
     if min_cost > 0:
-        print('Failed -- no exact match (cost was %d)' % min_cost)
+        print('Failed -- no exact match (cost was %d).' % min_cost)
+        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
+            f.write(('Failed -- no exact match (cost was %d).\n\n' % min_cost) +
+              search_text[log_begin:log_end] + '\n\n' +
+              search_text[begin:min_cost_end] + '\n\n' +
+              target_text[begin_in_target:end_in_target] + '\n\n' + 
+              target_text)
         return -1
     else:
-##        print('''
-##begin_in_target %d
-##begin_in_target_substr %d
-##search_anchor %d
-##min_cost_begin %d''' % (begin_in_target, begin_in_target_substr, search_anchor, min_cost_begin))
         return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
 
 
