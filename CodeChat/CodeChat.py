@@ -455,7 +455,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     # TODO: This is an ugly cheat sheet. I like https://github.com/ralsina/rst-cheatsheet better, but it downloads, instead of displaying in the browser.
     def on_action_ReST_cheat_sheet_triggered(self):
-        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://docutils.sourceforge.net/docs/user/rst/cheatsheet.txt'))
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://dl.dropbox.com/u/2337351/rst-cheatsheet.html'))
         
     def on_action_Sphinx_reST_primer_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/rest.html'))

@@ -13,7 +13,7 @@ First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351
 #. Copy the files from ``<path to CodeChat>/template`` to a directory of your choosing.
 #. Switch to the CodeChat application, then choose ``File | Choose project dir`` and select the directory you chose above.
 #. Choose ``File | Open`` then open ``contents.rst``. Add your source files to the list in that document.
-#. Open one of your source files and begin documenting; all comments [#]_ are processed as reST markup (:download:`cheatsheet <rst-cheatsheet.pdf>`) by Sphinx. The source files in ``<path to CodeChat>/src`` provide many examples of the use of this system. The items on the ``Help`` menu provide a convenient reference to the syntax used.
+#. Open one of your source files and begin documenting; all comments [#]_ are processed as `reST markup <https://dl.dropbox.com/u/2337351/rst-cheatsheet.html>`_ by `Sphinx <http://sphinx-doc.org/>`_. The source files in ``<path to CodeChat>/src`` provide many examples of the use of this system. The items on the ``Help`` menu provide a convenient reference to the syntax used.
 #. To view the results, select ``View | Toggle pane`` to view your code as a web page; for a more accurate rendering, select ``View | In browser``. Note that CodeChat will hilight the line in the web view on which your cursor was positioned in the code view.
 #. While in web view, click on text you'd like to edit then select ``View | Toggle pane`` to move to the code view. Edit and repeat steps 4-6 above.
 
