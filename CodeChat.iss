@@ -3,7 +3,7 @@
 
 ; A few handy definitions to avoid repetition
 #define PRODUCT_NAME 'CodeChat'
-#define PRODUCT_VERSION 'r193'
+#define PRODUCT_VERSION GetDateTimeString('ddddd', '', '');
 
 [Setup]
 AppName={#PRODUCT_NAME}
@@ -21,4 +21,4 @@ Source: "dist\all\*"; DestDir: "{app}"; Flags: recursesubdirs
 
 [Icons]
 Name: "{group}\{#PRODUCT_NAME}"; Filename: "{app}\bin\code_chat.exe"
-Name: "{group}\{#PRODUCT_NAME} help"; Filename: "{app}\doc\contents.html"
+Name: "{group}\{#PRODUCT_NAME} help"; Filename: "{app}\doc\README.html"
