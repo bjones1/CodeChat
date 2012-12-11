@@ -20,12 +20,12 @@ import codecs
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something::          | ::                                |
+# | ::                       | Do something ::         | ::                                |
 # |                          |                         |                                   |
 # |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
 # |                          |                         |  </pre>                           |
-# |  # Do something else     | Do something else::     |  <p>Do something else:</p>        |
+# |  # Do something else     | Do something else ::    |  <p>Do something else:</p>        |
 # |  bar = 2                 |                         |  <pre>bar = 2                     |
 # |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
@@ -35,13 +35,13 @@ import codecs
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something::          | ::                                |
+# | ::                       | Do something ::         | ::                                |
 # |                          |                         |                                   |
 # |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
 # |                          |  # wokifvzohtdlm        |                                   |
 # |  # Do something else     |                         |  </pre>                           |
-# |  bar = 2                 | Do something else::     |  <p>Do something else:</p>        |
+# |  bar = 2                 | Do something else ::    |  <p>Do something else:</p>        |
 # |                          |                         |  <pre>bar = 2                     |
 # |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
@@ -53,12 +53,12 @@ import codecs
 # +--------------------------+-------------------------+
 # + Python source            + Translated to reST      +
 # +==========================+=========================+
-# | ::                       | One space indent::      |
+# | ::                       | One space indent ::     |
 # |                          |                         |
 # |  # One space indent      |   foo = 1               |
 # |   foo = 1                |                         |
 # |                          |                         |
-# |  # No indent             | No indent::             |
+# |  # No indent             | No indent ::            |
 # |  bar = 2                 |                         |
 # |                          |  bar = 2                |
 # +--------------------------+-------------------------+
@@ -68,7 +68,7 @@ import codecs
 # +--------------------------+-------------------------+
 # + Python source            + Translated to reST      +
 # +==========================+=========================+
-# | ::                       | One space indent::      |
+# | ::                       | One space indent ::     |
 # |                          |                         |
 # |  # One space indent      |  # wokifvzohtdlm        |
 # |   foo = 1                |   foo = 1               |
@@ -103,7 +103,9 @@ import codecs
 # |                          |                         |
 # |    # Two space indent    |     # wokifvzohtdlm     |
 # |                          |                         |
-# |                          |      Four space indent  |
+# |     # wokifvzohtdlm      |      Four space indent  |
+# |                          |                         |
+# |      # Four space indent |                         |
 # +--------------------------+-------------------------+
 #
 # Summary and implementation
@@ -114,7 +116,7 @@ import codecs
 #
 # #. Comments must be preeceded by a series of indented markers, one per space of indentation.
 #
-# Therefore, the (future -- need to rewrite this mess) implemtation consists of a state machine. State transitions, such as code to comment or small comment indent to larger comment indent, provide an opportunity to apply the two rules above. Specifically, the state machine first reads a line, classifies it as code or comment with indent n, and updates the state. It then takes a state transition action as defined below, prepending the resulting string and transforming the line. Finally, it outputs the prepended string and the line.
+# Therefore, the implemtation consists of a state machine. State transitions, such as code to comment or small comment indent to larger comment indent, provide an opportunity to apply the two rules above. Specifically, the state machine first reads a line, classifies it as code or comment with indent n, and updates the state. It then takes a state transition action as defined be the labels on the arrows below, prepending the resulting string and transforming the line. Finally, it outputs the prepended string and the line.
 #
 # .. digraph:: code_to_rest
 #
