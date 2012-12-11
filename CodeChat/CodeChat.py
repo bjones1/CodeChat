@@ -190,10 +190,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.textBrowser.zoomIn(2)
         # Start in the plain text pane
         self.textBrowser.setVisible(False)
-        # Clicking on an external link produces a blank screen. I'm not sure why; I think Qt expects me to do this on anchorClicked signals, but I'm not sure. For simplicity, just use an external browswer.
+        # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
+        # Switch views on a double-click
+        # This syntax produces a ``TypeError: invalid argument to sipBadCatcherResult()`` on a double-click. Not sure why.
+        ## self.textBrowser.mouseDoubleClickEvent = lambda e:  self.on_action_Toggle_pane_triggered
+        # This works fine.
+        self.textBrowser.mouseDoubleClickEvent = self.mouseDoubleClickEvent
 
-        
         # | --Configure QScintilla--
         # | Set the default font
         self.font = QtGui.QFont()
@@ -216,11 +220,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)        
         # Try at removing ctrl-T key binding (use as toggle panes instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
-        
         # Enable/disable the save menu item when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
             lambda changed: self.action_Save.setEnabled(changed))
+        self.plainTextEdit.mouseDoubleClickEvent = self.mouseDoubleClickEvent
             
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
@@ -228,6 +232,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if not self.mru_files.open_last():
             self.open_untitled()
 
+    def mouseDoubleClickEvent(self, e):
+        self.on_action_Toggle_pane_triggered()
+        
 # File operations
 # ^^^^^^^^^^^^^^^
     # Open a new source file
