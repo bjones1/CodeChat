@@ -93,8 +93,8 @@ def find_approx_text_in_target(
     # If no unique match is found, give up (for now -- this could be improved).
     if not match:
         print("No unique match found.")
-        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
-            f.write("No unique match found.\n" + search_text[begin:end] + '\n\n\n\n' + target_text)
+##        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
+##            f.write("No unique match found.\n" + search_text[begin:end] + '\n\n\n\n' + target_text)
         return -1
     
     # **Record this cost (the difference between the source and target substrings). Perform all future searches only within the source and target substrings found in this search.**
@@ -153,12 +153,12 @@ def find_approx_text_in_target(
     # Return the match. It's not perfect if the cost > 0.
     if min_cost > 0:
         print('Failed -- no exact match (cost was %d).' % min_cost)
-        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
-            f.write(('Failed -- no exact match (cost was %d).\n\n' % min_cost) +
-              search_text[log_begin:log_end] + '\n\n' +
-              search_text[begin:min_cost_end] + '\n\n' +
-              target_text[begin_in_target:end_in_target] + '\n\n' + 
-              target_text)
+##        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
+##            f.write(('Failed -- no exact match (cost was %d).\n\n' % min_cost) +
+##              search_text[log_begin:log_end] + '\n\n' +
+##              search_text[begin:min_cost_end] + '\n\n' +
+##              target_text[begin_in_target:end_in_target] + '\n\n' + 
+##              target_text)
     return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
 
 
