@@ -18,6 +18,7 @@ Documentation of CodeChat's implemntation:
    CodeChat/FindLongestMatchingString.py
    CodeChat/CodeToRest.py
    CodeChat/LanguageSpecificOptions.py
+   CodeChat/version.py
    CodeChat/CodeChat_test.py
    conf.py
    code_chat.py
