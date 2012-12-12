@@ -17,7 +17,7 @@ First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351
 #. To view the results, double-click on a word in your source code. Your code will be transformed to HTML and the program will now show the word and its surroundings highlighed in the browser view. For a more accurate rendering, select ``View | In browser``.
 #. While in web view, double-click on text you'd like to edit, which will move to the same location in the code view. Edit and repeat steps 4-6 above.
 
-.. [#] Currently, only C/C++, Python, and reST are supported. 
+.. [#] Currently, only C/C++, Python, reST, assembly (.s), BASH scripts, and PHP is supported. 
 
 Optional modules
 ----------------
