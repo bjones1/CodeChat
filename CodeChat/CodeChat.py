@@ -380,9 +380,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     # To switch, do a save and update if modified. Then, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
     def plain_text_to_html_switch(self):
         self.save_then_update_html()
-        plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+        # Hide plain text, show html widgets. If these aren't made visible here, the self.textBrowser.cursorRect() and similar calls return junk.
+        self.plainTextEdit.setVisible(False)
+        self.textBrowser.setVisible(True)
+        self.textBrowser.setFocus()
         # In case the user browsed to some other url, come back to the source document.
         self.textBrowser.home()
+        plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
                                            self.textBrowser.toPlainText())
@@ -392,24 +396,28 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             cursor.setPosition(found, QtGui.QTextCursor.MoveAnchor)
             cursor.select(QtGui.QTextCursor.LineUnderCursor)
             self.textBrowser.setTextCursor(cursor)
+            # This scrolls the viewport so the hilighted text is often underneat the horizontal scroll bar. We want it to be centered in the viewport.
             self.textBrowser.ensureCursorVisible()
+            cursor_center_y = self.textBrowser.cursorRect().top() + self.textBrowser.cursorRect().height()/2
+            viewport_center_y = self.textBrowser.y() + self.textBrowser.height()/2
+            delta = cursor_center_y - viewport_center_y
+            # Note: We can't use the temptingly-named scrollContentsBy: per the `docs <http://doc.qt.digia.com/qt/qabstractscrollarea.html#scrollContentsBy>`_, "Calling this function in order to scroll programmatically is an error, use the scroll bars instead."
+            self.textBrowser.verticalScrollBar().setSliderPosition(self.textBrowser.verticalScrollBar().sliderPosition() + delta)
         else:
             print('Not found.')
-        self.plainTextEdit.setVisible(False)
-        self.textBrowser.setVisible(True)
-        self.textBrowser.setFocus()
         
     def html_to_plain_text_switch(self):
-        cursor = self.textBrowser.textCursor()
-        textBrowser_cursor_pos = cursor.position()
+        # Search for text under HTML cursor in plain text.
+        textBrowser_cursor_pos = self.textBrowser.textCursor().position()
         found = find_approx_text_in_target(self.textBrowser.toPlainText(),
                                            textBrowser_cursor_pos,
                                            self.plainTextEdit.text())
-        # Update position in source doc if text was found
+        # Update position in plain text widget if text was found.
         if found >= 0:
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GOTOPOS, found)
         else:
             print('Not found.')
+        # Hide html, show plain text widgets. Placing this code at the beginning of this function makes it find the wrong location (???).
         self.textBrowser.setVisible(False)
         self.plainTextEdit.setVisible(True)
         self.plainTextEdit.setFocus()
