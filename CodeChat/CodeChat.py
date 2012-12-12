@@ -28,7 +28,10 @@
 # - Fix broken regexps for comments
 # - Add a create new project option
 # - Fix extensions in LanguageSpecificOptions
-# - Show Sphinx build progress as a progress bar / in a text window
+# - Show Sphinx build progress as a progress bar
+#
+#   - Create an object implementing `file methods <http://docs.python.org/2/library/stdtypes.html#bltin-file-objects>`_ which puts results into a dialog box.
+#   - Assign this to sys.stdout, sys.stderr
 # - Create a short how-to video
 # - Some way to display Sphinx errors then find the offending source line
 # - Fix editor to render better HTML (long term -- probably QWebKit)
@@ -170,6 +173,11 @@ import codecs
 
 # Display the version of this program in Htlp | About
 import version
+
+# Capture Sphinx's output for display in the GUI
+from cStringIO import StringIO
+import sys
+
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
         # Store a reference to this window's containing application
@@ -368,10 +376,21 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def save_then_update_html(self):
         if self.plainTextEdit.isModified():
             self.save()
-        print('\n\nSphinx running...')
+            
+        # Redirect Sphinx output to the results window
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = my_stdout = sys.stderr = StringIO()
+        self.results_text_browser.setText('Sphinx running...\n')
+        # This won't be display until after Sphinx runs without processing events.
+        self.app.processEvents()
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
-        print('...done.')
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+        self.results_text_browser.setText(self.results_text_browser.toPlainText() + my_stdout.getvalue() + '\n\n...done.')
+        
+        # Update the browser with Sphinx's output
         self.textBrowser.clearHistory()
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
@@ -510,7 +529,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 # main()
 # ------
 # These routines run the CodeChat application.
-import sys        
 def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)

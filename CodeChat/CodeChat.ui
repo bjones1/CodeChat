@@ -7,131 +7,156 @@
     <x>0</x>
     <y>0</y>
     <width>684</width>
-    <height>1002</height>
+    <height>815</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>CodeChat</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QsciScintilla" name="plainTextEdit">
-      <property name="font">
-       <font>
-        <family>Courier New</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-        <underline>false</underline>
-        <strikeout>false</strikeout>
-       </font>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <property name="toolTip">
-       <string/>
-      </property>
-      <property name="whatsThis">
-       <string/>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QTextBrowser" name="textBrowser">
-      <property name="palette">
-       <palette>
-        <active>
-         <colorrole role="Button">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>240</red>
-            <green>240</green>
-            <blue>240</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Window">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>240</red>
-            <green>240</green>
-            <blue>240</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Highlight">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>51</red>
-            <green>153</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </active>
-        <inactive>
-         <colorrole role="Button">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>240</red>
-            <green>240</green>
-            <blue>240</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Window">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>240</red>
-            <green>240</green>
-            <blue>240</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Highlight">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>255</red>
-            <green>255</green>
-            <blue>0</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </inactive>
-        <disabled>
-         <colorrole role="Button">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>240</red>
-            <green>240</green>
-            <blue>240</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Window">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>240</red>
-            <green>240</green>
-            <blue>240</blue>
-           </color>
-          </brush>
-         </colorrole>
-         <colorrole role="Highlight">
-          <brush brushstyle="SolidPattern">
-           <color alpha="255">
-            <red>51</red>
-            <green>153</green>
-            <blue>255</blue>
-           </color>
-          </brush>
-         </colorrole>
-        </disabled>
-       </palette>
-      </property>
-      <property name="readOnly">
-       <bool>true</bool>
-      </property>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QTextBrowser" name="textBrowser">
+          <property name="palette">
+           <palette>
+            <active>
+             <colorrole role="Button">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+             <colorrole role="Window">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+             <colorrole role="Highlight">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>51</red>
+                <green>153</green>
+                <blue>255</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </active>
+            <inactive>
+             <colorrole role="Button">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+             <colorrole role="Window">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+             <colorrole role="Highlight">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>255</red>
+                <green>255</green>
+                <blue>0</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </inactive>
+            <disabled>
+             <colorrole role="Button">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+             <colorrole role="Window">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>240</red>
+                <green>240</green>
+                <blue>240</blue>
+               </color>
+              </brush>
+             </colorrole>
+             <colorrole role="Highlight">
+              <brush brushstyle="SolidPattern">
+               <color alpha="255">
+                <red>51</red>
+                <green>153</green>
+                <blue>255</blue>
+               </color>
+              </brush>
+             </colorrole>
+            </disabled>
+           </palette>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QsciScintilla" name="plainTextEdit">
+          <property name="font">
+           <font>
+            <family>Courier New</family>
+            <pointsize>8</pointsize>
+            <weight>50</weight>
+            <italic>false</italic>
+            <bold>false</bold>
+            <underline>false</underline>
+            <strikeout>false</strikeout>
+           </font>
+          </property>
+          <property name="toolTip">
+           <string/>
+          </property>
+          <property name="whatsThis">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QTextBrowser" name="results_text_browser">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
      </widget>
     </item>
    </layout>
