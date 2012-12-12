@@ -390,14 +390,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         old_stdout = sys.stdout
         old_stderr = sys.stderr
         sys.stdout = my_stdout = sys.stderr = StringIO()
-        self.results_text_browser.setText('Sphinx running...\n')
+        self.results_plain_text_edit.setPlainText('Sphinx running...\n')
         # This won't be display until after Sphinx runs without processing events.
         self.app.processEvents()
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
                               '.', self.html_dir) )
         sys.stdout = old_stdout
         sys.stderr = old_stderr
-        self.results_text_browser.setText(self.results_text_browser.toPlainText() + my_stdout.getvalue() + '\n\n...done.')
+        self.results_plain_text_edit.appendPlainText(my_stdout.getvalue() + '\n\n...done.')
         
         # Update the browser with Sphinx's output
         self.textBrowser.clearHistory()

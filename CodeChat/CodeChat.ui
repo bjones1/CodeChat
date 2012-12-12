@@ -149,12 +149,24 @@
         </item>
        </layout>
       </widget>
-      <widget class="QTextBrowser" name="results_text_browser">
+      <widget class="QPlainTextEdit" name="results_plain_text_edit">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <family>Courier New</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+       <property name="plainText">
+        <string>Sphinx has not yet been run.</string>
        </property>
       </widget>
      </widget>
