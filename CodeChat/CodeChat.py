@@ -220,10 +220,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)        
         # Try at removing ctrl-T key binding (use as toggle panes instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
+        # Show a difference background for the line the cursor is in
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEBACK, 0x99FFFF)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
         # Enable/disable the save menu item when the plain text modification
         # state changes.
         self.plainTextEdit.modificationChanged.connect(
             lambda changed: self.action_Save.setEnabled(changed))
+        # On a double-click, switch views.
         self.plainTextEdit.mouseDoubleClickEvent = self.mouseDoubleClickEvent
             
         # Set up the file MRU from the registry
