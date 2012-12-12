@@ -180,9 +180,13 @@ import sys
 
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
-        # Store a reference to this window's containing application
-        self.app = app
+        # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
+        self.setupUi(self)
+        
+        # Store a reference to this window's containing application.
+        self.app = app
+        
         # Load in the last used project directory, defaulting to the current directory.
         self.project_dir_key = 'project directory'
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
@@ -196,7 +200,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.project_dir = os.getcwd()
         # A path to the generated HTML files, relative to the project directory
         self.html_dir = '_build/html'
-        self.setupUi(self)
+
+        # Restore state from last run
+        self.restoreGeometry(bytearray(self.settings.value('geometry', [])))
+        self.restoreState(bytearray(self.settings.value('windowState', [])))
+        self.splitter.restoreState(bytearray(self.settings.value('splitterSizes', [])))
+        
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(2)
         # Start in the plain text view
@@ -525,6 +534,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # If the user cancels, don't close.
         if not self.save_before_close():
             e.ignore()
+        else:
+            # Save settings
+            self.settings.setValue("splitterSizes", self.splitter.saveState())
+            self.settings.setValue("windowState", self.saveState())
+            self.settings.setValue("geometry", self.saveGeometry())
+
 
 # main()
 # ------
