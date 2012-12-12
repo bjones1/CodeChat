@@ -237,7 +237,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
-            self.open_untitled()
+            self.open_contents()
 
     def mouseDoubleClickEvent(self, e):
         self.on_action_Toggle_view_triggered()
@@ -303,8 +303,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, pos)
         
-    def open_untitled(self):
-        self.source_file = 'untitled.rst'
+    def open_contents(self):
+        self.source_file = 'contents.rst'
         if os.path.exists(self.source_file):
             self.open(self.source_file)
         else:
@@ -444,8 +444,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.project_dir = project_dir
             self.settings.setValue(self.project_dir_key, self.project_dir)
             os.chdir(self.project_dir)
-            # Reload a potentially new file
-            self.open_untitled()
+            # Try loading the contents for this project.
+            self.open_contents()
         
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
