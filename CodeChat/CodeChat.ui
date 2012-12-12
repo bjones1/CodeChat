@@ -160,7 +160,7 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <addaction name="action_Toggle_pane"/>
+    <addaction name="action_Toggle_view"/>
     <addaction name="action_in_browser"/>
    </widget>
    <widget class="QMenu" name="menu_Help">
@@ -222,9 +222,9 @@
     <string>Ctrl+D</string>
    </property>
   </action>
-  <action name="action_Toggle_pane">
+  <action name="action_Toggle_view">
    <property name="text">
-    <string>To&amp;ggle pane</string>
+    <string>To&amp;ggle view</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+G</string>

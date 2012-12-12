@@ -188,13 +188,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.setupUi(self)
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(2)
-        # Start in the plain text pane
+        # Start in the plain text view
         self.textBrowser.setVisible(False)
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
         # This syntax produces a ``TypeError: invalid argument to sipBadCatcherResult()`` on a double-click. Not sure why.
-        ## self.textBrowser.mouseDoubleClickEvent = lambda e:  self.on_action_Toggle_pane_triggered
+        ## self.textBrowser.mouseDoubleClickEvent = lambda e:  self.on_action_Toggle_view_triggered
         # This works fine.
         self.textBrowser.mouseDoubleClickEvent = self.mouseDoubleClickEvent
 
@@ -218,7 +218,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Make home and end go to the beginning and end of the line, not the end of the word-wrapped paragraph.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_HOMEDISPLAY)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)        
-        # Try at removing ctrl-T key binding (use as toggle panes instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
+        # Try at removing ctrl-T key binding (use as toggle views instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
         # Show a difference background for the line the cursor is in
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEBACK, 0x99FFFF)
@@ -237,7 +237,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.open_untitled()
 
     def mouseDoubleClickEvent(self, e):
-        self.on_action_Toggle_pane_triggered()
+        self.on_action_Toggle_view_triggered()
         
 # File operations
 # ^^^^^^^^^^^^^^^
@@ -455,8 +455,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.save()
 
     @QtCore.pyqtSlot()
-    def on_action_Toggle_pane_triggered(self):
-        # Only one pane should be active at a time
+    def on_action_Toggle_view_triggered(self):
+        # Only one view should be active at a time.
         assert self.plainTextEdit.isVisible() != self.textBrowser.isVisible()
         if self.plainTextEdit.isVisible():
             self.plain_text_to_html_switch()
