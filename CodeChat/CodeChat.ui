@@ -172,6 +172,9 @@
     <addaction name="action_Sphinx_reST_primer"/>
     <addaction name="action_Sphinx_markup"/>
     <addaction name="separator"/>
+    <addaction name="action_LaTeX_math_reference"/>
+    <addaction name="action_GraphViz_reference"/>
+    <addaction name="separator"/>
     <addaction name="action_About"/>
    </widget>
    <addaction name="menu_File"/>
@@ -232,17 +235,17 @@
   </action>
   <action name="action_ReST_cheat_sheet">
    <property name="text">
-    <string>reST cheat sheet</string>
+    <string>&amp;reST cheat sheet</string>
    </property>
   </action>
   <action name="action_Sphinx_reST_primer">
    <property name="text">
-    <string>Sphinx reST primer</string>
+    <string>Sphinx reST &amp;primer</string>
    </property>
   </action>
   <action name="action_Sphinx_markup">
    <property name="text">
-    <string>Sphinx markup</string>
+    <string>Sphinx &amp;markup</string>
    </property>
   </action>
   <action name="action_in_browser">
@@ -258,6 +261,16 @@
   <action name="action_About">
    <property name="text">
     <string>&amp;About</string>
+   </property>
+  </action>
+  <action name="action_LaTeX_math_reference">
+   <property name="text">
+    <string>&amp;LaTeX math reference</string>
+   </property>
+  </action>
+  <action name="action_GraphViz_reference">
+   <property name="text">
+    <string>&amp;GraphViz reference</string>
    </property>
   </action>
  </widget>

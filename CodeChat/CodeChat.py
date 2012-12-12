@@ -487,6 +487,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/markup/index.html'))
         
     @QtCore.pyqtSlot()
+    def on_action_LaTeX_math_reference_triggered(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://en.wikibooks.org/wiki/LaTeX/Mathematics'))
+        
+    @QtCore.pyqtSlot()
+    def on_action_GraphViz_reference_triggered(self):
+        QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://www.graphviz.org/Documentation.php'))
+        
+    @QtCore.pyqtSlot()
     def on_action_About_triggered(self):
         QtGui.QMessageBox.about(self, 'CodeChat', 
           u'CodeChat, a conversational coding system,\n' +
