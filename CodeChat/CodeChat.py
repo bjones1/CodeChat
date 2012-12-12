@@ -167,6 +167,9 @@ from FindLongestMatchingString import find_approx_text_in_target
 
 # We need this to open and save text files in Unicode.
 import codecs
+
+# Display the version of this program in Htlp | About
+import version
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
         # Store a reference to this window's containing application
@@ -487,7 +490,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def on_action_About_triggered(self):
         QtGui.QMessageBox.about(self, 'CodeChat', 
           u'CodeChat, a conversational coding system,\n' +
-          u'was last revised on 8-Dec-2012.\n\n' +
+          u'was last revised on ' + version.PROGRAM_DATE + '.\n\n' +
           u'\u00A9 Copyright 2012 by Bryan A. Jones.')
         
     # Before closing the application, check to see if the user's work should be saved.        
