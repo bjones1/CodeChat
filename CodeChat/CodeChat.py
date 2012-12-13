@@ -205,8 +205,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(2)
-        # Start in the plain text view
-        self.textBrowser.setVisible(False)
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
@@ -252,6 +250,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
             self.open_contents()
+            
+        # Update html for initial open
+        self.save_then_update_html()
 
     def mouseDoubleClickEvent(self, e):
         self.on_action_Toggle_view_triggered()
@@ -297,11 +298,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         assert not self.plainTextEdit.isModified()
         # Save the cursor position from the current view.
         # TODO: save selection, not just cursor position.
-        if self.plainTextEdit.isVisible():
-            pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
-        else:
-            cursor = self.textBrowser.textCursor()
-            pos = cursor.position()
+        plain_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
+        web_cursor = self.textBrowser.textCursor()
+        web_pos = web_cursor.position()
         # Reload text file
         try:
             with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
@@ -313,16 +312,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.source_file_time = os.path.getmtime(self.source_file)
         self.plainTextEdit.setModified(False)
         self.mru_files.add_file(self.source_file)
-        # Restore the cursor position. Why not test plainTextEdit.isVisible? On init, window.show() hasn't run (isVisile is false for both plainTextEdit and textBrowser) and we always start in text mode. Don't update html in this case.
-        if self.textBrowser.isVisible():
-            # Update HTML from reloaded text, also.
-            self.save_then_update_html()
-            # Then restore cursor position
-            cursor.setPosition(pos, QtGui.QTextCursor.MoveAnchor)
-            cursor.select(QtGui.QTextCursor.LineUnderCursor)
-            self.textBrowser.setTextCursor(cursor)
-        else:
-            self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, pos)
+        # Restore cursor positions
+        web_cursor.setPosition(web_pos, QtGui.QTextCursor.MoveAnchor)
+        web_cursor.select(QtGui.QTextCursor.LineUnderCursor)
+        self.textBrowser.setTextCursor(web_cursor)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, plain_pos)
         
     def open_contents(self):
         self.source_file = 'contents.rst'
@@ -390,23 +384,26 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 assert False
         else:
             return True
+            
+    def run_Sphinx(self):
+        # Redirect Sphinx output to the results window
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = my_stdout = sys.stderr = StringIO()
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q',  '.', self.html_dir) )
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+        return my_stdout.getvalue()
         
     def save_then_update_html(self):
         if self.plainTextEdit.isModified():
             self.save()
             
-        # Redirect Sphinx output to the results window
-        old_stdout = sys.stdout
-        old_stderr = sys.stderr
-        sys.stdout = my_stdout = sys.stderr = StringIO()
         self.results_plain_text_edit.setPlainText('Sphinx running...\n')
-        # This won't be display until after Sphinx runs without processing events.
+        # This won't be displayed until after Sphinx runs without processing events.
         self.app.processEvents()
-        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q', 
-                              '.', self.html_dir) )
-        sys.stdout = old_stdout
-        sys.stderr = old_stderr
-        self.results_plain_text_edit.appendPlainText(my_stdout.getvalue() + '\n...done.')
+        s = self.run_Sphinx()            
+        self.results_plain_text_edit.appendPlainText(s + '\n...done.')
         
         # Update the browser with Sphinx's output
         self.textBrowser.setSource(self.html_url())
@@ -427,8 +424,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def plain_text_to_html_switch(self):
         self.save_then_update_html()
         # Hide plain text, show html widgets. If these aren't made visible here, the self.textBrowser.cursorRect() and similar calls return junk.
-        self.plainTextEdit.setVisible(False)
-        self.textBrowser.setVisible(True)
         self.textBrowser.setFocus()
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
@@ -462,8 +457,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             print('Not found.')
         # Hide html, show plain text widgets. Placing this code at the beginning of this function makes it find the wrong location (???).
-        self.textBrowser.setVisible(False)
-        self.plainTextEdit.setVisible(True)
         self.plainTextEdit.setFocus()
         
     def change_project_dir(self, project_dir):
@@ -518,8 +511,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     @QtCore.pyqtSlot()
     def on_action_Toggle_view_triggered(self):
         # Only one view should be active at a time.
-        assert self.plainTextEdit.isVisible() != self.textBrowser.isVisible()
-        if self.plainTextEdit.isVisible():
+        if self.plainTextEdit.hasFocus():
             self.plain_text_to_html_switch()
         else:
             self.html_to_plain_text_switch()
