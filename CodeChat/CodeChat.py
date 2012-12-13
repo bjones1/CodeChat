@@ -93,13 +93,7 @@ class MruFiles(object):
         
     # Returns the mru list as a list
     def get_mru_list(self):
-        mru_list = self.settings.value(self.mru_list_key)
-        if not mru_list:
-            mru_list = []
-            self.settings.setValue(self.mru_list_key, mru_list)
-            return mru_list
-        else:
-            return list(mru_list)
+        return list(self.settings.value(self.mru_list_key, []))
             
     # Adds a file to the mru list
     def add_file(self, file_name):
