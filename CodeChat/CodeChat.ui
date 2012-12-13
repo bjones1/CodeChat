@@ -186,6 +186,7 @@
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <addaction name="action_Create_new_project"/>
     <addaction name="action_Choose_project_dir"/>
     <addaction name="action_Open"/>
     <addaction name="action_Reload"/>
@@ -308,6 +309,11 @@
   <action name="action_GraphViz_reference">
    <property name="text">
     <string>&amp;GraphViz reference</string>
+   </property>
+  </action>
+  <action name="action_Create_new_project">
+   <property name="text">
+    <string>&amp;Create new project</string>
    </property>
   </action>
  </widget>

@@ -53,11 +53,10 @@ from PyQt4 import QtGui, QtCore, uic
 import os
 # A class to keep track of the most recently used files
 class MruFiles(object):
-    mru_list_key = "MRU list"
-    max_files = 10
-    
     # Initialize the mru list and the File menu's MRU items
     def __init__(self, parent, settings):
+        self.mru_list_key = "MRU list"
+        self.max_files = 10    
         self.settings = settings
         self.parent = parent
         # Create max_files QActions for mru entries and place them (hidden) in the File menu.
@@ -65,10 +64,12 @@ class MruFiles(object):
         for index in range(self.max_files):
             mru_item = QtGui.QAction(parent)
             mru_item.setVisible(False)
-            mru_item.setShortcut(QtGui.QKeySequence('Ctrl+' + str(index)))
+            if (index < 10):
+                mru_item.setShortcut(QtGui.QKeySequence('Ctrl+' + str(index)))
             mru_item.triggered.connect(self.mru_triggered)
             parent.menu_File.addAction(mru_item)
             self.mru_action_list.append(mru_item)
+        self.update_gui()
             
     def open_last(self):
         # Open the last file automatically
@@ -132,15 +133,15 @@ class MruFiles(object):
 # --------------
 # This class provides the bulk of the functionality. Almost evrything is GUI logic; the text to HTML matching ability is imported.
 #
-# The GUI's look is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
+# The GUI's layout is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
 try:
-    ui_path = os.path.dirname(__file__)
+    module_path = os.path.dirname(__file__)
 except NameError:
-    ui_path = ''
+    module_path = ''
     
 # When frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the .ui to a .py module. Oh, well.
 try: 
-    form_class, base_class = uic.loadUiType(os.path.join(ui_path, "CodeChat.ui"))
+    form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
 except (ImportError, IOError):
     from CodeChat_ui import Ui_MainWindow as form_class
 
@@ -178,6 +179,9 @@ import version
 from cStringIO import StringIO
 import sys
 
+# Use to copy new project file
+import shutil
+
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self, app, *args, **kwargs):
         # Let Qt and PyQt run their init first.
@@ -187,21 +191,20 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Store a reference to this window's containing application.
         self.app = app
         
-        # Load in the last used project directory, defaulting to the current directory.
         self.project_dir_key = 'project directory'
+        # A path to the generated HTML files, relative to the project directory
+        self.html_dir = '_build/html'
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
+        
+        # Open the last project directory of we can; otherwise, us the current directory.
         self.project_dir = self.settings.value(self.project_dir_key, os.getcwd())
         try:
             os.chdir(self.project_dir)
-        except OSError as e:
-            print('Error opening project directory %s: %s' % (e.strerror, e.filename))
-        # Save project dir: HTML loading requires a change to the HTML direcotry,
-        # while all else is relative to the project directory.
+        except OSError:
+            pass
         self.project_dir = os.getcwd()
-        # A path to the generated HTML files, relative to the project directory
-        self.html_dir = '_build/html'
-
-        # Restore state from last run
+        
+        # Restore state from last run, if it exists and is valid.
         self.restoreGeometry(bytearray(self.settings.value('geometry', [])))
         self.restoreState(bytearray(self.settings.value('windowState', [])))
         self.splitter.restoreState(bytearray(self.settings.value('splitterSizes', [])))
@@ -456,24 +459,40 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.textBrowser.setVisible(False)
         self.plainTextEdit.setVisible(True)
         self.plainTextEdit.setFocus()
+        
+    def change_project_dir(self, project_dir):
+        try:
+            os.chdir(project_dir)
+        except OSError as e:
+            QtGui.QMessageBox.critical(self, "CodeChat", str(e))
+            return
+        self.project_dir = project_dir
+        self.settings.setValue(self.project_dir_key, self.project_dir)
+        # Try loading the contents for this project.
+        self.open_contents()
 
 # Menu item actions
 # ^^^^^^^^^^^^^^^^^
     # The decorator below prevents this method from being called twice, per http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name.
     @QtCore.pyqtSlot()
-    def on_action_Reload_triggered(self):
-        if self.save_before_reload():
-            self.reload()
-        
+    def on_action_Create_new_project_triggered(self):
+        project_dir = QtGui.QFileDialog.getExistingDirectory()
+        if project_dir and self.save_before_close():
+            template_dir = os.path.abspath(os.path.join(module_path, '../template'))
+            # TODO: copytree works only if the directory doesn't exist, so tack on an extra name here. It would be better to simply place this in the indicated directory.
+            project_dir = os.path.join(project_dir, 'template')
+            try:
+                shutil.copytree(template_dir, project_dir)
+            except (shutil.Error, OSError) as e:
+                QtGui.QMessageBox.critical(self, "CodeChat", str(e))
+                return
+            self.change_project_dir(project_dir)
+
     @QtCore.pyqtSlot()
     def on_action_Choose_project_dir_triggered(self):
         project_dir = QtGui.QFileDialog.getExistingDirectory()
         if project_dir and project_dir != self.project_dir and self.save_before_close():
-            self.project_dir = project_dir
-            self.settings.setValue(self.project_dir_key, self.project_dir)
-            os.chdir(self.project_dir)
-            # Try loading the contents for this project.
-            self.open_contents()
+            self.change_project_dir(project_dir)
         
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
@@ -481,6 +500,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if source_file and self.save_before_close():
             self.open(source_file)
                
+    @QtCore.pyqtSlot()
+    def on_action_Reload_triggered(self):
+        if self.save_before_reload():
+            self.reload()
+        
     @QtCore.pyqtSlot()
     def on_action_Save_triggered(self):
         self.save()
