@@ -409,10 +409,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.results_plain_text_edit.appendPlainText(my_stdout.getvalue() + '\n...done.')
         
         # Update the browser with Sphinx's output
-        self.textBrowser.clearHistory()
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
+        # In case the user browsed to some other url, come back to the source document.
+        self.textBrowser.home()
+        self.textBrowser.clearHistory()
         
     def html_url(self):
         return QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file).replace('\\', '/'))
@@ -428,8 +430,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setVisible(False)
         self.textBrowser.setVisible(True)
         self.textBrowser.setFocus()
-        # In case the user browsed to some other url, come back to the source document.
-        self.textBrowser.home()
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
