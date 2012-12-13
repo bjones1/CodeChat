@@ -288,8 +288,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                                          QsciLexerCPP.CommentDoc, 'Courier New')
         self.reload()
          
-    # Reload the source file then regenerate the HTML file from it.
-    # TODO: Rethink this -- need a refresh, which either just updates the plain text when in that view, or updates plain text and rebuilds HTML if in that view, plus keeps the cursor position consistent.
+    # Reload the source file then regenerate the HTML file from it, if necessary.
     def reload(self):
         assert not self.plainTextEdit.isModified()
         # Save the cursor position from the current view.
@@ -299,9 +298,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             cursor = self.textBrowser.textCursor()
             pos = cursor.position()
-        # Restore current dir then reload file
-        with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
-            self.plainTextEdit.setText(f.read())
+        # Reload text file
+        try:
+            with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
+                self.plainTextEdit.setText(f.read())
+        except (IOError, ValueError) as e:
+            QtGui.QMessageBox.critical(self, "CodeChat", str(e))
+            return
         # Update modification time
         self.source_file_time = os.path.getmtime(self.source_file)
         self.plainTextEdit.setModified(False)
@@ -340,9 +343,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         return QtGui.QMainWindow.eventFilter(self, obj, event)
                
     def save(self):
-        with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
-            f.write(self.plainTextEdit.text())
-        self.source_file_time = os.path.getmtime(self.source_file)            
+        try:
+            with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
+                f.write(self.plainTextEdit.text())
+            self.source_file_time = os.path.getmtime(self.source_file)            
+        except (IOError, ValueError) as e:
+            QtGui.QMessageBox.critical(self, "CodeChat", str(e))
+            return
         self.plainTextEdit.setModified(False)
 
     # If necessary, ask the user to save the current file before closing it. Returns True unless the user cancels.
