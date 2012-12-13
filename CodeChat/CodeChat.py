@@ -122,6 +122,32 @@ class MruFiles(object):
         for index in range(len(mru_list), self.max_files):
             self.mru_action_list[index].setVisible(False)
 
+class SphinxThread(QtCore.QThread):
+    # run_Sphinx emits this with the results collected from the run as the first parameter.
+    signal_Sphinx_done = QtCore.pyqtSignal(str)
+    
+    def __init__(self, main_widget):
+        QtCore.QThread.__init__(self)
+        self.signal_Sphinx_done.connect(main_widget.after_Sphinx)
+        
+    # Run the Qt message loop, waiting for a signal.
+    def run(self):
+        self.exec_()
+
+    def run_Sphinx(self, html_dir):
+        # Redirect Sphinx output to the results window
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        my_stdout = StringIO()
+        my_stderr = StringIO()
+        sys.stderr = my_stderr
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q',  '.', html_dir) )
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
+        
+        # Send a signal with the result string when Sphinx finishes.
+        self.signal_Sphinx_done.emit(my_stdout.getvalue() + '\n' + my_stderr.getvalue())
+        
 
 # CodeChatWindow
 # --------------
@@ -177,6 +203,9 @@ import sys
 import shutil
 
 class CodeChatWindow(QtGui.QMainWindow, form_class):
+    # This signal starts a Sphinx background run; the parameter is the HTML directory to use.
+    signal_Sphinx_start = QtCore.pyqtSignal(str)
+    
     def __init__(self, app, *args, **kwargs):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
@@ -250,6 +279,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
             self.open_contents()
+            
+        # Prepare for running Sphinx in the background
+        self.is_building = False
+        self.thread_Sphinx = SphinxThread(self)
+        self.signal_Sphinx_start.connect(self.thread_Sphinx.run_Sphinx)
+        self.thread_Sphinx.start()
             
         # Update html for initial open
         self.save_then_update_html()
@@ -385,16 +420,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             return True
             
-    def run_Sphinx(self):
-        # Redirect Sphinx output to the results window
-        old_stdout = sys.stdout
-        old_stderr = sys.stderr
-        sys.stdout = my_stdout = sys.stderr = StringIO()
-        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q',  '.', self.html_dir) )
-        sys.stdout = old_stdout
-        sys.stderr = old_stderr
-        return my_stdout.getvalue()
-        
     def save_then_update_html(self):
         if self.plainTextEdit.isModified():
             self.save()
@@ -402,7 +427,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.results_plain_text_edit.setPlainText('Sphinx running...\n')
         # This won't be displayed until after Sphinx runs without processing events.
         self.app.processEvents()
-        s = self.run_Sphinx()            
+        self.signal_Sphinx_start.emit(self.html_dir)
+        
+    def after_Sphinx(self, s):
         self.results_plain_text_edit.appendPlainText(s + '\n...done.')
         
         # Update the browser with Sphinx's output
