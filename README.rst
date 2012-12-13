@@ -19,10 +19,11 @@ You may optionally install:
 
 Recent changes
 --------------
+- Window title shows current project directory and open file.
 - Added ``Create new project``, bug fixes.
 - Added a window to show output from the Sphinx build process.
 - Save/restore window geometry.
-- Support for PHP files.
+- Support for PHP, MATLAB files.
 - Make matched text in browser/code views more visible.
 - Enable double-click to switch views.
 - Improve matching between views.
@@ -30,6 +31,6 @@ Recent changes
 
 Contributing
 ------------
-This is a fairly basic implmentation; much improvement is needed! Please report bugs, request features, or contribute to the code at the homepage for CodeChat_.
+This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the CodeChat_ homepage!
 
 .. _CodeChat: https://bitbucket.org/bjones/documentation
