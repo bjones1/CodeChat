@@ -279,7 +279,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if lexer_class is not None:
             lexer = lexer_class()
             lexer.setDefaultFont(self.font)
-            self.plainTextEdit.setLexer(lexer)        
+            self.plainTextEdit.setLexer(lexer)
+        else:
+            # Disable lexer
+            self.plainTextEdit.setLexer()
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
                                          QsciLexerCPP.Comment, 'Courier New')
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
@@ -401,7 +404,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                               '.', self.html_dir) )
         sys.stdout = old_stdout
         sys.stderr = old_stderr
-        self.results_plain_text_edit.appendPlainText(my_stdout.getvalue() + '\n\n...done.')
+        self.results_plain_text_edit.appendPlainText(my_stdout.getvalue() + '\n...done.')
         
         # Update the browser with Sphinx's output
         self.textBrowser.clearHistory()
