@@ -1,6 +1,5 @@
 Welcome to CodeChat's documentation!
 ====================================
-
 User documentation contents:
 
 .. toctree::
@@ -26,6 +25,5 @@ Documentation of CodeChat's implemntation:
 
 Indices and tables
 ==================
-
 * :ref:`genindex`
 * :ref:`search`
