@@ -52,15 +52,13 @@ def find_approx_text(search_text, target_text, cost = None):
     # first matched char
     begin_in_target, end_in_target = match.groups()[0]
     
-    # TRE picks the first match it finds, even if there is
-    # more than one matck with identical error. So,
-    # manually call it again with a substring to check.
+    # TRE picks the first match it finds, even if there is more than one matck with identical error. So, manually call it again with a substring to check. In addition, make sure this match is unique: it should be 10% better than the next best match.
     match_again = pat.search(target_text[end_in_target:], fz)
-    if match_again and (match_again.cost <= match.cost):
-#        print('Multiple matches ' + str(match_again.groups()))
+    if match_again and (match_again.cost <= match.cost*1.1):
+##        print('Multiple matches ' + str(match_again.groups()))
         return None, 0, 0
     else:
-#        print(search_text + '\n' + target_text[begin_in_target:end_in_target])
+##        print(search_text + '\n' + target_text[begin_in_target:end_in_target])
         return match, begin_in_target, end_in_target
 
 # .. _find_approx_text_in_target:
@@ -102,8 +100,8 @@ def find_approx_text_in_target(
     min_cost_begin = begin
     min_cost_end = end
     # For debug logging
-    log_begin = begin
-    log_end = end
+ ##   log_begin = begin
+ ##   log_end = end
     
     # For an exact match, need to define this, since the while loops won't. We're 0 characters forward from the begin_in_target point before we do any additional search refinements.
     begin_in_target_substr = 0
@@ -152,16 +150,18 @@ def find_approx_text_in_target(
 
     # Return the match. It's not perfect if the cost > 0.
     if min_cost > 0:
-        print('Failed -- no exact match (cost was %d).' % min_cost)
+        print('No exact match; cost was %d.' % min_cost)
 ##        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
 ##            f.write(('Failed -- no exact match (cost was %d).\n\n' % min_cost) +
 ##              search_text[log_begin:log_end] + '\n\n' +
 ##              search_text[begin:min_cost_end] + '\n\n' +
 ##              target_text[begin_in_target:end_in_target] + '\n\n' + 
 ##              target_text)
-    return begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
+    offset = begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
+    # Make sure the result lies within the bounds of target_text. Since we return a cursor position, an offset of len(target_text), meaning the end of target_text, is valid.
+    return min(len(target_text), max(0, offset))
 
-
+# If this module is run, execute unit tests.
 if __name__ == '__main__':
     from CodeChat_test import main
     main()
