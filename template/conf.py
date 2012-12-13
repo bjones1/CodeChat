@@ -1,4 +1,7 @@
-# -*- coding: utf-8 -*-
+# .. -*- coding: utf-8 -*-
+#
+# conf.py
+# =======
 #
 # Testing documentation build configuration file, created by
 # sphinx-quickstart on Thu Dec 01 13:58:15 2011.
@@ -91,7 +94,7 @@ pygments_style = 'sphinx'
 # A list of ignored prefixes for module index sorting.
 ##modindex_common_prefix = []
 
-# If true, keep warnings as “system message” paragraphs in the built documents.
+# If true, keep warnings as ?system message? paragraphs in the built documents.
 # Regardless of this setting, warnings are always written to the standard error
 # stream when sphinx-build is run.
 keep_warnings = True
