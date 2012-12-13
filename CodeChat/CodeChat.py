@@ -290,6 +290,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
                                          QsciLexerCPP.CommentDoc, 'Courier New')
         self.reload()
+        self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
          
     # Reload the source file then regenerate the HTML file from it, if necessary.
     def reload(self):
@@ -332,6 +333,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.setText('')
             self.textBrowser.setPlainText('')
             self.plainTextEdit.setModified(False)
+            self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
             self.source_file_time = 0
         
     # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
