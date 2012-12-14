@@ -140,6 +140,11 @@ class SphinxObject(QtCore.QObject):
         # Send a signal with the result string when Sphinx finishes.
         self.signal_Sphinx_done.emit(my_stdout.getvalue() + '\n' + my_stderr.getvalue())
 
+# A convenience class to add a restart() method to a QTimer.
+class RestartableTimer(QtCore.QTimer):
+    def restart(self):
+        self.stop()
+        self.start()
 
 # CodeChatWindow
 # --------------
@@ -259,11 +264,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Auto-save and build whenever edits are made.
         self.plainTextEdit.modificationChanged.connect(self.on_code_changed)
         # Update web hilight whenever code cursor moves and the app is idle.
-        self.timer_sync_code_to_web = QtCore.QTimer()
+        self.timer_sync_code_to_web = RestartableTimer()
         self.timer_sync_code_to_web.setSingleShot(True)
         self.timer_sync_code_to_web.setInterval(250)
         self.timer_sync_code_to_web.timeout.connect(self.code_to_web_sync)
-        self.plainTextEdit.cursorPositionChanged.connect(lambda line, pos: self.timer_sync_code_to_web.start())
+        self.plainTextEdit.cursorPositionChanged.connect(lambda line, pos: self.timer_sync_code_to_web.restart())
 
         # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         self.is_building = False
@@ -374,10 +379,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 pass
             
         # Look for idle time by resetting our timer on any event.
-        if ( (event.type() == QtCore.QEvent.KeyPress) or
-             (event.type() == QtCore.QEvent.MouseMove) ):
-            self.timer_sync_code_to_web.stop()
-            self.timer_sync_code_to_web.start()
+        if ( ((event.type() == QtCore.QEvent.KeyPress) or
+              (event.type() == QtCore.QEvent.MouseMove)) and
+              self.timer_sync_code_to_web.isActive() ):
+            self.timer_sync_code_to_web.restart()
             
         # Allow default Qt event processing
         return QtGui.QMainWindow.eventFilter(self, obj, event)
@@ -441,13 +446,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Display Sphinx build output
         self.results_plain_text_edit.setPlainText(s)
         
-        # Update the browser with Sphinx's output
+        # Update the browser with Sphinx's output. Save and restore the cursor to keep the screen from jumping around.
+        web_cursor = self.textBrowser.textCursor()
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
+        self.textBrowser.setTextCursor(web_cursor)
         
         # Resync web with code
-        self.timer_sync_code_to_web.start()
+        self.timer_sync_code_to_web.restart()
 
         # Update state and start a new build if necessary
         self.is_building = False

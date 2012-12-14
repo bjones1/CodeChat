@@ -1,6 +1,5 @@
 CodeChat, a conversational coding system
 ========================================
-
 Welcome to CodeChat_, a conversational coding system. CodeChat encourages `literate programming <http://www.literateprogramming.com/>`_ by transforming source files into web pages and by providing a simple editor which synchronizes between the source code view and the web view of a document. Some examples of the results:
 
 - Explaining to myself what my code should do helped me rewrite and fix `CodeToRest <https://dl.dropbox.com/u/2337351/CodeChat/doc/CodeChat/CodeToRest.py.html>`_.
@@ -19,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- Code and web views both open simultaneously, all edits are immediately compiled and then synced.
 - Window title shows current project directory and open file.
 - Added ``Create new project``, bug fixes.
 - Added a window to show output from the Sphinx build process.
@@ -26,8 +26,6 @@ Recent changes
 - Support for PHP, MATLAB files.
 - Make matched text in browser/code views more visible.
 - Enable double-click to switch views.
-- Improve matching between views.
-- Additional help menu items.
 
 Contributing
 ------------
