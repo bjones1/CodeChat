@@ -44,8 +44,8 @@
 import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
-# Not sure what this does -- I still have to use QtCore.QUrl to build urls. ???
-sip.setapi('QUrl', 2)
+# Not sure what this does -- I still have to use QtCore.QUrl to build urls. ??? It also makes the Spyder debugger mad, so omit for now.
+# sip.setapi('QUrl', 2)
 
 # The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package.
 from PyQt4 import QtGui, QtCore, uic
@@ -122,18 +122,10 @@ class MruFiles(object):
         for index in range(len(mru_list), self.max_files):
             self.mru_action_list[index].setVisible(False)
 
-class SphinxThread(QtCore.QThread):
+class SphinxObject(QtCore.QObject):
     # run_Sphinx emits this with the results collected from the run as the first parameter.
     signal_Sphinx_done = QtCore.pyqtSignal(str)
     
-    def __init__(self, main_widget):
-        QtCore.QThread.__init__(self)
-        self.signal_Sphinx_done.connect(main_widget.after_Sphinx)
-        
-    # Run the Qt message loop, waiting for a signal.
-    def run(self):
-        self.exec_()
-
     def run_Sphinx(self, html_dir):
         # Redirect Sphinx output to the results window
         old_stdout = sys.stdout
@@ -269,24 +261,31 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
         # Enable/disable the save menu item when the plain text modification
         # state changes.
-        self.plainTextEdit.modificationChanged.connect(
-            lambda changed: self.action_Save.setEnabled(changed))
+        self.plainTextEdit.modificationChanged.connect(self.on_code_change_triggered)
         # On a double-click, switch views.
         self.plainTextEdit.mouseDoubleClickEvent = self.mouseDoubleClickEvent
             
+        # Prepare for running Sphinx in the background
+        self.is_building = False
+        self.need_to_build = True
+        self.thread_Sphinx = QtCore.QThread()
+        self.obj_sphinx = SphinxObject()
+        self.obj_sphinx.moveToThread(self.thread_Sphinx)
+        self.obj_sphinx.signal_Sphinx_done.connect(self.after_Sphinx)
+        self.signal_Sphinx_start.connect(self.obj_sphinx.run_Sphinx)
+        self.thread_Sphinx.start()
+        
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
             self.open_contents()
             
-        # Prepare for running Sphinx in the background
-        self.is_building = False
-        self.thread_Sphinx = SphinxThread(self)
-        self.signal_Sphinx_start.connect(self.thread_Sphinx.run_Sphinx)
-        self.thread_Sphinx.start()
-            
         # Update html for initial open
+        self.save_then_update_html()
+        
+    def on_code_change_triggered(self, changed):
+        self.action_Save.setEnabled(changed)
         self.save_then_update_html()
 
     def mouseDoubleClickEvent(self, e):
@@ -421,13 +420,19 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             return True
             
     def save_then_update_html(self):
+        if self.is_building:
+            return
+        self.is_building = True
+            
         if self.plainTextEdit.isModified():
             self.save()
             
         self.results_plain_text_edit.setPlainText('Sphinx running...\n')
         # This won't be displayed until after Sphinx runs without processing events.
         self.app.processEvents()
+        print('1')
         self.signal_Sphinx_start.emit(self.html_dir)
+        print('2')
         
     def after_Sphinx(self, s):
         self.results_plain_text_edit.appendPlainText(s + '\n...done.')
@@ -439,6 +444,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # In case the user browsed to some other url, come back to the source document.
         self.textBrowser.home()
         self.textBrowser.clearHistory()
+        
+        # Update state and start a new build if necessary
+        self.is_building = False
+        if self.plainTextEdit.isModified():
+            self.save_then_update_html()
         
     def html_url(self):
         return QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file).replace('\\', '/'))
@@ -588,6 +598,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.settings.setValue("splitterSizes", self.splitter.saveState())
             self.settings.setValue("windowState", self.saveState())
             self.settings.setValue("geometry", self.saveGeometry())
+            # End Sphinx thread
+            self.thread_Sphinx.quit()
+            self.thread_Sphinx.wait()
 
 
 # main()
