@@ -438,15 +438,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.signal_Sphinx_start.emit(self.html_dir)
 
     def after_Sphinx(self, s):
+        # Display Sphinx build output
         self.results_plain_text_edit.setPlainText(s)
-
+        
         # Update the browser with Sphinx's output
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
-        # In case the user browsed to some other url, come back to the source document.
-        self.textBrowser.home()
-        self.textBrowser.clearHistory()
 
         # Update state and start a new build if necessary
         self.is_building = False
@@ -463,6 +461,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     #
     # To sync, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
     def code_to_web_sync(self):
+        # If any links were clicked, go back to document matching the code view.
+        self.textBrowser.setSource(self.html_url())
+        
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
