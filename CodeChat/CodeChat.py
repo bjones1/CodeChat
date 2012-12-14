@@ -315,8 +315,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                                          QsciLexerCPP.CommentLine, 'Courier New')
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
                                          QsciLexerCPP.CommentDoc, 'Courier New')
-        self.reload()
         self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
+        self.reload()
 
     # Reload the source file then regenerate the HTML file from it, if necessary.
     def reload(self):
@@ -428,14 +428,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.save()
 
         self.results_plain_text_edit.setPlainText('Sphinx running...')
-        # This won't be displayed until after Sphinx runs without processing events.
-        self.app.processEvents()
         self.signal_Sphinx_start.emit(self.html_dir)
 
     def after_Sphinx(self, s):
         self.results_plain_text_edit.setPlainText(s)
 
         # Update the browser with Sphinx's output
+        print(self.html_url())
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
