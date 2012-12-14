@@ -56,7 +56,7 @@ class MruFiles(object):
     # Initialize the mru list and the File menu's MRU items
     def __init__(self, parent, settings):
         self.mru_list_key = "MRU list"
-        self.max_files = 10    
+        self.max_files = 10
         self.settings = settings
         self.parent = parent
         # Create max_files QActions for mru entries and place them (hidden) in the File menu.
@@ -70,7 +70,7 @@ class MruFiles(object):
             parent.menu_File.addAction(mru_item)
             self.mru_action_list.append(mru_item)
         self.update_gui()
-            
+
     def open_last(self):
         # Open the last file automatically
         mru_list = self.get_mru_list()
@@ -90,11 +90,11 @@ class MruFiles(object):
             # Get the file name stored within that action
             file_name = mru_action.data()
             self.parent.open(file_name)
-        
+
     # Returns the mru list as a list
     def get_mru_list(self):
         return list(self.settings.value(self.mru_list_key, []))
-            
+
     # Adds a file to the mru list
     def add_file(self, file_name):
         # Add file_name to the mru list, moving it to the top if it's already in the list
@@ -109,7 +109,7 @@ class MruFiles(object):
         self.settings.setValue(self.mru_list_key, mru_list)
         # Update the GUI
         self.update_gui()
-        
+
     def update_gui(self):
         # For each elemnt in the mru list, update the menu item
         mru_list = self.get_mru_list()
@@ -125,7 +125,7 @@ class MruFiles(object):
 class SphinxObject(QtCore.QObject):
     # run_Sphinx emits this with the results collected from the run as the first parameter.
     signal_Sphinx_done = QtCore.pyqtSignal(str)
-    
+
     def run_Sphinx(self, html_dir):
         # Redirect Sphinx output to the results window
         old_stdout = sys.stdout
@@ -136,10 +136,10 @@ class SphinxObject(QtCore.QObject):
         sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q',  '.', html_dir) )
         sys.stdout = old_stdout
         sys.stderr = old_stderr
-        
+
         # Send a signal with the result string when Sphinx finishes.
         self.signal_Sphinx_done.emit(my_stdout.getvalue() + '\n' + my_stderr.getvalue())
-        
+
 
 # CodeChatWindow
 # --------------
@@ -150,14 +150,14 @@ try:
     module_path = os.path.dirname(__file__)
 except NameError:
     module_path = ''
-    
+
 # When frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the .ui to a .py module. Oh, well.
-try: 
+try:
     form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
 except (ImportError, IOError):
     from CodeChat_ui import Ui_MainWindow as form_class
 
-# Scintilla_ (wrapped in Python) provides the text editor. However, the `Python documentation`_ for it was poor at best. Here's a `quick tutorial`_ I found helpful. 
+# Scintilla_ (wrapped in Python) provides the text editor. However, the `Python documentation`_ for it was poor at best. Here's a `quick tutorial`_ I found helpful.
 #
 # .. _Scintilla: http://www.scintilla.org/ScintillaDoc.html
 # .. _`Python documentation`: http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html
@@ -197,20 +197,20 @@ import shutil
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use.
     signal_Sphinx_start = QtCore.pyqtSignal(str)
-    
+
     def __init__(self, app, *args, **kwargs):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self, *args, **kwargs)
         self.setupUi(self)
-        
+
         # Store a reference to this window's containing application.
         self.app = app
-        
+
         self.project_dir_key = 'project directory'
         # A path to the generated HTML files, relative to the project directory
         self.html_dir = '_build/html'
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
-        
+
         # Open the last project directory of we can; otherwise, us the current directory.
         self.project_dir = self.settings.value(self.project_dir_key, os.getcwd())
         try:
@@ -218,12 +218,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         except OSError:
             pass
         self.project_dir = os.getcwd()
-        
+
         # Restore state from last run, if it exists and is valid.
         self.restoreGeometry(bytearray(self.settings.value('geometry', [])))
         self.restoreState(bytearray(self.settings.value('windowState', [])))
         self.splitter.restoreState(bytearray(self.settings.value('splitterSizes', [])))
-        
+
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(2)
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
@@ -236,7 +236,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.font = QtGui.QFont()
         self.font.setFamily('Courier New')
         self.font.setFixedPitch(True)
-        self.font.setPointSize(10)        
+        self.font.setPointSize(10)
         # Margin 0 is used for line numbers
         fontmetrics = QtGui.QFontMetrics(self.font)
         self.plainTextEdit.setMarginsFont(self.font)
@@ -250,7 +250,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
         # Make home and end go to the beginning and end of the line, not the end of the word-wrapped paragraph.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_HOMEDISPLAY)
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)        
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)
         # Try at removing ctrl-T key binding (use as toggle views instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
         # Show a difference background for the line the cursor is in
@@ -260,7 +260,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.modificationChanged.connect(lambda changed: self.save_then_update_html())
         # Update web hilight whenever code cursor moves
         self.plainTextEdit.cursorPositionChanged.connect(self.on_plainTextEdit_cursor_position_change)
-            
+
         # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         self.is_building = False
         self.need_to_build = True
@@ -270,20 +270,20 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.obj_sphinx.signal_Sphinx_done.connect(self.after_Sphinx)
         self.signal_Sphinx_start.connect(self.obj_sphinx.run_Sphinx)
         self.thread_Sphinx.start()
-        
-        
+
+
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
             self.open_contents()
-            
+
         # Update html for initial open
         self.save_then_update_html()
-        
+
     def on_plainTextEdit_cursor_position_change(self, line, index):
         print('change')
-                
+
 # File operations
 # ^^^^^^^^^^^^^^^
     # Open a new source file
@@ -300,7 +300,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             head, tail = os.path.split(self.source_file)
             name, ext = os.path.splitext(tail)
-            self.html_file = os.path.join(self.html_dir, head, name) + '.html'        
+            self.html_file = os.path.join(self.html_dir, head, name) + '.html'
         # Choose a lexer
         # Set style for comments to a fixed-width courier font.
         lexer_class = self.language_specific_options.lexer
@@ -311,15 +311,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             # Disable lexer
             self.plainTextEdit.setLexer()
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
                                          QsciLexerCPP.Comment, 'Courier New')
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
                                          QsciLexerCPP.CommentLine, 'Courier New')
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_STYLESETFONT,
                                          QsciLexerCPP.CommentDoc, 'Courier New')
         self.reload()
         self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
-         
+
     # Reload the source file then regenerate the HTML file from it, if necessary.
     def reload(self):
         assert not self.plainTextEdit.isModified()
@@ -344,7 +344,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         web_cursor.select(QtGui.QTextCursor.LineUnderCursor)
         self.textBrowser.setTextCursor(web_cursor)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, plain_pos)
-        
+
     def open_contents(self):
         self.source_file = 'contents.rst'
         if os.path.exists(self.source_file):
@@ -356,7 +356,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.setModified(False)
             self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
             self.source_file_time = 0
-        
+
     # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
     def eventFilter(self, obj, event):
         if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
@@ -367,12 +367,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 # Ignore if the file no longer exists.
                 pass
         return QtGui.QMainWindow.eventFilter(self, obj, event)
-               
+
     def save(self):
         try:
             with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
                 f.write(self.plainTextEdit.text())
-            self.source_file_time = os.path.getmtime(self.source_file)            
+            self.source_file_time = os.path.getmtime(self.source_file)
         except (IOError, ValueError) as e:
             QtGui.QMessageBox.critical(self, "CodeChat", str(e))
             return
@@ -394,8 +394,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 assert False
         else:
             return True
-    
-    # If the file on disk changed and the file is modified, ask the user which to keep. Returns True if the on disk file should be reloaded.        
+
+    # If the file on disk changed and the file is modified, ask the user which to keep. Returns True if the on disk file should be reloaded.
     def save_before_reload(self):
         if self.plainTextEdit.isModified():
             ret = QtGui.QMessageBox.warning(self, 'CodeChat', 'The file ' + self.source_file + ' had been edited and modified on disk. Do you want to save your changes, overwriting the changes on disk, or discard your changes and reload from disk?',
@@ -411,23 +411,23 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 assert False
         else:
             return True
-            
+
     def save_then_update_html(self):
         if self.is_building:
             return
         self.is_building = True
-            
+
         if self.plainTextEdit.isModified():
             self.save()
-            
+
         self.results_plain_text_edit.setPlainText('Sphinx running...')
         # This won't be displayed until after Sphinx runs without processing events.
         self.app.processEvents()
         self.signal_Sphinx_start.emit(self.html_dir)
-        
+
     def after_Sphinx(self, s):
         self.results_plain_text_edit.setPlainText(s)
-        
+
         # Update the browser with Sphinx's output
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
@@ -435,15 +435,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # In case the user browsed to some other url, come back to the source document.
         self.textBrowser.home()
         self.textBrowser.clearHistory()
-        
+
         # Update state and start a new build if necessary
         self.is_building = False
         if self.plainTextEdit.isModified():
             self.save_then_update_html()
-        
+
     def html_url(self):
         return QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file).replace('\\', '/'))
-        
+
 # Switching between text and HTML
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     # When switching, this code attempts to locate the same text in ther other view.
@@ -470,7 +470,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             pass
 ##            print('Not found.')
-        
+
     def html_to_plain_text_switch(self):
         # Search for text under HTML cursor in plain text.
         textBrowser_cursor_pos = self.textBrowser.textCursor().position()
@@ -485,7 +485,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 ##            print('Not found.')
         # Hide html, show plain text widgets. Placing this code at the beginning of this function makes it find the wrong location (???).
         self.plainTextEdit.setFocus()
-        
+
     def change_project_dir(self, project_dir):
         try:
             os.chdir(project_dir)
@@ -519,18 +519,18 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         project_dir = QtGui.QFileDialog.getExistingDirectory()
         if project_dir and project_dir != self.project_dir and self.save_before_close():
             self.change_project_dir(project_dir)
-        
+
     @QtCore.pyqtSlot()
     def on_action_Open_triggered(self):
         source_file = QtGui.QFileDialog.getOpenFileName()
         if source_file and self.save_before_close():
             self.open(source_file)
-               
+
     @QtCore.pyqtSlot()
     def on_action_Reload_triggered(self):
         if self.save_before_reload():
             self.reload()
-        
+
     @QtCore.pyqtSlot()
     def on_action_Save_triggered(self):
         self.save()
@@ -550,35 +550,35 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     def on_action_CodeChat_documentation_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://bitbucket.org/bjones/documentation'))
-        
+
     @QtCore.pyqtSlot()
     # TODO: This is an ugly cheat sheet. I like https://github.com/ralsina/rst-cheatsheet better, but it downloads, instead of displaying in the browser.
     def on_action_ReST_cheat_sheet_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://dl.dropbox.com/u/2337351/rst-cheatsheet.html'))
-        
+
     def on_action_Sphinx_reST_primer_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/rest.html'))
-        
+
     @QtCore.pyqtSlot()
     def on_action_Sphinx_markup_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://sphinx-doc.org/markup/index.html'))
-        
+
     @QtCore.pyqtSlot()
     def on_action_LaTeX_math_reference_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://en.wikibooks.org/wiki/LaTeX/Mathematics'))
-        
+
     @QtCore.pyqtSlot()
     def on_action_GraphViz_reference_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://www.graphviz.org/Documentation.php'))
-        
+
     @QtCore.pyqtSlot()
     def on_action_About_triggered(self):
-        QtGui.QMessageBox.about(self, 'CodeChat', 
+        QtGui.QMessageBox.about(self, 'CodeChat',
           u'CodeChat, a conversational coding system,\n' +
           u'was last revised on ' + version.PROGRAM_DATE + '.\n\n' +
           u'\u00A9 Copyright 2012 by Bryan A. Jones.')
-        
-    # Before closing the application, check to see if the user's work should be saved.        
+
+    # Before closing the application, check to see if the user's work should be saved.
     def closeEvent(self, e):
         # If the user cancels, don't close.
         if not self.save_before_close():
@@ -604,7 +604,7 @@ def main():
     app.installEventFilter(window)
     window.show()
     sys.exit(app.exec_())
-    
+
 if __name__ == '__main__':
     # Make Python think we're running from the parent directory, so Sphinx will find the CodeChat.CodeToRest extension.
     sys.path[0] = os.path.abspath('..')
