@@ -228,6 +228,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.restoreGeometry(bytearray(self.settings.value('geometry', [])))
         self.restoreState(bytearray(self.settings.value('windowState', [])))
         self.splitter.restoreState(bytearray(self.settings.value('splitterSizes', [])))
+        self.splitter_2.restoreState(bytearray(self.settings.value('splitter_2Sizes', [])))
 
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(2)
@@ -592,6 +593,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             # Save settings
             self.settings.setValue("splitterSizes", self.splitter.saveState())
+            self.settings.setValue("splitter_2Sizes", self.splitter_2.saveState())
             self.settings.setValue("windowState", self.saveState())
             self.settings.setValue("geometry", self.saveGeometry())
             # End Sphinx thread
