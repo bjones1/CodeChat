@@ -128,7 +128,7 @@ import codecs
 def code_to_rest(language_specific_options, in_file, out_file):
     unique_remove_comment = (language_specific_options.comment_string + ' ' +
       language_specific_options.unique_remove_str)
-    
+
     # Keep track of the type of the last line.
     last_is_code = False
     # Keep track of the indentation of comment
@@ -172,7 +172,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
             if last_is_code:
                 # Finish code off with a newline-preserving marker
                 current_line_list.insert(0, '\n ' + unique_remove_comment)
-            
+
         # Convert to a string
         line_str = ''.join(current_line_list)
         current_line_list = []
@@ -181,7 +181,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
         # We're done!
         out_file.write(line_str)
         last_is_code = not comment_match
-        
+
     # At the end of the file, include a final newline
     out_file.write('\n')
 
@@ -190,7 +190,7 @@ def CodeToRest(source_path, rst_path, language_specific_options):
     with codecs.open(source_path, 'r', encoding = 'utf-8') as in_file:
         with codecs.open(rst_path, mode = 'w', encoding = 'utf-8') as out_file:
             code_to_rest(language_specific_options, in_file, out_file)
-            
+
 
 
 # .. function:: sphinx_builder_inited(app)
@@ -230,7 +230,7 @@ def sphinx_builder_inited(app):
                     CodeToRest(source_file, rest_file, lso)
                 else:
                     pass
-    
+
 
 # Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.
 def sphinx_html_page_context(app, pagename, templatename, context, doctree):
@@ -245,7 +245,7 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
         if hasattr(env, "codelinks"):
             for codelink in env.codelinks:
                 print(codelink)
-                str = re.sub('<span class="n">' + codelink['search'] + '</span>', 
+                str = re.sub('<span class="n">' + codelink['search'] + '</span>',
                              '<span class="n"><a href="' + codelink['replace'] + '">' +  codelink['search'] + '</a></span>',
                              str)
         context['body'] = str
@@ -285,7 +285,7 @@ def setup(app):
     # See sphinx_source_read() for more info.
     app.connect('html-page-context', sphinx_html_page_context)
     app.connect('builder-inited', sphinx_builder_inited)
-    
+
     app.add_directive('codelink', CodelinkDirective)
     app.connect('env-purge-doc', purge_codelinks)
 

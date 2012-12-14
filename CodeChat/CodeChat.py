@@ -378,13 +378,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             except os.error:
                 # Ignore if the file no longer exists.
                 pass
-            
+
         # Look for idle time by resetting our timer on any event.
         if ( ((event.type() == QtCore.QEvent.KeyPress) or
               (event.type() == QtCore.QEvent.MouseMove)) and
               self.timer_sync_code_to_web.isActive() ):
             self.timer_sync_code_to_web.restart()
-            
+
         # Allow default Qt event processing
         return QtGui.QMainWindow.eventFilter(self, obj, event)
 
@@ -446,14 +446,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def after_Sphinx(self, s):
         # Display Sphinx build output
         self.results_plain_text_edit.setPlainText(s)
-        
+
         # Update the browser with Sphinx's output. Save and restore the cursor to keep the screen from jumping around.
         web_cursor = self.textBrowser.textCursor()
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
         self.textBrowser.setTextCursor(web_cursor)
-        
+
         # Resync web with code
         self.timer_sync_code_to_web.restart()
 
@@ -474,7 +474,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def code_to_web_sync(self):
         # If any links were clicked, go back to document matching the code view.
         self.textBrowser.setSource(self.html_url())
-        
+
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,

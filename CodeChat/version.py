@@ -4,4 +4,4 @@
 # ==========
 # This file provides the version of the program as a date.
 PROGRAM_DATE = \
-  '13-Dec-2012'
+  '14-Dec-2012'

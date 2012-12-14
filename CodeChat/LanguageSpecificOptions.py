@@ -26,7 +26,7 @@ class LanguageSpecificOptions(object):
     #
     #    A unique string to mark lines for removal in HTML.
     unique_remove_str = 'wokifvzohtdlm'
-    
+
     # .. attribute:: language_specific_options
     #
     #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.

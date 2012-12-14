@@ -51,7 +51,7 @@ def find_approx_text(search_text, target_text, cost = None):
     # match.group()[0][0] contains the the index into the target string of the
     # first matched char
     begin_in_target, end_in_target = match.groups()[0]
-    
+
     # TRE picks the first match it finds, even if there is more than one matck with identical error. So, manually call it again with a substring to check. In addition, make sure this match is unique: it should be 10% better than the next best match.
     match_again = pat.search(target_text[end_in_target:], fz)
     if match_again and (match_again.cost <= match.cost*1.1):
@@ -94,7 +94,7 @@ def find_approx_text_in_target(
 ##        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
 ##            f.write("No unique match found.\n" + search_text[begin:end] + '\n\n\n\n' + target_text)
         return -1
-    
+
     # **Record this cost (the difference between the source and target substrings). Perform all future searches only within the source and target substrings found in this search.**
     min_cost = match.cost
     min_cost_begin = begin
@@ -102,7 +102,7 @@ def find_approx_text_in_target(
     # For debug logging
  ##   log_begin = begin
  ##   log_end = end
-    
+
     # For an exact match, need to define this, since the while loops won't. We're 0 characters forward from the begin_in_target point before we do any additional search refinements.
     begin_in_target_substr = 0
 
@@ -117,13 +117,13 @@ def find_approx_text_in_target(
         # this case.
         end -= max((end - search_anchor) - step_size, 1)
         match, begin_in_target_substr, end_in_target_substr = \
-            find_approx_text(search_text[begin:end], 
+            find_approx_text(search_text[begin:end],
                              target_text[begin_in_target:end_in_target])
 
         # **If there are multiple matches, undo this search radius change and exit. This is the lowest achievable cost.**
         if not match:
             break
-        
+
         # **If the cost has decreased, record this new cost and its associated left search radius.**
         if match.cost < min_cost:
             min_cost = match.cost
@@ -142,7 +142,7 @@ def find_approx_text_in_target(
         # **If there are multiple matches, undo this search radius change and exit. This is the lowest achievable cost.**
         if not match:
             break
-        
+
         # **If the cost has decreased, record this new cost and its associated left search radius.**
         if match.cost < min_cost:
             min_cost = match.cost
@@ -155,7 +155,7 @@ def find_approx_text_in_target(
 ##            f.write(('Failed -- no exact match (cost was %d).\n\n' % min_cost) +
 ##              search_text[log_begin:log_end] + '\n\n' +
 ##              search_text[begin:min_cost_end] + '\n\n' +
-##              target_text[begin_in_target:end_in_target] + '\n\n' + 
+##              target_text[begin_in_target:end_in_target] + '\n\n' +
 ##              target_text)
     offset = begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
     # Make sure the result lies within the bounds of target_text. Since we return a cursor position, an offset of len(target_text), meaning the end of target_text, is valid.

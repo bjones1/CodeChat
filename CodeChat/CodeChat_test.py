@@ -56,7 +56,7 @@ class TestFindLongestMatchingString(object):
                   search_text = '# The :doc:`README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.',
                   target_text = 'The CodeChat user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system.')
         assert index == 66-34
-        
+
 # Test the fixup code which removed junk lines used only to produce a desired indent.
 from CodeToRest import sphinx_html_page_context
 class TestHtmlCleanup(object):
@@ -65,19 +65,19 @@ class TestHtmlCleanup(object):
         context = {'body' : string}
         sphinx_html_page_context(None, None, None, context, None)
         return context['body']
-        
+
     # Show that normal text isn't changed
     def test_1(self):
         string = 'testing'
         ret = self.s(string)
         assert ret == string
-        
+
     def test_2(self):
         string = 'testing'
         ret = self.s(string)
         assert ret == string
 
-from cStringIO import StringIO        
+from cStringIO import StringIO
 from CodeToRest import code_to_rest
 from LanguageSpecificOptions import LanguageSpecificOptions
 from pygments.lexers.compiled import CLexer, CppLexer
@@ -94,7 +94,7 @@ class TestHtmlCleanup(object):
         # For convenience, create the removal string for the chosen language
         unique_remove_comment = lso.comment_string + ' ' + lso.unique_remove_str + '\n'
         return out_stringIO.getvalue(), unique_remove_comment
-        
+
     # A single line of code, without an ending \n
     def test_1(self):
         ret, comment = self.t('testing')
