@@ -229,7 +229,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
-        self.textBrowser.mouseDoubleClickEvent = lambda e: self.on_action_Toggle_view_triggered()
+        self.textBrowser.mouseDoubleClickEvent = lambda e: self.web_to_code_sync()
 
         # | --Configure QScintilla--
         # | Set the default font
@@ -258,8 +258,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
         # Auto-save and build whenever edits are made.
         self.plainTextEdit.modificationChanged.connect(lambda changed: self.save_then_update_html())
-        # Update web hilight whenever code cursor moves
-        self.plainTextEdit.cursorPositionChanged.connect(self.on_plainTextEdit_cursor_position_change)
+        # Update web hilight whenever code cursor moves and the app is idle.
+        self.timer_sync_code_to_web = QtCore.QTimer()
+        self.timer_sync_code_to_web.setSingleShot(True)
+        self.timer_sync_code_to_web.setInterval(250)
+        self.timer_sync_code_to_web.timeout.connect(self.code_to_web_sync)
+        self.plainTextEdit.cursorPositionChanged.connect(lambda line, pos: self.timer_sync_code_to_web.start())
 
         # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         self.is_building = False
@@ -277,12 +281,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
             self.open_contents()
-
-        # Update html for initial open
-        self.save_then_update_html()
-
-    def on_plainTextEdit_cursor_position_change(self, line, index):
-        print('change')
 
 # File operations
 # ^^^^^^^^^^^^^^^
@@ -323,11 +321,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     # Reload the source file then regenerate the HTML file from it, if necessary.
     def reload(self):
         assert not self.plainTextEdit.isModified()
-        # Save the cursor position from the current view.
+        # Save the cursor position for the code view.
         # TODO: save selection, not just cursor position.
-        plain_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
-        web_cursor = self.textBrowser.textCursor()
-        web_pos = web_cursor.position()
+        code_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         # Reload text file
         try:
             with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
@@ -340,10 +336,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setModified(False)
         self.mru_files.add_file(self.source_file)
         # Restore cursor positions
-        web_cursor.setPosition(web_pos, QtGui.QTextCursor.MoveAnchor)
-        web_cursor.select(QtGui.QTextCursor.LineUnderCursor)
-        self.textBrowser.setTextCursor(web_cursor)
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, plain_pos)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, code_pos)
+        # Force a rebuild to display this new document
+        self.need_to_build = True
+        self.save_then_update_html()
 
     def open_contents(self):
         self.source_file = 'contents.rst'
@@ -356,9 +352,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.setModified(False)
             self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
             self.source_file_time = 0
+            # Force a rebuild to display this new document
+            self.need_to_build = True
+            self.save_then_update_html()
 
-    # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
     def eventFilter(self, obj, event):
+        # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
         if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
             try:
                 if os.path.getmtime(self.source_file) != self.source_file_time:
@@ -366,6 +365,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             except os.error:
                 # Ignore if the file no longer exists.
                 pass
+            
+        # Look for idle time by resetting our timer on any event.
+        if ( (event.type() == QtCore.QEvent.KeyPress) or
+             (event.type() == QtCore.QEvent.MouseMove) ):
+            self.timer_sync_code_to_web.stop()
+            self.timer_sync_code_to_web.start()
+            
+        # Allow default Qt event processing
         return QtGui.QMainWindow.eventFilter(self, obj, event)
 
     def save(self):
@@ -445,12 +452,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def html_url(self):
         return QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file).replace('\\', '/'))
 
-# Switching between text and HTML
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    # When switching, this code attempts to locate the same text in ther other view.
+# Syncing between code and web
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    # When syncing, this code attempts to locate the same text in ther other view.
     #
-    # To switch, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
-    def plain_text_to_html_switch(self):
+    # To sync, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
+    def code_to_web_sync(self):
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
@@ -468,11 +475,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             delta = cursor_center_y - viewport_center_y
             # Note: We can't use the temptingly-named scrollContentsBy: per the `docs <http://doc.qt.digia.com/qt/qabstractscrollarea.html#scrollContentsBy>`_, "Calling this function in order to scroll programmatically is an error, use the scroll bars instead."
             self.textBrowser.verticalScrollBar().setSliderPosition(self.textBrowser.verticalScrollBar().sliderPosition() + delta)
-        else:
-            pass
-##            print('Not found.')
 
-    def html_to_plain_text_switch(self):
+    def web_to_code_sync(self):
         # Search for text under HTML cursor in plain text.
         textBrowser_cursor_pos = self.textBrowser.textCursor().position()
         found = find_approx_text_in_target(self.textBrowser.toPlainText(),
@@ -481,9 +485,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Update position in plain text widget if text was found.
         if found >= 0:
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GOTOPOS, found)
-        else:
-            pass
-##            print('Not found.')
         # Hide html, show plain text widgets. Placing this code at the beginning of this function makes it find the wrong location (???).
         self.plainTextEdit.setFocus()
 
@@ -531,18 +532,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def on_action_Reload_triggered(self):
         if self.save_before_reload():
             self.reload()
-
-    @QtCore.pyqtSlot()
-    def on_action_Save_triggered(self):
-        self.save()
-
-    @QtCore.pyqtSlot()
-    def on_action_Toggle_view_triggered(self):
-        # Only one view should be active at a time.
-        if self.plainTextEdit.hasFocus():
-            self.plain_text_to_html_switch()
-        else:
-            self.html_to_plain_text_switch()
 
     @QtCore.pyqtSlot()
     def on_action_in_browser_triggered(self):

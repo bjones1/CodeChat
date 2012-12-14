@@ -193,7 +193,6 @@
     <addaction name="action_Choose_project_dir"/>
     <addaction name="action_Open"/>
     <addaction name="action_Reload"/>
-    <addaction name="action_Save"/>
     <addaction name="action_Quit"/>
     <addaction name="separator"/>
    </widget>
@@ -231,17 +230,6 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="action_Save">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>&amp;Save</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
-  </action>
   <action name="action_Quit">
    <property name="text">
     <string>&amp;Quit</string>
@@ -267,6 +255,9 @@
    </property>
   </action>
   <action name="action_Toggle_view">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>To&amp;ggle view</string>
    </property>
