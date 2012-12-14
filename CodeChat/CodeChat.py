@@ -229,10 +229,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
-        # This syntax produces a ``TypeError: invalid argument to sipBadCatcherResult()`` on a double-click. Not sure why.
-        ## self.textBrowser.mouseDoubleClickEvent = lambda e:  self.on_action_Toggle_view_triggered
-        # This works fine.
-        self.textBrowser.mouseDoubleClickEvent = self.mouseDoubleClickEvent
+        self.textBrowser.mouseDoubleClickEvent = lambda e: self.on_action_Toggle_view_triggered()
 
         # | --Configure QScintilla--
         # | Set the default font
@@ -259,13 +256,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Show a difference background for the line the cursor is in
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEBACK, 0x99FFFF)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
-        # Enable/disable the save menu item when the plain text modification
-        # state changes.
-        self.plainTextEdit.modificationChanged.connect(self.on_code_change_triggered)
-        # On a double-click, switch views.
-        self.plainTextEdit.mouseDoubleClickEvent = self.mouseDoubleClickEvent
+        # Auto-save and build whenever edits are made.
+        self.plainTextEdit.modificationChanged.connect(lambda changed: self.save_then_update_html())
+        # Update web hilight whenever code cursor moves
+        self.plainTextEdit.cursorPositionChanged.connect(self.on_plainTextEdit_cursor_position_change)
             
-        # Prepare for running Sphinx in the background
+        # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         self.is_building = False
         self.need_to_build = True
         self.thread_Sphinx = QtCore.QThread()
@@ -274,6 +270,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.obj_sphinx.signal_Sphinx_done.connect(self.after_Sphinx)
         self.signal_Sphinx_start.connect(self.obj_sphinx.run_Sphinx)
         self.thread_Sphinx.start()
+        
         
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
@@ -284,13 +281,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Update html for initial open
         self.save_then_update_html()
         
-    def on_code_change_triggered(self, changed):
-        self.action_Save.setEnabled(changed)
-        self.save_then_update_html()
-
-    def mouseDoubleClickEvent(self, e):
-        self.on_action_Toggle_view_triggered()
-        
+    def on_plainTextEdit_cursor_position_change(self, line, index):
+        print('change')
+                
 # File operations
 # ^^^^^^^^^^^^^^^
     # Open a new source file
@@ -427,15 +420,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.plainTextEdit.isModified():
             self.save()
             
-        self.results_plain_text_edit.setPlainText('Sphinx running...\n')
+        self.results_plain_text_edit.setPlainText('Sphinx running...')
         # This won't be displayed until after Sphinx runs without processing events.
         self.app.processEvents()
-        print('1')
         self.signal_Sphinx_start.emit(self.html_dir)
-        print('2')
         
     def after_Sphinx(self, s):
-        self.results_plain_text_edit.appendPlainText(s + '\n...done.')
+        self.results_plain_text_edit.setPlainText(s)
         
         # Update the browser with Sphinx's output
         self.textBrowser.setSource(self.html_url())
@@ -457,11 +448,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     # When switching, this code attempts to locate the same text in ther other view.
     #
-    # To switch, do a save and update if modified. Then, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
+    # To switch, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
     def plain_text_to_html_switch(self):
-        self.save_then_update_html()
-        # Hide plain text, show html widgets. If these aren't made visible here, the self.textBrowser.cursorRect() and similar calls return junk.
-        self.textBrowser.setFocus()
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
@@ -480,7 +468,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             # Note: We can't use the temptingly-named scrollContentsBy: per the `docs <http://doc.qt.digia.com/qt/qabstractscrollarea.html#scrollContentsBy>`_, "Calling this function in order to scroll programmatically is an error, use the scroll bars instead."
             self.textBrowser.verticalScrollBar().setSliderPosition(self.textBrowser.verticalScrollBar().sliderPosition() + delta)
         else:
-            print('Not found.')
+            pass
+##            print('Not found.')
         
     def html_to_plain_text_switch(self):
         # Search for text under HTML cursor in plain text.
@@ -492,7 +481,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if found >= 0:
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GOTOPOS, found)
         else:
-            print('Not found.')
+            pass
+##            print('Not found.')
         # Hide html, show plain text widgets. Placing this code at the beginning of this function makes it find the wrong location (???).
         self.plainTextEdit.setFocus()
         
