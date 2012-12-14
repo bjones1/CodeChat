@@ -445,6 +445,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
+        
+        # Resync web with code
+        self.timer_sync_code_to_web.start()
 
         # Update state and start a new build if necessary
         self.is_building = False
