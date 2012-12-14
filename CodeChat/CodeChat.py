@@ -438,7 +438,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
         # Update state and start a new build if necessary
         self.is_building = False
-        if self.plainTextEdit.isModified():
+        if self.plainTextEdit.isModified() or self.need_to_build:
+            self.need_to_build = False
             self.save_then_update_html()
 
     def html_url(self):
