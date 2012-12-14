@@ -13,7 +13,7 @@
 import tre
 
 # For debug
-import codecs
+##import codecs
 
 # .. _find_approx_text:
 #
@@ -90,7 +90,7 @@ def find_approx_text_in_target(
     match, begin_in_target, end_in_target = find_approx_text(search_text[begin:end], target_text)
     # If no unique match is found, give up (for now -- this could be improved).
     if not match:
-        print("No unique match found.")
+##        print("No unique match found.")
 ##        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
 ##            f.write("No unique match found.\n" + search_text[begin:end] + '\n\n\n\n' + target_text)
         return -1
@@ -149,8 +149,8 @@ def find_approx_text_in_target(
             min_cost_begin = begin
 
     # Return the match. It's not perfect if the cost > 0.
-    if min_cost > 0:
-        print('No exact match; cost was %d.' % min_cost)
+##    if min_cost > 0:
+##        print('No exact match; cost was %d.' % min_cost)
 ##        with codecs.open('search_log.txt', 'w', encoding = 'utf-8') as f:
 ##            f.write(('Failed -- no exact match (cost was %d).\n\n' % min_cost) +
 ##              search_text[log_begin:log_end] + '\n\n' +
