@@ -257,7 +257,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEBACK, 0x99FFFF)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
         # Auto-save and build whenever edits are made.
-        self.plainTextEdit.modificationChanged.connect(lambda changed: self.save_then_update_html())
+        self.plainTextEdit.modificationChanged.connect(self.on_code_changed)
         # Update web hilight whenever code cursor moves and the app is idle.
         self.timer_sync_code_to_web = QtCore.QTimer()
         self.timer_sync_code_to_web.setSingleShot(True)
@@ -268,6 +268,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         self.is_building = False
         self.need_to_build = True
+        self.ignore_code_modified = False
         self.thread_Sphinx = QtCore.QThread()
         self.obj_sphinx = SphinxObject()
         self.obj_sphinx.moveToThread(self.thread_Sphinx)
@@ -275,12 +276,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.signal_Sphinx_start.connect(self.obj_sphinx.run_Sphinx)
         self.thread_Sphinx.start()
 
-
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_last():
             self.open_contents()
+
+    def on_code_changed(self, modified):
+        if not self.ignore_code_modified:
+            self.save_then_update_html()
 
 # File operations
 # ^^^^^^^^^^^^^^^
@@ -327,13 +331,16 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Reload text file
         try:
             with codecs.open(self.source_file, 'r', encoding = 'utf-8') as f:
+                self.ignore_code_modified = True
                 self.plainTextEdit.setText(f.read())
         except (IOError, ValueError) as e:
+            self.ignore_code_modified = False
             QtGui.QMessageBox.critical(self, "CodeChat", str(e))
             return
         # Update modification time
         self.source_file_time = os.path.getmtime(self.source_file)
         self.plainTextEdit.setModified(False)
+        self.ignore_code_modified = False
         self.mru_files.add_file(self.source_file)
         # Restore cursor positions
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, code_pos)
@@ -434,7 +441,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.results_plain_text_edit.setPlainText(s)
 
         # Update the browser with Sphinx's output
-        print(self.html_url())
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
