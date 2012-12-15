@@ -18,7 +18,8 @@ You may optionally install:
 
 Recent changes
 --------------
-- Code and web views both open simultaneously, all edits are immediately compiled and then synced.
+- Code and web views both open simultaneously; all edits are immediately compiled then synced.
+- Improved home/end key behavior.
 - Window title shows current project directory and open file.
 - Added ``Create new project``, bug fixes.
 - Added a window to show output from the Sphinx build process.

@@ -254,9 +254,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         # Enable word wrap
         self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
-        # Make home and end go to the beginning and end of the line, not the end of the word-wrapped paragraph.
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_HOMEDISPLAY)
-        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDDISPLAY)
+        # Make home go to the beginning of the line, then to the first non-blank character in the paragraph, then to the beginning of the paragraph. Have end go to the end of the line, then to the end of the paragraph. Default behavior is to always go to the beginning/end of the paragraph.
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_VCHOMEWRAP)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDWRAP)
+        # Use this for shift+home/end as well.
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME + (QsciScintilla.SCMOD_SHIFT << 16), QsciScintilla.SCI_VCHOMEWRAPEXTEND)
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END + (QsciScintilla.SCMOD_SHIFT << 16), QsciScintilla.SCI_LINEENDWRAPEXTEND)
         # Try at removing ctrl-T key binding (use as toggle views instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
         # Show a difference background for the line the cursor is in
@@ -447,15 +450,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Display Sphinx build output
         self.results_plain_text_edit.setPlainText(s)
 
-        # Update the browser with Sphinx's output. Save and restore the cursor to keep the screen from jumping around.
-        web_cursor = self.textBrowser.textCursor()
+        # Update the browser with Sphinx's output.
         self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
         self.textBrowser.reload()
-        self.textBrowser.setTextCursor(web_cursor)
 
-        # Resync web with code
-        self.timer_sync_code_to_web.restart()
+        # Resync web with code -- this also prevents the screen from jumping around (on a reload(), it jump to the top). Since we're syncing now, cancel any future syncs.
+        self.timer_sync_code_to_web.stop()
+        self.code_to_web_sync()
 
         # Update state and start a new build if necessary
         self.is_building = False
