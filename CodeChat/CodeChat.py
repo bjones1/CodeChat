@@ -243,9 +243,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.font.setFamily('Courier New')
         self.font.setFixedPitch(True)
         self.font.setPointSize(10)
-        # Margin 0 is used for line numbers
-        fontmetrics = QtGui.QFontMetrics(self.font)
+        self.plainTextEdit.setFont(self.font)
         self.plainTextEdit.setMarginsFont(self.font)
+        # Margin 0 is used for line numbers. Configure it.
+        fontmetrics = QtGui.QFontMetrics(self.font)
         self.plainTextEdit.setMarginWidth(0, fontmetrics.width("00000") + 6)
         self.plainTextEdit.setMarginLineNumbers(0, True)
         self.plainTextEdit.setMarginsBackgroundColor(QtGui.QColor("#cccccc"))
