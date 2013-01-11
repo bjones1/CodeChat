@@ -360,18 +360,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     def open_contents(self):
         self.source_file = 'contents.rst'
-        if os.path.exists(self.source_file):
-            self.open(self.source_file)
-        else:
-            # It's a new file, so make it empty and give it a modification time in the past.
-            self.plainTextEdit.setText('')
-            self.textBrowser.setPlainText('')
-            self.plainTextEdit.setModified(False)
-            self.setWindowTitle('CodeChat - ' + self.project_dir + ' - ' + self.source_file)
-            self.source_file_time = 0
-            # Force a rebuild to display this new document
-            self.need_to_build = True
-            self.save_then_update_html()
+        # If this file doesn't exist, create a blank one.
+        if not os.path.exists(self.source_file):
+            # Create a blank file
+            try:
+                with open(self.source_file, 'w'):
+                    # Write nothing, so it's empty.
+                    pass
+            except IOError:
+                print('Panic!')
+        # Now open it.
+        self.open(self.source_file)
 
     def eventFilter(self, obj, event):
         # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
@@ -452,9 +451,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.results_plain_text_edit.setPlainText(s)
 
         # Update the browser with Sphinx's output.
-        self.textBrowser.setSource(self.html_url())
+        if os.path.exists(self.get_html_file()):
+            self.textBrowser.setSource(self.html_url())
         # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
-        self.textBrowser.reload()
+            self.textBrowser.reload()
+        else:
+            self.textBrowser.setHtml('')
 
         # Resync web with code -- this also prevents the screen from jumping around (on a reload(), it jump to the top). Since we're syncing now, cancel any future syncs.
         self.timer_sync_code_to_web.stop()
@@ -467,7 +469,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.save_then_update_html()
 
     def html_url(self):
-        return QtCore.QUrl('file:///' + os.path.join(self.project_dir, self.html_file).replace('\\', '/'))
+        return QtCore.QUrl('file:///' + self.get_html_file().replace('\\', '/'))
+
+    def get_html_file(self):
+        return os.path.join(self.project_dir, self.html_file)
 
 # Syncing between code and web
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -476,7 +481,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     # To sync, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
     def code_to_web_sync(self):
         # If any links were clicked, go back to document matching the code view.
-        self.textBrowser.setSource(self.html_url())
+        if os.path.exists(self.get_html_file()):
+            self.textBrowser.setSource(self.html_url())
 
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
