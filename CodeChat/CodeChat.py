@@ -480,9 +480,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     #
     # To sync, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
     def code_to_web_sync(self):
-        # If any links were clicked, go back to document matching the code view.
-        if os.path.exists(self.get_html_file()):
-            self.textBrowser.setSource(self.html_url())
+        # If any links were clicked, go back to document matching the code view. Note: just calling setSource scrolls to the top of the document; to avoid this, only setSource if source changed.
+        html_url = self.html_url()
+        if self.textBrowser.source() != html_url and os.path.exists(self.get_html_file()):
+            self.textBrowser.setSource(html_url)
 
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
