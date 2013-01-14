@@ -18,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- Bug fixes: CodeChat no longer crashes when the last project directory is missing; the web view doesn't jump to the top when code under the cursor isn't found in the web view.
 - Code and web views both open simultaneously; all edits are immediately compiled then synced.
 - Improved home/end key behavior.
 - Window title shows current project directory and open file.
