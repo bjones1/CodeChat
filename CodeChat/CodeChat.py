@@ -593,7 +593,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QMessageBox.about(self, 'CodeChat',
           u'CodeChat, a conversational coding system,\n' +
           u'was last revised on ' + version.PROGRAM_DATE + '.\n\n' +
-          u'\u00A9 Copyright 2012 by Bryan A. Jones.')
+          u'\u00A9 Copyright 2013 by Bryan A. Jones.')
 
     # Before closing the application, check to see if the user's work should be saved.
     def closeEvent(self, e):
