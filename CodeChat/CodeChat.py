@@ -7,7 +7,7 @@
 #
 # Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
 #
-# The :doc:`../README` user manual gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
+# The :doc:`user manual <../README>` gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
 #
 # ==============================    ===================
 # Functionality                     Module
@@ -25,27 +25,23 @@
 # - Rewrite documentation in this program
 # - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
-# - Fix broken regexps for comments
-# - Add a create new project option
+# - Fix broken regexps for comments (#foo doesn't work)
 # - Fix extensions in LanguageSpecificOptions
-# - Show Sphinx build progress as a progress bar
-#
-#   - Create an object implementing `file methods <http://docs.python.org/2/library/stdtypes.html#bltin-file-objects>`_ which puts results into a dialog box.
-#   - Assign this to sys.stdout, sys.stderr
 # - Create a short how-to video
 # - Some way to display Sphinx errors then find the offending source line
 # - Fix editor to render better HTML (long term -- probably QWebKit)
+# - Port to Unix, Mac using CMake / CPack
 #
 # MRU list
 # --------
 # This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry.
-
+#
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/incompatible_apis.html for more information.
 import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
 # Not sure what this does -- I still have to use QtCore.QUrl to build urls. ??? It also makes the Spyder debugger mad, so omit for now.
-# sip.setapi('QUrl', 2)
+## sip.setapi('QUrl', 2)
 
 # The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package.
 from PyQt4 import QtGui, QtCore, uic
