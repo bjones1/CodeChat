@@ -32,11 +32,7 @@
 # - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Port to Unix, Mac using CMake / CPack
 #
-# MRU list
-# --------
-# This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry.
-#
-# The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/incompatible_apis.html for more information.
+# The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
 sip.setapi('QString', 2)
 sip.setapi('QVariant', 2)
@@ -47,24 +43,33 @@ sip.setapi('QVariant', 2)
 from PyQt4 import QtGui, QtCore, uic
 
 import os
-# A class to keep track of the most recently used files
+# MRU list
+# --------
+# This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry, pushing any updates to ``self.mru_action_list``, a list of File menu QActions (see update_gui_).
 class MruFiles(object):
-    # Initialize the mru list and the File menu's MRU items
-    def __init__(self, parent, settings):
+    # Initialize the MRU list and the File menu's MRU items.
+    def __init__(self,
+                 # The parent CodeChatWindow; this class will modify its File menu.
+                 parent,
+                 # An instance of QSettings in which this class will store MRU information.
+                 settings):
         self.mru_list_key = "MRU list"
         self.max_files = 10
         self.settings = settings
         self.parent = parent
-        # Create max_files QActions for mru entries and place them (hidden) in the File menu.
+        # Create max_files QActions for MRU entries and place them (hidden) in the File menu.
         self.mru_action_list = []
         for index in range(self.max_files):
             mru_item = QtGui.QAction(parent)
             mru_item.setVisible(False)
+            # Assign a ctrl+number shortcut key if possible.
             if (index < 10):
                 mru_item.setShortcut(QtGui.QKeySequence('Ctrl+' + str(index)))
+            # Notify this class when an MRU item on the file menu is triggered.
             mru_item.triggered.connect(self.mru_triggered)
             parent.menu_File.addAction(mru_item)
             self.mru_action_list.append(mru_item)
+        # Perform an initial update of the File menu items, now that they're created.
         self.update_gui()
 
     def open_last(self):
@@ -77,7 +82,7 @@ class MruFiles(object):
                 return True
         return False
 
-    # Called when an mru file is triggered
+    # Called when an MRU file is triggered.
     @QtCore.pyqtSlot()
     def mru_triggered(self):
         # Determine which action sent this signal
@@ -106,6 +111,7 @@ class MruFiles(object):
         # Update the GUI
         self.update_gui()
 
+    # .. _update_gui:
     def update_gui(self):
         # For each elemnt in the mru list, update the menu item
         mru_list = self.get_mru_list()
@@ -227,7 +233,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.splitter_2.restoreState(bytearray(self.settings.value('splitter_2Sizes', [])))
 
         # Select a larger font for the HTML editor
-        self.textBrowser.zoomIn(2)
+        self.textBrowser.zoomIn(6)
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
@@ -619,6 +625,6 @@ def main():
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    # Make Python think we're running from the parent directory, so Sphinx will find the CodeChat.CodeToRest extension.
-    sys.path[0] = os.path.abspath('..')
+    # This line allows running this module as a script from Spyder. Without it, Sphinx reports ``Extension error: Could not import extension CodeChat.CodeToRest (exception: No module named CodeToRest)``.
+    sys.path[0] = '.'
     main()
