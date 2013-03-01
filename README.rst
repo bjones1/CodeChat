@@ -7,7 +7,7 @@ Welcome to CodeChat_, a conversational coding system. CodeChat encourages `liter
 
 Getting started
 ---------------
-First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351/CodeChat/Install_CodeChat.exe>`_ to install the program. To create a new CodeChat project, select ``File | Create new project`` and place it in a directory of your choosing, then follow the directions that appear.
+First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351/CodeChat/Install_CodeChat.exe>`_ to install the program. Next, create a new CodeChat project by selecting ``File | Create new project`` and place it in a directory of your choosing, then follow the directions that appear.
 
 Optional modules
 ----------------
@@ -18,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- Double-clicking on equations now searches for the underlying LaTeX source (experimental).
 - Bug fixes: CodeChat no longer crashes when the last project directory is missing; the web view doesn't jump to the top when code under the cursor isn't found in the web view.
 - Code and web views both open simultaneously; all edits are immediately compiled then synced.
 - Improved home/end key behavior.
@@ -27,7 +28,6 @@ Recent changes
 - Save/restore window geometry.
 - Support for PHP, MATLAB files.
 - Make matched text in browser/code views more visible.
-- Enable double-click to switch views.
 
 Contributing
 ------------

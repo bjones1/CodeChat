@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-
-# Testing
-# -------
+#
+# Unit testing
+# ------------
 # This test bench exercises the FindLongestMatchingString module.
 
 from FindLongestMatchingString import find_approx_text_in_target as f

@@ -2,7 +2,6 @@
 #
 # CodeChat
 # ========
-#
 # .. module:: CodeChat
 #
 # Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
@@ -22,6 +21,7 @@
 #
 # To do
 # -----
+# - Pre-process search text to convert images to alt text in web_to_code_sync?
 # - Rewrite documentation in this program
 # - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
@@ -31,6 +31,8 @@
 # - Some way to display Sphinx errors then find the offending source line
 # - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Port to Unix, Mac using CMake / CPack
+# - Toolbars to insert common expressions (hyperlink, footnote, etc)
+# - Better Sphinx status (progress bar?) for long builds.
 #
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
@@ -77,6 +79,7 @@ class MruFiles(object):
         mru_list = self.get_mru_list()
         if mru_list:
             file_name = str(mru_list[0])
+            # TODO: This is the wrong approach. What if the file was deleted just after this check? Instead, open should throw an exception that this code should catch and return false with.
             if os.path.exists(file_name):
                 self.parent.open(file_name)
                 return True
@@ -90,9 +93,10 @@ class MruFiles(object):
         if mru_action:
             # Get the file name stored within that action
             file_name = mru_action.data()
+            # TODO: Catch any exceptions thrown by this open.
             self.parent.open(file_name)
 
-    # Returns the mru list as a list
+    # Returns the registry's mru list as a Python list.
     def get_mru_list(self):
         return list(self.settings.value(self.mru_list_key, []))
 
@@ -201,6 +205,8 @@ import sys
 # Use to copy new project file
 import shutil
 
+import re
+
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use.
     signal_Sphinx_start = QtCore.pyqtSignal(str)
@@ -233,7 +239,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.splitter_2.restoreState(bytearray(self.settings.value('splitter_2Sizes', [])))
 
         # Select a larger font for the HTML editor
-        self.textBrowser.zoomIn(6)
+        self.textBrowser.zoomIn(3)
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
@@ -506,10 +512,30 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.textBrowser.verticalScrollBar().setSliderPosition(self.textBrowser.verticalScrollBar().sliderPosition() + delta)
 
     def web_to_code_sync(self):
-        # Search for text under HTML cursor in plain text.
-        textBrowser_cursor_pos = self.textBrowser.textCursor().position()
-        found = find_approx_text_in_target(self.textBrowser.toPlainText(),
-                                           textBrowser_cursor_pos,
+        # Get the HTML as text, the source of our search string.
+        search_text = self.textBrowser.toPlainText()
+        search_index = self.textBrowser.textCursor().position()
+
+        # If an image was clicked, insert its alt text in the search string.
+        format = self.textBrowser.textCursor().charFormat()
+        if format.isImageFormat():
+            # This is the name of the image. Look through the html to find the alt tag following the image's name.
+            image_path = format.toImageFormat().name()
+            # Can't use self.textBrowser.toHtml(), since Qt strips out the alt tag, which we need. Instead, read it from the file.
+            try:
+                with open(self.get_html_file(), 'r') as html_file:
+                    html = html_file.read()
+                # Group 1 of this regular expression will contain the alt text.
+                match = re.search('src="%s" alt="([^"]*)"' % re.escape(image_path), html)
+                if match:
+                    # If found, insert it at the cursor.
+                    search_text = search_text[:search_index] + match.group(1) + search_text[search_index:]
+                    print('Searching for ' + match.group(1))
+            except IOError:
+                pass
+
+        found = find_approx_text_in_target(search_text,
+                                           search_index,
                                            self.plainTextEdit.text())
         # Update position in plain text widget if text was found.
         if found >= 0:
