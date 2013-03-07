@@ -18,7 +18,8 @@ You may optionally install:
 
 Recent changes
 --------------
-- Double-clicking on equations now searches for the underlying LaTeX source (experimental).
+- The location in the web view is preserved even which a sync can't locate the corresponding position in the code view.
+- Double-clicking on equations now searches for the underlying LaTeX source.
 - Bug fixes: CodeChat no longer crashes when the last project directory is missing; the web view doesn't jump to the top when code under the cursor isn't found in the web view.
 - Code and web views both open simultaneously; all edits are immediately compiled then synced.
 - Improved home/end key behavior.

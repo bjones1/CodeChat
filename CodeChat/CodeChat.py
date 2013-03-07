@@ -448,6 +448,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             return
         self.is_building = True
 
+        # TODO: if Sphinx gets stuck, this will never save your work!
         if self.plainTextEdit.isModified():
             self.save()
 
@@ -460,13 +461,16 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
         # Update the browser with Sphinx's output.
         if os.path.exists(self.get_html_file()):
+            # Keep the same scroll position after reloading the file.
+            slider_pos = self.textBrowser.verticalScrollBar().sliderPosition()
             self.textBrowser.setSource(self.html_url())
-        # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
+            # If the source URL doesn't change, but the file it points to does, reload it; otherwise, QT won't update itself.
             self.textBrowser.reload()
+            self.textBrowser.verticalScrollBar().setSliderPosition(slider_pos)
         else:
             self.textBrowser.setHtml('')
 
-        # Resync web with code -- this also prevents the screen from jumping around (on a reload(), it jump to the top). Since we're syncing now, cancel any future syncs.
+        # Resync web with code -- this also prevents the screen from jumping around (on a reload(), it jumps to the top). Since we're syncing now, cancel any future syncs.
         self.timer_sync_code_to_web.stop()
         self.code_to_web_sync()
 
@@ -530,7 +534,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
                 if match:
                     # If found, insert it at the cursor.
                     search_text = search_text[:search_index] + match.group(1) + search_text[search_index:]
-                    print('Searching for ' + match.group(1))
+                    #print('Searching for ' + match.group(1))
             except IOError:
                 pass
 
