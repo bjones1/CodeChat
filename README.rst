@@ -18,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- The installer and executable should no longer trigger spurious virus warnings.
 - The location in the web view is preserved even which a sync can't locate the corresponding position in the code view.
 - Double-clicking on equations now searches for the underlying LaTeX source.
 - Bug fixes: CodeChat no longer crashes when the last project directory is missing; the web view doesn't jump to the top when code under the cursor isn't found in the web view.
