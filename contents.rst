@@ -8,6 +8,7 @@ User documentation contents:
    README
    template/contents
 
+
 Documentation of CodeChat's implemntation:
 
 .. toctree::
@@ -18,10 +19,19 @@ Documentation of CodeChat's implemntation:
    CodeChat/CodeToRest.py
    CodeChat/LanguageSpecificOptions.py
    CodeChat/version.py
-   CodeChat/CodeChat_test.py
    conf.py
    code_chat.py
    pyinstaller_hooks/hook-CodeChat.py
+
+
+Documentation of CodeChat's unit testing:
+
+.. toctree::
+   :maxdepth: 2
+
+   CodeChat/CodeChat_test.py
+   CodeChat/FindLongestMatchingString_test.py
+   CodeChat/CodeToRest_test.py
 
 Indices and tables
 ==================
