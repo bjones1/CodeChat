@@ -2,11 +2,13 @@
 #
 # Unit testing
 # ------------
-# This test bench exercises the CodeChat module. TODO!
+# This test bench exercises the CodeChat module. It cannot be run directly from Spyder, since that produces spurious errors (``ImportError: No module named CodeChat_test``). Therefore, the auto-run code (pytest.main()) is omitted.
+#
+# TODO
 
-import sys
-from PyQt4 import QtGui, QtCore
+# This must appear before importing PyQt4, since it sets SIP's api version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import MruFiles, form_class
+from PyQt4 import QtGui, QtCore
 
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self):
@@ -26,15 +28,3 @@ class TestMruFiles(object):
             settings.remove(key)
         mru_files = MruFiles(mw, settings)
         assert mru_files.get_mru_list() == []
-
-import pytest
-def main():
-    # Run all tests -- see http://pytest.org/latest/usage.html#calling-pytest-from-python-code.
-    pytest.main()
-    # Run a specifically-named test -- see above link plus http://pytest.org/latest/usage.html#specifying-tests-selecting-tests.
-    #pytest.main('-k test_11')
-
-if __name__ == '__main__':
-#    main()
-    a = TestMruFiles()
-    a.test_mru_list_empty()
