@@ -18,7 +18,7 @@ class TestMruFiles(object):
     # The MruFiles object should work with nothing in the MRU list.
     def test_mru_list_empty(self):
         # Removing ``app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error.
-        app = QtGui.QApplication(sys.argv)
+        app = QtGui.QApplication([])
         mw = CodeChatWindow()
         settings = QtCore.QSettings("MSU BJones", "CodeChat_test")
         # Remove all keys
