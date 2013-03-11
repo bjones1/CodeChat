@@ -9,7 +9,7 @@ User documentation contents:
    template/contents
 
 
-Documentation of CodeChat's implemntation:
+Documentation of CodeChat's implementation:
 
 .. toctree::
    :maxdepth: 2
