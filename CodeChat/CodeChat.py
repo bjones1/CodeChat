@@ -74,8 +74,8 @@ class MruFiles(object):
         # Perform an initial update of the File menu items, now that they're created.
         self.update_gui()
 
-    def open_last(self):
-        # Open the last file automatically
+    def open_mru(self):
+        # Open the most recently used file (the file that was open when the program exited).
         mru_list = self.get_mru_list()
         if mru_list:
             file_name = str(mru_list[0])
@@ -297,7 +297,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Set up the file MRU from the registry
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
-        if not self.mru_files.open_last():
+        if not self.mru_files.open_mru():
             self.open_contents()
 
     def on_code_changed(self, modified):

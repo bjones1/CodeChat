@@ -30,4 +30,4 @@ class TestMruFiles(object):
         # The MRU list should be empty
         assert mru_files.get_mru_list() == []
         # There's no MRU file to open.
-        assert mru_files.open_last() == False
+        assert mru_files.open_mru() == False
