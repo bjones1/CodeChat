@@ -17,8 +17,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.setupUi(self)
 
 class TestMruFiles(object):
-    # The MruFiles object should work with nothing in the MRU list.
-    def test_mru_list_empty(self):
+    def setup(self):
         # Removing ``app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error.
         app = QtGui.QApplication([])
         mw = CodeChatWindow()
@@ -26,8 +25,22 @@ class TestMruFiles(object):
         # Remove all keys
         for key in settings.allKeys():
             settings.remove(key)
-        mru_files = MruFiles(mw, settings)
+        self.mru_files = MruFiles(mw, settings)
+
+    # The MruFiles object should work with nothing in the MRU list.
+    def test_mru_list_empty(self):
         # The MRU list should be empty
-        assert mru_files.get_mru_list() == []
+        assert self.mru_files.get_mru_list() == []
         # There's no MRU file to open.
-        assert mru_files.open_mru() == False
+        assert self.mru_files.open_mru() == False
+
+    # Insert items. The most recently inserted item should be at the top, while the first insertion is at the end of the list.
+    def test_mru_insert_order(self):
+        # Create a list ['a', 'b', ... 'j'], 10 items long.
+        file_list = [chr(ord('a') + i) for i in range(10)]
+        # Add these as files to the MRU list.
+        for file_name in file_list:
+            self.mru_files.add_file(file_name)
+        # Check the order.
+        file_list.reverse()
+        assert self.mru_files.get_mru_list() == file_list
