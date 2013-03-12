@@ -27,4 +27,7 @@ class TestMruFiles(object):
         for key in settings.allKeys():
             settings.remove(key)
         mru_files = MruFiles(mw, settings)
+        # The MRU list should be empty
         assert mru_files.get_mru_list() == []
+        # There's no MRU file to open.
+        assert mru_files.open_last() == False
