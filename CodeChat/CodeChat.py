@@ -21,7 +21,19 @@
 #
 # To do
 # -----
-# - Pre-process search text to convert images to alt text in web_to_code_sync?
+# - Pre-process search text to convert images to alt text in web_to_code_sync:
+#
+#   - Create a list of (index, inserted alt text string length) to convert an index from the QTextEdit to an index in this text-only, images-replaced-as-alt-text version of the document.
+# - Provide a styled preview: instead of styling only code, copy formatting from HTML version to plain text version using Scintilla's `styling <http://www.scintilla.org/ScintillaDoc.html#Styling>`_ feature. Basically, the code in the left view would have different font/size/color attributes, but be verbatim text. Any paragraph-level formatting (lists, indents, etc.) would be eventually handled by auto-word-wrap which makes the code look indented, etc, but not rely on any actual word-processor like formatting: the idea is to keep the code the same, just make it prettier. Perhaps have a toggle?
+#
+#   - One option is to throw away Scintilla's lexer for sytax coloring in favor of results copied from Pygments. This would be more consistent.
+#   - One obvious problem: how to style text (comment characters, etc.) that doesn't appear in the HTML version?
+#   - Use proportional text or not? Proportional provides a better preview, but makes some areas (getting title underline correct lengths) hard and others (working with tables) frustrating and nearly impossible.
+#   - Implementation sketch: QTextEdit.document() gives a QTextDocument(). QTextDocument.begin() on this yields a QTextBlock; iterate using QTextBlock.next(). In each block, check QTextBlock.isValid(), then look at each QTextFragment in the block (QTextBlock.begin(); iterator.atEnd(), iterator.fragment().charFormat() use QTextBlock.text(), QTextBlock.charFormat().font() to get info.
+#   - Other ideas:
+#
+#     - Extend Sphinx' HTML formatter to output everything (all whitespace, backticks, etc.). This would probably be hard, since HTML also eats whitespace by default, enforces paragraph spacing, etc.
+#     - Extend CodeToRest to wrap all reST syntax so that it appears verbatim in the output. This would probably be hard.
 # - Rewrite documentation in this program
 # - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
