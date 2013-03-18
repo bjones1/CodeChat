@@ -26,6 +26,7 @@ class TestMruFiles(object):
         for key in settings.allKeys():
             settings.remove(key)
         self.mru_files = MruFiles(mw, settings)
+        # TODO: I get lots of ``QAction: Initialize QApplication before calling 'setVisible'`` errors when a test fails. I'm not sure how to fix this.
 
     # The MruFiles object should work with nothing in the MRU list.
     def test_mru_list_empty(self):
@@ -35,11 +36,12 @@ class TestMruFiles(object):
         assert self.mru_files.open_mru() == False
 
     # This helper method inserts 'a'...'j' into the MRU list.
-    def insert_letters(self, num_inserts = None):
-        if num_inserts is None:
-            num_inserts = range(self.mru_files.max_files)
-        # Create a list ['a', 'b', ... 'j'], 10 items long.
-        file_list = [chr(ord('a') + i) for i in num_inserts]
+    def insert_letters(self,
+                       # Perform ``inserts_factor`` * (capacity of MRU list) inserts.
+                       inserts_factor = 1):
+        num_inserts = inserts_factor*self.mru_files.max_files
+        # Create a list ['a', 'b', ...], which contains num_inserts elements.
+        file_list = [chr(ord('a') + i) for i in range(num_inserts)]
         # Add these as files to the MRU list.
         for file_name in file_list:
             self.mru_files.add_file(file_name)
@@ -64,4 +66,7 @@ class TestMruFiles(object):
         assert self.mru_files.get_mru_list() == file_list
 
     def test_insert_past_capacity(self):
-        pass
+        file_list = self.insert_letters(2)
+        file_list.reverse()
+        ml = self.mru_files.get_mru_list()
+        assert ml == file_list[0:len(ml)]
