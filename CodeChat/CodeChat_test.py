@@ -2,11 +2,11 @@
 #
 # Unit testing
 # ------------
-# This test bench exercises the CodeChat module. It cannot be run directly from Spyder, since that produces spurious errors (``ImportError: No module named CodeChat_test``). Therefore, the auto-run code (pytest.main()) is omitted.
+# This test bench exercises the CodeChat module. It cannot be run directly from Spyder, since that produces spurious errors (``ImportError: No module named CodeChat_test``). Therefore, the auto-run code (``pytest.main()``) is omitted.
 #
 # TODO
-
-# This must appear before importing PyQt4, since it sets SIP's api version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
+#
+# This must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import MruFiles, form_class
 from PyQt4 import QtGui, QtCore
 
@@ -35,9 +35,11 @@ class TestMruFiles(object):
         assert self.mru_files.open_mru() == False
 
     # This helper method inserts 'a'...'j' into the MRU list.
-    def insert_letters(self):
+    def insert_letters(self, num_inserts = None):
+        if num_inserts is None:
+            num_inserts = range(self.mru_files.max_files)
         # Create a list ['a', 'b', ... 'j'], 10 items long.
-        file_list = [chr(ord('a') + i) for i in range(10)]
+        file_list = [chr(ord('a') + i) for i in num_inserts]
         # Add these as files to the MRU list.
         for file_name in file_list:
             self.mru_files.add_file(file_name)
@@ -50,12 +52,16 @@ class TestMruFiles(object):
         file_list.reverse()
         assert self.mru_files.get_mru_list() == file_list
 
+    # Insering an item twice causes it to rise to the top of the MRU list.
     def test_mru_double_insert(self):
         file_list = self.insert_letters()
         self.mru_files.add_file('a')
-        # Check the order.
+        # Create a list of 'a', 'j', 'i', ... 'b', the correct order.
         file_list.reverse()
         file_list = file_list[0:-1]
         file_list.insert(0, 'a')
+        # Check the order -- did 'a' rise to the top?
         assert self.mru_files.get_mru_list() == file_list
 
+    def test_insert_past_capacity(self):
+        pass
