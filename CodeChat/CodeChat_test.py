@@ -39,8 +39,8 @@ class TestMruFiles(object):
                        # Perform ``inserts_factor`` * (capacity of MRU list) inserts.
                        inserts_factor = 1):
         num_inserts = inserts_factor*self.mru_files.max_files
-        # Create a list ['a', 'b', ...], which contains ``num_inserts`` elements.
-        file_list = [chr(ord('a') + i) for i in range(num_inserts)]
+        # Create a list ['А', 'Б', ...] (of captial Cyrillic letters), which contains ``num_inserts`` elements.
+        file_list = [unichr(ord(u'\u0411') + i) for i in range(num_inserts)]
         # Add these as files to the MRU list.
         for file_name in file_list:
             self.mru_files.add_file(file_name)
