@@ -223,9 +223,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use.
     signal_Sphinx_start = QtCore.pyqtSignal(str)
 
-    def __init__(self, app, *args, **kwargs):
+    def __init__(self, app):
         # Let Qt and PyQt run their init first.
-        QtGui.QMainWindow.__init__(self, *args, **kwargs)
+        QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
         # Store a reference to this window's containing application.
