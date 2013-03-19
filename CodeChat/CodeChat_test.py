@@ -18,15 +18,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
 class TestMruFiles(object):
     def setup(self):
-        # Removing ``app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error.
-        app = QtGui.QApplication([])
+        # Removing ``self.app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error. Storing this as ``app = ...`` allows app to be destructed when ``setup()`` exits, producing a string of ``QAction: Initialize QApplication before calling 'setVisible'`` warnings.
+        self.app = QtGui.QApplication([])
         mw = CodeChatWindow()
         settings = QtCore.QSettings("MSU BJones", "CodeChat_test")
         # Remove all keys
         for key in settings.allKeys():
             settings.remove(key)
         self.mru_files = MruFiles(mw, settings)
-        # TODO: I get lots of ``QAction: Initialize QApplication before calling 'setVisible'`` errors when a test fails. I'm not sure how to fix this.
 
     # The MruFiles object should work with nothing in the MRU list.
     def test_mru_list_empty(self):
@@ -35,12 +34,12 @@ class TestMruFiles(object):
         # There's no MRU file to open.
         assert self.mru_files.open_mru() == False
 
-    # This helper method inserts 'a'...'j' into the MRU list.
+    # This helper method inserts a list of strings (fake files) into the MRU list.
     def insert_letters(self,
                        # Perform ``inserts_factor`` * (capacity of MRU list) inserts.
                        inserts_factor = 1):
         num_inserts = inserts_factor*self.mru_files.max_files
-        # Create a list ['a', 'b', ...], which contains num_inserts elements.
+        # Create a list ['a', 'b', ...], which contains ``num_inserts`` elements.
         file_list = [chr(ord('a') + i) for i in range(num_inserts)]
         # Add these as files to the MRU list.
         for file_name in file_list:
