@@ -90,7 +90,7 @@ class MruFiles(object):
         # Open the most recently used file (the file that was open when the program exited).
         mru_list = self.get_mru_list()
         if mru_list:
-            file_name = str(mru_list[0])
+            file_name = mru_list[0]
             # TODO: This is the wrong approach. What if the file was deleted just after this check? Instead, open should throw an exception that this code should catch and return false with.
             if os.path.exists(file_name):
                 self.parent.open(file_name)

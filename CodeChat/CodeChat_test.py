@@ -9,12 +9,17 @@
 # This must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import MruFiles, form_class
 from PyQt4 import QtGui, QtCore
+import os
 
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     def __init__(self):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
+        self.open_list = []
+
+    def open(self, file_name):
+        self.open_list.append(file_name)
 
 class TestMruFiles(object):
     def setup(self):
@@ -40,7 +45,7 @@ class TestMruFiles(object):
                        inserts_factor = 1):
         num_inserts = inserts_factor*self.mru_files.max_files
         # Create a list ['А', 'Б', ...] (of captial Cyrillic letters), which contains ``num_inserts`` elements.
-        file_list = [unichr(ord(u'\u0411') + i) for i in range(num_inserts)]
+        file_list = [unichr(ord(u'\u0410') + i) for i in range(num_inserts)]
         # Add these as files to the MRU list.
         for file_name in file_list:
             self.mru_files.add_file(file_name)
@@ -57,7 +62,7 @@ class TestMruFiles(object):
     def test_mru_double_insert(self):
         file_list = self.insert_letters()
         self.mru_files.add_file('a')
-        # Create a list of 'a', 'j', 'i', ... 'b', the correct order.
+        # Create a list of 'a', 'j', 'i', ... 'b', the correct order. (But 'j', 'i', 'b' are really their Cyrillic equivalents).
         file_list.reverse()
         file_list = file_list[0:-1]
         file_list.insert(0, 'a')
@@ -69,3 +74,13 @@ class TestMruFiles(object):
         file_list.reverse()
         ml = self.mru_files.get_mru_list()
         assert ml == file_list[0:len(ml)]
+
+    # Open a non-ASCII test file to test Unicode support.
+    def test_open_mru(self):
+        unicode_file_name = os.getcwdu() + os.path.sep + u'\u0411.txt'
+        # Create an empty test file with a Cyrillic name.
+        with open(unicode_file_name, 'w'):
+            pass
+        self.mru_files.add_file(unicode_file_name)
+        assert self.mru_files.open_mru()
+        os.remove(unicode_file_name)
