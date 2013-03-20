@@ -9,6 +9,7 @@
 # This must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import MruFiles, form_class
 from PyQt4 import QtGui, QtCore
+from PyQt4.QtTest import QTest
 import os
 
 class CodeChatWindow(QtGui.QMainWindow, form_class):
@@ -25,12 +26,14 @@ class TestMruFiles(object):
     def setup(self):
         # Removing ``self.app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error. Storing this as ``app = ...`` allows app to be destructed when ``setup()`` exits, producing a string of ``QAction: Initialize QApplication before calling 'setVisible'`` warnings.
         self.app = QtGui.QApplication([])
-        mw = CodeChatWindow()
+        self.mw = CodeChatWindow()
         settings = QtCore.QSettings("MSU BJones", "CodeChat_test")
         # Remove all keys
         for key in settings.allKeys():
             settings.remove(key)
-        self.mru_files = MruFiles(mw, settings)
+        self.mru_files = MruFiles(self.mw, settings)
+        # Per the `QTest docs <http://qt-project.org/doc/qt-4.8/qtestlib-tutorial3.html>`_: "The widget must also be shown in order to correctly test keyboard shortcuts."
+        self.mw.show()
 
     # The MruFiles object should work with nothing in the MRU list.
     def test_mru_list_empty(self):
@@ -84,3 +87,24 @@ class TestMruFiles(object):
         self.mru_files.add_file(unicode_file_name)
         assert self.mru_files.open_mru()
         os.remove(unicode_file_name)
+        # The open() function should have been called once, with the name of the test file.
+        assert self.mw.open_list == [unicode_file_name]
+
+    # Open a file that doesn't exist.
+    def test_open_mru_nonexistant(self):
+        self.mru_files.add_file('i do not exist.txt')
+        assert self.mru_files.open_mru() == False
+
+    # Execute an MRU open from the file menu.
+    def test_file_menu_mru(self):
+        unicode_file_name = os.getcwdu() + os.path.sep + u'test.txt'
+        # Create an empty test file.
+        with open(unicode_file_name, 'w'):
+            pass
+        self.mru_files.add_file(unicode_file_name)
+        # Press Ctrl+0 to open the first element of the MRU list.
+        QTest.keyClick(self.mw, '0', QtCore.Qt.ControlModifier)
+
+        os.remove(unicode_file_name)
+        # The open() function should have been called once, with the name of the test file.
+        assert self.mw.open_list == [unicode_file_name]
