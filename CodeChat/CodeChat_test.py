@@ -104,7 +104,10 @@ class TestMruFiles(object):
         self.mru_files.add_file(unicode_file_name)
         # Press Ctrl+0 to open the first element of the MRU list.
         QTest.keyClick(self.mw, '0', QtCore.Qt.ControlModifier)
+        # Now press Alt+F, 0. The 0 keypress must go directly to the File menu object; sending it to the main window has no effect.
+        QTest.keyClick(self.mw, 'f', QtCore.Qt.AltModifier)
+        QTest.keyClick(self.mw.menu_File, '0')
 
         os.remove(unicode_file_name)
-        # The open() function should have been called once, with the name of the test file.
-        assert self.mw.open_list == [unicode_file_name]
+        # The open() function should have been called twice, with the name of the test file.
+        assert self.mw.open_list == [unicode_file_name, unicode_file_name]
