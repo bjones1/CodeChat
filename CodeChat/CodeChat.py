@@ -44,7 +44,6 @@
 # - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Port to Unix, Mac using CMake / CPack
 # - Toolbars to insert common expressions (hyperlink, footnote, etc)
-# - Better Sphinx status (progress bar?) for long builds.
 # - Optimization: have Sphinx read in doctrees, then stay in a reprocess loop, only writing results on close.
 # - Provide a MRU list for projects. Have a unique file MRU list for each project.
 #
@@ -523,6 +522,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.textBrowser.verticalScrollBar().setSliderPosition(slider_pos)
         else:
             self.textBrowser.setHtml('')
+        self.textBrowser.plain_text = self.textBrowser.toPlainText()
 
         # Resync web with code -- this also prevents the screen from jumping around (on a reload(), it jumps to the top). Since we're syncing now, cancel any future syncs.
         self.timer_sync_code_to_web.stop()
@@ -554,7 +554,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         plainTextEdit_cursor_pos = self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GETCURRENTPOS)
         found = find_approx_text_in_target(self.plainTextEdit.text(),
                                            plainTextEdit_cursor_pos,
-                                           self.textBrowser.toPlainText())
+                                           self.textBrowser.plain_text)
         if found >= 0:
             # Select the line containing the found location
             cursor = self.textBrowser.textCursor()
@@ -571,7 +571,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     def web_to_code_sync(self):
         # Get the HTML as text, the source of our search string.
-        search_text = self.textBrowser.toPlainText()
+        search_text = self.textBrowser.plain_text
         search_index = self.textBrowser.textCursor().position()
 
         # If an image was clicked, insert its alt text in the search string.
