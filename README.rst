@@ -18,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- Verbose Sphinx output is now displayed as the build progresses.
 - The installer and executable should no longer trigger spurious virus warnings.
 - The location in the web view is preserved even which a sync can't locate the corresponding position in the code view.
 - Double-clicking on equations now searches for the underlying LaTeX source.

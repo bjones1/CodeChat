@@ -45,6 +45,8 @@
 # - Port to Unix, Mac using CMake / CPack
 # - Toolbars to insert common expressions (hyperlink, footnote, etc)
 # - Better Sphinx status (progress bar?) for long builds.
+# - Optimization: have Sphinx read in doctrees, then stay in a reprocess loop, only writing results on close.
+# - Provide a MRU list for projects. Have a unique file MRU list for each project.
 #
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
@@ -145,26 +147,43 @@ class MruFiles(object):
         for index in range(len(mru_list), self.max_files):
             self.mru_action_list[index].setVisible(False)
 
+# This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display.
 class SphinxObject(QtCore.QObject):
-    # run_Sphinx emits this with the results collected from the run as the first parameter.
-    signal_Sphinx_done = QtCore.pyqtSignal(str)
+    # run_Sphinx emits this as Sphinx produces results from the build.
+    signal_Sphinx_results = QtCore.pyqtSignal(unicode)
+
+    # run_Sphinx emits this when the Sphinx build finishes with the results from stderr.
+    signal_Sphinx_done = QtCore.pyqtSignal(unicode)
 
     def run_Sphinx(self, html_dir):
-        # Redirect Sphinx output to the results window
+        # Redirect Sphinx output to the results window. Save stderr results until the build is finished; display progress from the build by emitting signal_Sphinx_results during the build.
         old_stdout = sys.stdout
         old_stderr = sys.stderr
-        my_stdout = StringIO()
+        my_stdout = self  # This object's write() and flush() methods act like stdout.
         my_stderr = StringIO()
         sys.stderr = my_stderr
-        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '-q',  '.', html_dir) )
+        sys.stdout = my_stdout
+
+        # Run Sphinx.
+        sphinx.cmdline.main( ('', '-b', 'html', '-d', '_build/doctrees', '.', html_dir) )
+
+        # Restore stdout and stderr.
         sys.stdout = old_stdout
         sys.stderr = old_stderr
 
-        # Send a signal with the result string when Sphinx finishes.
-        self.signal_Sphinx_done.emit(my_stdout.getvalue() + '\n' + my_stderr.getvalue())
+        # Send a signal with the stderr string now that Sphinx is finished.
+        self.signal_Sphinx_done.emit(my_stderr.getvalue())
+
+    # This object emit()s all stdout writes to the GUI thread for immediate display.
+    def write(self, s):
+        self.signal_Sphinx_results.emit(s)
+
+    # Sphinx calls flush(), so we need a dummy implementation.
+    def flush(self):
+        pass
 
 # A convenience class to add a restart() method to a QTimer.
-class RestartableTimer(QtCore.QTimer):
+class QRestartableTimer(QtCore.QTimer):
     def restart(self):
         self.stop()
         self.start()
@@ -294,7 +313,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Auto-save and build whenever edits are made.
         self.plainTextEdit.modificationChanged.connect(self.on_code_changed)
         # Update web hilight whenever code cursor moves and the app is idle.
-        self.timer_sync_code_to_web = RestartableTimer()
+        self.timer_sync_code_to_web = QRestartableTimer()
         self.timer_sync_code_to_web.setSingleShot(True)
         self.timer_sync_code_to_web.setInterval(250)
         self.timer_sync_code_to_web.timeout.connect(self.code_to_web_sync)
@@ -307,6 +326,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.thread_Sphinx = QtCore.QThread()
         self.obj_sphinx = SphinxObject()
         self.obj_sphinx.moveToThread(self.thread_Sphinx)
+        self.obj_sphinx.signal_Sphinx_results.connect(self.Sphinx_results)
         self.obj_sphinx.signal_Sphinx_done.connect(self.after_Sphinx)
         self.signal_Sphinx_start.connect(self.obj_sphinx.run_Sphinx)
         self.thread_Sphinx.start()
@@ -469,12 +489,29 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.plainTextEdit.isModified():
             self.save()
 
-        self.results_plain_text_edit.setPlainText('Sphinx running...')
+        # Erase any previous build results.
+        self.results_plain_text_edit.setPlainText('')
+        # Start the Sphinx build in the background.
         self.signal_Sphinx_start.emit(self.html_dir)
 
-    def after_Sphinx(self, s):
-        # Display Sphinx build output
-        self.results_plain_text_edit.setPlainText(s)
+    def Sphinx_results(self, results):
+        # Append Sphinx build output. Just calling ``self.results_plain_text_edit.appendPlainText(results)`` appends an unnecessary newline.
+        c = self.results_plain_text_edit.textCursor()
+        c.movePosition(QtGui.QTextCursor.End)
+        c.insertText(results)
+        self.results_plain_text_edit.setTextCursor(c)
+        # Scroll to bottom to show these results.
+        self.results_plain_text_edit.ensureCursorVisible()
+
+    def after_Sphinx(self, stderr):
+        # Provide a "done" notification. Show stderr in red if available.
+        html = '<pre>Done.\n</pre>'
+        # If there's no stderr output, suppress the extra line created by a <pre>.
+        if stderr:
+            html += '<pre style="color:red">' + stderr + '</pre>'
+        self.results_plain_text_edit.appendHtml(html)
+        # Scroll to bottom to show these results.
+        self.results_plain_text_edit.ensureCursorVisible()
 
         # Update the browser with Sphinx's output.
         if os.path.exists(self.get_html_file()):
