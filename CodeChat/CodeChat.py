@@ -241,6 +241,8 @@ class SphinxObject(QtCore.QObject):
     def flush(self):
         pass
 
+# Resettable timer
+# ----------------
 # A convenience class to add a restart() method to a QTimer.
 class QRestartableTimer(QtCore.QTimer):
     def restart(self):
