@@ -61,7 +61,7 @@
 # These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
 # Standard library
-# ****************
+# ^^^^^^^^^^^^^^^^
 # We need this to open and save text files in Unicode.
 import codecs
 # Used to capture Sphinx's stderr output for display in the GUI.
@@ -74,7 +74,7 @@ import re
 import os
 #
 # Third-party imports
-# *******************
+# ^^^^^^^^^^^^^^^^^^^
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
 sip.setapi('QString', 2)
@@ -88,17 +88,14 @@ from PyQt4 import QtGui, QtCore, uic
 # `Scintilla <http://www.scintilla.org/ScintillaDoc.html>`_ (wrapped in Python) provides the text editor. However, the `Python documentation <http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html>`_ for it was poor at best. Here's a `quick tutorial <http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/>`_ I found helpful.
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 
-# Sphinx_ transforms reST_ to HTML, a core element of this tool.
-#
-# .. _Sphinx: http://sphinx.pocoo.org/
-# .. _reST: http://docutils.sourceforge.net/docs/index.html
+# `Sphinx <http://sphinx.pocoo.org>`_ transforms `reST <http://docutils.sourceforge.net/docs/index.html>`_ to HTML, a core element of this tool.
 import sphinx.cmdline
 
 # `Pygments <http://pygments.org/>`_ is used to match an extension (such as .cc or .cpp) to a file type (C++ source code).
 from pygments.lexers import get_lexer_for_filename
 #
 # Local application imports
-# *************************
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
 # The GUI's layout is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
 try:
     module_path = os.path.dirname(__file__)
@@ -116,7 +113,7 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
-# Display the version of this program in Htlp | About
+# Display the version of this program in Help | About
 import version
 
 # MRU list
