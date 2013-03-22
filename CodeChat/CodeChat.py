@@ -24,7 +24,6 @@
 # GUI                               :doc:`CodeChat.py`
 # Source code to reST               :doc:`CodeToRest.py`
 # Matching between text and HTML    :doc:`FindLongestMatchingString.py`
-# Unit test                         :doc:`CodeChat_test.py`
 # ==============================    ===================
 #
 # .. contents::
@@ -57,6 +56,25 @@
 # - Optimization: have Sphinx read in doctrees, then stay in a reprocess loop, only writing results on close.
 # - Provide a MRU list for projects. Have a unique file MRU list for each project.
 #
+# Imports
+# -------
+# These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
+#
+# Standard library
+# ****************
+# We need this to open and save text files in Unicode.
+import codecs
+# Used to capture Sphinx's stderr output for display in the GUI.
+from cStringIO import StringIO
+import sys
+# Use to copy a new project file.
+import shutil
+# Used to search for alt text in generated HTML.
+import re
+import os
+#
+# Third-party imports
+# *******************
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
 sip.setapi('QString', 2)
@@ -67,7 +85,40 @@ sip.setapi('QVariant', 2)
 # The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package.
 from PyQt4 import QtGui, QtCore, uic
 
-import os
+# `Scintilla <http://www.scintilla.org/ScintillaDoc.html>`_ (wrapped in Python) provides the text editor. However, the `Python documentation <http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html>`_ for it was poor at best. Here's a `quick tutorial <http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/>`_ I found helpful.
+from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
+
+# Sphinx_ transforms reST_ to HTML, a core element of this tool.
+#
+# .. _Sphinx: http://sphinx.pocoo.org/
+# .. _reST: http://docutils.sourceforge.net/docs/index.html
+import sphinx.cmdline
+
+# `Pygments <http://pygments.org/>`_ is used to match an extension (such as .cc or .cpp) to a file type (C++ source code).
+from pygments.lexers import get_lexer_for_filename
+#
+# Local application imports
+# *************************
+# The GUI's layout is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
+try:
+    module_path = os.path.dirname(__file__)
+except NameError:
+    module_path = ''
+
+# When frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the .ui to a .py module. Oh, well.
+try:
+    form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
+except (ImportError, IOError):
+    from CodeChat_ui import Ui_MainWindow as form_class
+
+from LanguageSpecificOptions import LanguageSpecificOptions
+
+# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
+from FindLongestMatchingString import find_approx_text_in_target
+
+# Display the version of this program in Htlp | About
+import version
+
 # MRU list
 # --------
 # This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry, pushing any updates to ``self.mru_action_list``, a list of File menu QActions (see update_gui_).
@@ -156,6 +207,8 @@ class MruFiles(object):
         for index in range(len(mru_list), self.max_files):
             self.mru_action_list[index].setVisible(False)
 
+# Background Sphinx execution
+# ---------------------------
 # This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display.
 class SphinxObject(QtCore.QObject):
     # run_Sphinx emits this as Sphinx produces results from the build.
@@ -201,57 +254,6 @@ class QRestartableTimer(QtCore.QTimer):
 # --------------
 # This class provides the bulk of the functionality. Almost evrything is GUI logic; the text to HTML matching ability is imported.
 #
-# The GUI's layout is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
-try:
-    module_path = os.path.dirname(__file__)
-except NameError:
-    module_path = ''
-
-# When frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the .ui to a .py module. Oh, well.
-try:
-    form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
-except (ImportError, IOError):
-    from CodeChat_ui import Ui_MainWindow as form_class
-
-# Scintilla_ (wrapped in Python) provides the text editor. However, the `Python documentation`_ for it was poor at best. Here's a `quick tutorial`_ I found helpful.
-#
-# .. _Scintilla: http://www.scintilla.org/ScintillaDoc.html
-# .. _`Python documentation`: http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html
-# .. _`quick tutorial`: http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/
-from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
-
-# Sphinx_ transforms reST_ to HTML, a core element of this tool.
-#
-# .. _Sphinx: http://sphinx.pocoo.org/
-# .. _reST: http://docutils.sourceforge.net/docs/index.html
-import sphinx.cmdline
-
-# TODO: a better way?
-# Pygments_ is used to match an extension (such as .cc or .cpp) to a file type (C++ source code).
-#
-# .. _Pygments: http://pygments.org/
-from pygments.lexers import get_lexer_for_filename
-
-from LanguageSpecificOptions import LanguageSpecificOptions
-
-# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
-from FindLongestMatchingString import find_approx_text_in_target
-
-# We need this to open and save text files in Unicode.
-import codecs
-
-# Display the version of this program in Htlp | About
-import version
-
-# Capture Sphinx's output for display in the GUI
-from cStringIO import StringIO
-import sys
-
-# Use to copy new project file
-import shutil
-
-import re
-
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use.
     signal_Sphinx_start = QtCore.pyqtSignal(str)
