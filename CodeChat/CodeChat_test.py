@@ -80,7 +80,7 @@ class TestMruFiles(object):
 
     # Open a non-ASCII test file to test Unicode support.
     def test_open_mru(self):
-        unicode_file_name = os.getcwdu() + os.path.sep + u'\u0411.txt'
+        unicode_file_name = u'\u0411.txt'
         # Create an empty test file with a Cyrillic name.
         with open(unicode_file_name, 'w'):
             pass
@@ -97,7 +97,7 @@ class TestMruFiles(object):
 
     # Execute an MRU open from the file menu.
     def test_file_menu_mru(self):
-        unicode_file_name = os.getcwdu() + os.path.sep + u'test.txt'
+        unicode_file_name = u'test.txt'
         # Create an empty test file.
         with open(unicode_file_name, 'w'):
             pass

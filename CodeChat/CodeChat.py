@@ -60,10 +60,15 @@ import os
 # MRU list
 # --------
 # This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry, pushing any updates to ``self.mru_action_list``, a list of File menu QActions (see update_gui_).
+#
+# Data structures:
+#
+# #. ``self.mru_action_list = [QAction(MRU list[0]), ...]`` stores the list of File menu MRU QActions. Each action stores data the from MRU list.
+# #. The MRU list (obtained from ``self.get_mru_list() == [MRU_file_0_name, ...]`` stores a list of file names of MRU files.
 class MruFiles(object):
     # Initialize the MRU list and the File menu's MRU items.
     def __init__(self,
-                 # The parent CodeChatWindow; this class will modify its File menu.
+                 # The parent CodeChatWindow; this class will modify its File menu and call its open() method.
                  parent,
                  # An instance of QSettings in which this class will store MRU information.
                  settings):
@@ -71,14 +76,14 @@ class MruFiles(object):
         self.max_files = 10
         self.settings = settings
         self.parent = parent
-        # Create max_files QActions for MRU entries and place them (hidden) in the File menu.
+        # Create ``self.max_files`` QActions for MRU entries and place them (hidden) in the File menu.
         self.mru_action_list = []
         for index in range(self.max_files):
             mru_item = QtGui.QAction(parent)
             mru_item.setVisible(False)
             # Assign a ctrl+number shortcut key if possible.
             if (index < 10):
-                mru_item.setShortcut(QtGui.QKeySequence('Ctrl+' + str(index)))
+                mru_item.setShortcut(QtGui.QKeySequence(u'Ctrl+' + unicode(index)))
             # Notify this class when an MRU item on the file menu is triggered.
             mru_item.triggered.connect(self.mru_triggered)
             parent.menu_File.addAction(mru_item)
@@ -108,35 +113,35 @@ class MruFiles(object):
             # TODO: Catch any exceptions thrown by this open.
             self.parent.open(file_name)
 
-    # Returns the registry's mru list as a Python list.
+    # Returns the registry's MRU list as a Python list.
     def get_mru_list(self):
         return list(self.settings.value(self.mru_list_key, []))
 
-    # Adds a file to the mru list
+    # Adds a file to the MRU list.
     def add_file(self, file_name):
-        # Add file_name to the mru list, moving it to the top if it's already in the list
+        # Add file_name to the mru list, moving it to the top if it's already in the list.
         mru_list = self.get_mru_list()
         if file_name in mru_list:
             mru_list.remove(file_name)
         mru_list.insert(0, file_name)
-        # Trim the list if it is too long
+        # Trim the list if it is too long.
         if len(mru_list) > self.max_files:
             mru_list.pop()
-        # Update the stored mru list
+        # Update the stored MRU list.
         self.settings.setValue(self.mru_list_key, mru_list)
-        # Update the GUI
+        # Update the GUI.
         self.update_gui()
 
     # .. _update_gui:
     def update_gui(self):
-        # For each elemnt in the mru list, update the menu item
+        # For each elemnt in the MRU list, update the menu item.
         mru_list = self.get_mru_list()
         for index in range(len(mru_list)):
             mru_action = self.mru_action_list[index]
             mru_action.setText('&%d %s' % (index, mru_list[index]))
             mru_action.setData(mru_list[index])
             mru_action.setVisible(True)
-        # Hide the rest of the actions
+        # Hide the rest of the actions.
         for index in range(len(mru_list), self.max_files):
             self.mru_action_list[index].setVisible(False)
 
