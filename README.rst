@@ -18,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- Finally included the GPL license.
 - Verbose Sphinx output is now displayed as the build progresses.
 - The installer and executable should no longer trigger spurious virus warnings.
 - The location in the web view is preserved even which a sync can't locate the corresponding position in the code view.
@@ -37,3 +38,15 @@ Contributing
 This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the CodeChat_ homepage!
 
 .. _CodeChat: https://bitbucket.org/bjones/documentation
+
+License
+-------
+Copyright (C) 2012-2013 Bryan A. Jones.
+
+This file is part of CodeChat.
+
+CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.

@@ -1,4 +1,14 @@
-# -*- coding: utf-8 -*-
+# .. -*- coding: utf-8 -*-
+#
+# .. Copyright (C) 2012-2013 Bryan A. Jones.
+#
+# .. This file is part of CodeChat.
+#
+# .. CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#
+# .. CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#
+# .. You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
 # conf.py - CodeChat Configuration
 # ================================
@@ -62,11 +72,11 @@ release = version
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['build', 
-                    'dist', 
-                    '_build', 
-                    '*/__init__.py.rst', 
-                    'tre-0.8.0-src', 
+exclude_patterns = ['build',
+                    'dist',
+                    '_build',
+                    '*/__init__.py.rst',
+                    'tre-0.8.0-src',
                     'CodeChat/example',
                     'CodeChat/CodeChat_ui.py',
                     ]
@@ -85,8 +95,8 @@ exclude_patterns = ['build',
 # output. They are ignored by default.
 ##show_authors = False
 
-# The default language to highlight source code in. The default is 'python'. 
-# The value should be a valid Pygments lexer name, see 
+# The default language to highlight source code in. The default is 'python'.
+# The value should be a valid Pygments lexer name, see
 # Showing code examples for more details.
 highlight_language = 'python3'
 
