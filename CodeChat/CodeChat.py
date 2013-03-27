@@ -226,9 +226,11 @@ class MruFiles(object):
 #      label = "BackgroundSphinx";
 #      "run_Sphinx"
 #    }
-#    "run_Sphinx" -> "Sphinx_results" [label = "signal_Sphinx_results(unicode str)", taillabel="(2)"];
-#    "run_Sphinx" -> "after_Sphinx" [label = "signal_Sphinx_done(unicode str)", taillabel="(3)"];
-#    "save_then_update_html" -> "run_Sphinx" [label = "signal_Sphinx_start()", taillabel="(1)"];
+#    "run_Sphinx" -> "Sphinx_results" [label = "signal_Sphinx_results", taillabel="(2)"];
+#    "run_Sphinx" -> "after_Sphinx" [label = "signal_Sphinx_done", taillabel="(3)"];
+#    "save_then_update_html" -> "run_Sphinx" [label = "signal_Sphinx_start", taillabel="(1)"];
+#
+# This class must inherit from a QObject in order to support the signal/slot mechanism.
 class BackgroundSphinx(QtCore.QObject):
     # run_Sphinx emits this as Sphinx produces results from the build.
     signal_Sphinx_results = QtCore.pyqtSignal(unicode)
@@ -236,8 +238,10 @@ class BackgroundSphinx(QtCore.QObject):
     # run_Sphinx emits this when the Sphinx build finishes with the results from stderr.
     signal_Sphinx_done = QtCore.pyqtSignal(unicode)
 
+    # This routine is (indirectly) invoked by CodeChat.save_then_update_html. It returns nothing, instead emitting signals when output is ready, as explained above. In addition to the parameters described below, run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
     def run_Sphinx(self, html_dir):
-        # Redirect Sphinx output to the results window. Save stderr results until the build is finished; display progress from the build by emitting signal_Sphinx_results during the build.
+                         # Directory in which Sphinx should place the HTML output from the build.
+        # Redirect Sphinx output to the results window. Save stderr results until the build is finished; display progress from the build by emitting signal_Sphinx_results as the build produces output.
         old_stdout = sys.stdout
         old_stderr = sys.stderr
         sys.stdout = self  # This object's write() and flush() methods act like stdout.
@@ -260,11 +264,11 @@ class BackgroundSphinx(QtCore.QObject):
         # Send a signal with the stderr string now that Sphinx is finished.
         self.signal_Sphinx_done.emit(my_stderr.getvalue())
 
-    # This object emit()s all stdout writes to the GUI thread for immediate display.
+    # This object emit()s all stdout.write() calls to the GUI thread for immediate display.
     def write(self, s):
         self.signal_Sphinx_results.emit(s)
 
-    # Sphinx calls flush(), so we need a dummy implementation.
+    # Sphinx calls stdout.flush(), so we need a dummy implementation.
     def flush(self):
         pass
 
@@ -281,7 +285,7 @@ class QRestartableTimer(QtCore.QTimer):
 # This class provides the bulk of the functionality. Almost evrything is GUI logic; the text to HTML matching ability is imported.
 #
 class CodeChatWindow(QtGui.QMainWindow, form_class):
-    # This signal starts a Sphinx background run; the parameter is the HTML directory to use.
+    # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See `Background Sphinx execution`_ for more information.
     signal_Sphinx_start = QtCore.pyqtSignal(str)
 
     def __init__(self, app):
