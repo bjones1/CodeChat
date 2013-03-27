@@ -240,10 +240,8 @@ class BackgroundSphinx(QtCore.QObject):
         # Redirect Sphinx output to the results window. Save stderr results until the build is finished; display progress from the build by emitting signal_Sphinx_results during the build.
         old_stdout = sys.stdout
         old_stderr = sys.stderr
-        my_stdout = self  # This object's write() and flush() methods act like stdout.
-        my_stderr = StringIO()
-        sys.stderr = my_stderr
-        sys.stdout = my_stdout
+        sys.stdout = self  # This object's write() and flush() methods act like stdout.
+        sys.stderr = my_stderr = StringIO()
 
         # Run Sphinx. The `command-line options <http://sphinx-doc.org/invocation.html>`_ are:
         sphinx.cmdline.main( ('',
