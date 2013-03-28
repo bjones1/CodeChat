@@ -10,19 +10,31 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
+# *******************************
 # CodeChat_test.py - Unit testing
-# -------------------------------
+# *******************************
 # This test bench exercises the CodeChat module. It cannot be run directly from Spyder, since that produces spurious errors (``ImportError: No module named CodeChat_test``). Therefore, the auto-run code (``pytest.main()``) is omitted.
 #
 # Imports
-# 
+# =======
+# Local application imports
+# -------------------------
 # This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import MruFiles, form_class
-from PyQt4 import QtGui, QtCore
-from PyQt4.QtTest import QTest
+
+# Standard library
+# ----------------
 import os
 
-class CodeChatWindow(QtGui.QMainWindow, form_class):
+# Third-party imports
+# -------------------
+from PyQt4 import QtGui, QtCore
+from PyQt4.QtTest import QTest
+
+# MruFiles
+# ========
+# The following class providees a mock for CodeChatWindow for use with MruFiles testing. It provides an open() methods which simply records the passed file name, and also performs necessary GUI setup in __init__ so that testing of the Qt portions of the class will work.
+class CodeChatWindowMock(QtGui.QMainWindow, form_class):
     def __init__(self):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self)
@@ -36,7 +48,7 @@ class TestMruFiles(object):
     def setup(self):
         # Removing ``self.app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error. Storing this as ``app = ...`` allows app to be destructed when ``setup()`` exits, producing a string of ``QAction: Initialize QApplication before calling 'setVisible'`` warnings.
         self.app = QtGui.QApplication([])
-        self.mw = CodeChatWindow()
+        self.mw = CodeChatWindowMock()
         settings = QtCore.QSettings("MSU BJones", "CodeChat_test")
         # Remove all keys
         for key in settings.allKeys():
@@ -121,3 +133,9 @@ class TestMruFiles(object):
         os.remove(unicode_file_name)
         # The open() function should have been called twice, with the name of the test file.
         assert self.mw.open_list == [unicode_file_name, unicode_file_name]
+
+# BackgroundSphinx
+# ================
+class TestBackgroundSphinx(object):
+    def test_0(self):
+        assert False
