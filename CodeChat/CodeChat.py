@@ -10,8 +10,8 @@
 #
 # .. You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# CodeChat
-# ========
+# CodeChat.py
+# ===========
 # .. module:: CodeChat
 #
 # Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>

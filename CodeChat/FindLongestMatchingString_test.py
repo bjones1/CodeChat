@@ -10,8 +10,8 @@
 #
 # .. You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Unit testing
-# ------------
+# FindLongestMatchingString.py - Unit testing
+# -------------------------------------------
 # This test bench exercises the FindLongestMatchingString module.
 
 from FindLongestMatchingString import find_approx_text_in_target as f

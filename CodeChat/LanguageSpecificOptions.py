@@ -20,7 +20,7 @@ from pygments.lexers.web import PhpLexer
 from pygments.lexers.math import MatlabLexer
 
 
-# Language Specific Options
+# LanguageSpecificOptions.py
 # ==============================================================================
 # For each programming language supported, :meth:`set_language` specifies:
 #

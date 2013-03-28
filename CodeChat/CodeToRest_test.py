@@ -10,11 +10,11 @@
 #
 # .. You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Unit testing
-# ------------
+# CodeToRest_test.py - Unit testing
+# ---------------------------------
 # This test bench exercises the CodeToRest module.
 
-# Test the fixup code which removed junk lines used only to produce a desired indent.
+# Test the fixup code which removes junk lines used only to produce a desired indent.
 from CodeToRest import sphinx_html_page_context
 class TestSphinxHtmlPageContext(object):
     # Given a string, return it after sphinx_html_page_context processes it.

@@ -10,13 +10,13 @@
 #
 # .. You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Unit testing
-# ------------
+# CodeChat_test.py - Unit testing
+# -------------------------------
 # This test bench exercises the CodeChat module. It cannot be run directly from Spyder, since that produces spurious errors (``ImportError: No module named CodeChat_test``). Therefore, the auto-run code (``pytest.main()``) is omitted.
 #
-# TODO
-#
-# This must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
+# Imports
+# 
+# This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import MruFiles, form_class
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtTest import QTest
@@ -57,7 +57,7 @@ class TestMruFiles(object):
                        # Perform ``inserts_factor`` * (capacity of MRU list) inserts.
                        inserts_factor = 1):
         num_inserts = inserts_factor*self.mru_files.max_files
-        # Create a list ['А', 'Б', ...] (of captial Cyrillic letters), which contains ``num_inserts`` elements.
+        # Create a list ['?', '?', ...] (of captial Cyrillic letters), which contains ``num_inserts`` elements.
         file_list = [unichr(ord(u'\u0410') + i) for i in range(num_inserts)]
         # Add these as files to the MRU list.
         for file_name in file_list:

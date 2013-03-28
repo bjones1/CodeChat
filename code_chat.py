@@ -10,8 +10,8 @@
 #
 # .. You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Run CodeChat
-# ============
+# code_chat.py - Run CodeChat
+# ===========================
 # This script runs the CodeChat application.
 
 import CodeChat.CodeChat
