@@ -8,6 +8,7 @@
 :
 : You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
+mkdir dist
 cd dist
 rmdir /q /s all
 mkdir all
