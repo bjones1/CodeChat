@@ -20,7 +20,7 @@
 # Local application imports
 # -------------------------
 # This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
-from CodeChat import MruFiles, form_class
+from CodeChat import MruFiles, form_class, BackgroundSphinx
 
 # Standard library
 # ----------------
@@ -30,6 +30,7 @@ import os
 # -------------------
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtTest import QTest
+import sphinx
 
 # MruFiles
 # ========
@@ -136,6 +137,14 @@ class TestMruFiles(object):
 
 # BackgroundSphinx
 # ================
+# At the simplest level, test this from a single thread by providing a mock Sphinx/signals and calling run_Sphinx directly.
+def sphinx_cmdline_main(self, *args):
+    assert False
+
+# Install our mock object in place of the real Sphinx.
+sphinx.cmdline.main = sphinx_cmdline_main
+
 class TestBackgroundSphinx(object):
     def test_0(self):
-        assert False
+        bs = BackgroundSphinx()
+        bs.run_Sphinx('test_dir')
