@@ -8,12 +8,14 @@
 
    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 CodeChat's table of contents
-============================
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 Welcome to CodeChat's documentation! Documentation for this program is divided into the following sections.
  
+###########################
 User documentation contents
----------------------------
+###########################
 .. toctree::
    :maxdepth: 2
 
@@ -21,8 +23,9 @@ User documentation contents
    template/contents
 
 
+##########################################
 Documentation of CodeChat's implementation
-------------------------------------------
+##########################################
 .. toctree::
    :maxdepth: 2
 
@@ -36,8 +39,9 @@ Documentation of CodeChat's implementation
    pyinstaller_hooks/hook-CodeChat.py
 
 
+########################################
 Documentation of CodeChat's unit testing
-----------------------------------------
+########################################
 .. toctree::
    :maxdepth: 2
 
@@ -45,7 +49,8 @@ Documentation of CodeChat's unit testing
    CodeChat/FindLongestMatchingString_test.py
    CodeChat/CodeToRest_test.py
 
+################
 Index and search
-----------------
+################
 * :ref:`genindex`
 * :ref:`search`

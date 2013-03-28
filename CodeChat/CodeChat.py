@@ -10,8 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
+# ***********
 # CodeChat.py
-# ===========
+# ***********
 # .. module:: CodeChat
 #
 # Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
@@ -29,7 +30,7 @@
 # .. contents::
 #
 # To do
-# -----
+# =====
 # - Pre-process search text to convert images to alt text in web_to_code_sync:
 #
 #   - Create a list of (index, inserted alt text string length) to convert an index from the QTextEdit to an index in this text-only, images-replaced-as-alt-text version of the document.
@@ -43,11 +44,10 @@
 #
 #     - Extend Sphinx' HTML formatter to output everything (all whitespace, backticks, etc.). This would probably be hard, since HTML also eats whitespace by default, enforces paragraph spacing, etc.
 #     - Extend CodeToRest to wrap all reST syntax so that it appears verbatim in the output. This would probably be hard.
-# - Rewrite documentation in this program. Make all the different title styles follow some standard (probably the `Python <http://sphinx-doc.org/rest.html#sections>`_ default), or perhaps something adapted from that:
+# - Rewrite documentation in this program. Make all the different title styles follow the `Python documentation standard <http://sphinx-doc.org/rest.html#sections>`_, with the following changes:
 #
-#   - Use ``#`` with overline for parts
+#   - Use ``@`` with overline for the title of the entire Sphinx output.
 #   - Use ``*`` with overline for chapters. All .py files should contain a single chapter composed of the file name followed by a dash then explanatory text.
-#   - Use everything else the same as Python.
 # - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
 # - Fix broken regexps for comments (#foo doesn't work)
@@ -63,11 +63,11 @@
 # - Use Doxygen output to auto-apply references to variables, classes, methods, etc.
 #
 # Imports
-# -------
+# =======
 # These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
 # Standard library
-# ^^^^^^^^^^^^^^^^
+# ----------------
 # We need this to open and save text files in Unicode.
 import codecs
 # Used to capture Sphinx's stderr output for display in the GUI.
@@ -80,7 +80,7 @@ import re
 import os
 #
 # Third-party imports
-# ^^^^^^^^^^^^^^^^^^^
+# -------------------
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
 sip.setapi('QString', 2)
@@ -101,7 +101,7 @@ import sphinx.cmdline
 from pygments.lexers import get_lexer_for_filename
 #
 # Local application imports
-# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# -------------------------
 # The GUI's layout is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
 try:
     module_path = os.path.dirname(__file__)
@@ -123,7 +123,7 @@ from FindLongestMatchingString import find_approx_text_in_target
 import version
 
 # MRU list
-# --------
+# ========
 # This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry, pushing any updates to ``self.mru_action_list``, a list of File menu QActions (see update_gui_).
 #
 # Data structures:
@@ -211,7 +211,7 @@ class MruFiles(object):
             self.mru_action_list[index].setVisible(False)
 
 # Background Sphinx execution
-# ---------------------------
+# ===========================
 # This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the :ref:`CodeChat constructor <BackgroundSphinx init>` between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
 #
 # The process begins at (1), when CodeChat.save_then_update_html emits signal_Sphinx_start, which Qt then places in the BackgroundSphinx message queue. When BackgroundSphinx is idle, this message then invokes run_Sphinx(), which executes Sphinx in the worker thread. As Sphinx runs, any status messages produced cause run_sphinx() to emit signal_Sphinx_results in step (2), which delivers these status messages to the GUI queue; when the GUI is idle, these messages then invoke Sphinx_results, which displays them in the bottom pane of the GUI. When Sphinx finishes, step (3) shows that run_Sphinx() emits signal_Sphinx_done with any error messages produced during the build.
@@ -281,7 +281,7 @@ class BackgroundSphinx(QtCore.QObject):
         pass
 
 # Resettable timer
-# ----------------
+# ================
 # A convenience class to add a restart() method to a QTimer.
 class QRestartableTimer(QtCore.QTimer):
     def restart(self):
@@ -289,7 +289,7 @@ class QRestartableTimer(QtCore.QTimer):
         self.start()
 
 # CodeChatWindow
-# --------------
+# ==============
 # This class provides the bulk of the functionality. Almost evrything is GUI logic; the text to HTML matching ability is imported.
 #
 class CodeChatWindow(QtGui.QMainWindow, form_class):
@@ -396,7 +396,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.save_then_update_html()
 
 # File operations
-# ^^^^^^^^^^^^^^^
+# ---------------
     # Open a new source file
     def open(self, source_file):
         # Split the source file into a path relative to the project direcotry, a base name, and an extension
@@ -596,7 +596,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         return os.path.join(self.project_dir, self.html_file)
 
 # Syncing between code and web
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# ----------------------------
     # When syncing, this code attempts to locate the same text in ther other view.
     #
     # To sync, find the same text under the plain text cursor in the htmn document and select around it to show the user where on the screen the equivalent content is.
@@ -668,7 +668,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.open_contents()
 
 # Menu item actions
-# ^^^^^^^^^^^^^^^^^
+# -----------------
     # The decorator below prevents this method from being called twice, per http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name.
     @QtCore.pyqtSlot()
     def on_action_Create_new_project_triggered(self):
@@ -752,7 +752,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
 
 # main()
-# ------
+# ======
 # These routines run the CodeChat application.
 def main():
     # Instantiate the app and GUI then run them
