@@ -36,14 +36,18 @@
 # - Provide a styled preview: instead of styling only code, copy formatting from HTML version to plain text version using Scintilla's `styling <http://www.scintilla.org/ScintillaDoc.html#Styling>`_ feature. Basically, the code in the left view would have different font/size/color attributes, but be verbatim text. Any paragraph-level formatting (lists, indents, etc.) would be eventually handled by auto-word-wrap which makes the code look indented, etc, but not rely on any actual word-processor like formatting: the idea is to keep the code the same, just make it prettier. Perhaps have a toggle?
 #
 #   - One option is to throw away Scintilla's lexer for sytax coloring in favor of results copied from Pygments. This would be more consistent.
-#   - One obvious problem: how to style text (comment characters, etc.) that doesn't appear in the HTML version?
+#   - One obvious problem: how to style text (comment characters, etc.) that doesn't appear in the HTML version? It's probably best not to style it at all, showing that it's syntax, not productive text.
 #   - Use proportional text or not? Proportional provides a better preview, but makes some areas (getting title underline correct lengths) hard and others (working with tables) frustrating and nearly impossible.
-#   - Implementation sketch: QTextEdit.document() gives a QTextDocument(). QTextDocument.begin() on this yields a QTextBlock; iterate using QTextBlock.next(). In each block, check QTextBlock.isValid(), then look at each QTextFragment in the block (QTextBlock.begin(); iterator.atEnd(), iterator.fragment().charFormat() use QTextBlock.text(), QTextBlock.charFormat().font() to get info.
+#   - Implementation sketch: QTextEdit.document() gives a QTextDocument(). QTextDocument.begin() on this yields a QTextBlock; iterate using QTextBlock.next(). In each block, check QTextBlock.isValid(), then look at each QTextFragment in the block (QTextBlock.begin(); iterator.atEnd(), iterator.fragment().charFormat() use QTextBlock.text(), QTextBlock.charFormat().font() to get info. Given a fragment, get its index in the document then do an approximate match on it. Then, do a literal match on as much of the fragment as possible and style. Continue at the first non-matching location and repeat.
 #   - Other ideas:
 #
 #     - Extend Sphinx' HTML formatter to output everything (all whitespace, backticks, etc.). This would probably be hard, since HTML also eats whitespace by default, enforces paragraph spacing, etc.
 #     - Extend CodeToRest to wrap all reST syntax so that it appears verbatim in the output. This would probably be hard.
-# - Rewrite documentation in this program
+# - Rewrite documentation in this program. Make all the different title styles follow some standard (probably the `Python <http://sphinx-doc.org/rest.html#sections>`_ default), or perhaps something adapted from that:
+#
+#   - Use ``#`` with overline for parts
+#   - Use ``*`` with overline for chapters. All .py files should contain a single chapter composed of the file name followed by a dash then explanatory text.
+#   - Use everything else the same as Python.
 # - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
 # - Fix broken regexps for comments (#foo doesn't work)
@@ -55,6 +59,8 @@
 # - Toolbars to insert common expressions (hyperlink, footnote, etc)
 # - Optimization: have Sphinx read in doctrees, then stay in a reprocess loop, only writing results on close.
 # - Provide a MRU list for projects. Have a unique file MRU list for each project.
+# - Provide an options dialog (default font size, HTML dir name, etc.)
+# - Use Doxygen output to auto-apply references to variables, classes, methods, etc.
 #
 # Imports
 # -------
