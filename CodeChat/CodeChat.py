@@ -252,6 +252,8 @@ class BackgroundSphinx(QtCore.QObject):
                               # Name of the Sphinx executable. Not needed here.
                               '-b', 'html',
                               # Select the HTML builder.
+                              '-d', '_build/doctrees',
+                              # Place doctrees in the _build directory; by default, Sphinx places this in _build/html/.doctrees.
                               '.',
                               # Source directory: the current directory.
                               html_dir) )
