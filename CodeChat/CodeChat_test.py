@@ -26,6 +26,7 @@ from CodeChat import MruFiles, form_class, BackgroundSphinx
 # ----------------
 import os
 import sys
+import time
 
 # Third-party imports
 # -------------------
@@ -139,7 +140,7 @@ class TestMruFiles(object):
 
 # BackgroundSphinx
 # ================
-# At the simplest level, test this from a single thread by providing a mock Sphinx, a mock CodeChat, connecting signals then calling run_Sphinx directly.
+# To test this, we must provide a mock Sphinx, a mock CodeChat, connect signals then call run_Sphinx directly (for single-threaded tests) or indirectly (for background thread tests).
 #
 # Sphinx mock
 # -----------
@@ -174,10 +175,17 @@ class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
     def Sphinx_done(self, s):
         self.done.append(s)
 
+# Sphinx_start signal emitter
+# ---------------------------
+# An object which emits a Qt signal must inherit from QObject. However, test classes which inherit from QObject aren't found by the test runner. Hence, this class to emit a signal but not (directly) run tests.
+class EmitSphinxStartSignal(QtCore.QObject):
+    signal_Sphinx_start = QtCore.pyqtSignal(unicode)
+
 # Unit tests
 # ----------
 # With the mocks above in place, create a Qt app and connect the appropriate signals, then test.
 class TestBackgroundSphinx(object):
+
     def setup(self):
         # See setup_ for details on this syntax.
         self.app = QtGui.QApplication([])
@@ -188,6 +196,33 @@ class TestBackgroundSphinx(object):
         bs = BackgroundSphinx()
         bs.signal_Sphinx_results.connect(self.mw.Sphinx_results)
         bs.signal_Sphinx_done.connect(self.mw.Sphinx_done)
-        bs.run_Sphinx('test_dir')
+        esss = EmitSphinxStartSignal()
+        esss.signal_Sphinx_start.connect(bs.run_Sphinx)
+        esss.signal_Sphinx_start.emit('test_dir')
+        assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
+        assert self.mw.done == ['Error']
+
+    def test_run_Sphinx_background(self):
+        # Create a thread to run BackgroundSphinx in and start it.
+        thread_Sphinx = QtCore.QThread()
+        bs = BackgroundSphinx()
+        bs.moveToThread(thread_Sphinx)
+        bs.signal_Sphinx_results.connect(self.mw.Sphinx_results)
+        bs.signal_Sphinx_done.connect(self.mw.Sphinx_done)
+        thread_Sphinx.start()
+
+        # Create a signal to start a Sphinx run and emit it.
+        esss = EmitSphinxStartSignal()
+        esss.signal_Sphinx_start.connect(bs.run_Sphinx)
+        esss.signal_Sphinx_start.emit('test_dir')
+
+        # Wait for background thread to run (kludge). Calling processEvents is critical; otherwise, BackgroundSphinx signals won't be delivered yet.
+        time.sleep(0.1)
+        self.app.processEvents()
+
+        # End Sphinx thread
+        thread_Sphinx.quit()
+        thread_Sphinx.wait()
+
         assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
         assert self.mw.done == ['Error']
