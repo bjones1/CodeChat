@@ -25,6 +25,7 @@ from CodeChat import MruFiles, form_class, BackgroundSphinx
 # Standard library
 # ----------------
 import os
+import sys
 
 # Third-party imports
 # -------------------
@@ -35,7 +36,7 @@ import sphinx
 # MruFiles
 # ========
 # The following class providees a mock for CodeChatWindow for use with MruFiles testing. It provides an open() methods which simply records the passed file name, and also performs necessary GUI setup in __init__ so that testing of the Qt portions of the class will work.
-class CodeChatWindowMock(QtGui.QMainWindow, form_class):
+class CodeChatWindowForMruFilesMock(QtGui.QMainWindow, form_class):
     def __init__(self):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self)
@@ -46,10 +47,11 @@ class CodeChatWindowMock(QtGui.QMainWindow, form_class):
         self.open_list.append(file_name)
 
 class TestMruFiles(object):
+    # .. _setup:
     def setup(self):
         # Removing ``self.app =`` produces a ``QWidget: Must construct a QApplication before a QPaintDevice`` error. Storing this as ``app = ...`` allows app to be destructed when ``setup()`` exits, producing a string of ``QAction: Initialize QApplication before calling 'setVisible'`` warnings.
         self.app = QtGui.QApplication([])
-        self.mw = CodeChatWindowMock()
+        self.mw = CodeChatWindowForMruFilesMock()
         settings = QtCore.QSettings("MSU BJones", "CodeChat_test")
         # Remove all keys
         for key in settings.allKeys():
@@ -137,14 +139,55 @@ class TestMruFiles(object):
 
 # BackgroundSphinx
 # ================
-# At the simplest level, test this from a single thread by providing a mock Sphinx/signals and calling run_Sphinx directly.
-def sphinx_cmdline_main(self, *args):
-    assert False
+# At the simplest level, test this from a single thread by providing a mock Sphinx, a mock CodeChat, connecting signals then calling run_Sphinx directly.
+#
+# Sphinx mock
+# -----------
+# This mock Sphinx function writes a string to stdout, then one to stderr, then another to stdout to make sure the two stdout strings are not confused with stderr results.
+def sphinx_cmdline_main_mock(cmdline_args):
+    # The final argument to Sphinx must be the HTML output directory.
+    assert cmdline_args[-1] == 'test_dir'
+    # Perform I/O that should be logged per the explanation above.
+    sys.stdout.write('Running Sphinx')
+    sys.stderr.write('Error')
+    sys.stdout.write('\nSphinx done.')
 
 # Install our mock object in place of the real Sphinx.
-sphinx.cmdline.main = sphinx_cmdline_main
+sphinx.cmdline.main = sphinx_cmdline_main_mock
 
+# CodeChat mock
+# -------------
+# This mock CodeChat class simply provides a way to receive emitted signals from run_Sphinx and log them.
+class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
+    def __init__(self):
+        # Let Qt run its init first.
+        QtGui.QMainWindow.__init__(self)
+        # Start with empty results and done logs.
+        self.results = []
+        self.done = []
+
+    # Log any calls to this in self.results.
+    def Sphinx_results(self, s):
+        self.results.append(s)
+
+    # Log all calls to this in self.done.
+    def Sphinx_done(self, s):
+        self.done.append(s)
+
+# Unit tests
+# ----------
+# With the mocks above in place, create a Qt app and connect the appropriate signals, then test.
 class TestBackgroundSphinx(object):
-    def test_0(self):
+    def setup(self):
+        # See setup_ for details on this syntax.
+        self.app = QtGui.QApplication([])
+        self.mw = CodeChatWindowForBackgroundSphinxMock()
+        self.mw.show()
+
+    def test_run_Sphinx(self):
         bs = BackgroundSphinx()
+        bs.signal_Sphinx_results.connect(self.mw.Sphinx_results)
+        bs.signal_Sphinx_done.connect(self.mw.Sphinx_done)
         bs.run_Sphinx('test_dir')
+        assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
+        assert self.mw.done == ['Error']
