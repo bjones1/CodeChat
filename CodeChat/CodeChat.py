@@ -294,7 +294,7 @@ class QRestartableTimer(QtCore.QTimer):
 #
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See `Background Sphinx execution`_ for more information.
-    signal_Sphinx_start = QtCore.pyqtSignal(str)
+    signal_Sphinx_start = QtCore.pyqtSignal(unicode)
 
     def __init__(self, app):
         # Let Qt and PyQt run their init first.
