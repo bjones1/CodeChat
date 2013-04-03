@@ -18,6 +18,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- 3-Apr-2013: Fix to handle Unicode files correctly.
 - Finally included the GPL license.
 - Verbose Sphinx output is now displayed as the build progresses.
 - The installer and executable should no longer trigger spurious virus warnings.
@@ -35,9 +36,7 @@ Recent changes
 
 Contributing
 ------------
-This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the CodeChat_ homepage!
-
-.. _CodeChat: https://bitbucket.org/bjones/documentation
+This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the `CodeChat <https://bitbucket.org/bjones/documentation>`_ homepage!
 
 License
 -------
