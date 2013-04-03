@@ -463,7 +463,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if not os.path.exists(self.source_file):
             # Create a blank file
             try:
-                with open(self.source_file, 'w'):
+                with codecs.open(self.source_file, 'w', encoding = 'utf-8'):
                     # Write nothing, so it's empty.
                     pass
             except IOError:
