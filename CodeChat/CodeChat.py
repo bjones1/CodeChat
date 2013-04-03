@@ -57,7 +57,7 @@
 # - Fix editor to render better HTML (long term -- probably QWebKit)
 # - Port to Unix, Mac using CMake / CPack
 # - Toolbars to insert common expressions (hyperlink, footnote, etc)
-# - Optimization: have Sphinx read in doctrees, then stay in a reprocess loop, only writing results on close.
+# - Optimization: have Sphinx read in doctrees, then stay in a reprocess loop, only writing results on close. Also, run Sphinx in a separate process using multiprocessing (which PyInstaller supports).
 # - Provide a MRU list for projects. Have a unique file MRU list for each project.
 # - Provide an options dialog (default font size, HTML dir name, etc.)
 # - Use Doxygen output to auto-apply references to variables, classes, methods, etc.
