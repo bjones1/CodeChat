@@ -367,6 +367,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.timer_sync_code_to_web.setInterval(250)
         self.timer_sync_code_to_web.timeout.connect(self.code_to_web_sync)
         self.plainTextEdit.cursorPositionChanged.connect(lambda line, pos: self.timer_sync_code_to_web.restart())
+        # Use UTF-8.
+        self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCODEPAGE, QsciScintilla.SC_CP_UTF8)
 
         # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         #
