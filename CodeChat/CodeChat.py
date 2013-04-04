@@ -17,7 +17,7 @@
 #
 # Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
 #
-# The :doc:`user manual <../README>` gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the to do list reflects changes needed to make this happen.
+# The :doc:`user manual <../README>` gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the table of contents shows the structure of this specific module.
 #
 # ==============================    ===================
 # Functionality                     Module
@@ -27,7 +27,8 @@
 # Matching between text and HTML    :doc:`FindLongestMatchingString.py`
 # ==============================    ===================
 #
-# .. contents::
+# .. contents:: Table of Contents
+#    :local:
 #
 # To do
 # =====
@@ -290,12 +291,17 @@ class QRestartableTimer(QtCore.QTimer):
 
 # CodeChatWindow
 # ==============
-# This class provides the bulk of the functionality. Almost evrything is GUI logic; the text to HTML matching ability is imported.
+# This class provides four distinct categories of functionality:
 #
+# .. contents::
+#    :local:
+#    :depth: 1
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See `Background Sphinx execution`_ for more information.
     signal_Sphinx_start = QtCore.pyqtSignal(unicode)
-
+#
+# Initialization / finalization
+# -----------------------------
     def __init__(self, app):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self)
@@ -309,7 +315,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.html_dir = '_build/html'
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
 
-        # Open the last project directory of we can; otherwise, us the current directory.
+        # Open the last project directory of we can; otherwise, use the current directory.
         self.project_dir = self.settings.value(self.project_dir_key, os.getcwd())
         try:
             os.chdir(self.project_dir)
@@ -330,46 +336,57 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Switch views on a double-click
         self.textBrowser.mouseDoubleClickEvent = lambda e: self.web_to_code_sync()
 
-        # | --Configure QScintilla--
-        # | Set the default font
+# Configure QScintilla
+# ^^^^^^^^^^^^^^^^^^^^
+        # Set the default font.
         self.font = QtGui.QFont()
         self.font.setFamily('Courier New')
         self.font.setFixedPitch(True)
         self.font.setPointSize(10)
         self.plainTextEdit.setFont(self.font)
         self.plainTextEdit.setMarginsFont(self.font)
+
         # Margin 0 is used for line numbers. Configure it.
         fontmetrics = QtGui.QFontMetrics(self.font)
         self.plainTextEdit.setMarginWidth(0, fontmetrics.width("00000") + 6)
         self.plainTextEdit.setMarginLineNumbers(0, True)
         self.plainTextEdit.setMarginsBackgroundColor(QtGui.QColor("#cccccc"))
-        # Brace matching: enable for a brace immediately before or after
-        # the current position
+
+        # Brace matching: enable for a brace immediately before or after the current position.
         self.plainTextEdit.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        # Enable word wrap
+
+        # Enable word wrap.
         self.plainTextEdit.setWrapMode(QsciScintilla.WrapWord)
+
         # Make home go to the beginning of the line, then to the first non-blank character in the paragraph, then to the beginning of the paragraph. Have end go to the end of the line, then to the end of the paragraph. Default behavior is to always go to the beginning/end of the paragraph.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME, QsciScintilla.SCI_VCHOMEWRAP)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END, QsciScintilla.SCI_LINEENDWRAP)
         # Use this for shift+home/end as well.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_HOME + (QsciScintilla.SCMOD_SHIFT << 16), QsciScintilla.SCI_VCHOMEWRAPEXTEND)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, QsciScintilla.SCK_END + (QsciScintilla.SCMOD_SHIFT << 16), QsciScintilla.SCI_LINEENDWRAPEXTEND)
+
         # Try at removing ctrl-T key binding (use as toggle views instead). Fails -- just using SCI_CLEARCMDKEY produces no action (i.e. keystroke isn't acted on by Scintilla, but isn't passed to QT either)
         ## self.plainTextEdit.SendScintilla(QsciScintilla.SCI_ASSIGNCMDKEY, ord('T') + (QsciScintilla.SCMOD_CTRL << 16), 0)
-        # Show a difference background for the line the cursor is in
+
+        # Show a differenct background for the line the cursor is in.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEBACK, 0x99FFFF)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
+
         # Auto-save and build whenever edits are made.
         self.plainTextEdit.modificationChanged.connect(self.on_code_changed)
+
         # Update web hilight whenever code cursor moves and the app is idle.
         self.timer_sync_code_to_web = QRestartableTimer()
         self.timer_sync_code_to_web.setSingleShot(True)
         self.timer_sync_code_to_web.setInterval(250)
         self.timer_sync_code_to_web.timeout.connect(self.code_to_web_sync)
         self.plainTextEdit.cursorPositionChanged.connect(lambda line, pos: self.timer_sync_code_to_web.restart())
+
         # Use UTF-8.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCODEPAGE, QsciScintilla.SC_CP_UTF8)
 
+# Background Sphinx setup
+# ^^^^^^^^^^^^^^^^^^^^^^^
         # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
         #
         # First, set up state variables used to do this.
@@ -387,7 +404,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.signal_Sphinx_start.connect(self.background_sphinx.run_Sphinx)
         self.thread_Sphinx.start()
 
-        # Set up the file MRU from the registry
+        # Set up the file MRU from the registry.
         self.mru_files = MruFiles(self, self.settings)
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_mru():
@@ -396,6 +413,21 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def on_code_changed(self, modified):
         if not self.ignore_code_modified:
             self.save_then_update_html()
+
+    # Before closing the application, check to see if the user's work should be saved.
+    def closeEvent(self, e):
+        # If the user cancels, don't close.
+        if not self.save_before_close():
+            e.ignore()
+        else:
+            # Save settings.
+            self.settings.setValue("splitterSizes", self.splitter.saveState())
+            self.settings.setValue("splitter_2Sizes", self.splitter_2.saveState())
+            self.settings.setValue("windowState", self.saveState())
+            self.settings.setValue("geometry", self.saveGeometry())
+            # End Sphinx thread.
+            self.thread_Sphinx.quit()
+            self.thread_Sphinx.wait()
 
 # File operations
 # ---------------
@@ -736,21 +768,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
           u'CodeChat, a conversational coding system,\n' +
           u'was last revised on ' + version.PROGRAM_DATE + '.\n\n' +
           u'\u00A9 Copyright 2013 by Bryan A. Jones.')
-
-    # Before closing the application, check to see if the user's work should be saved.
-    def closeEvent(self, e):
-        # If the user cancels, don't close.
-        if not self.save_before_close():
-            e.ignore()
-        else:
-            # Save settings
-            self.settings.setValue("splitterSizes", self.splitter.saveState())
-            self.settings.setValue("splitter_2Sizes", self.splitter_2.saveState())
-            self.settings.setValue("windowState", self.saveState())
-            self.settings.setValue("geometry", self.saveGeometry())
-            # End Sphinx thread
-            self.thread_Sphinx.quit()
-            self.thread_Sphinx.wait()
 
 
 # main()
