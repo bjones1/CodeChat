@@ -239,12 +239,28 @@ class MruFiles(object):
 #
 # This class must inherit from a QObject in order to support the signal/slot mechanism.
 class BackgroundSphinx(QtCore.QObject):
+# Construction
+# ------------
+# This section of the object builds the graph shown above, initializing this object then running it run in a newly-created background thread.
+#
     # run_Sphinx emits this as Sphinx produces results from the build.
     signal_Sphinx_results = QtCore.pyqtSignal(unicode)
 
     # run_Sphinx emits this when the Sphinx build finishes with the results from stderr.
     signal_Sphinx_done = QtCore.pyqtSignal(unicode)
 
+    def __init__(self, parent):
+        QtCore.QObject.__init__(self)
+        # Create a series of signal/slot connections per the :ref:`diagram <BackgroundSphinx diagram>` then start the background Sphinx thread, which waits for signals to arrive from the parent to begin processing.
+        self.thread = QtCore.QThread()
+        self.moveToThread(self.thread)
+        self.signal_Sphinx_results.connect(parent.Sphinx_results)
+        self.signal_Sphinx_done.connect(parent.after_Sphinx)
+        parent.signal_Sphinx_start.connect(self.run_Sphinx)
+        self.thread.start()
+
+# Worker routine
+# --------------
     # This routine is (indirectly) invoked by CodeChat.save_then_update_html. It returns nothing, instead emitting signals when output is ready, as explained above. In addition to the parameters described below, run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
     def run_Sphinx(self, html_dir):
                          # Directory in which Sphinx should place the HTML output from the build.
@@ -273,6 +289,8 @@ class BackgroundSphinx(QtCore.QObject):
         # Send a signal with the stderr string now that Sphinx is finished.
         self.signal_Sphinx_done.emit(my_stderr.getvalue())
 
+# stdout emulation
+# ----------------
     # This object emit()s all stdout.write() calls to the GUI thread for immediate display.
     def write(self, s):
         self.signal_Sphinx_results.emit(s)
@@ -393,16 +411,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.is_building = False
         self.need_to_build = True
         self.ignore_code_modified = False
-        # .. _BackgroundSphinx init:
-        #
-        # Next, create a series of signal/slot connections per the :ref:`diagram <BackgroundSphinx diagram>` then run a thread which waits for a signal to arrive in the background Sphinx thread.
-        self.thread_Sphinx = QtCore.QThread()
-        self.background_sphinx = BackgroundSphinx()
-        self.background_sphinx.moveToThread(self.thread_Sphinx)
-        self.background_sphinx.signal_Sphinx_results.connect(self.Sphinx_results)
-        self.background_sphinx.signal_Sphinx_done.connect(self.after_Sphinx)
-        self.signal_Sphinx_start.connect(self.background_sphinx.run_Sphinx)
-        self.thread_Sphinx.start()
+
+        # Start up the background Sphinx thread.
+        self.background_sphinx = BackgroundSphinx(self)
 
         # Set up the file MRU from the registry.
         self.mru_files = MruFiles(self, self.settings)
@@ -410,6 +421,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if not self.mru_files.open_mru():
             self.open_contents()
 
+# Need to categorize / move
+# ^^^^^^^^^^^^^^^^^^^^^^^^^
     def on_code_changed(self, modified):
         if not self.ignore_code_modified:
             self.save_then_update_html()
@@ -425,9 +438,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.settings.setValue("splitter_2Sizes", self.splitter_2.saveState())
             self.settings.setValue("windowState", self.saveState())
             self.settings.setValue("geometry", self.saveGeometry())
-            # End Sphinx thread.
-            self.thread_Sphinx.quit()
-            self.thread_Sphinx.wait()
+            # End the background Sphinx thread by requesting the event loop to shut down, then waiting for it to do so.
+            self.background_sphinx.thread.quit()
+            self.background_sphinx.thread.wait()
 
 # File operations
 # ---------------

@@ -160,6 +160,8 @@ sphinx.cmdline.main = sphinx_cmdline_main_mock
 # -------------
 # This mock CodeChat class simply provides a way to receive emitted signals from run_Sphinx and log them.
 class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
+    signal_Sphinx_start = QtCore.pyqtSignal(unicode)
+
     def __init__(self):
         # Let Qt run its init first.
         QtGui.QMainWindow.__init__(self)
@@ -172,14 +174,8 @@ class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
         self.results.append(s)
 
     # Log all calls to this in self.done.
-    def Sphinx_done(self, s):
+    def after_Sphinx(self, s):
         self.done.append(s)
-
-# Sphinx_start signal emitter
-# ---------------------------
-# An object which emits a Qt signal must inherit from QObject. However, test classes which inherit from QObject aren't found by the test runner. Hence, this class to emit a signal but not (directly) run tests.
-class EmitSphinxStartSignal(QtCore.QObject):
-    signal_Sphinx_start = QtCore.pyqtSignal(unicode)
 
 # Unit tests
 # ----------
@@ -192,37 +188,20 @@ class TestBackgroundSphinx(object):
         self.mw = CodeChatWindowForBackgroundSphinxMock()
         self.mw.show()
 
-    def test_run_Sphinx(self):
-        bs = BackgroundSphinx()
-        bs.signal_Sphinx_results.connect(self.mw.Sphinx_results)
-        bs.signal_Sphinx_done.connect(self.mw.Sphinx_done)
-        esss = EmitSphinxStartSignal()
-        esss.signal_Sphinx_start.connect(bs.run_Sphinx)
-        esss.signal_Sphinx_start.emit('test_dir')
-        assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
-        assert self.mw.done == ['Error']
-
     def test_run_Sphinx_background(self):
         # Create a thread to run BackgroundSphinx in and start it.
-        thread_Sphinx = QtCore.QThread()
-        bs = BackgroundSphinx()
-        bs.moveToThread(thread_Sphinx)
-        bs.signal_Sphinx_results.connect(self.mw.Sphinx_results)
-        bs.signal_Sphinx_done.connect(self.mw.Sphinx_done)
-        thread_Sphinx.start()
+        bs = BackgroundSphinx(self.mw)
 
-        # Create a signal to start a Sphinx run and emit it.
-        esss = EmitSphinxStartSignal()
-        esss.signal_Sphinx_start.connect(bs.run_Sphinx)
-        esss.signal_Sphinx_start.emit('test_dir')
+        # Emit a a signal to start a Sphinx run.
+        self.mw.signal_Sphinx_start.emit('test_dir')
 
         # Wait for background thread to run (kludge). Calling processEvents is critical; otherwise, BackgroundSphinx signals won't be delivered yet.
         time.sleep(0.1)
         self.app.processEvents()
 
         # End Sphinx thread
-        thread_Sphinx.quit()
-        thread_Sphinx.wait()
+        bs.thread.quit()
+        bs.thread.wait()
 
         assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
         assert self.mw.done == ['Error']
