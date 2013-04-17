@@ -213,7 +213,7 @@ class MruFiles(object):
 
 # Background Sphinx execution
 # ===========================
-# This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the :ref:`CodeChat constructor <BackgroundSphinx init>` between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
+# This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the constructor below between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
 #
 # The process begins at (1), when CodeChat.save_then_update_html emits signal_Sphinx_start, which Qt then places in the BackgroundSphinx message queue. When BackgroundSphinx is idle, this message then invokes run_Sphinx(), which executes Sphinx in the worker thread. As Sphinx runs, any status messages produced cause run_sphinx() to emit signal_Sphinx_results in step (2), which delivers these status messages to the GUI queue; when the GUI is idle, these messages then invoke Sphinx_results, which displays them in the bottom pane of the GUI. When Sphinx finishes, step (3) shows that run_Sphinx() emits signal_Sphinx_done with any error messages produced during the build.
 #
@@ -241,7 +241,7 @@ class MruFiles(object):
 class BackgroundSphinx(QtCore.QObject):
 # Construction
 # ------------
-# This section of the object builds the graph shown above, initializing this object then running it run in a newly-created background thread.
+# This section of the object builds the graph shown above, initializing this object then running it run in a newly-created background thread. **Note: this code runs in the GUI thread.** Everything else in this object runs in the background thread.
 #
     # run_Sphinx emits this as Sphinx produces results from the build.
     signal_Sphinx_results = QtCore.pyqtSignal(unicode)
@@ -251,17 +251,20 @@ class BackgroundSphinx(QtCore.QObject):
 
     def __init__(self, parent):
         QtCore.QObject.__init__(self)
-        # Create a series of signal/slot connections per the :ref:`diagram <BackgroundSphinx diagram>` then start the background Sphinx thread, which waits for signals to arrive from the parent to begin processing.
+
+        # Start a thread for backgroun Sphinx operation, which waits for signals to arrive from the parent to begin processing. Doing this right isn't obvious; the best reference and short example code is given in the `QThread docs <http://qt-project.org/doc/qt-4.8/qthread.html#details>`_.
         self.thread = QtCore.QThread()
         self.moveToThread(self.thread)
+        self.thread.start()
+
+        # Create a series of signal/slot connections per the :ref:`diagram <BackgroundSphinx diagram>`. These connections must be established **after** the call to moveToThread, so that they're be delivered asynchronoushly. Otherwise, the background Sphinx thread will cause the GUI thread to block until it completes.
         self.signal_Sphinx_results.connect(parent.Sphinx_results)
         self.signal_Sphinx_done.connect(parent.after_Sphinx)
         parent.signal_Sphinx_start.connect(self.run_Sphinx)
-        self.thread.start()
 
 # Worker routine
 # --------------
-    # This routine is (indirectly) invoked by CodeChat.save_then_update_html. It returns nothing, instead emitting signals when output is ready, as explained above. In addition to the parameters described below, run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
+    # This routine is (indirectly) invoked by CodeChat.save_then_update_html. It returns nothing, instead emitting signals when output is ready, as explained above. run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
     def run_Sphinx(self, html_dir):
                          # Directory in which Sphinx should place the HTML output from the build.
         # Redirect Sphinx output to the results window. Save stderr results until the build is finished; display progress from the build by emitting signal_Sphinx_results as the build produces output.
@@ -403,11 +406,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Use UTF-8.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCODEPAGE, QsciScintilla.SC_CP_UTF8)
 
-# Background Sphinx setup
-# ^^^^^^^^^^^^^^^^^^^^^^^
-        # Prepare for running Sphinx in the background. Getting this right was very difficult for me. My best references: I stole the code from http://stackoverflow.com/questions/6783194/background-thread-with-qthread-in-pyqt and tried to understand the explanation at http://qt-project.org/wiki/ThreadsEventsQObjects#913fb94dd61f1a62fc809f8d842c3afa.
-        #
-        # First, set up state variables used to do this.
+# TODO: A better title for this section
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # First, set up state variables used to do invoke a background Sphinx run.
         self.is_building = False
         self.need_to_build = True
         self.ignore_code_modified = False
