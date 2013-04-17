@@ -98,7 +98,7 @@ from pygments.lexers import get_lexer_for_filename
 #
 # Local application imports
 # -------------------------
-from CodeChat_utils import MruFiles, BackgroundSphinx, QRestartableTimer
+from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer
 
 from LanguageSpecificOptions import LanguageSpecificOptions
 

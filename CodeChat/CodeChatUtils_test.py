@@ -20,7 +20,8 @@
 # Local application imports
 # -------------------------
 # This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
-from CodeChat import MruFiles, form_class, BackgroundSphinx
+from CodeChat import form_class
+from CodeChatUtils import MruFiles, BackgroundSphinx
 
 # Standard library
 # ----------------
