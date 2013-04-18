@@ -46,6 +46,17 @@ def end_multiprocessing():
     parent_conn.close()
     process.join()
 
+# This class emulates stdout, transforming writes into a connection send.
+class PipeSendStdout(object):
+    def __init__(self, conn):
+        self.conn = conn
+
+    def write(self, data):
+        self.conn.send((False, data))
+
+    def flush(self):
+        pass
+
 def run_Sphinx_process(conn):
     # Main loop
     while True:
@@ -60,7 +71,7 @@ def run_Sphinx_process(conn):
         old_stderr = sys.stderr
         sys.stderr = StringIO()
         old_stdout = sys.stdout
-        sys.stdout = StringIO()
+        sys.stdout = PipeSendStdout(conn)
 
         # Run Sphinx. The `command-line options <http://sphinx-doc.org/invocation.html>`_ are:
         os.chdir(working_dir)
@@ -77,7 +88,6 @@ def run_Sphinx_process(conn):
 
         # Send stdout, stderr data
         try:
-            conn.send((False, sys.stdout.getvalue()))
             conn.send((True, sys.stderr.getvalue()))
             sys.stdout = old_stdout
             sys.stderr = old_stderr
