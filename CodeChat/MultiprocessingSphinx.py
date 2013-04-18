@@ -22,7 +22,7 @@
 # ----------------
 import sys
 import os
-from multiprocessing import Process, Pipe
+from multiprocessing import Process, Pipe, freeze_support
 # Used to capture Sphinx's stderr output for display in the GUI.
 from cStringIO import StringIO
 #
@@ -35,7 +35,9 @@ parent_conn = None
 process = None
 def init_multiprocessing():
     global parent_conn, process
+
     # Start a process for background Sphinx operation
+    freeze_support()
     parent_conn, child_conn = Pipe()
     process = Process(target = run_Sphinx_process, args = (child_conn, ))
     process.start()
