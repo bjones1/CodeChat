@@ -144,20 +144,6 @@ class TestMruFiles(object):
 # ================
 # To test this, we must provide a mock Sphinx, a mock CodeChat, connect signals then call run_Sphinx directly (for single-threaded tests) or indirectly (for background thread tests).
 #
-# Sphinx mock
-# -----------
-# This mock Sphinx function writes a string to stdout, then one to stderr, then another to stdout to make sure the two stdout strings are not confused with stderr results.
-def sphinx_cmdline_main_mock(cmdline_args):
-    # The final argument to Sphinx must be the HTML output directory.
-    assert cmdline_args[-1] == 'test_dir'
-    # Perform I/O that should be logged per the explanation above.
-    sys.stdout.write('Running Sphinx')
-    sys.stderr.write('Error')
-    sys.stdout.write('\nSphinx done.')
-
-# Install our mock object in place of the real Sphinx.
-sphinx.cmdline.main = sphinx_cmdline_main_mock
-
 # CodeChat mock
 # -------------
 # This mock CodeChat class simply provides a way to receive emitted signals from run_Sphinx and log them.
@@ -198,8 +184,8 @@ class TestBackgroundSphinx(object):
         # Emit a a signal to start a Sphinx run.
         self.mw.signal_Sphinx_start.emit('test_dir')
 
-        # Wait for background thread to run (kludge). Calling processEvents is critical; otherwise, BackgroundSphinx signals won't be delivered yet.
-        time.sleep(0.1)
+        # Wait for background process to run (kludge). Calling processEvents is critical; otherwise, BackgroundSphinx signals won't be delivered yet.
+        time.sleep(0.5)
         self.app.processEvents()
 
         # End Sphinx thread
@@ -209,5 +195,5 @@ class TestBackgroundSphinx(object):
 
         print(self.mw.results)
         print(self.mw.done)
-        assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
-        assert self.mw.done == ['Error']
+        assert self.mw.results == []
+        assert self.mw.done == [u"Error: Source directory doesn't contain conf.py file.\n"]
