@@ -98,6 +98,7 @@ from pygments.lexers import get_lexer_for_filename
 #
 # Local application imports
 # -------------------------
+from MultiprocessingSphinx import end_multiprocessing
 from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer
 
 from LanguageSpecificOptions import LanguageSpecificOptions
@@ -130,7 +131,7 @@ except (ImportError, IOError):
 #    :local:
 #    :depth: 1
 class CodeChatWindow(QtGui.QMainWindow, form_class):
-    # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See `Background Sphinx execution`_ for more information.
+    # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See :ref:`Background-Sphinx-execution` for more information.
     signal_Sphinx_start = QtCore.pyqtSignal(unicode)
 #
 # Initialization / finalization
@@ -252,6 +253,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.settings.setValue("windowState", self.saveState())
             self.settings.setValue("geometry", self.saveGeometry())
             # End the background Sphinx thread by requesting the event loop to shut down, then waiting for it to do so.
+            end_multiprocessing()
             self.background_sphinx.thread.quit()
             self.background_sphinx.thread.wait()
 

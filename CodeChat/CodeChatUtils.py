@@ -20,20 +20,18 @@
 #
 # Standard library
 # ----------------
-# Used to capture Sphinx's stderr output for display in the GUI.
-from cStringIO import StringIO
-import sys
 import os
 #
 # Third-party imports
 # -------------------
-# The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package.
+# The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package. 
 from PyQt4 import QtGui, QtCore
+#
+# Local imports
+# -------------
+import MultiprocessingSphinx
 
-# `Sphinx <http://sphinx.pocoo.org>`_ transforms `reST <http://docutils.sourceforge.net/docs/index.html>`_ to HTML, a core element of this tool.
-import sphinx.cmdline
-
-# MRU list
+# MRU list 
 # ========
 # This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry, pushing any updates to ``self.mru_action_list``, a list of File menu QActions (see update_gui_).
 #
@@ -120,7 +118,9 @@ class MruFiles(object):
         # Hide the rest of the actions.
         for index in range(len(mru_list), self.max_files):
             self.mru_action_list[index].setVisible(False)
-
+#
+# .. _Background-Sphinx-execution:
+#
 # Background Sphinx execution
 # ===========================
 # This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the constructor below between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
@@ -175,42 +175,31 @@ class BackgroundSphinx(QtCore.QObject):
 # Worker routine
 # --------------
     # This routine is (indirectly) invoked by CodeChat.save_then_update_html. It returns nothing, instead emitting signals when output is ready, as explained above. run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
+    #
+    # Crazy idea: Run Sphinx in a separate process, to make the GUI more responsive, since the GIL prevents the GUI from running while Sphinx is executing. To do so, I can use Python's multiprocessing module. The main question: how do I pass data to/from the Sphinx process? There are two types of messages from Sphinx: stdout results and stderr results; a stderr result is sent when Sphinx is done. There's one type of message to Sphinx: the html_dir, and perhaps the current directory (since this could change, but a separate process wouldn't know). Should I use a pipe or a queue? It seems like a pipe would be better, since it's two-way. So, something like this:
+    #
+    # #. Start up Sphinx in a separate process, giving it a pipe end.
+    # #. Sphinx blocks on a pipe read, which gives it (current dir, html_dir)
+    # #. Sphinx begins processing; the worker thread blocks on pipe reads of (message_dest [stdout or stderr], message_text. It emits signals for both, ending when it gets a stderr message and going to the previous step.
+    #
+    # #. How to prototype this? Seems like I could just code it up. Need a separate routine to run Sphinx in a separate process.
     def run_Sphinx(self, html_dir):
                          # Directory in which Sphinx should place the HTML output from the build.
-        # Redirect Sphinx output to the results window. Save stderr results until the build is finished; display progress from the build by emitting signal_Sphinx_results as the build produces output.
-        old_stdout = sys.stdout
-        old_stderr = sys.stderr
-        sys.stdout = self  # This object's write() and flush() methods act like stdout.
-        sys.stderr = my_stderr = StringIO()
-
-        # Run Sphinx. The `command-line options <http://sphinx-doc.org/invocation.html>`_ are:
-        sphinx.cmdline.main( ('',
-                              # Name of the Sphinx executable. Not needed here.
-                              '-b', 'html',
-                              # Select the HTML builder.
-                              '-d', '_build/doctrees',
-                              # Place doctrees in the _build directory; by default, Sphinx places this in _build/html/.doctrees.
-                              '.',
-                              # Source directory: the current directory.
-                              html_dir) )
-                              # Build directory: place the resulting HTML files in html_dir.
-
-        # Restore stdout and stderr.
-        sys.stdout = old_stdout
-        sys.stderr = old_stderr
-
+        # Start the build by sending params.
+        print('Starting build')
+        MultiprocessingSphinx.parent_conn.send([os.getcwd(), html_dir])
+        # Send any stdout as a signal
+        is_stderr = False
+        while not is_stderr:
+            is_stderr, txt = MultiprocessingSphinx.parent_conn.recv()
+            #is_stderr, txt = True, 'done'
+            if not is_stderr:
+                # Send any stdout text along
+                self.signal_Sphinx_results.emit(txt)
         # Send a signal with the stderr string now that Sphinx is finished.
-        self.signal_Sphinx_done.emit(my_stderr.getvalue())
+        print('Build done.')
+        self.signal_Sphinx_done.emit(txt)
 
-# stdout emulation
-# ----------------
-    # This object emit()s all stdout.write() calls to the GUI thread for immediate display.
-    def write(self, s):
-        self.signal_Sphinx_results.emit(s)
-
-    # Sphinx calls stdout.flush(), so we need a dummy implementation.
-    def flush(self):
-        pass
 
 # Resettable timer
 # ================

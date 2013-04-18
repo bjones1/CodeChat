@@ -14,10 +14,10 @@
 # ===========================
 # This script runs the CodeChat application.
 
-import CodeChat.CodeChat
 
-def main():
-    CodeChat.CodeChat.main()
+import CodeChat.MultiprocessingSphinx
 
 if __name__ == '__main__':
-    main()
+    import CodeChat.CodeChat
+    CodeChat.MultiprocessingSphinx.init_multiprocessing()
+    CodeChat.CodeChat.main()
