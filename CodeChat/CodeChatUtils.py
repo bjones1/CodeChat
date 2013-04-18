@@ -24,14 +24,14 @@ import os
 #
 # Third-party imports
 # -------------------
-# The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package. 
+# The excellent `PyQt4 library <http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/classes.html>`_ provides the GUI for this package.
 from PyQt4 import QtGui, QtCore
 #
 # Local imports
 # -------------
 import MultiprocessingSphinx
 
-# MRU list 
+# MRU list
 # ========
 # This class provides a most-recently-used (where "used" is updated when a document is opened) menu item and the functionality to load in files from the MRU list. It stores the MRU list in the registry, pushing any updates to ``self.mru_action_list``, a list of File menu QActions (see update_gui_).
 #
@@ -186,7 +186,6 @@ class BackgroundSphinx(QtCore.QObject):
     def run_Sphinx(self, html_dir):
                          # Directory in which Sphinx should place the HTML output from the build.
         # Start the build by sending params.
-        print('Starting build')
         MultiprocessingSphinx.parent_conn.send([os.getcwd(), html_dir])
         # Send any stdout as a signal
         is_stderr = False
@@ -197,7 +196,6 @@ class BackgroundSphinx(QtCore.QObject):
                 # Send any stdout text along
                 self.signal_Sphinx_results.emit(txt)
         # Send a signal with the stderr string now that Sphinx is finished.
-        print('Build done.')
         self.signal_Sphinx_done.emit(txt)
 
 

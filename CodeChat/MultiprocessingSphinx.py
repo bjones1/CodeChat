@@ -43,34 +43,24 @@ def init_multiprocessing():
 
 def end_multiprocessing():
     global parent_conn, process
-    print('Sending shutdown...')
     parent_conn.close()
-    print('Joining...')
     process.join()
-    print('Done.')
 
 def run_Sphinx_process(conn):
     # Main loop
     while True:
         try:
             # Wait for data to use for invokation.
-            print('Waiting for data...')
             (working_dir, html_dir) = conn.recv()
-            print('Got %s, %s.' % (working_dir, html_dir))
         except EOFError:
             # End this process if requested.
             return
 
         # First, capture stdout and stderr.
-        print('Starting Sphinx...')
+        old_stderr = sys.stderr
         sys.stderr = StringIO()
-        # Uncommenting this produces the following error::
-        #
-        #   Traceback (most recent call last):
-        #     File "C:\Users\bjones\Documents\documentation\CodeChat\CodeChat.py", line 474, in code_to_web_sync
-        #    self.textBrowser.plain_text)
-        #    AttributeError: 'QTextBrowser' object has no attribute 'plain_text'
-        #sys.stdout = StringIO()
+        old_stdout = sys.stdout
+        sys.stdout = StringIO()
 
         # Run Sphinx. The `command-line options <http://sphinx-doc.org/invocation.html>`_ are:
         os.chdir(working_dir)
@@ -87,8 +77,10 @@ def run_Sphinx_process(conn):
 
         # Send stdout, stderr data
         try:
-#            conn.send((False, sys.stdout.getvalue()))
+            conn.send((False, sys.stdout.getvalue()))
             conn.send((True, sys.stderr.getvalue()))
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
         except EOFError:
             # End this process if requested.
             return

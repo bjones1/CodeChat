@@ -216,6 +216,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.timer_sync_code_to_web.timeout.connect(self.code_to_web_sync)
         self.plainTextEdit.cursorPositionChanged.connect(lambda line, pos: self.timer_sync_code_to_web.restart())
 
+        # This needs to be set, since the timer above will expire before self.textBrowser.plain_text is set by after_Sphinx.
+        self.textBrowser.plain_text = ''
+
         # Use UTF-8.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCODEPAGE, QsciScintilla.SC_CP_UTF8)
 
