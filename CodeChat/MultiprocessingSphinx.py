@@ -10,9 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *****************
-# CodeChat_utils.py
-# *****************
+# ************************
+# MultiprocessingSphinx.py
+# ************************
 #
 # Imports
 # =======
@@ -30,7 +30,6 @@ from cStringIO import StringIO
 # -------------------
 # `Sphinx <http://sphinx.pocoo.org>`_ transforms `reST <http://docutils.sourceforge.net/docs/index.html>`_ to HTML, a core element of this tool.
 import sphinx.cmdline
-
 
 parent_conn = None
 process = None
@@ -64,7 +63,7 @@ def run_Sphinx_process(conn):
             # Wait for data to use for invokation.
             (working_dir, html_dir) = conn.recv()
         except EOFError:
-            # End this process if requested.
+            # End this process if requested by a pipe close.
             return
 
         # First, capture stdout and stderr.
@@ -92,5 +91,5 @@ def run_Sphinx_process(conn):
             sys.stdout = old_stdout
             sys.stderr = old_stderr
         except EOFError:
-            # End this process if requested.
+            # End this process if requested by a pipe close.
             return

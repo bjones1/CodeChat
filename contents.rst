@@ -31,6 +31,7 @@ Implementation documentation
 
    CodeChat/CodeChat.py
    CodeChat/CodeChatUtils.py
+   CodeChat/MultiprocessingSphinx.py
    CodeChat/FindLongestMatchingString.py
    CodeChat/CodeToRest.py
    CodeChat/LanguageSpecificOptions.py

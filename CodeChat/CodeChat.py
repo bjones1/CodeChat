@@ -100,13 +100,12 @@ from pygments.lexers import get_lexer_for_filename
 # -------------------------
 from MultiprocessingSphinx import end_multiprocessing
 from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer
-
 from LanguageSpecificOptions import LanguageSpecificOptions
 
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
-# Display the version of this program in Help | About
+# Display the version of this program in Help | About.
 import version
 
 # GUI layout import
@@ -603,7 +602,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
 # main()
 # ======
-# These routines run the CodeChat application.
+# These routines run the CodeChat GUI.
 def main():
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
@@ -612,8 +611,3 @@ def main():
     app.installEventFilter(window)
     window.show()
     sys.exit(app.exec_())
-
-if __name__ == '__main__':
-    # This line allows running this module as a script from Spyder. Without it, Sphinx reports ``Extension error: Could not import extension CodeChat.CodeToRest (exception: No module named CodeToRest)``.
-    sys.path[0] = '.'
-    main()
