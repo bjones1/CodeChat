@@ -191,7 +191,6 @@ class BackgroundSphinx(QtCore.QObject):
         is_stderr = False
         while not is_stderr:
             is_stderr, txt = MultiprocessingSphinx.parent_conn.recv()
-            #is_stderr, txt = True, 'done'
             if not is_stderr:
                 # Send any stdout text along
                 self.signal_Sphinx_results.emit(txt)
