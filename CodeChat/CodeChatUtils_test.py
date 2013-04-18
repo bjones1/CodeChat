@@ -193,7 +193,5 @@ class TestBackgroundSphinx(object):
         bs.thread.quit()
         bs.thread.wait()
 
-        print(self.mw.results)
-        print(self.mw.done)
         assert self.mw.results == []
         assert self.mw.done == [u"Error: Source directory doesn't contain conf.py file.\n"]
