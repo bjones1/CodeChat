@@ -29,6 +29,7 @@ Implementation documentation
 .. toctree::
    :maxdepth: 2
 
+   code_chat.py
    CodeChat/CodeChat.py
    CodeChat/CodeChatUtils.py
    CodeChat/MultiprocessingSphinx.py
@@ -37,7 +38,6 @@ Implementation documentation
    CodeChat/LanguageSpecificOptions.py
    CodeChat/version.py
    conf.py
-   code_chat.py
    pyinstaller_hooks/hook-CodeChat.py
 
 
