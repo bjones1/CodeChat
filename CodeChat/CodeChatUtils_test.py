@@ -22,6 +22,7 @@
 # This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import form_class
 from CodeChatUtils import MruFiles, BackgroundSphinx
+from MultiprocessingSphinx import init_multiprocessing, end_multiprocessing
 
 # Standard library
 # ----------------
@@ -190,7 +191,8 @@ class TestBackgroundSphinx(object):
         self.mw.show()
 
     def test_run_Sphinx_background(self):
-        # Create a thread to run BackgroundSphinx in and start it.
+        # Create a process/thread to run BackgroundSphinx in and start it.
+        init_multiprocessing()
         bs = BackgroundSphinx(self.mw)
 
         # Emit a a signal to start a Sphinx run.
@@ -201,8 +203,11 @@ class TestBackgroundSphinx(object):
         self.app.processEvents()
 
         # End Sphinx thread
+        end_multiprocessing()
         bs.thread.quit()
         bs.thread.wait()
 
+        print(self.mw.results)
+        print(self.mw.done)
         assert self.mw.results == ['Running Sphinx', '\nSphinx done.']
         assert self.mw.done == ['Error']
