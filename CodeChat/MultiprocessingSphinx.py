@@ -44,6 +44,7 @@ def init_multiprocessing():
 
 def end_multiprocessing():
     global parent_conn, process
+
     parent_conn.close()
     process.join()
 
