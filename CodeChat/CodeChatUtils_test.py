@@ -22,19 +22,17 @@
 # This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import form_class
 from CodeChatUtils import MruFiles, BackgroundSphinx
-from MultiprocessingSphinx import init_multiprocessing, end_multiprocessing
+from MultiprocessingSphinx import MultiprocessingSphinxManager
 
 # Standard library
 # ----------------
 import os
-import sys
 import time
 
 # Third-party imports
 # -------------------
 from PyQt4 import QtGui, QtCore
 from PyQt4.QtTest import QTest
-import sphinx
 
 # MruFiles
 # ========
@@ -150,9 +148,11 @@ class TestMruFiles(object):
 class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
     signal_Sphinx_start = QtCore.pyqtSignal(unicode)
 
-    def __init__(self):
+    def __init__(self, msm):
         # Let Qt run its init first.
         QtGui.QMainWindow.__init__(self)
+        # We need a multiprocessing Sphinx manager to run Sphinx.
+        self.multiprocessing_Sphinx_manager = msm
         # Start with empty results and done logs.
         self.results = []
         self.done = []
@@ -170,15 +170,14 @@ class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
 # With the mocks above in place, create a Qt app and connect the appropriate signals, then test.
 class TestBackgroundSphinx(object):
 
-    def setup(self):
+    def test_run_Sphinx_background(self):
         # See setup_ for details on this syntax.
         self.app = QtGui.QApplication([])
-        self.mw = CodeChatWindowForBackgroundSphinxMock()
+        msm = MultiprocessingSphinxManager()
+        self.mw = CodeChatWindowForBackgroundSphinxMock(msm)
         self.mw.show()
 
-    def test_run_Sphinx_background(self):
         # Create a process/thread to run BackgroundSphinx in and start it.
-        init_multiprocessing()
         bs = BackgroundSphinx(self.mw)
 
         # Emit a a signal to start a Sphinx run.
@@ -189,7 +188,7 @@ class TestBackgroundSphinx(object):
         self.app.processEvents()
 
         # End Sphinx thread
-        end_multiprocessing()
+        msm.finalize()
         bs.thread.quit()
         bs.thread.wait()
 

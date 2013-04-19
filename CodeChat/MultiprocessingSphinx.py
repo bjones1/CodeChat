@@ -31,24 +31,24 @@ from cStringIO import StringIO
 # `Sphinx <http://sphinx.pocoo.org>`_ transforms `reST <http://docutils.sourceforge.net/docs/index.html>`_ to HTML, a core element of this tool.
 import sphinx.cmdline
 
-parent_conn = None
-process = None
-def init_multiprocessing():
-    global parent_conn, process
+# MultiprocessingSphinxManager
+# ============================
+# This class starts and ends the process in which Sphinx runs.
+class MultiprocessingSphinxManager(object):
+    def __init__(self):
+        # Start a process for background Sphinx operation
+        freeze_support()
+        self.parent_conn, self.child_conn = Pipe()
+        self.process = Process(target = run_Sphinx_process, args = (self.child_conn, ))
+        self.process.start()
 
-    # Start a process for background Sphinx operation
-    freeze_support()
-    parent_conn, child_conn = Pipe()
-    process = Process(target = run_Sphinx_process, args = (child_conn, ))
-    process.start()
+    def finalize(self):
+        self.parent_conn.close()
+        self.process.join()
 
-def end_multiprocessing():
-    global parent_conn, process
-
-    parent_conn.close()
-    process.join()
-
-# This class emulates stdout, transforming writes into a connection send.
+# PipeSendStdout
+# ==============
+# This class emulates stdout, transforming writes into a connection send. It's used by run_Sphinx_process_ below.
 class PipeSendStdout(object):
     def __init__(self, conn):
         self.conn = conn
@@ -59,6 +59,9 @@ class PipeSendStdout(object):
     def flush(self):
         pass
 
+# run_Sphinx_process
+# ==================
+# This routine will be run in a separate process, performing Sphinx builds.
 def run_Sphinx_process(conn):
     # Main loop
     while True:

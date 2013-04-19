@@ -66,11 +66,11 @@
 # Run the CodeChat application
 # ============================
 # This module will be imported by the main entry point, then again by the multiprocessing module. So, only put imports below needed by both.
-from CodeChat.MultiprocessingSphinx import init_multiprocessing
+from CodeChat.MultiprocessingSphinx import MultiprocessingSphinxManager
 
 if __name__ == '__main__':
-    # Hide this import, so the MultiprocessingSphinx doesn't import unnecessary items.
+    # Hide this import, so the MultiprocessingSphinx process doesn't import unnecessary items.
     from CodeChat.CodeChat import main
 
-    init_multiprocessing()
-    main()
+    msm = MultiprocessingSphinxManager()
+    main(msm)

@@ -50,7 +50,6 @@ from pygments.lexers import get_lexer_for_filename
 #
 # Local application imports
 # -------------------------
-from MultiprocessingSphinx import end_multiprocessing
 from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer
 from LanguageSpecificOptions import LanguageSpecificOptions
 
@@ -87,13 +86,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 #
 # Initialization / finalization
 # -----------------------------
-    def __init__(self, app):
+    def __init__(self, app, multiprocessing_Sphinx_manager):
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
-        # Store a reference to this window's containing application.
+        # Store constructor args.
         self.app = app
+        self.multiprocessing_Sphinx_manager = multiprocessing_Sphinx_manager
 
         self.project_dir_key = 'project directory'
         # A path to the generated HTML files, relative to the project directory
@@ -207,7 +207,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.settings.setValue("windowState", self.saveState())
             self.settings.setValue("geometry", self.saveGeometry())
             # End the background Sphinx thread by requesting the event loop to shut down, then waiting for it to do so.
-            end_multiprocessing()
+            self.multiprocessing_Sphinx_manager.finalize()
             self.background_sphinx.thread.quit()
             self.background_sphinx.thread.wait()
 
@@ -555,10 +555,10 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 # main()
 # ======
 # These routines run the CodeChat GUI.
-def main():
+def main(multiprocessing_Sphinx_manager):
     # Instantiate the app and GUI then run them
     app = QtGui.QApplication(sys.argv)
-    window = CodeChatWindow(app)
+    window = CodeChatWindow(app, multiprocessing_Sphinx_manager)
     # Install an event filter to catch ApplicationActivate events (see CodeChatWindow.eventFilter)
     app.installEventFilter(window)
     window.show()

@@ -162,6 +162,9 @@ class BackgroundSphinx(QtCore.QObject):
     def __init__(self, parent):
         QtCore.QObject.__init__(self)
 
+        # Obtain a reference to the multiprocessing Sphinx connection object from the parent.
+        self.parent_conn = parent.multiprocessing_Sphinx_manager.parent_conn
+
         # Start a thread for backgroun Sphinx operation, which waits for signals to arrive from the parent to begin processing. Doing this right isn't obvious; the best reference and short example code is given in the `QThread docs <http://qt-project.org/doc/qt-4.8/qthread.html#details>`_.
         self.thread = QtCore.QThread()
         self.moveToThread(self.thread)
@@ -186,11 +189,11 @@ class BackgroundSphinx(QtCore.QObject):
     def run_Sphinx(self, html_dir):
                          # Directory in which Sphinx should place the HTML output from the build.
         # Start the build by sending params.
-        MultiprocessingSphinx.parent_conn.send([os.getcwd(), html_dir])
+        self.parent_conn.send([os.getcwd(), html_dir])
         # Send any stdout as a signal
         is_stderr = False
         while not is_stderr:
-            is_stderr, txt = MultiprocessingSphinx.parent_conn.recv()
+            is_stderr, txt = self.parent_conn.recv()
             if not is_stderr:
                 # Send any stdout text along
                 self.signal_Sphinx_results.emit(txt)
