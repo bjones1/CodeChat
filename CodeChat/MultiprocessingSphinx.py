@@ -10,9 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ************************
-# MultiprocessingSphinx.py
-# ************************
+# ***********************************************************
+# MultiprocessingSphinx.py - run Sphinx in a separate process
+# ***********************************************************
 #
 # Imports
 # =======

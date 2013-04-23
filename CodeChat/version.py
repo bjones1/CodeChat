@@ -10,8 +10,8 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# version.py
-# ==========
-# This file provides the version of the program as a date.
+# ============================================================================
+# version.py - Give the release version of the CodeChat application as a date.
+# ============================================================================
 PROGRAM_DATE = \
   '18-Apr-2013'

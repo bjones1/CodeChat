@@ -15,18 +15,50 @@
 # ***************************
 # Author: Bryan A. Jones <bjones AT ece DOT msstate DOT edu>
 #
-# The :doc:`user manual <../README>` gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. The table below shows the overall structure of this package; the table of contents shows the structure of this specific module.
-#
-# ==============================    ===================
-# Functionality                     Module
-# ==============================    ===================
-# GUI                               :doc:`CodeChat.py`
-# Source code to reST               :doc:`CodeToRest.py`
-# Matching between text and HTML    :doc:`FindLongestMatchingString.py`
-# ==============================    ===================
+# The :doc:`user manual <../README>` gives a broad overview of this system. In contrast, this document discusses the implementation specifics of the CodeChat system. In particular:
 #
 # .. contents:: Table of Contents
 #    :local:
+#
+# CodeChat application
+# ====================
+# The application is comprised of the following modules. TODO: a block diagram of some sort here.
+#
+# .. toctree::
+#    :maxdepth: 1
+# 
+#    CodeChat/CodeChat.py
+#    CodeChat/CodeChatUtils.py
+#    CodeChat/MultiprocessingSphinx.py
+#    CodeChat/FindLongestMatchingString.py
+#    CodeChat/CodeToRest.py
+#    CodeChat/LanguageSpecificOptions.py
+#    CodeChat/version.py
+#    conf.py
+#
+#
+# Unit testing
+# ------------
+# The following modules perform unit tests on portion of the application.
+#
+# .. toctree::
+#    :maxdepth: 1
+#
+#    CodeChat/CodeChatUtils_test.py
+#    CodeChat/FindLongestMatchingString_test.py
+#    CodeChat/CodeToRest_test.py
+#    CodeChat/pytest.ini
+#
+# Build system
+# ============
+# The build system provides the ability to package this program into a self-contained executable then publish it on the web. Core components:
+#
+# .. toctree::
+#    :maxdepth: 1
+#
+#    build_exe.bat
+#    pyinstaller_hooks/hook-CodeChat.py
+#    build_dist.bat
 #
 # To do
 # =====
@@ -47,7 +79,6 @@
 #
 #   - Use ``@`` with overline for the title of the entire Sphinx output.
 #   - Use ``*`` with overline for chapters. All .py files should contain a single chapter composed of the file name followed by a dash then explanatory text.
-# - Refactor to enable more unit testing
 # - Preserve last cursor position in MRU list
 # - Fix broken regexps for comments (#foo doesn't work)
 # - Fix extensions in LanguageSpecificOptions
@@ -61,11 +92,11 @@
 # - Provide an options dialog (default font size, HTML dir name, etc.)
 # - Use Doxygen output to auto-apply references to variables, classes, methods, etc.
 #
+# Run CodeChat
+# ============
 # This script runs the CodeChat application.
 #
-# Run the CodeChat application
-# ============================
-# This module will be imported by the main entry point, then again by the multiprocessing module. So, only put imports below needed by both.
+# This script will be imported by the main entry point, then again by the multiprocessing module. So, only put imports below needed by both.
 from CodeChat.MultiprocessingSphinx import MultiprocessingSphinxManager
 
 if __name__ == '__main__':

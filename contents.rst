@@ -11,7 +11,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 CodeChat's table of contents
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-Welcome to CodeChat's documentation! Documentation for this program is divided into the following sections.
+Welcome to CodeChat's documentation! Documentation for this program is divided into the following two sections.
  
 ##################
 User documentation
@@ -30,25 +30,6 @@ Implementation documentation
    :maxdepth: 2
 
    code_chat.py
-   CodeChat/CodeChat.py
-   CodeChat/CodeChatUtils.py
-   CodeChat/MultiprocessingSphinx.py
-   CodeChat/FindLongestMatchingString.py
-   CodeChat/CodeToRest.py
-   CodeChat/LanguageSpecificOptions.py
-   CodeChat/version.py
-   conf.py
-   pyinstaller_hooks/hook-CodeChat.py
-
-
-Unit testing
-============
-.. toctree::
-   :maxdepth: 2
-
-   CodeChat/CodeChatUtils_test.py
-   CodeChat/FindLongestMatchingString_test.py
-   CodeChat/CodeToRest_test.py
 
 ################
 Index and search

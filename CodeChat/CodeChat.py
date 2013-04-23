@@ -10,9 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ***********
-# CodeChat.py
-# ***********
+# ************************************************************************
+# CodeChat.py - create the GUI which ties together the entire application.
+# ************************************************************************
 # .. module:: CodeChat
 #
 # Imports

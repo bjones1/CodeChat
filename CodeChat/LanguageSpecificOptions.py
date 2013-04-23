@@ -20,8 +20,9 @@ from pygments.lexers.web import PhpLexer
 from pygments.lexers.math import MatlabLexer
 
 
-# LanguageSpecificOptions.py
-# ==============================================================================
+# ========================================================================================
+# LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
+# ========================================================================================
 # For each programming language supported, :meth:`set_language` specifies:
 #
 # .. attribute:: comment_string

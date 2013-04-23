@@ -10,8 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# conf.py - CodeChat Configuration
-# ================================
+# ==================================================
+# conf.py - Sphinx configuration for use by CodeChat
+# ==================================================
 # This file supplies configuration information for Sphinx, which CodeChat uses to produces its documentation. It was originally created by sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its containing dir.
