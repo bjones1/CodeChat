@@ -18,6 +18,7 @@ from pygments.lexers.math import SLexer
 from pygments.lexers.shell import BashLexer
 from pygments.lexers.web import PhpLexer
 from pygments.lexers.math import MatlabLexer
+from pygments.lexers.shell import BatchLexer
 
 
 # ========================================================================================
@@ -54,6 +55,7 @@ class LanguageSpecificOptions(object):
       BashLexer().__class__   : ('#',           QsciLexerBash,    ('.bash',)),
       PhpLexer().__class__    : ('#',           None,             ('.php', )),
       MatlabLexer().__class__ : ('%',           None,             ('.m', )),
+      BatchLexer().__class__  : (':',           None,               ('.bat', )),
     }
 
     # .. method:: set_language(language_)
