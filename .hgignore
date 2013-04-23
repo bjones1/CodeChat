@@ -21,3 +21,4 @@ CodeChat/CodeChat_ui.py
 warncode_chat.txt
 Install_CodeChat.exe
 template/default.css
+*.bat.rst
