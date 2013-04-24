@@ -5,6 +5,8 @@ Welcome to CodeChat_, a conversational coding system. CodeChat encourages `liter
 - Explaining to myself what my code should do helped me rewrite and fix `CodeToRest <https://dl.dropbox.com/u/2337351/CodeChat/doc/CodeChat/CodeToRest.py.html>`_.
 - Likewise, explaining how a micro air vehicle responds to force created by its rotors enabled me to develop a `simulation of it <https://dl.dropbox.com/u/2337351/MAV_class/Python_tutorial/mav3d_simulation.py.html>`_.
 
+For additional information, refer to :doc:`contents`.
+
 Getting started
 ---------------
 First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351/CodeChat/Install_CodeChat.exe>`_ to install the program. Next, create a new CodeChat project by selecting ``File | Create new project`` and place it in a directory of your choosing, then follow the directions that appear.
@@ -18,6 +20,7 @@ You may optionally install:
 
 Recent changes
 --------------
+- 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
 - 3-Apr-2013: Fix to handle Unicode files correctly.
 - Finally included the GPL license.

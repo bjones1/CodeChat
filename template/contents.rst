@@ -10,7 +10,7 @@ Now, you're ready to document some code. Open :doc:`conf.py` for an example of t
 #. Add your source files to the table of contents below, after ``conf.py``.
 #. Open one of your source files and begin documenting; all comments [#]_ are processed as reST/Sphinx, while source code will be syntax hilighted [#]_.
 
-.. [#] Currently, only single-line comments in C/C++, Python, reST, assembly (.s), BASH scripts, PHP, and MATLAB scripts are supported.
+.. [#] Currently, only single-line comments in C/C++, Python, reST, assembly (.s), BASH scripts, PHP, MATLAB scripts, DOS batch (.bat) files, .ini, and .iss files are supported.
 
 .. [#] The :doc:`conf.py` provided with this template assmes Python source files. To change this, edit the line ``highlight_language = 'python3'`` in :doc:`conf.py` or add a `highlight directive <http://sphinx-doc.org/markup/code.html#code-examples>`_ such as ``// .. highlight:: c`` to each source flie.
 
