@@ -19,7 +19,7 @@ from pygments.lexers.shell import BashLexer
 from pygments.lexers.web import PhpLexer
 from pygments.lexers.math import MatlabLexer
 from pygments.lexers.shell import BatchLexer
-
+from pygments.lexers import IniLexer
 
 # ========================================================================================
 # LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
@@ -56,6 +56,7 @@ class LanguageSpecificOptions(object):
       PhpLexer().__class__    : ('#',           None,             ('.php', )),
       MatlabLexer().__class__ : ('%',           None,             ('.m', )),
       BatchLexer().__class__  : (':',           None,               ('.bat', )),
+      IniLexer().__class__    : (';',           None,               ('.ini', '.iss', )),
     }
 
     # .. method:: set_language(language_)

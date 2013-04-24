@@ -1,18 +1,20 @@
-; Copyright (C) 2012-2013 Bryan A. Jones.
+; .. Copyright (C) 2012-2013 Bryan A. Jones.
 ;
-; This file is part of CodeChat.
+;    This file is part of CodeChat.
 ;
-; CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+;    CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 ;
-; CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+;    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 ;
-; You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+;    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 ;
-;
-; This produces a setup .msi to install CodeChat. It was created from Example1.iss which comes with Inno setup plus info from
+; *********************************************************************************************************
+; CodeChat.iss - `Inno Setup <http://www.jrsoftware.org/isinfo.php>`_ Script to package the CodeChat binary
+; *********************************************************************************************************
+; This produces a setup .exe to install CodeChat. It was created from Example1.iss which comes with Inno setup plus info from
 ; http://opencandy.com/2011/06/09/installer-platform-comparison-making-the-right-choice/.
-
-; A few handy definitions to avoid repetition
+;
+; Provide a few handy definitions to avoid repetition.
 #define PRODUCT_NAME 'CodeChat'
 #define PRODUCT_VERSION GetDateTimeString('ddddd', '', '');
 
