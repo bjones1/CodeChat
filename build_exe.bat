@@ -12,13 +12,13 @@
 : ******************************************************************************
 : build_exe.bat - Build a self-contained executable for the CodeChat application
 : ******************************************************************************
-: This file creates a Windows executable using Pyinstaller.
+: This file creates a Windows executable using `Pyinstaller <http://www.pyinstaller.org/>`_.
 :
 : The frozen executable fails when loading the ``.ui`` file directly. So, translate it to a ``.py`` file instead.
 call pyuic4 CodeChat\CodeChat.ui -o CodeChat\CodeChat_ui.py
 
 : Convert to an executable.
-..\pyinstaller-git\pyinstaller.py -y code_chat.spec
+..\pyinstaller-git\pyinstaller.py -y --additional-hooks-dir=pyinstaller_hooks code_chat.py
 copy /Y default.css template
 xcopy /E /I template dist\code_chat\template
 del dist\code_chat\template\conf.py.rst

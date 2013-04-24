@@ -22,3 +22,5 @@ warncode_chat.txt
 Install_CodeChat.exe
 template/default.css
 *.bat.rst
+*.iss.rst
+*.ini.rst
