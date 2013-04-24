@@ -51,18 +51,18 @@
 #
 # Build system
 # ============
-# The build system provides the ability to package this program into a self-contained executable then publish it on the web. Core components:
+# The build system provides the ability to package this program into a self-contained executable then publish it on the web. In particular, :doc:`build_exe.bat <build_exe.bat>` employs Pyinstaller to transform the Python code into a binary. After this succeeds, :doc:`build_dist.bat <build_dist.bat>` then relies on Inno Setup to package this binary, along with supporting files (docs, template, source code, etc.) into a single executable, which is then published to the web via a public Dropbox share. Core components:
 #
 # .. toctree::
 #    :maxdepth: 1
 #
 #    build_exe.bat
-#    pyinstaller_hooks/hook-CodeChat.py
 #    build_dist.bat
 #    CodeChat.iss
 #
 # To do
 # =====
+# - Place all build stuff in a build directory. Have Pyinstaller and Inno setup write their files there.
 # - Pre-process search text to convert images to alt text in web_to_code_sync:
 #
 #   - Create a list of (index, inserted alt text string length) to convert an index from the QTextEdit to an index in this text-only, images-replaced-as-alt-text version of the document.

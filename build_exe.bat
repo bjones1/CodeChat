@@ -22,12 +22,12 @@ call pyuic4 CodeChat\CodeChat.ui -o CodeChat\CodeChat_ui.py
 : -y
 :   Replace an existing executable folder or file without warning.
 :
-: --additional-hooks-dir
-:   Give a path in which :doc:`hook-CodeChat.py <pyinstaller_hooks/hook-CodeChat.py>` resides.
+: --hidden-import
+:   Inform Pyinstaller of the hidden import which Sphinx dynamically loads.
 :
 : code_chat.py
 :   CodeChat entry point, from which Pyinstaller builds the application.
-..\pyinstaller-git\pyinstaller.py -y --additional-hooks-dir=pyinstaller_hooks code_chat.py
+..\pyinstaller-git\pyinstaller.py -y --hidden-import=CodeChat.CodeToRest code_chat.py
 
 : Next, copy over template files which CodeChat uses for creating a new project and delete junk (which shouldn't be copied when crating a new project). **Note:** the first copy is really a kludgy symbolic link. I haven't found a better way to do this.
 copy /Y default.css template
