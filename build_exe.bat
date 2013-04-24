@@ -17,9 +17,22 @@
 : The frozen executable fails when loading the ``.ui`` file directly. So, translate it to a ``.py`` file instead.
 call pyuic4 CodeChat\CodeChat.ui -o CodeChat\CodeChat_ui.py
 
-: Convert to an executable.
+: Convert to an executable. `Options <http://htmlpreview.github.io/?https://github.com/pyinstaller/pyinstaller/blob/develop/doc/Manual.html#options>`_ are:
+:
+: -y
+:   Replace an existing executable folder or file without warning.
+:
+: --additional-hooks-dir
+:   Give a path in which :doc:`hook-CodeChat.py <pyinstaller_hooks/hook-CodeChat.py>` resides.
+:
+: code_chat.py
+:   CodeChat entry point, from which Pyinstaller builds the application.
 ..\pyinstaller-git\pyinstaller.py -y --additional-hooks-dir=pyinstaller_hooks code_chat.py
+
+: Next, copy over template files which CodeChat uses for creating a new project and delete junk (which shouldn't be copied when crating a new project). **Note:** the first copy is really a kludgy symbolic link. I haven't found a better way to do this.
 copy /Y default.css template
 xcopy /E /I template dist\code_chat\template
 del dist\code_chat\template\conf.py.rst
+
+: Finally, run the application to make sure it works.
 dist\code_chat\code_chat

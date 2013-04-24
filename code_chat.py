@@ -60,7 +60,6 @@
 #    pyinstaller_hooks/hook-CodeChat.py
 #    build_dist.bat
 #    CodeChat.iss
-#    CodeChat.spec
 #
 # To do
 # =====
