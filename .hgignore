@@ -24,3 +24,4 @@ template/default.css
 *.bat.rst
 *.iss.rst
 *.ini.rst
+code_chat.spec
