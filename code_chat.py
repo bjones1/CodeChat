@@ -22,7 +22,9 @@
 #
 # CodeChat application
 # ====================
-# The application is comprised of the following modules. TODO: a block diagram of some sort here.
+# CodeChat provides two largely separate core functions. First, it presents a GUI to the user, enabling editing of source code, display of the resulting web page, and synchronization between the two. Second, it invokes a code to web backend as necessary so that the resulting web pages reflect the code.
+#
+# In particular, :doc:`CodeChat.py <CodeChat/CodeChat.py>` implements the GUI, relying on :doc:`CodeChatUtils.py <CodeChat/CodeChatUtils.py>` for some supporting functionality and employing :doc:`FindLongestMatchingString.py <CodeChat/FindLongestMatchingString.py>` for the text matching underly web to code synchronization. Sphinx, run in a separate process by :doc:`MultiprocessingSphinx.py <CodeChat/MultiprocessingSphinx.py>`, invokes :doc:`CodeToRest.py <CodeChat/CodeToRest.py>` extension (which is specified in the Sphinx configuration file :doc:`conf.py <conf.py>`) to transform code into reST, then produces the web pages.
 #
 # .. toctree::
 #    :maxdepth: 1
