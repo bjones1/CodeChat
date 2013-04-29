@@ -10,10 +10,14 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
+# .. module:: CodeChat
+#
 # ************************************************************************
 # CodeChat.py - create the GUI which ties together the entire application.
 # ************************************************************************
-# .. module:: CodeChat
+# .. contents:: Table of Contents
+#    :local:
+#    :depth: 1
 #
 # Imports
 # =======
@@ -53,12 +57,12 @@ from pygments.lexers import get_lexer_for_filename
 from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer
 from LanguageSpecificOptions import LanguageSpecificOptions
 
-# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py` for details.
+# The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py <FindLongestMatchingString.py>` for details.
 from FindLongestMatchingString import find_approx_text_in_target
 
 # Display the version of this program in Help | About.
 import version
-
+#
 # GUI layout import
 # -----------------
 # The GUI's layout is defined in the .ui file, which the following code loads. The .ui file could be in the current directory, if this module is executed directly; otherwise, it's in the directory which this module lives in, if imported the usual way.
@@ -72,7 +76,7 @@ try:
     form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
 except (ImportError, IOError):
     from CodeChat_ui import Ui_MainWindow as form_class
-
+#
 # CodeChatWindow
 # ==============
 # This class provides four distinct categories of functionality:
@@ -120,7 +124,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.textBrowser.setOpenExternalLinks(True)
         # Switch views on a double-click
         self.textBrowser.mouseDoubleClickEvent = lambda e: self.web_to_code_sync()
-
+#
 # Configure QScintilla
 # ^^^^^^^^^^^^^^^^^^^^
         # Set the default font.
@@ -172,7 +176,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
         # Use UTF-8.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCODEPAGE, QsciScintilla.SC_CP_UTF8)
-
+#
 # TODO: A better title for this section
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         # First, set up state variables used to do invoke a background Sphinx run.
@@ -188,7 +192,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Load the last open, or choose a default file name and open it if it exists.
         if not self.mru_files.open_mru():
             self.open_contents()
-
+#
 # Need to categorize / move
 # ^^^^^^^^^^^^^^^^^^^^^^^^^
     def on_code_changed(self, modified):
@@ -210,7 +214,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.multiprocessing_Sphinx_manager.finalize()
             self.background_sphinx.thread.quit()
             self.background_sphinx.thread.wait()
-
+#
 # File operations
 # ---------------
     # Open a new source file
@@ -287,6 +291,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Now open it.
         self.open(self.source_file)
 
+    # .. _CodeChatGui_eventFilter:
     def eventFilter(self, obj, event):
         # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
         if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
@@ -410,7 +415,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     def get_html_file(self):
         return os.path.join(self.project_dir, self.html_file)
-
+#
 # Syncing between code and web
 # ----------------------------
     # When syncing, this code attempts to locate the same text in ther other view.
@@ -482,7 +487,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.settings.setValue(self.project_dir_key, self.project_dir)
         # Try loading the contents for this project.
         self.open_contents()
-
+#
 # Menu item actions
 # -----------------
     # The decorator below prevents this method from being called twice, per http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name.
@@ -550,16 +555,16 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
           u'CodeChat, a conversational coding system,\n' +
           u'was last revised on ' + version.PROGRAM_DATE + '.\n\n' +
           u'\u00A9 Copyright 2013 by Bryan A. Jones.')
-
-
+#
 # main()
 # ======
-# These routines run the CodeChat GUI.
+# This routine runs the CodeChat GUI.
 def main(multiprocessing_Sphinx_manager):
-    # Instantiate the app and GUI then run them
+    # Instantiate the app and GUI.
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow(app, multiprocessing_Sphinx_manager)
-    # Install an event filter to catch ApplicationActivate events (see CodeChatWindow.eventFilter)
+    # Install an `event filter <http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter>`_ to catch `ApplicationActivate <http://qt-project.org/doc/qt-4.8/qevent.html#Type-enum>`_ events (see :ref:`CodeChatWindow.eventFilter <CodeChatGui_eventFilter>`).
     app.installEventFilter(window)
+    # Run the program.
     window.show()
     sys.exit(app.exec_())
