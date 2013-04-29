@@ -13,6 +13,9 @@
 # *******************************************************************
 # CodeChatUtils.py - Provide a set of utilities in support of the GUI
 # *******************************************************************
+# .. contents:: Table of Contents
+#    :local:
+#    :depth: 1
 #
 # Imports
 # =======
@@ -38,7 +41,7 @@ import MultiprocessingSphinx
 # Data structures:
 #
 # #. ``self.mru_action_list = [QAction(MRU list[0]), ...]`` stores the list of File menu MRU QActions. Each action stores data the from MRU list.
-# #. The MRU list (obtained from ``self.get_mru_list() == [MRU_file_0_name, ...]`` stores a list of file names of MRU files.
+# #. The MRU list (obtained from ``self.get_mru_list() == [MRU_file_0_name, ...]`` stores a list of most-recently-used file names.
 class MruFiles(object):
     # Initialize the MRU list and the File menu's MRU items.
     def __init__(self,
@@ -93,7 +96,7 @@ class MruFiles(object):
 
     # Adds a file to the MRU list.
     def add_file(self, file_name):
-        # Add file_name to the mru list, moving it to the top if it's already in the list.
+        # Add file_name to the MRU list, moving it to the top if it's already in the list.
         mru_list = self.get_mru_list()
         if file_name in mru_list:
             mru_list.remove(file_name)
@@ -107,6 +110,8 @@ class MruFiles(object):
         self.update_gui()
 
     # .. _update_gui:
+    #
+    # Take the MRU list stored in the registry and update the File menu to reflect these registry contents.
     def update_gui(self):
         # For each elemnt in the MRU list, update the menu item.
         mru_list = self.get_mru_list()
@@ -123,9 +128,9 @@ class MruFiles(object):
 #
 # Background Sphinx execution
 # ===========================
-# This class is run in a separate thread to perform a Sphinx build in the background. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the constructor below between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
+# This class is run in a separate thread to perform a Sphinx build in another process. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the constructor below between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
 #
-# The process begins at (1), when CodeChat.save_then_update_html emits signal_Sphinx_start, which Qt then places in the BackgroundSphinx message queue. When BackgroundSphinx is idle, this message then invokes run_Sphinx(), which executes Sphinx in the worker thread. As Sphinx runs, any status messages produced cause run_sphinx() to emit signal_Sphinx_results in step (2), which delivers these status messages to the GUI queue; when the GUI is idle, these messages then invoke Sphinx_results, which displays them in the bottom pane of the GUI. When Sphinx finishes, step (3) shows that run_Sphinx() emits signal_Sphinx_done with any error messages produced during the build.
+# The process begins at (1a), when :ref:`CodeChatWindow.save_then_update_html <CodeChatWindow-save_then_update_html>` emits :ref:`signal_Sphinx_start <CodeChatWindow-signal_Sphinx_start>`, which Qt then places in the BackgroundSphinx message queue. When BackgroundSphinx is idle, this message then invokes :ref:`run_Sphinx() <BackgroundSphinx-run_Sphinx>`, which starts Sphinx execution in a separate process via an IPC pipe write in (1b). As Sphinx runs, the worker thread waits for any status messages produced by the IPC pipe in (2a), which cause :ref:`run_Sphinx() <BackgroundSphinx-run_Sphinx>` to emit :ref:`signal_Sphinx_results <BackgroundSphinx-signal_Sphinx_results>` in step (2b), in order to deliver these status messages to the GUI queue; when the GUI is idle, these messages then invoke :ref:`Sphinx_results <CodeChatWindow-Sphinx_results>`, which displays them in the bottom pane of the GUI. When Sphinx finishes, step (3) shows that :ref:`run_Sphinx() <BackgroundSphinx-run_Sphinx>` emits :ref:`signal_Sphinx_done <BackgroundSphinx-signal_Sphinx_done>` to :ref:`after_Sphinx <CodeChatWindow-after_Sphinx>` with any error messages produced during the build.
 #
 # This message-passing approach to concurrency helps avoid many of the common errors found in multi-threaded programming. In particular, BackgroundSphinx and CodeChat have no shared state to protect; all shared information is instead passed in messages. Therefore, there is no mutex/semaphore usage, and no consequent livelock / deadlock errors.
 #
@@ -134,7 +139,7 @@ class MruFiles(object):
 # .. digraph:: GUI_and_BackgroundSphinx_synchronization
 #
 #    subgraph cluster_CodeChat {
-#      label = "CodeChat";
+#      label = "CodeChatWindow";
 #      "save_then_update_html";
 #      "Sphinx_results";
 #      "after_Sphinx";
@@ -143,9 +148,15 @@ class MruFiles(object):
 #      label = "BackgroundSphinx";
 #      "run_Sphinx"
 #    }
-#    "run_Sphinx" -> "Sphinx_results" [label = "signal_Sphinx_results", taillabel="(2)"];
-#    "run_Sphinx" -> "after_Sphinx" [label = "signal_Sphinx_done", taillabel="(3)"];
-#    "save_then_update_html" -> "run_Sphinx" [label = "signal_Sphinx_start", taillabel="(1)"];
+#    subgraph cluster_MultiprocessingSphinx {
+#      label = "MultiprocessingSphinx";
+#      "run_Sphinx_process"
+#    }
+#    "save_then_update_html" -> "run_Sphinx" [label = "signal_Sphinx_start", taillabel = "(1a)"];
+#    "run_Sphinx" -> "run_Sphinx_process" [taillabel = "(1a)"];
+#    "run_Sphinx_process" -> "run_Sphinx" [taillabel = "(2a)"];
+#    "run_Sphinx" -> "Sphinx_results" [label = "signal_Sphinx_results", taillabel = "(2b)"];
+#    "run_Sphinx" -> "after_Sphinx" [label = "signal_Sphinx_done", taillabel = "(3)"];
 #
 # This class must inherit from a QObject in order to support the signal/slot mechanism.
 class BackgroundSphinx(QtCore.QObject):
@@ -153,9 +164,13 @@ class BackgroundSphinx(QtCore.QObject):
 # ------------
 # This section of the object builds the graph shown above, initializing this object then running it run in a newly-created background thread. **Note: this code runs in the GUI thread.** Everything else in this object runs in the background thread.
 #
+    # .. _BackgroundSphinx-signal_Sphinx_results:
+    #
     # run_Sphinx emits this as Sphinx produces results from the build.
     signal_Sphinx_results = QtCore.pyqtSignal(unicode)
 
+    # .. _BackgroundSphinx-signal_Sphinx_done:
+    #
     # run_Sphinx emits this when the Sphinx build finishes with the results from stderr.
     signal_Sphinx_done = QtCore.pyqtSignal(unicode)
 
@@ -177,15 +192,16 @@ class BackgroundSphinx(QtCore.QObject):
 
 # Worker routine
 # --------------
-    # This routine is (indirectly) invoked by CodeChat.save_then_update_html. It returns nothing, instead emitting signals when output is ready, as explained above. run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
+    # This routine is (indirectly) invoked by :ref:`CodeChatWindow.save_then_update_html <CodeChatWindow-save_then_update_html>`. It returns nothing, instead emitting signals when output is ready, as explained above. run_Sphinx assumes that all Sphinx input files have been saved to the disk in the current directory tree.
     #
-    # Crazy idea: Run Sphinx in a separate process, to make the GUI more responsive, since the GIL prevents the GUI from running while Sphinx is executing. To do so, I can use Python's multiprocessing module. The main question: how do I pass data to/from the Sphinx process? There are two types of messages from Sphinx: stdout results and stderr results; a stderr result is sent when Sphinx is done. There's one type of message to Sphinx: the html_dir, and perhaps the current directory (since this could change, but a separate process wouldn't know). Should I use a pipe or a queue? It seems like a pipe would be better, since it's two-way. So, something like this:
+    # The actual work is done in a separate process, to overcome GIL-enforced single-tasking. The approach:
     #
-    # #. Start up Sphinx in a separate process, giving it a pipe end.
+    # #. Start up Sphinx in a separate process, giving it a pipe end. Done by the :ref:`MultiprocessingSphinxManager constructor <MultiprocessingSphinxManager-__init-__>`.
     # #. Sphinx blocks on a pipe read, which gives it (current dir, html_dir)
-    # #. Sphinx begins processing; the worker thread blocks on pipe reads of (message_dest [stdout or stderr], message_text. It emits signals for both, ending when it gets a stderr message and going to the previous step.
+    # #. Sphinx begins processing; this worker thread blocks on a pipe read of (is_message_from_stderr, message_text). It emits signals for both, ending when it gets a stderr message and going to the previous step to wait for another Sphinx run.
     #
-    # #. How to prototype this? Seems like I could just code it up. Need a separate routine to run Sphinx in a separate process.
+    # .. _BackgroundSphinx-run_Sphinx:
+    #
     def run_Sphinx(self, html_dir):
                          # Directory in which Sphinx should place the HTML output from the build.
         # Start the build by sending params.
@@ -199,8 +215,7 @@ class BackgroundSphinx(QtCore.QObject):
                 self.signal_Sphinx_results.emit(txt)
         # Send a signal with the stderr string now that Sphinx is finished.
         self.signal_Sphinx_done.emit(txt)
-
-
+#
 # Resettable timer
 # ================
 # A convenience class to add a restart() method to a QTimer.

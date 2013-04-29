@@ -35,6 +35,7 @@ import sphinx.cmdline
 # ============================
 # This class starts and ends the process in which Sphinx runs.
 class MultiprocessingSphinxManager(object):
+    # .. _MultiprocessingSphinxManager-__init-__:
     def __init__(self):
         # Start a process for background Sphinx operation
         freeze_support()

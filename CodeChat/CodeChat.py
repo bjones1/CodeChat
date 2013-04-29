@@ -85,6 +85,8 @@ except (ImportError, IOError):
 #    :local:
 #    :depth: 1
 class CodeChatWindow(QtGui.QMainWindow, form_class):
+    # .. _CodeChatWindow-signal_Sphinx_start:
+    #
     # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See :ref:`Background-Sphinx-execution` for more information.
     signal_Sphinx_start = QtCore.pyqtSignal(unicode)
 #
@@ -355,6 +357,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             return True
 
+    # .. _CodeChatWindow-save_then_update_html:
     def save_then_update_html(self):
         if self.is_building:
             return
@@ -369,6 +372,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Start the Sphinx build in the background.
         self.signal_Sphinx_start.emit(self.html_dir)
 
+    # .. _CodeChatWindow-Sphinx_results:
     def Sphinx_results(self, results):
         # Append Sphinx build output. Just calling ``self.results_plain_text_edit.appendPlainText(results)`` appends an unnecessary newline.
         c = self.results_plain_text_edit.textCursor()
@@ -378,6 +382,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Scroll to bottom to show these results.
         self.results_plain_text_edit.ensureCursorVisible()
 
+    # .. _CodeChatWindow-after_Sphinx:
     def after_Sphinx(self, stderr):
         # Provide a "done" notification. Show stderr in red if available.
         html = '<pre>Done.\n</pre>'
