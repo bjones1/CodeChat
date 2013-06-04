@@ -24,6 +24,7 @@
 # Standard library
 # ----------------
 import os
+import subprocess
 #
 # Third-party imports
 # -------------------
@@ -202,19 +203,32 @@ class BackgroundSphinx(QtCore.QObject):
     #
     # .. _BackgroundSphinx-run_Sphinx:
     #
-    def run_Sphinx(self, html_dir):
+    def run_Sphinx(self, html_dir, build_tool):
                          # Directory in which Sphinx should place the HTML output from the build.
-        # Start the build by sending params.
-        self.parent_conn.send([os.getcwd(), html_dir])
-        # Send any stdout as a signal
-        is_stderr = False
-        while not is_stderr:
-            is_stderr, txt = self.parent_conn.recv()
-            if not is_stderr:
-                # Send any stdout text along
-                self.signal_Sphinx_results.emit(txt)
-        # Send a signal with the stderr string now that Sphinx is finished.
-        self.signal_Sphinx_done.emit(txt)
+
+        if build_tool == BUILD_TOOL_DOXYGEN:
+            # A better way to get real-time output: http://stackoverflow.com/questions/1388753/how-to-get-output-from-subprocess-popen/1388807#1388807
+            try:
+                output = subprocess.check_output('doxygen', stderr=subprocess.STDOUT)
+            except subprocess.CalledProcessError as e:
+                output = e.output
+
+            self.signal_Sphinx_done.emit(output)
+
+        elif self.build_tool == BUILD_TOOL_SPHINX:
+            # Start the build by sending params.
+            self.parent_conn.send([os.getcwd(), html_dir])
+            # Send any stdout as a signal
+            is_stderr = False
+            while not is_stderr:
+                is_stderr, txt = self.parent_conn.recv()
+                if not is_stderr:
+                    # Send any stdout text along
+                    self.signal_Sphinx_results.emit(txt)
+            # Send a signal with the stderr string now that Sphinx is finished.
+            self.signal_Sphinx_done.emit(txt)
+        else:
+            assert False
 #
 # Resettable timer
 # ================
@@ -223,3 +237,7 @@ class QRestartableTimer(QtCore.QTimer):
     def restart(self):
         self.stop()
         self.start()
+#
+# Build tools enum
+# ================
+BUILD_TOOL_SPHINX, BUILD_TOOL_DOXYGEN = range(2)

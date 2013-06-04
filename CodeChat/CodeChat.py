@@ -54,7 +54,7 @@ from pygments.lexers import get_lexer_for_filename
 #
 # Local application imports
 # -------------------------
-from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer
+from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer, BUILD_TOOL_DOXYGEN, BUILD_TOOL_SPHINX
 from LanguageSpecificOptions import LanguageSpecificOptions
 
 # The ability to match text in source code with text in HTML forms one of the core strengths of this module. See :doc:`FindLongestMatchingString.py <FindLongestMatchingString.py>` for details.
@@ -87,8 +87,8 @@ except (ImportError, IOError):
 class CodeChatWindow(QtGui.QMainWindow, form_class):
     # .. _CodeChatWindow-signal_Sphinx_start:
     #
-    # This signal starts a Sphinx background run; the parameter is the HTML directory to use. See :ref:`Background-Sphinx-execution` for more information.
-    signal_Sphinx_start = QtCore.pyqtSignal(unicode)
+    # This signal starts a Sphinx background run; the parameters are (the HTML directory to use, the build tool). See :ref:`Background-Sphinx-execution` for more information.
+    signal_Sphinx_start = QtCore.pyqtSignal(unicode, int)
 #
 # Initialization / finalization
 # -----------------------------
@@ -101,9 +101,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.app = app
         self.multiprocessing_Sphinx_manager = multiprocessing_Sphinx_manager
 
+        # Select build tool
+        self.build_tool = BUILD_TOOL_DOXYGEN
+
         self.project_dir_key = 'project directory'
         # A path to the generated HTML files, relative to the project directory
-        self.html_dir = '_build/html'
+        if self.build_tool == BUILD_TOOL_DOXYGEN:
+            self.html_dir = 'docs'
+        elif self.build_tool == BUILD_TOOL_SPHINX:
+            self.html_dir = '_build/html'
+        else:
+            assert False
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
 
         # Open the last project directory of we can; otherwise, use the current directory.
@@ -226,14 +234,25 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Choose a language
         self.language_specific_options = LanguageSpecificOptions()
         self.language_specific_options.set_language(get_lexer_for_filename(source_file))
-        # If this is a code-to-reST file, append .html to the filename
-        if self.language_specific_options.comment_string:
-            self.html_file = os.path.join(self.html_dir, self.source_file) + '.html'
-        # Otherwise, replace the extension with .html
-        else:
+        # Determine the html file matching this source file
+        if self.build_tool == BUILD_TOOL_DOXYGEN:
+            # TODO
             head, tail = os.path.split(self.source_file)
             name, ext = os.path.splitext(tail)
             self.html_file = os.path.join(self.html_dir, head, name) + '.html'
+        elif self.build_tool == BUILD_TOOL_SPHINX:
+            # If this is a code-to-reST file, append .html to the filename
+            if self.language_specific_options.comment_string:
+                self.html_file = os.path.join(self.html_dir, self.source_file) + '.html'
+            # Otherwise, replace the extension with .html
+            else:
+                head, tail = os.path.split(self.source_file)
+                name, ext = os.path.splitext(tail)
+                self.html_file = os.path.join(self.html_dir, head, name) + '.html'
+        else:
+            assert False
+
+
         # Choose a lexer
         # Set style for comments to a fixed-width courier font.
         lexer_class = self.language_specific_options.lexer
@@ -370,7 +389,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Erase any previous build results.
         self.results_plain_text_edit.setPlainText('')
         # Start the Sphinx build in the background.
-        self.signal_Sphinx_start.emit(self.html_dir)
+        self.signal_Sphinx_start.emit(self.html_dir, self.build_tool)
 
     # .. _CodeChatWindow-Sphinx_results:
     def Sphinx_results(self, results):

@@ -196,6 +196,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
 
 # Wrap code_to_rest by opening in and out files.
 def CodeToRest(source_path, rst_path, language_specific_options):
+    print('Processing ' + source_path + ' to ' + rst_path)
     with codecs.open(source_path, 'r', encoding = 'utf-8') as in_file:
         with codecs.open(rst_path, mode = 'w', encoding = 'utf-8') as out_file:
             code_to_rest(language_specific_options, in_file, out_file)
