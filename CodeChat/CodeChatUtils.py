@@ -215,7 +215,7 @@ class BackgroundSphinx(QtCore.QObject):
 
             self.signal_Sphinx_done.emit(output)
 
-        elif self.build_tool == BUILD_TOOL_SPHINX:
+        elif build_tool == BUILD_TOOL_SPHINX:
             # Start the build by sending params.
             self.parent_conn.send([os.getcwd(), html_dir])
             # Send any stdout as a signal

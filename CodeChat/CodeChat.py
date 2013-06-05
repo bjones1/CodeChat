@@ -97,21 +97,21 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
+        # Finish UI setup by grouping checkable menu items.
+        self.build_tool_action_group = QtGui.QActionGroup(self)
+        self.build_tool_action_group.addAction(self.action_Sphinx)
+        self.build_tool_action_group.addAction(self.action_Doxygen)
+        # Check one, which also sets the corresponding self.build_tool variable.
+        self.action_Sphinx.setChecked(True)
+        # TODO: A hack for debugging. Remove when the above line causes this to be set.
+        self.build_tool = BUILD_TOOL_SPHINX
+
         # Store constructor args.
         self.app = app
         self.multiprocessing_Sphinx_manager = multiprocessing_Sphinx_manager
 
-        # Select build tool
-        self.build_tool = BUILD_TOOL_DOXYGEN
-
         self.project_dir_key = 'project directory'
         # A path to the generated HTML files, relative to the project directory
-        if self.build_tool == BUILD_TOOL_DOXYGEN:
-            self.html_dir = 'docs'
-        elif self.build_tool == BUILD_TOOL_SPHINX:
-            self.html_dir = '_build/html'
-        else:
-            assert False
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
 
         # Open the last project directory of we can; otherwise, use the current directory.
@@ -236,19 +236,21 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.language_specific_options.set_language(get_lexer_for_filename(source_file))
         # Determine the html file matching this source file
         if self.build_tool == BUILD_TOOL_DOXYGEN:
-            # TODO
+            # TODO - find some Doxygen file which gives source file to html file mapping.
             head, tail = os.path.split(self.source_file)
             name, ext = os.path.splitext(tail)
-            self.html_file = os.path.join(self.html_dir, head, name) + '.html'
+            # TODO: kludge to play with the results
+            name = 'index'
+            self.html_file = os.path.join(self.html_dir(), name) + '.html'
         elif self.build_tool == BUILD_TOOL_SPHINX:
             # If this is a code-to-reST file, append .html to the filename
             if self.language_specific_options.comment_string:
-                self.html_file = os.path.join(self.html_dir, self.source_file) + '.html'
+                self.html_file = os.path.join(self.html_dir(), self.source_file) + '.html'
             # Otherwise, replace the extension with .html
             else:
                 head, tail = os.path.split(self.source_file)
                 name, ext = os.path.splitext(tail)
-                self.html_file = os.path.join(self.html_dir, head, name) + '.html'
+                self.html_file = os.path.join(self.html_dir(), head, name) + '.html'
         else:
             assert False
 
@@ -389,7 +391,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Erase any previous build results.
         self.results_plain_text_edit.setPlainText('')
         # Start the Sphinx build in the background.
-        self.signal_Sphinx_start.emit(self.html_dir, self.build_tool)
+        self.signal_Sphinx_start.emit(self.html_dir(), self.build_tool)
 
     # .. _CodeChatWindow-Sphinx_results:
     def Sphinx_results(self, results):
@@ -439,6 +441,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     def get_html_file(self):
         return os.path.join(self.project_dir, self.html_file)
+
+    def html_dir(self):
+        if self.build_tool == BUILD_TOOL_DOXYGEN:
+            return 'docs'
+        elif self.build_tool == BUILD_TOOL_SPHINX:
+            return '_build/html'
+        else:
+            assert False
 #
 # Syncing between code and web
 # ----------------------------
@@ -514,6 +524,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 #
 # Menu item actions
 # -----------------
+# File menu
+# ^^^^^^^^^
     # The decorator below prevents this method from being called twice, per http://www.riverbankcomputing.co.uk/static/Docs/PyQt4/html/new_style_signals_slots.html#connecting-slots-by-name.
     @QtCore.pyqtSlot()
     def on_action_Create_new_project_triggered(self):
@@ -546,6 +558,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.save_before_reload():
             self.reload()
 
+# View menu
+# ^^^^^^^^^
     @QtCore.pyqtSlot()
     def on_action_in_browser_triggered(self):
         self.save_then_update_html()
@@ -554,6 +568,22 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     def on_action_CodeChat_documentation_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://bitbucket.org/bjones/documentation'))
 
+# Options menu
+# ^^^^^^^^^^^^
+    @QtCore.pyqtSlot(bool)
+    def on_action_Sphinx_triggered(self, is_checked):
+        if is_checked:
+            self.build_tool = BUILD_TOOL_SPHINX
+            self.save_then_update_html()
+
+    @QtCore.pyqtSlot(bool)
+    def on_action_Doxygen_triggered(self, is_checked):
+        if is_checked:
+            self.build_tool = BUILD_TOOL_DOXYGEN
+            self.save_then_update_html()
+
+# Help menu
+# ^^^^^^^^^
     @QtCore.pyqtSlot()
     def on_action_ReST_cheat_sheet_triggered(self):
         QtGui.QDesktopServices.openUrl(QtCore.QUrl('http://dl.dropbox.com/u/2337351/rst-cheatsheet.html'))
@@ -592,3 +622,9 @@ def main(multiprocessing_Sphinx_manager):
     # Run the program.
     window.show()
     sys.exit(app.exec_())
+
+# Doxygen bugs:
+#
+# #. The html_file doesn't get updated when an option menu item is run. This only happens in open(). Need to factor it out.
+# #. Switching causes CodeChat to queue up another build. However, it may not be run if, after finishing the previous build, nothing was modified.
+# #. Mapping file names to html is problematic.
