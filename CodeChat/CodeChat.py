@@ -238,10 +238,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.build_tool == BUILD_TOOL_DOXYGEN:
             # TODO - find some Doxygen file which gives source file to html file mapping.
             head, tail = os.path.split(self.source_file)
-            name, ext = os.path.splitext(tail)
-            # TODO: kludge to play with the results
-            name = 'index'
-            self.html_file = os.path.join(self.html_dir(), name) + '.html'
+            # From what I've seen: _ becomes __, . becomes _8. I'm not sure what happens when different directories have the same file name, nor what happens with non-ASCII characters. Likewise, this doesn't deal with special page creation (such as \page, \mainpage) where the resulting .html may be a combination of several source files.
+            tail = tail.translate({ord(u'_'): u'__', ord(u'.'): u'_8'})
+            self.html_file = os.path.join(self.html_dir(), tail) + '.html'
         elif self.build_tool == BUILD_TOOL_SPHINX:
             # If this is a code-to-reST file, append .html to the filename
             if self.language_specific_options.comment_string:
