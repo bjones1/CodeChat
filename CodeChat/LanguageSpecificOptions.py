@@ -14,7 +14,7 @@ from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash
 from pygments.lexers.compiled import CLexer, CppLexer
 from pygments.lexers.agile import PythonLexer
 from pygments.lexers.text import RstLexer
-from pygments.lexers.math import SLexer
+from pygments.lexers.asm import GasLexer
 from pygments.lexers.shell import BashLexer
 from pygments.lexers.web import PhpLexer
 from pygments.lexers.math import MatlabLexer
@@ -51,7 +51,7 @@ class LanguageSpecificOptions(object):
       CppLexer().__class__    : ('//',          QsciLexerCPP,     ('.cpp',)),
       PythonLexer().__class__ : ('#',           QsciLexerPython,  ('.py',)),
       RstLexer().__class__    : (None,          None,             ()),
-      SLexer().__class__      : (';',           None,             ('.s',)),
+      GasLexer().__class__    : (';',           None,             ('.s',)),
       BashLexer().__class__   : ('#',           QsciLexerBash,    ('.bash',)),
       PhpLexer().__class__    : ('#',           None,             ('.php', )),
       MatlabLexer().__class__ : ('%',           None,             ('.m', )),
