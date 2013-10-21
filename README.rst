@@ -21,6 +21,7 @@ You may optionally install:
 
 Recent changes
 ==============
+- Current: Beta Doxygen support.
 - 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
 - 3-Apr-2013: Fix to handle Unicode files correctly.
