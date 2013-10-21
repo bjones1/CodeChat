@@ -10,9 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ==================================================
+# **************************************************
 # conf.py - Sphinx configuration for use by CodeChat
-# ==================================================
+# **************************************************
 # This file supplies configuration information for Sphinx, which CodeChat uses to produces its documentation. It was originally created by sphinx-quickstart.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -23,7 +23,7 @@
 import CodeChat.version
 #
 # General configuration
-# ---------------------
+# =====================
 # Add any `Sphinx extension module names <http://sphinx-doc.org/extensions.html>`_ here, as strings. They can be extensions coming with Sphinx (named ``sphinx.ext.*``) or your custom ones. **NOTE:** CodeChat relies on the ``CodeChat.CodeToRest`` extension; this must be present in every CodeChat project.
 extensions = ['sphinx.ext.pngmath', 'sphinx.ext.graphviz', 'CodeChat.CodeToRest']
 
@@ -77,7 +77,7 @@ pygments_style = 'sphinx'
 keep_warnings = True
 #
 # Options for HTML output
-# -----------------------
+# =======================
 # The theme to use for HTML and HTML Help pages.  CodeChat can ONLY use this theme, which was hand-modified to deal with limitations (no CSS include support) of the Qt QTextBrowser.
 html_theme = 'default'
 

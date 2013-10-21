@@ -1,5 +1,6 @@
+****************************************
 CodeChat, a conversational coding system
-========================================
+****************************************
 Welcome to CodeChat_, a conversational coding system. CodeChat encourages `literate programming <http://www.literateprogramming.com/>`_ by transforming source files into web pages and by providing a simple editor which synchronizes between the source code view and the web view of a document. Some examples of the results:
 
 - Explaining to myself what my code should do helped me rewrite and fix `CodeToRest <https://dl.dropbox.com/u/2337351/CodeChat/doc/CodeChat/CodeToRest.py.html>`_.
@@ -8,18 +9,18 @@ Welcome to CodeChat_, a conversational coding system. CodeChat encourages `liter
 For additional information, refer to :doc:`contents`.
 
 Getting started
----------------
+===============
 First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351/CodeChat/Install_CodeChat.exe>`_ to install the program. Next, create a new CodeChat project by selecting ``File | Create new project`` and place it in a directory of your choosing, then follow the directions that appear.
 
 Optional modules
-----------------
+================
 You may optionally install:
 
 * `MiKTeX <http://miktex.org>`_ to generate math formulas viewable in this application. On the first run, you'll be prompted to install a few additional MiKTeX packages.
 * `GraphViz <http://www.graphviz.org/>`_ to create graphs.
 
 Recent changes
---------------
+==============
 - 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
 - 3-Apr-2013: Fix to handle Unicode files correctly.
@@ -39,11 +40,11 @@ Recent changes
 - Make matched text in browser/code views more visible.
 
 Contributing
-------------
+============
 This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the `CodeChat <https://bitbucket.org/bjones/documentation>`_ homepage!
 
 License
--------
+=======
 Copyright (C) 2012-2013 Bryan A. Jones.
 
 This file is part of CodeChat.
