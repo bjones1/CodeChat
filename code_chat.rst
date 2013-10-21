@@ -29,6 +29,7 @@ In particular, :doc:`CodeChat.py <CodeChat/CodeChat.py>` implements the GUI, rel
    :maxdepth: 1
 
    code_chat.py
+   CodeChat/__init__.py
    CodeChat/CodeChat.py
    CodeChat/CodeChatUtils.py
    CodeChat/MultiprocessingSphinx.py

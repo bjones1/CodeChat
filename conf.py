@@ -54,7 +54,6 @@ release = version
 exclude_patterns = ['build',
                     'dist',
                     '_build',
-                    '*/__init__.py.rst',
                     'tre-0.8.0-src',
                     'CodeChat/example',
                     'CodeChat/CodeChat_ui.py',
