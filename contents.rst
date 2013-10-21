@@ -29,7 +29,7 @@ Implementation documentation
 .. toctree::
    :maxdepth: 2
 
-   code_chat.py
+   code_chat
 
 ################
 Index and search
