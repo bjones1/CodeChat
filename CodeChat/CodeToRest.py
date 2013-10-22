@@ -216,7 +216,7 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 def sphinx_builder_inited(app):
     # Look for every extension of every supported langauge
     lso = LanguageSpecificOptions()
-    for source_suffix in lso.language_specific_options.keys():
+    for source_suffix in lso.extension_to_options.keys():
         # Choose the current language to process any file in
         lso.set_language(source_suffix)
         # Find all source files with the given extension. This was copied almost verabtim from sphinx.environment.BuildEnvironment.find_files.

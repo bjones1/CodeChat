@@ -10,7 +10,7 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash 
+from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash
 # ========================================================================================
 # LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
 # ========================================================================================
@@ -33,8 +33,8 @@ class LanguageSpecificOptions(object):
 
     # .. attribute:: language_specific_options
     #
-    #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.
-    language_specific_options = {
+    #    A dict of language-specific options.
+    extension_to_options = {
     ##  Pygments  lexer
     ##  Extension  Comment string, QScintilla lexer
       '.c'      : ('//',           QsciLexerCPP),
@@ -57,4 +57,4 @@ class LanguageSpecificOptions(object):
     #    Sets the :class:`LanguageSpecificOptions` offered, where *extension* gives the extension for the desired language.
     def set_language(self, extension):
         # If the extension is unknown, then assign the comment string and lexer as None.
-        (self.comment_string, self.lexer) = self.language_specific_options.get(extension, (None, None))
+        (self.comment_string, self.lexer) = self.extension_to_options.get(extension, (None, None))
