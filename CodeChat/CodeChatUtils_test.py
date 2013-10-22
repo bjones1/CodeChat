@@ -21,7 +21,7 @@
 # -------------------------
 # This import must appear before importing PyQt4, since it sets SIP's API version. Otherwise, this produces the error message ``ValueError: API 'QString' has already been set to version 1``.
 from CodeChat import form_class
-from CodeChatUtils import MruFiles, BackgroundSphinx
+from CodeChatUtils import MruFiles, BackgroundSphinx, BUILD_TOOL_SPHINX
 from MultiprocessingSphinx import MultiprocessingSphinxManager
 
 # Standard library
@@ -146,7 +146,7 @@ class TestMruFiles(object):
 # -------------
 # This mock CodeChat class simply provides a way to receive emitted signals from run_Sphinx and log them.
 class CodeChatWindowForBackgroundSphinxMock(QtGui.QMainWindow):
-    signal_Sphinx_start = QtCore.pyqtSignal(unicode)
+    signal_Sphinx_start = QtCore.pyqtSignal(unicode, int)
 
     def __init__(self, msm):
         # Let Qt run its init first.
@@ -180,8 +180,8 @@ class TestBackgroundSphinx(object):
         # Create a process/thread to run BackgroundSphinx in and start it.
         bs = BackgroundSphinx(self.mw)
 
-        # Emit a a signal to start a Sphinx run.
-        self.mw.signal_Sphinx_start.emit('test_dir')
+        # Emit a signal to start a Sphinx run.
+        self.mw.signal_Sphinx_start.emit('test_dir', BUILD_TOOL_SPHINX)
 
         # Wait for background process to run (kludge). Calling processEvents is critical; otherwise, BackgroundSphinx signals won't be delivered yet.
         time.sleep(0.5)
