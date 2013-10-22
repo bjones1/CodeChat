@@ -10,13 +10,33 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ==============================================================================
+# *******************************************************************
 # CodeToRest.py - a Sphinx extension to translate source code to reST
-# ==============================================================================
+# *******************************************************************
 # .. module:: CodeToRest
-
+#
+# Imports
+# =======
+# These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
+#
+# Standard library
+# ----------------
+# We need this to open and save text files in Unicode.
 import re
 import codecs
+import os.path
+
+# Third-party imports
+# -------------------
+# Sphinx routines help to search for source files.
+from sphinx.util.matching import compile_matchers
+from sphinx.util import get_matching_docs
+# Needed to create a new Sphinx directive (codelink).
+from sphinx.util.compat import Directive
+
+# Local application imports
+# -------------------------
+from LanguageSpecificOptions import LanguageSpecificOptions
 
 # code_to_rest
 # ============
@@ -203,16 +223,17 @@ def CodeToRest(source_path, rst_path, language_specific_options):
 
 
 
+# Sphinx extension
+# ================
+# The following functions CodeToRest-related Sphinx extensions.
+#
+# CodeToRest extension
+# --------------------
+# This extension provide the CodeToRest Sphinx extension.
+#
 # .. function:: sphinx_builder_inited(app)
 #
 # This function searches for source code and transforms it to reST before Sphinx searches for reST source.
-#
-# To do so, we need to search for source files. Sphinx has some utils to help with that.
-from sphinx.util.matching import compile_matchers
-from sphinx.util import get_matching_docs
-import os.path
-from LanguageSpecificOptions import LanguageSpecificOptions
-
 def sphinx_builder_inited(app):
     # Look for every extension of every supported langauge
     lso = LanguageSpecificOptions()
@@ -260,8 +281,9 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
                              str)
         context['body'] = str
 
-# Playing with creating a new codelink directive to embed hyperlinks in code.
-from sphinx.util.compat import Directive
+# CodeLink directive
+# ------------------
+# This provides an experimental codelink directive to embed hyperlinks in code.
 class CodelinkDirective(Directive):
     # this enables content in the directive
     required_arguments = 1
@@ -290,6 +312,8 @@ def purge_codelinks(app, env, docname):
     env.todo_all_todos = [codelink for codelink in env.codelinks
                           if codelink['docname'] != docname]
 
+# Sphinx hooks
+# ------------
 # This routine defines the entry point called by Sphinx to initialize this extension, per http://sphinx.pocoo.org/ext/appapi.htm.
 def setup(app):
     # See sphinx_source_read() for more info.
@@ -299,6 +323,3 @@ def setup(app):
     app.add_directive('codelink', CodelinkDirective)
     app.connect('env-purge-doc', purge_codelinks)
 
-if __name__ == '__main__':
-    from CodeChat import main
-    main()
