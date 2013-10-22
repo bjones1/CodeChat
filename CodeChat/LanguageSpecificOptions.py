@@ -11,9 +11,12 @@
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash
-# ========================================================================================
+# ****************************************************************************************
 # LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
-# ========================================================================================
+# ****************************************************************************************
+#
+# LanguageSpecificOptions
+# =======================
 # For each programming language supported, :meth:`set_language` specifies:
 #
 # .. attribute:: comment_string
