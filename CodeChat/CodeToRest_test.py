@@ -10,10 +10,26 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
+# *********************************
 # CodeToRest_test.py - Unit testing
-# ---------------------------------
+# *********************************
 # This test bench exercises the CodeToRest module.
+#
+# Imports
+# =======
+# These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
+#
+# Standard library
+# ----------------
+from cStringIO import StringIO
 
+# Local application imports
+# -------------------------
+from CodeToRest import code_to_rest
+from LanguageSpecificOptions import LanguageSpecificOptions
+
+# CodeToRest tests
+# ================
 # Test the fixup code which removes junk lines used only to produce a desired indent.
 from CodeToRest import sphinx_html_page_context
 class TestSphinxHtmlPageContext(object):
@@ -29,17 +45,12 @@ class TestSphinxHtmlPageContext(object):
         ret = self.s(string)
         assert ret == string
 
-from cStringIO import StringIO
-from CodeToRest import code_to_rest
-from LanguageSpecificOptions import LanguageSpecificOptions
-from pygments.lexers.compiled import CLexer, CppLexer
-from pygments.lexers.agile import PythonLexer
 class TestCodeToRest(object):
     # Given a string and a language, run it through code_to_rest and return the resulting string.
-    def t(self, in_string, language = CLexer()):
+    def t(self, in_string, extension = '.c'):
         # Use a StringIO object to act like file IO which code_to_rest expects.
         lso = LanguageSpecificOptions()
-        lso.set_language(language)
+        lso.set_language(extension)
         in_stringIO = StringIO(in_string)
         out_stringIO = StringIO()
         code_to_rest(lso, in_stringIO, out_stringIO)
