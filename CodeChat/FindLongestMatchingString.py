@@ -10,25 +10,27 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ===================================================================================================
+# ***************************************************************************************************
 # FindLongestMatchingString.py - provide approximate matching to support code and web synchronization
-# ===================================================================================================
-#
+# ***************************************************************************************************
 # The find_approx_text_in_target_ function in this module searches a target string for the best match to characters about an anchor point in a source string. In particular, it first locates a block of target text which forms the closest approximate match for source characters about the anchor. Then, it looks for the (almost) longest possible exact match between source characters about the anchor and the block of target text found in the first step.
 #
-# Implementation
-# ==============
+# Imports
+# =======
+# These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
+# Third-party imports
+# -------------------
 # For approximate pattern matching, this module uses the Python port of TRE. See  http://hackerboss.com/approximate-regex-matching-in-python/ for more details. I modified the Python wrapper code to allow Unicode strings.
 import tre
 
 # For debug
-##import codecs
+#import codecs
 
 # .. _find_approx_text:
 #
 # find_approx_text
-# ------------------------------------------------------------------------------
+# ================
 # The find_approx_text function performs a single approximate match; find_approx_text_in_target_ calls this repeatedly. Its parameters:
 #
 # search_text
@@ -170,8 +172,3 @@ def find_approx_text_in_target(
     offset = begin_in_target + begin_in_target_substr + (search_anchor - min_cost_begin)
     # Make sure the result lies within the bounds of target_text. Since we return a cursor position, an offset of len(target_text), meaning the end of target_text, is valid.
     return min(len(target_text), max(0, offset))
-
-# If this module is run, execute unit tests.
-if __name__ == '__main__':
-    from CodeChat_test import main
-    main()
