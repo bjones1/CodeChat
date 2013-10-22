@@ -49,9 +49,6 @@ from PyQt4 import QtGui, QtCore, uic
 # `Scintilla <http://www.scintilla.org/ScintillaDoc.html>`_ (wrapped in Python) provides the text editor. However, the `Python documentation <http://www.riverbankcomputing.co.uk/static/Docs/QScintilla2/annotated.html>`_ for it was poor at best. Here's a `quick tutorial <http://eli.thegreenplace.net/2011/04/01/sample-using-qscintilla-with-pyqt/>`_ I found helpful.
 from PyQt4.Qsci import QsciScintilla, QsciLexerCPP
 
-# `Pygments <http://pygments.org/>`_ is used to match an extension (such as .cc or .cpp) to a file type (C++ source code).
-from pygments.lexers import get_lexer_for_filename
-#
 # Local application imports
 # -------------------------
 from CodeChatUtils import MruFiles, BackgroundSphinx, QRestartableTimer, BUILD_TOOL_DOXYGEN, BUILD_TOOL_SPHINX
@@ -233,7 +230,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.source_file = os.path.relpath(source_file)
         # Choose a language
         self.language_specific_options = LanguageSpecificOptions()
-        self.language_specific_options.set_language(get_lexer_for_filename(source_file))
+        self.language_specific_options.set_language(os.path.splitext(source_file)[1])
         # Determine the html file matching this source file
         if self.build_tool == BUILD_TOOL_DOXYGEN:
             # TODO - find some Doxygen file which gives source file to html file mapping.

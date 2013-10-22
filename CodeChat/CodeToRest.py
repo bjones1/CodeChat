@@ -216,30 +216,30 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 def sphinx_builder_inited(app):
     # Look for every extension of every supported langauge
     lso = LanguageSpecificOptions()
-    for lang in lso.language_specific_options.keys():
-        lso.set_language(lang())
-        for source_suffix in lso.extensions:
-            # Find all source files with the given extension. This was copied almost verabtim from sphinx.environment.BuildEnvironment.find_files.
-            matchers = compile_matchers(
-                app.config.exclude_patterns[:] +
-                app.config.exclude_trees +
-                [d + app.config.source_suffix for d in app.config.unused_docs] +
-                ['**/' + d for d in app.config.exclude_dirnames] +
-                ['**/_sources', '.#*']
-            )
-            docs = set(get_matching_docs(
-                app.srcdir, source_suffix, exclude_matchers = matchers))
-            # This can return an empty filename; remove it.
-            docs -= set([''])
-            # Now, translate any old or missing files
-            for source_file_noext in docs:
-                source_file = source_file_noext + source_suffix
-                rest_file = source_file + app.config.source_suffix
-                if ( (not os.path.exists(rest_file)) or
-                     (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                    CodeToRest(source_file, rest_file, lso)
-                else:
-                    pass
+    for source_suffix in lso.language_specific_options.keys():
+        # Choose the current language to process any file in
+        lso.set_language(source_suffix)
+        # Find all source files with the given extension. This was copied almost verabtim from sphinx.environment.BuildEnvironment.find_files.
+        matchers = compile_matchers(
+            app.config.exclude_patterns[:] +
+            app.config.exclude_trees +
+            [d + app.config.source_suffix for d in app.config.unused_docs] +
+            ['**/' + d for d in app.config.exclude_dirnames] +
+            ['**/_sources', '.#*']
+        )
+        docs = set(get_matching_docs(
+            app.srcdir, source_suffix, exclude_matchers = matchers))
+        # This can return an empty filename; remove it.
+        docs -= set([''])
+        # Now, translate any old or missing files
+        for source_file_noext in docs:
+            source_file = source_file_noext + source_suffix
+            rest_file = source_file + app.config.source_suffix
+            if ( (not os.path.exists(rest_file)) or
+                 (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
+                CodeToRest(source_file, rest_file, lso)
+            else:
+                pass
 
 
 # Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.

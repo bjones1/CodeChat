@@ -10,17 +10,7 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash
-from pygments.lexers.compiled import CLexer, CppLexer
-from pygments.lexers.agile import PythonLexer
-from pygments.lexers.text import RstLexer
-from pygments.lexers.asm import GasLexer
-from pygments.lexers.shell import BashLexer
-from pygments.lexers.web import PhpLexer
-from pygments.lexers.math import MatlabLexer
-from pygments.lexers.shell import BatchLexer
-from pygments.lexers import IniLexer
-
+from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython, QsciLexerBash 
 # ========================================================================================
 # LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
 # ========================================================================================
@@ -46,23 +36,25 @@ class LanguageSpecificOptions(object):
     #    A tuple of language-specific options, indexed by the class of the parser which Pygments selects.
     language_specific_options = {
     ##  Pygments  lexer
-    ##  |                        Comment string, QScintilla lexer, extension list
-      CLexer().__class__      : ('//',          QsciLexerCPP,     ('.c', '.h')),
-      CppLexer().__class__    : ('//',          QsciLexerCPP,     ('.cpp',)),
-      PythonLexer().__class__ : ('#',           QsciLexerPython,  ('.py',)),
-      RstLexer().__class__    : (None,          None,             ()),
-      GasLexer().__class__    : (';',           None,             ('.s',)),
-      BashLexer().__class__   : ('#',           QsciLexerBash,    ('.bash',)),
-      PhpLexer().__class__    : ('#',           None,             ('.php', )),
-      MatlabLexer().__class__ : ('%',           None,             ('.m', )),
-      BatchLexer().__class__  : (':',           None,               ('.bat', )),
-      IniLexer().__class__    : (';',           None,               ('.ini', '.iss', )),
+    ##  Extension  Comment string, QScintilla lexer
+      '.c'      : ('//',           QsciLexerCPP),
+      '.cc'     : ('//',           QsciLexerCPP),
+      '.cpp'    : ('//',           QsciLexerCPP),
+      '.h'      : ('//',           QsciLexerCPP),
+      '.hh'     : ('//',           QsciLexerCPP),
+      '.hpp'    : ('//',           QsciLexerCPP),
+      '.py'     : ('#',            QsciLexerPython),
+      '.s'      : (';',            None),
+      '.php'    : ('#',            None),
+      '.m'      : ('%',            None),
+      '.bat'    : (':',            None),
+      '.ini'    : (';',            None),
+      '.iss'    : (';',            None),
     }
 
-    # .. method:: set_language(language_)
+    # .. method:: set_language(extension)
     #
-    #    Sets the :class:`LanguageSpecificOptions` offered, where *language_* gives the Pygments lexer for the desired language.
-    def set_language(self, language_):
-        language = language_.__class__
-        (self.comment_string, self.lexer, self.extensions) = \
-          self.language_specific_options[language]
+    #    Sets the :class:`LanguageSpecificOptions` offered, where *extension* gives the extension for the desired language.
+    def set_language(self, extension):
+        # If the extension is unknown, then assign the comment string and lexer as None.
+        (self.comment_string, self.lexer) = self.language_specific_options.get(extension, (None, None))
