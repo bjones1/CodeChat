@@ -8,7 +8,7 @@ import sys
 import os
 import shutil
 
-version = "git b56d7b2"
+version = "0.8.0"
 data_files = []
 include_dirs = ["../lib"]
 libraries = ["tre"]
