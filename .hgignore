@@ -9,19 +9,33 @@
 # You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
 syntax: glob
+# Python compiled files
 *.pyc
+
+# CodeChat-generated files
 *.py.rst
+*.bat.rst
+*.iss.rst
+*.ini.rst
 _build
-dist
-tre-0.8.0-src/win32/Release
+
+# Files created when building a binary release
 build
+dist
 tre.pyd
 tre.dll
 CodeChat/CodeChat_ui.py
 warncode_chat.txt
 Install_CodeChat.exe
 template/default.css
-*.bat.rst
-*.iss.rst
-*.ini.rst
 code_chat.spec
+
+# TRE flies
+tre-0.8.0-src/.git
+tre-0.8.0-src/.gitignore
+tre-0.8.0-src/win32/Release
+tre-0.8.0-src/win32/tre.ncb
+tre-0.8.0-src/win32/tre.suo
+tre-0.8.0-src/win32/*.vcproj.*.user
+
+# Others
