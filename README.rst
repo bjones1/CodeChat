@@ -21,7 +21,7 @@ You may optionally install:
 
 Recent changes
 ==============
-- Current: Beta Doxygen support. Fixed crash when file with an unknown extension was leaded.
+- Current: Beta Doxygen support. Fixed crash when file with an unknown extension was loaded.
 - 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
 - 3-Apr-2013: Fix to handle Unicode files correctly.
@@ -77,7 +77,7 @@ To run::
  export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
  python code_chat.py
 
-CodeChat doesn't close properly in Unix, but gets stuck trying to end the Sphinx build subprocess. Until this is fixed, press Ctrl+C after clicking the close button at the command line.
+CodeChat doesn't close properly in Unix, but gets stuck trying to end the Sphinx build subprocess (see `this bug <https://bitbucket.org/bjones/documentation/issue/27/app-doesnt-close-on-linux>`_). Until this is fixed, press Ctrl+C after clicking the close button at the command line.
 
 Mac
 ^^^
