@@ -50,11 +50,9 @@ You'll need Python 2.7 installed on your PC. Python 3 is definitely not supporte
 
 Windows
 ^^^^^^^
-Note: This is untested. I did this too long ago and haven't tested recently.
-
 - Download and install `PyQt4 <http://www.riverbankcomputing.com/software/pyqt/download>`_ and `Sphinx <http://sphinx-doc.org/>`_.
-- Build the TRE library using Visual Studio 2008 express (or the full version) based on the project file in ``tre-0.8.0-src/win32``. Copy the resulting ``tre.dll`` to the CodeChat's root directory (where ``code_chat.py`` resides).
-- From a command line in tre-0.8.0-src/python, run ``python setup.py build_ext -i`` then copy the resulting ``tre.pyd`` to the CodeChat root directory.
+- Build the TRE library using Visual Studio 2008 express (or the full version) based on the project file in ``tre-0.8.0-src/win32``.
+- From a command line in ``tre-0.8.0-src/python``, run ``python setup.py build_ext -i -I../include`` then copy the resulting ``tre.pyd`` and ``tre.dll`` to the CodeChat root directory (where ``code_chat.py`` resides).
 - Execute ``code_chat.py`` from the CodeChat root directory.
 
 Unix
