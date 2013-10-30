@@ -10,7 +10,7 @@ For additional information, refer to :doc:`contents`.
 
 Getting started
 ===============
-First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351/CodeChat/Install_CodeChat.exe>`_ to install the program. Next, create a new CodeChat project by selecting ``File | Create new project`` and place it in a directory of your choosing, then follow the directions that appear.
+First, download then run `Install_CodeChat.exe <https://dl.dropbox.com/u/2337351/CodeChat/Install_CodeChat.exe>`_ to install the program. Next, create a new CodeChat project by selecting ``File | Create new project`` and place it in a directory of your choosing, then follow the directions that appear. See `Running from source`_ for other options.
 
 Optional modules
 ================
@@ -43,6 +43,40 @@ Recent changes
 Contributing
 ============
 This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the `CodeChat <https://bitbucket.org/bjones/documentation>`_ homepage!
+
+Running from source
+-------------------
+You'll need Python 2.7 installed on your PC. Python 3 is definitely not supported; I haven't tried with earlier versions of Python.
+
+Windows
+^^^^^^^
+Note: This is untested. I did this too long ago and haven't tested recently.
+
+- Download and install `PyQt4 <http://www.riverbankcomputing.com/software/pyqt/download>`_ and `Sphinx <http://sphinx-doc.org/>`_.
+- Build the TRE library using Visual Studio 2008 express (or the full version) based on the project file in ``tre-0.8.0-src/win32``. Copy the resulting ``tre.dll`` to the CodeChat's root directory (where ``code_chat.py`` resides).
+- From a command line in tre-0.8.0-src/python, run ``python setup.py build_ext -i`` then copy the resulting ``tre.pyd`` to the CodeChat root directory.
+- Execute ``code_chat.py`` from the CodeChat root directory.
+
+Unix
+^^^^
+To install::
+
+ sudo apt-get install python-dev python-qt4 python-sphinx tortoisehg
+ hg clone https://bitbucket.org/bjones/documentation
+ cd documentation/tre-0.8.0-src
+ ./configure
+ make
+ sudo make install
+ cd python
+ python setup.py build_ext -i
+ cp tre.so ../..
+
+To run::
+
+ export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+ python code_chat.py
+
+CodeChat doesn't close properly in Unix, but gets stuck trying to end the Sphinx build subprocess. Just press Ctrl+C after clicking the close button at the command line.
 
 License
 =======
