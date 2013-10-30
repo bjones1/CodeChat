@@ -57,11 +57,14 @@ Windows
 
 Unix
 ^^^^
+The following was tested on Ubuntu 12.05 LTS. Modify as appropriate for your distribution.
+
 To install::
 
- sudo apt-get install python-dev python-qt4 python-sphinx tortoisehg
+ sudo apt-get install python-dev python-qt4 python-sphinx tortoisehg autoconf gettext libtool autopoint 
  hg clone https://bitbucket.org/bjones/documentation
  cd documentation/tre-0.8.0-src
+ utils/autogen.sh
  ./configure
  make
  sudo make install
@@ -74,7 +77,11 @@ To run::
  export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
  python code_chat.py
 
-CodeChat doesn't close properly in Unix, but gets stuck trying to end the Sphinx build subprocess. Just press Ctrl+C after clicking the close button at the command line.
+CodeChat doesn't close properly in Unix, but gets stuck trying to end the Sphinx build subprocess. Until this is fixed, press Ctrl+C after clicking the close button at the command line.
+
+Mac
+^^^
+Sorry, I don't own one. I would hope the Unix approach above would provide a good starting place. Please contact me if you'd like to try this out.
 
 License
 =======
