@@ -13,7 +13,7 @@
 #include "Python.h"
 #include "structmember.h"
 
-#include <tre.h>
+#include <tre/tre.h>
 
 #define	TRE_MODULE	"tre"
 
@@ -334,18 +334,20 @@ PyTrePattern_search(TrePatternObject *self, PyObject *args)
   size_t nsub;
   int rc;
   regmatch_t *pm;
-  Py_UNICODE *u_targ;
-  char* s_targ;
+  char *targ;
   size_t tlen;
 
-  if (!PyArg_ParseTuple(args, "OO!|i:match", &pstring, &TreFuzzynessType,
-			&fz, &eflags))
-    return NULL;
-
-  if (!PyUnicode_Check(pstring) && !PyString_Check(pstring))
+  if (PyTuple_Size(args) > 0 && PyUnicode_Check(PyTuple_GetItem(args, 0)))
     {
-	  PyErr_SetString(PyExc_TypeError, "Search text must be string or unicode.");
-	  return NULL;
+      if (!PyArg_ParseTuple(args, "UO!|i:search", &pstring, &TreFuzzynessType,
+			&fz, &eflags))
+      return NULL;
+    }
+  else
+    {
+      if (!PyArg_ParseTuple(args, "SO!|i:search", &pstring, &TreFuzzynessType,
+			&fz, &eflags))
+      return NULL;
     }
 
   mo = newTreMatchObject();
@@ -354,27 +356,34 @@ PyTrePattern_search(TrePatternObject *self, PyObject *args)
 
   nsub = self->rgx.re_nsub + 1;
   pm = PyMem_New(regmatch_t, nsub);
-  if (pm != NULL)
+  if (!pm)
     {
-      mo->am.nmatch = nsub;
-      mo->am.pmatch = pm;
-    }
-  else
-    {
-      /* XXX */
       Py_DECREF(mo);
-      return NULL;
+      return PyErr_NoMemory();
     }
+
+  mo->am.nmatch = nsub;
+  mo->am.pmatch = pm;
 
   if (PyUnicode_Check(pstring))
     {
-  	  u_targ = PyUnicode_AsUnicode(pstring);
-	  tlen = PyUnicode_GetSize(pstring);
-      rc = tre_regawnexec(&self->rgx, u_targ, tlen, &mo->am, fz->ap, eflags);
-    } else {
-  	  s_targ = PyString_AsString(pstring);
-	  tlen = PyString_Size(pstring);
-      rc = tre_reganexec(&self->rgx, s_targ, tlen, &mo->am, fz->ap, eflags);
+      Py_ssize_t len = PyUnicode_GetSize(pstring);
+      wchar_t *buf = calloc(sizeof(wchar_t), len);
+      if(!buf)
+        {
+          Py_DECREF(mo);
+          return PyErr_NoMemory();
+        }
+      PyUnicode_AsWideChar(pstring, buf, len);
+      rc = tre_regawnexec(&self->rgx, buf, len, &mo->am, fz->ap, eflags);
+      free(buf);
+    }
+  else
+    {
+      targ = PyString_AsString(pstring);
+      tlen = PyString_Size(pstring);
+
+      rc = tre_reganexec(&self->rgx, targ, tlen, &mo->am, fz->ap, eflags);
     }
 
   if (PyErr_Occurred())
@@ -405,7 +414,7 @@ PyTrePattern_search(TrePatternObject *self, PyObject *args)
 
 static PyMethodDef TrePattern_methods[] = {
   { "search", (PyCFunction)PyTrePattern_search, METH_VARARGS,
-    "try to match against given string, returning " TRE_MODULE ".match object "
+    "try to search in the given string, returning " TRE_MODULE ".match object "
     "or None on failure" },
   {NULL, NULL}
 };
@@ -458,7 +467,7 @@ static PyTypeObject TrePatternType = {
 };
 
 static TrePatternObject *
-newTrePatternObject(PyObject *args)
+newTrePatternObject()
 {
   TrePatternObject *self;
 
@@ -473,41 +482,47 @@ static PyObject *
 PyTre_ncompile(PyObject *self, PyObject *args)
 {
   TrePatternObject *rv;
-  PyObject* po_pattern;
-  Py_UNICODE* u_pattern;
-  char *s_pattern;
+  PyUnicodeObject *upattern = NULL;
+  char *pattern = NULL;
   int pattlen;
   int cflags = 0;
   int rc;
 
-  if (!PyArg_ParseTuple(args, "O|i:compile", &po_pattern, &cflags))
-    return NULL;
-
-  if (!PyUnicode_Check(po_pattern) && !PyString_Check(po_pattern))
+  if (PyTuple_Size(args) > 0 && PyUnicode_Check(PyTuple_GetItem(args, 0)))
     {
-	  PyErr_SetString(PyExc_TypeError, "Search pattern must be string or unicode.");
-	  return NULL;
+      if (!PyArg_ParseTuple(args, "U|i:compile", &upattern, &cflags))
+        return NULL;
+    }
+  else
+    {
+      if (!PyArg_ParseTuple(args, "s#|i:compile", &pattern, &pattlen, &cflags))
+        return NULL;
     }
 
-  rv = newTrePatternObject(args);
+  rv = newTrePatternObject();
   if (rv == NULL)
     return NULL;
 
-  if (PyUnicode_Check(po_pattern))
+  if (upattern != NULL)
     {
-  	  u_pattern = PyUnicode_AsUnicode(po_pattern);
-	  pattlen = PyUnicode_GetSize(po_pattern);
-      rc = tre_regwncomp(&rv->rgx, u_pattern, pattlen, cflags);
-    } else {
-  	  s_pattern = PyString_AsString(po_pattern);
-	  pattlen = PyString_Size(po_pattern);
-      rc = tre_regncomp(&rv->rgx, s_pattern, pattlen, cflags);
+      Py_ssize_t len = PyUnicode_GetSize(upattern);
+      wchar_t *buf = calloc(sizeof(wchar_t), len);
+      if(!buf)
+        {
+          Py_DECREF(rv);
+          return PyErr_NoMemory();
+        }
+      PyUnicode_AsWideChar(upattern, buf, len);
+      rc = tre_regwncomp(&rv->rgx, buf, len, cflags);
+      free(buf);
     }
+  else
+    rc = tre_regncomp(&rv->rgx, (char*)pattern, pattlen, cflags);
 
   if (rc != REG_OK)
     {
       if (!PyErr_Occurred())
-        _set_tre_err(rc, &rv->rgx);
+	_set_tre_err(rc, &rv->rgx);
       Py_DECREF(rv);
       return NULL;
     }

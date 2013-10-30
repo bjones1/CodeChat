@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="retest"
-	ProjectGUID="{65DEBB46-DC8B-41DD-B616-A99DC16E6ED0}"
+	ProjectGUID="{F9A3C846-B5B3-4A68-9F8D-A918942FFB29}"
 	TargetFrameworkVersion="0"
 	>
 	<Platforms>
