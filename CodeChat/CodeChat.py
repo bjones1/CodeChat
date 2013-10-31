@@ -90,6 +90,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 # Initialization / finalization
 # -----------------------------
     def __init__(self, app, multiprocessing_Sphinx_manager):
+
+        # Store constructor args.
+        self.app = app
+        self.multiprocessing_Sphinx_manager = multiprocessing_Sphinx_manager
+
+# GUI init
+# ^^^^^^^^
         # Let Qt and PyQt run their init first.
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
@@ -103,15 +110,13 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # TODO: A hack for debugging. Remove when the above line causes this to be set.
         self.build_tool = BUILD_TOOL_SPHINX
 
-        # Store constructor args.
-        self.app = app
-        self.multiprocessing_Sphinx_manager = multiprocessing_Sphinx_manager
-
-        self.project_dir_key = 'project directory'
-        # A path to the generated HTML files, relative to the project directory
+# Restore state from stored settings
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        # Retrieve settings
         self.settings = QtCore.QSettings("MSU BJones", "CodeChat")
 
         # Open the last project directory of we can; otherwise, use the current directory.
+        self.project_dir_key = 'project directory'
         self.project_dir = self.settings.value(self.project_dir_key, os.getcwd())
         try:
             os.chdir(self.project_dir)
@@ -125,6 +130,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.splitter.restoreState(bytearray(self.settings.value('splitterSizes', [])))
         self.splitter_2.restoreState(bytearray(self.settings.value('splitter_2Sizes', [])))
 
+# Configure HTML viewer
+# ^^^^^^^^^^^^^^^^^^^^^
         # Select a larger font for the HTML editor
         self.textBrowser.zoomIn(3)
         # Clicking on an external link produces a blank screen. I'm not sure why; perhaps Qt expects me to do this in my own code on anchorClicked signals. For simplicity, just use an external browswer.
