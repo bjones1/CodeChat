@@ -21,7 +21,7 @@ You may optionally install:
 
 Recent changes
 ==============
-- Current: Beta Doxygen support. Fixed crash when file with an unknown extension was loaded.
+- 4-Nov-2013: Beta Doxygen support. Fixed crash when file with an unknown extension was loaded. Status bar now provides build results.
 - 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
 - 3-Apr-2013: Fix to handle Unicode files correctly.
@@ -42,7 +42,7 @@ Recent changes
 
 Contributing
 ============
-This is a fairly basic implmentation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the `CodeChat <https://bitbucket.org/bjones/documentation>`_ homepage!
+This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the `CodeChat <https://bitbucket.org/bjones/documentation>`_ homepage!
 
 Running from source
 -------------------

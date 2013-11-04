@@ -101,7 +101,15 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
 
-        # Finish UI setup by grouping checkable menu items.
+        # Add build progress and build results widgets to the status bar.
+        self.build_progress_label = QtGui.QLabel()
+        self.build_results_label = QtGui.QLabel()
+        self.statusbar.addWidget(QtGui.QLabel('Last build result:'))
+        self.statusbar.addWidget(self.build_results_label)
+        self.statusbar.addWidget(QtGui.QLabel('    Build status:'))
+        self.statusbar.addWidget(self.build_progress_label)
+
+        # Group checkable menu items, which I can't do in Qt designer.
         self.build_tool_action_group = QtGui.QActionGroup(self)
         self.build_tool_action_group.addAction(self.action_Sphinx)
         self.build_tool_action_group.addAction(self.action_Doxygen)
@@ -207,8 +215,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if not self.mru_files.open_mru():
             self.open_contents()
 #
-# Need to categorize / move
-# ^^^^^^^^^^^^^^^^^^^^^^^^^
+# Misc event handlers
+# ^^^^^^^^^^^^^^^^^^^
     def on_code_changed(self, modified):
         if not self.ignore_code_modified:
             self.save_then_update_html()
@@ -391,8 +399,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.plainTextEdit.isModified():
             self.save()
 
-        # Erase any previous build results.
+        # Erase any previous build results and update the build progress.
         self.results_plain_text_edit.setPlainText('')
+        self.build_progress_label.setText('Building...')
         # Start the Sphinx build in the background.
         self.signal_Sphinx_start.emit(self.html_dir(), self.build_tool)
 
@@ -408,12 +417,17 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
     # .. _CodeChatWindow-after_Sphinx:
     def after_Sphinx(self, stderr):
-        # Provide a "done" notification. Show stderr in red if available.
-        html = '<pre>Done.\n</pre>'
-        # If there's no stderr output, suppress the extra line created by a <pre>.
+        # Update the build status
+        self.build_progress_label.setText('Done.')
+        # Show stderr in red if available. If there's no stderr output, suppress the extra line created by a <pre>.
         if stderr:
-            html += '<pre style="color:red">' + stderr + '</pre>'
-        self.results_plain_text_edit.appendHtml(html)
+            html = '<pre style="color:red">' + stderr + '</pre>'
+            self.results_plain_text_edit.appendHtml(html)
+            num_errors = stderr.count('ERROR')
+            num_warnings = stderr.count('WARNING')
+            self.build_results_label.setText('<font color="red">%d error(s), %d warning(s).</font>' % (num_errors, num_warnings))
+        else:
+            self.build_results_label.setText('No errors or warnings.')
         # Scroll to bottom to show these results.
         self.results_plain_text_edit.ensureCursorVisible()
 
