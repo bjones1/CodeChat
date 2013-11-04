@@ -45,6 +45,15 @@ class TestSphinxHtmlPageContext(object):
         ret = self.s(string)
         assert ret == string
 
+    # An empty comment before a heading.
+    def test_2(self):
+        string = '<blockquote>\n<div># wokifvzohtdlm</div></blockquote>'
+        ret = self.s(string)
+        assert ret == '<blockquote>\n</blockquote>'
+
+    # TODO: Many more test cases.
+
+
 class TestCodeToRest(object):
     # Given a string and a language, run it through code_to_rest and return the resulting string.
     def t(self, in_string, extension = '.c'):

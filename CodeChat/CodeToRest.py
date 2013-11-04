@@ -269,11 +269,19 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
     env = app and app.builder.env
     if 'body' in context.keys():
         str = context['body']
-        # Clean markers injected by code_to_rest.
-        str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)  # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
+        # Clean up markers injected by code_to_rest.
+        #
+        # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
+        str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)
         str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
         str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
         str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
+        # When an empty comment indented by at least two spaces preceeds a heading, like this:
+        ##   #
+        ## Foo
+        ## ---
+        # then the HTML produced is repeated <blockquote><div> then <div># wokifvzohtdlm</div>.
+        str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', str)
         if hasattr(env, "codelinks"):
             for codelink in env.codelinks:
                 print(codelink)
