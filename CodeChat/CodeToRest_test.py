@@ -133,13 +133,3 @@ class TestCodeToRest(object):
         ret, comment = self.t('//\r\n')
         # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
         assert ret == '\n\n'
-
-import pytest
-def main():
-    # Run all tests -- see http://pytest.org/latest/usage.html#calling-pytest-from-python-code.
-    pytest.main()
-    # Run a specifically-named test -- see above link plus http://pytest.org/latest/usage.html#specifying-tests-selecting-tests.
-    #pytest.main('-k test_11')
-
-if __name__ == '__main__':
-    main()
