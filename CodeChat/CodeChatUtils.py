@@ -37,12 +37,12 @@ from PyQt4 import QtGui, QtCore
 #
 # Data structures:
 #
-# #. ``self.mru_action_list = [QAction(MRU list[0]), ...]`` stores the list of File menu MRU QActions. Each action stores data the from MRU list.
+# #. ``self.mru_action_list = [QAction(), ...]`` stores the list of File menu MRU QActions. Each action stores a filename from the MRU list.
 # #. The MRU list (obtained from ``self.get_mru_list() == [MRU_file_0_name, ...]`` stores a list of most-recently-used file names.
 class MruFiles(object):
     # Initialize the MRU list and the File menu's MRU items.
     def __init__(self,
-                 # The parent CodeChatWindow; this class will modify its File menu and call its open() method.
+                 # The parent CodeChatWindow; this class will modify its File menu and call its ``open()`` method.
                  parent,
                  # An instance of QSettings in which this class will store MRU information.
                  settings):
@@ -64,6 +64,21 @@ class MruFiles(object):
             self.mru_action_list.append(mru_item)
         # Perform an initial update of the File menu items, now that they're created.
         self.update_gui()
+
+    # .. _update_gui:
+    #
+    # Take the MRU list stored in the registry and update the File menu to reflect these registry contents.
+    def update_gui(self):
+        # For each element in the MRU list, update the menu item.
+        mru_list = self.get_mru_list()
+        for index in range(len(mru_list)):
+            mru_action = self.mru_action_list[index]
+            mru_action.setText('&%d %s' % (index, mru_list[index]))
+            mru_action.setData(mru_list[index])
+            mru_action.setVisible(True)
+        # Hide the rest of the actions.
+        for index in range(len(mru_list), self.max_files):
+            self.mru_action_list[index].setVisible(False)
 
     def open_mru(self):
         # Open the most recently used file (the file that was open when the program exited).
@@ -105,27 +120,12 @@ class MruFiles(object):
         self.settings.setValue(self.mru_list_key, mru_list)
         # Update the GUI.
         self.update_gui()
-
-    # .. _update_gui:
-    #
-    # Take the MRU list stored in the registry and update the File menu to reflect these registry contents.
-    def update_gui(self):
-        # For each elemnt in the MRU list, update the menu item.
-        mru_list = self.get_mru_list()
-        for index in range(len(mru_list)):
-            mru_action = self.mru_action_list[index]
-            mru_action.setText('&%d %s' % (index, mru_list[index]))
-            mru_action.setData(mru_list[index])
-            mru_action.setVisible(True)
-        # Hide the rest of the actions.
-        for index in range(len(mru_list), self.max_files):
-            self.mru_action_list[index].setVisible(False)
 #
 # .. _Background-Sphinx-execution:
 #
 # Background Sphinx execution
 # ===========================
-# This class is run in a separate thread to perform a Sphinx build in another process. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the constructor below between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, which ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
+# This class is run in a separate thread to perform a Sphinx build in another process. It captures stdout and stderr from Sphinx, passing them back to the GUI for display. To begin, this program establishes a set of signal/slot connections in the constructor below between the CodeChat object (running in the main thread) and the BackgroundSphinx object (which runs in a separate worker thread), illustrated in the diagram below. Boxes represent objects, while ellipses represent methods of that object. Numbers indicate the sequence of events, which is further explained below.
 #
 # The process begins at (1a), when :ref:`CodeChatWindow.save_then_update_html <CodeChatWindow-save_then_update_html>` emits :ref:`signal_Sphinx_start <CodeChatWindow-signal_Sphinx_start>`, which Qt then places in the BackgroundSphinx message queue. When BackgroundSphinx is idle, this message then invokes :ref:`run_Sphinx() <BackgroundSphinx-run_Sphinx>`, which starts Sphinx execution in a separate process via an IPC pipe write in (1b). As Sphinx runs, the worker thread waits for any status messages produced by the IPC pipe in (2a), which cause :ref:`run_Sphinx() <BackgroundSphinx-run_Sphinx>` to emit :ref:`signal_Sphinx_results <BackgroundSphinx-signal_Sphinx_results>` in step (2b), in order to deliver these status messages to the GUI queue; when the GUI is idle, these messages then invoke :ref:`Sphinx_results <CodeChatWindow-Sphinx_results>`, which displays them in the bottom pane of the GUI. When Sphinx finishes, step (3) shows that :ref:`run_Sphinx() <BackgroundSphinx-run_Sphinx>` emits :ref:`signal_Sphinx_done <BackgroundSphinx-signal_Sphinx_done>` to :ref:`after_Sphinx <CodeChatWindow-after_Sphinx>` with any error messages produced during the build.
 #
@@ -150,7 +150,7 @@ class MruFiles(object):
 #      "run_Sphinx_process"
 #    }
 #    "save_then_update_html" -> "run_Sphinx" [label = "signal_Sphinx_start", taillabel = "(1a)"];
-#    "run_Sphinx" -> "run_Sphinx_process" [taillabel = "(1a)"];
+#    "run_Sphinx" -> "run_Sphinx_process" [taillabel = "(1b)"];
 #    "run_Sphinx_process" -> "run_Sphinx" [taillabel = "(2a)"];
 #    "run_Sphinx" -> "Sphinx_results" [label = "signal_Sphinx_results", taillabel = "(2b)"];
 #    "run_Sphinx" -> "after_Sphinx" [label = "signal_Sphinx_done", taillabel = "(3)"];
@@ -177,7 +177,7 @@ class BackgroundSphinx(QtCore.QObject):
         # Obtain a reference to the multiprocessing Sphinx connection object from the parent.
         self.parent_conn = parent.multiprocessing_Sphinx_manager.parent_conn
 
-        # Start a thread for backgroun Sphinx operation, which waits for signals to arrive from the parent to begin processing. Doing this right isn't obvious; the best reference and short example code is given in the `QThread docs <http://qt-project.org/doc/qt-4.8/qthread.html#details>`_.
+        # Start a thread for background Sphinx operation, which waits for signals to arrive from the parent to begin processing. Doing this right isn't obvious; the best reference and short example code is given in the `QThread docs <http://qt-project.org/doc/qt-4.8/qthread.html#details>`_.
         self.thread = QtCore.QThread()
         self.moveToThread(self.thread)
         self.thread.start()
@@ -193,7 +193,7 @@ class BackgroundSphinx(QtCore.QObject):
     #
     # The actual work is done in a separate process, to overcome GIL-enforced single-tasking. The approach:
     #
-    # #. Start up Sphinx in a separate process, giving it a pipe end. Done by the :ref:`MultiprocessingSphinxManager constructor <MultiprocessingSphinxManager-__init-__>`.
+    # #. Start up Sphinx in a separate process, giving it a pipe end. This is performed by the :ref:`MultiprocessingSphinxManager constructor <MultiprocessingSphinxManager-__init-__>`.
     # #. Sphinx blocks on a pipe read, which gives it (current dir, html_dir)
     # #. Sphinx begins processing; this worker thread blocks on a pipe read of (is_message_from_stderr, message_text). It emits signals for both, ending when it gets a stderr message and going to the previous step to wait for another Sphinx run.
     #
@@ -202,6 +202,7 @@ class BackgroundSphinx(QtCore.QObject):
     def run_Sphinx(self, html_dir, build_tool):
                          # Directory in which Sphinx should place the HTML output from the build.
 
+        # Beta support, poorly documented thus far: also provide Doxygen support. Since Doxygen isn't a Python module, run it using Subprocess then wait for that to terminate before reporting results.
         if build_tool == BUILD_TOOL_DOXYGEN:
             # A better way to get real-time output: http://stackoverflow.com/questions/1388753/how-to-get-output-from-subprocess-popen/1388807#1388807
             try:
@@ -214,9 +215,10 @@ class BackgroundSphinx(QtCore.QObject):
         elif build_tool == BUILD_TOOL_SPHINX:
             # Start the build by sending params.
             self.parent_conn.send([os.getcwd(), html_dir])
-            # Send any stdout as a signal
+            # Emit any stdout received.
             is_stderr = False
             while not is_stderr:
+                # the MultiprocessingSphinx pipe returns two params: is_stderr is true if this is stderr results (indicating the end of a build), and text either from stdout or stderr.
                 is_stderr, txt = self.parent_conn.recv()
                 if not is_stderr:
                     # Send any stdout text along

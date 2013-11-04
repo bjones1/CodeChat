@@ -225,13 +225,14 @@ def CodeToRest(source_path, rst_path, language_specific_options):
 
 # Sphinx extension
 # ================
-# The following functions CodeToRest-related Sphinx extensions.
+# The following functions supply CodeToRest-related Sphinx extensions.
 #
 # CodeToRest extension
 # --------------------
-# This extension provide the CodeToRest Sphinx extension.
+# This extension provides the CodeToRest Sphinx extension. The overall process:
 #
-# .. function:: sphinx_builder_inited(app)
+# #. Translate all source files to reST before Sphinx looks for reST source (``sphinx_builder_inited``).
+# #. When Sphinx has HTML ready to output, strip out gunk inserted by ``code_to_rest`` to format source files correctly (``sphinx_html_page_context``).
 #
 # This function searches for source code and transforms it to reST before Sphinx searches for reST source.
 def sphinx_builder_inited(app):
