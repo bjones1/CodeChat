@@ -87,8 +87,8 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
     # This signal starts a Sphinx background run; the parameters are (the HTML directory to use, the build tool). See :ref:`Background-Sphinx-execution` for more information.
     signal_Sphinx_start = QtCore.pyqtSignal(unicode, int)
 #
-# Initialization / finalization
-# -----------------------------
+# Initialization
+# --------------
     def __init__(self, app, multiprocessing_Sphinx_manager):
 
         # Store constructor args.
@@ -199,9 +199,9 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Use UTF-8.
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCODEPAGE, QsciScintilla.SC_CP_UTF8)
 #
-# TODO: A better title for this section
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        # First, set up state variables used to do invoke a background Sphinx run.
+# Misc
+# ^^^^
+        # Set up state variables used to do invoke a background Sphinx run.
         self.is_building = False
         self.need_to_build = True
         self.ignore_code_modified = False
@@ -211,12 +211,37 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 
         # Set up the file MRU from the registry.
         self.mru_files = MruFiles(self, self.settings)
-        # Load the last open, or choose a default file name and open it if it exists.
+        # Load the last opened file, or choose a default file name and open it if it exists.
         if not self.mru_files.open_mru():
             self.open_contents()
 #
-# Misc event handlers
-# ^^^^^^^^^^^^^^^^^^^
+# Event handlers
+# --------------
+    # .. _CodeChatGui_eventFilter:
+    #
+    # Install an `event filter <http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter>`_ to:
+    #
+    # - Catch `ApplicationActivate <http://qt-project.org/doc/qt-4.8/qevent.html#Type-enum>`_ events in order to auto-reload the current source file if necessary.
+    # - Reset the build timer on any event
+    def eventFilter(self, obj, event):
+        # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
+        if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
+            try:
+                if os.path.getmtime(self.source_file) != self.source_file_time:
+                    self.reload()
+            except os.error:
+                # Ignore if the file no longer exists.
+                pass
+
+        # Look for idle time by resetting our timer on any event.
+        if ( ((event.type() == QtCore.QEvent.KeyPress) or
+              (event.type() == QtCore.QEvent.MouseMove)) and
+              self.timer_sync_code_to_web.isActive() ):
+            self.timer_sync_code_to_web.restart()
+
+        # Allow default Qt event processing
+        return QtGui.QMainWindow.eventFilter(self, obj, event)
+
     def on_code_changed(self, modified):
         if not self.ignore_code_modified:
             self.save_then_update_html()
@@ -325,26 +350,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Now open it.
         self.open(self.source_file)
 
-    # .. _CodeChatGui_eventFilter:
-    def eventFilter(self, obj, event):
-        # Look for a switch to this application to check for an updated file. This is installed in main(). For more info, see http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter.
-        if obj is self.app and event.type() == QtCore.QEvent.ApplicationActivate:
-            try:
-                if os.path.getmtime(self.source_file) != self.source_file_time:
-                    self.reload()
-            except os.error:
-                # Ignore if the file no longer exists.
-                pass
-
-        # Look for idle time by resetting our timer on any event.
-        if ( ((event.type() == QtCore.QEvent.KeyPress) or
-              (event.type() == QtCore.QEvent.MouseMove)) and
-              self.timer_sync_code_to_web.isActive() ):
-            self.timer_sync_code_to_web.restart()
-
-        # Allow default Qt event processing
-        return QtGui.QMainWindow.eventFilter(self, obj, event)
-
     def save(self):
         try:
             with codecs.open(self.source_file, 'w', encoding = 'utf-8') as f:
@@ -389,6 +394,33 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         else:
             return True
 
+    def html_url(self):
+        return QtCore.QUrl('file:///' + self.get_html_file().replace('\\', '/'))
+
+    def get_html_file(self):
+        return os.path.join(self.project_dir, self.html_file)
+
+    def html_dir(self):
+        if self.build_tool == BUILD_TOOL_DOXYGEN:
+            return 'docs'
+        elif self.build_tool == BUILD_TOOL_SPHINX:
+            return '_build/html'
+        else:
+            assert False
+
+    def change_project_dir(self, project_dir):
+        try:
+            os.chdir(project_dir)
+        except OSError as e:
+            QtGui.QMessageBox.critical(self, "CodeChat", str(e))
+            return
+        self.project_dir = project_dir
+        self.settings.setValue(self.project_dir_key, self.project_dir)
+        # Try loading the contents for this project.
+        self.open_contents()
+
+# Save, build, load updated HTML
+# ------------------------------
     # .. _CodeChatWindow-save_then_update_html:
     def save_then_update_html(self):
         if self.is_building:
@@ -420,11 +452,11 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Update the build status
         self.build_progress_label.setText('Done.')
         # Show stderr in red if available. If there's no stderr output, suppress the extra line created by a <pre>.
-        if stderr:
-            html = '<pre style="color:red">' + stderr + '</pre>'
-            self.results_plain_text_edit.appendHtml(html)
-            num_errors = stderr.count('ERROR')
-            num_warnings = stderr.count('WARNING')
+        html = '<pre style="color:red">' + stderr + '</pre>'
+        self.results_plain_text_edit.appendHtml(html)
+        num_errors = stderr.count('ERROR')
+        num_warnings = stderr.count('WARNING')
+        if num_errors or num_warnings:
             self.build_results_label.setText('<font color="red">%d error(s), %d warning(s).</font>' % (num_errors, num_warnings))
         else:
             self.build_results_label.setText('No errors or warnings.')
@@ -452,20 +484,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         if self.plainTextEdit.isModified() or self.need_to_build:
             self.need_to_build = False
             self.save_then_update_html()
-
-    def html_url(self):
-        return QtCore.QUrl('file:///' + self.get_html_file().replace('\\', '/'))
-
-    def get_html_file(self):
-        return os.path.join(self.project_dir, self.html_file)
-
-    def html_dir(self):
-        if self.build_tool == BUILD_TOOL_DOXYGEN:
-            return 'docs'
-        elif self.build_tool == BUILD_TOOL_SPHINX:
-            return '_build/html'
-        else:
-            assert False
 #
 # Syncing between code and web
 # ----------------------------
@@ -527,17 +545,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             self.plainTextEdit.SendScintilla(QsciScintilla.SCI_GOTOPOS, found)
         # Hide html, show plain text widgets. Placing this code at the beginning of this function makes it find the wrong location (???).
         self.plainTextEdit.setFocus()
-
-    def change_project_dir(self, project_dir):
-        try:
-            os.chdir(project_dir)
-        except OSError as e:
-            QtGui.QMessageBox.critical(self, "CodeChat", str(e))
-            return
-        self.project_dir = project_dir
-        self.settings.setValue(self.project_dir_key, self.project_dir)
-        # Try loading the contents for this project.
-        self.open_contents()
 #
 # Menu item actions
 # -----------------
@@ -634,7 +641,7 @@ def main(multiprocessing_Sphinx_manager):
     # Instantiate the app and GUI.
     app = QtGui.QApplication(sys.argv)
     window = CodeChatWindow(app, multiprocessing_Sphinx_manager)
-    # Install an `event filter <http://qt-project.org/doc/qt-4.8/qobject.html#installEventFilter>`_ to catch `ApplicationActivate <http://qt-project.org/doc/qt-4.8/qevent.html#Type-enum>`_ events (see :ref:`CodeChatWindow.eventFilter <CodeChatGui_eventFilter>`).
+    # Install an `event filter <CodeChatGui_eventFilter>`_.
     app.installEventFilter(window)
     # Run the program.
     window.show()
