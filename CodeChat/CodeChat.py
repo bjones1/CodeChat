@@ -183,8 +183,12 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEBACK, 0x99FFFF)
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETCARETLINEVISIBLE, True)
 
-        # Auto-save and build whenever edits are made.
-        self.plainTextEdit.modificationChanged.connect(self.on_code_changed)
+        # Auto-save and build whenever edits are made after a delay.
+        self.timer_save_and_build = QRestartableTimer()
+        self.timer_save_and_build.setSingleShot(True)
+        self.timer_save_and_build.setInterval(250)
+        self.timer_save_and_build.timeout.connect(self.on_code_changed)
+        self.plainTextEdit.modificationChanged.connect(lambda modified: self.timer_save_and_build.restart())
 
         # Update web hilight whenever code cursor moves and the app is idle.
         self.timer_sync_code_to_web = QRestartableTimer()
@@ -238,12 +242,14 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
               (event.type() == QtCore.QEvent.MouseMove)) and
               self.timer_sync_code_to_web.isActive() ):
             self.timer_sync_code_to_web.restart()
+            self.timer_save_and_build.restart()
 
         # Allow default Qt event processing
         return QtGui.QMainWindow.eventFilter(self, obj, event)
 
-    def on_code_changed(self, modified):
-        if not self.ignore_code_modified:
+    def on_code_changed(self):
+        if ((not self.ignore_code_modified) and
+          self.plainTextEdit.isModified()):
             self.save_then_update_html()
 
     # Before closing the application, check to see if the user's work should be saved.
