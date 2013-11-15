@@ -207,7 +207,7 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
 # ^^^^
         # Set up state variables used to do invoke a background Sphinx run.
         self.is_building = False
-        self.need_to_build = True
+        self.need_to_build = False
         self.ignore_code_modified = False
 
         # Start up the background Sphinx thread.
@@ -339,7 +339,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
         # Restore cursor positions
         self.plainTextEdit.SendScintilla(QsciScintilla.SCI_SETSEL, -1, code_pos)
         # Force a rebuild to display this new document
-        self.need_to_build = True
         self.save_then_update_html()
 
     def open_contents(self):
@@ -433,7 +432,6 @@ class CodeChatWindow(QtGui.QMainWindow, form_class):
             return
         self.is_building = True
 
-        # TODO: if Sphinx gets stuck, this will never save your work!
         if self.plainTextEdit.isModified():
             self.save()
 
