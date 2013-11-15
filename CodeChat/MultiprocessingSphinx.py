@@ -40,7 +40,7 @@ class MultiprocessingSphinxManager(object):
         # Start a process for background Sphinx operation
         freeze_support()
         self.parent_conn, self.child_conn = Pipe()
-        self.process = Process(target = run_Sphinx_process, args = (self.child_conn, ))
+        self.process = Process(target = run_Sphinx_process, args = (self.child_conn, self.parent_conn))
         self.process.start()
 
     def finalize(self):
@@ -63,12 +63,15 @@ class PipeSendStdout(object):
 # run_Sphinx_process
 # ==================
 # This routine will be run in a separate process, performing Sphinx builds.
-def run_Sphinx_process(conn):
+def run_Sphinx_process(child_conn, parent_conn):
+    # In Unix, the both the child and the parent must close the parent's pipe for it to be closed, per http://stackoverflow.com/questions/6564395/why-doesnt-pipe-close-cause-eoferror-during-pipe-recv-in-python-multiproces.
+    parent_conn.close()
+
     # Main loop
     while True:
         try:
             # Wait for data to use for invokation.
-            (working_dir, html_dir) = conn.recv()
+            (working_dir, html_dir) = child_conn.recv()
         except EOFError:
             # End this process if requested by a pipe close.
             return
@@ -77,7 +80,7 @@ def run_Sphinx_process(conn):
         old_stderr = sys.stderr
         sys.stderr = StringIO()
         old_stdout = sys.stdout
-        sys.stdout = PipeSendStdout(conn)
+        sys.stdout = PipeSendStdout(child_conn)
 
         # Run Sphinx. The `command-line options <http://sphinx-doc.org/invocation.html>`_ are:
         os.chdir(working_dir)
@@ -94,7 +97,7 @@ def run_Sphinx_process(conn):
 
         # Send stdout, stderr data
         try:
-            conn.send((True, sys.stderr.getvalue()))
+            child_conn.send((True, sys.stderr.getvalue()))
             sys.stdout = old_stdout
             sys.stderr = old_stderr
         except EOFError:
