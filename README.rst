@@ -21,6 +21,13 @@ You may optionally install:
 
 Recent changes
 ==============
+- Current changes:
+
+  - Added a status bar to report build status, allowing the user to hide the build output window.
+  - Fixed a code formatting bug that produces garbage in the HTML in some cases.
+  - Added a timer to build after a short amount of idle time, rather than immediate builds.
+  - Unnecessary double builds no longer occur.
+  - Fixed a hang-on-close bug in Unix.
 - 4-Nov-2013: Beta Doxygen support. Fixed crash when file with an unknown extension was loaded. Status bar now provides build results.
 - 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
@@ -50,7 +57,7 @@ You'll need Python 2.7 installed on your PC. Python 3 is definitely not supporte
 
 Windows
 ^^^^^^^
-- Download and install `PyQt4 <http://www.riverbankcomputing.com/software/pyqt/download>`_ and `Sphinx <http://sphinx-doc.org/>`_.
+- Download and install `PyQt4 <http://www.riverbankcomputing.com/software/pyqt/download>`_ and `Sphinx <http://sphinx-doc.org/>`_. Optionally install Miktex_ and Graphviz_.
 - Build the TRE library using Visual Studio 2008 express (or the full version) based on the project file in ``tre-0.8.0-src/win32``.
 - From a command line in ``tre-0.8.0-src/python``, run ``python setup.py build_ext -i -I../include`` then copy the resulting ``tre.pyd`` and ``tre.dll`` to the CodeChat root directory (where ``code_chat.py`` resides).
 - Execute ``code_chat.py`` from the CodeChat root directory.
@@ -61,7 +68,7 @@ The following was tested on Ubuntu 12.05 LTS. Modify as appropriate for your dis
 
 To install::
 
- sudo apt-get install python-dev python-qt4 python-sphinx tortoisehg autoconf gettext libtool autopoint 
+ sudo apt-get install python-dev python-qt4 python-sphinx tortoisehg autoconf gettext libtool autopoint graphviz texlive
  hg clone https://bitbucket.org/bjones/documentation
  cd documentation/tre-0.8.0-src
  utils/autogen.sh
@@ -75,9 +82,7 @@ To install::
 To run::
 
  export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
- python code_chat.py
-
-CodeChat doesn't close properly in Unix, but gets stuck trying to end the Sphinx build subprocess (see `this bug <https://bitbucket.org/bjones/documentation/issue/27/app-doesnt-close-on-linux>`_). Until this is fixed, press Ctrl+C after clicking the close button at the command line.
+ ./code_chat.py
 
 Mac
 ^^^
