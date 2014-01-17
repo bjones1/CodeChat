@@ -269,19 +269,27 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
     env = app and app.builder.env
     if 'body' in context.keys():
         str = context['body']
-        # Clean up markers injected by code_to_rest.
-        #
+# Clean up markers injected by code_to_rest.
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
         str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)
+
+        # TODO: Add examples of where these are seen.
         str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
         str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
         str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
+
         # When an empty comment indented by at least two spaces preceeds a heading, like this:
         ##   #
         ## Foo
         ## ---
         # then the HTML produced is repeated <blockquote><div> then <div># wokifvzohtdlm</div>.
         str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', str)
+
+        # The BatchLexer doesn't always recognize comments, treating then an un-hilighed code: just a blank line which says
+        ## : wokifvz-ohtdlm (dash added to keep this from disappearing)
+        str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', str)
+
         if hasattr(env, "codelinks"):
             for codelink in env.codelinks:
                 print(codelink)
@@ -331,4 +339,3 @@ def setup(app):
 
     app.add_directive('codelink', CodelinkDirective)
     app.connect('env-purge-doc', purge_codelinks)
-
