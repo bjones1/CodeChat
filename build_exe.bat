@@ -22,14 +22,15 @@
 :    :hidden:
 :
 :    rthook_pyqt4.py
+:    hook-CodeChat.py
 :
 : `Options <http://htmlpreview.github.io/?https://github.com/pyinstaller/pyinstaller/blob/develop/doc/Manual.html#options>`_ are:
 :
 : -y
 :   Replace an existing executable folder or file without warning.
 :
-: --hidden-import
-:   Name an imported Python module that is not visible in your code. (In this case, Sphinx dynamically loads the :doc:`CodeToRest <CodeChat/CodeToRest.py>` extension.)
+: --additional-hooks-dir=hook-path
+: 	Additional path to search for hook files. The root directory contains :doc:`hook-CodeChat.py <hook-CodeChat.py>`, which is needed to correctly bulid CodeChat.
 :
 : --runtime-hook=path-to-hook-file
 :   Specify a file with a custom runtime hook. Here, :doc:`rthook_pyqt4.py <rthook_pyqt4.py>` overrides the SIP API as needed by :ref:`CodeChat <sip_api_2>`.
@@ -40,7 +41,7 @@
 :
 : ``code_chat.py``
 :   CodeChat entry point, from which Pyinstaller builds the application.
-..\pyinstaller-git\pyinstaller.py -y --hidden-import=CodeChat.CodeToRest --runtime-hook=rthook_pyqt4.py --noconsole code_chat.py
+..\pyinstaller-git\pyinstaller.py -y --additional-hooks-dir=. --runtime-hook=rthook_pyqt4.py --noconsole code_chat.py
 :
 : Copy template files
 : ===================
