@@ -64,4 +64,3 @@ The build system provides the ability to package this program into a self-contai
 
    build_exe.bat
    build_dist.bat
-   CodeChat.iss

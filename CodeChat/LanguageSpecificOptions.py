@@ -10,7 +10,15 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython
+# | Fix: Sphinx reports the error:
+# |  ``Extension error:``
+# |  ``Could not import extension CodeChat.CodeToRest (exception: No module named Qsci)``
+# | on the import below. ??? We only need this import for the CodeChat app, so work around it for now.
+try:
+    from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython
+except ImportError as e:
+    QsciLexerCPP, QsciLexerPython = (None, None)
+    
 # ****************************************************************************************
 # LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
 # ****************************************************************************************

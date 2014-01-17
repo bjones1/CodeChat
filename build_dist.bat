@@ -9,7 +9,7 @@
 :    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 :
 :
-: .. highlight:: BatchLexer
+: .. highlight:: bat
 :
 : ****************************************************************
 : build_dist.bat - Package the executable then publish to the web.
@@ -61,6 +61,11 @@ xcopy /E /I ..\..\_build\html doc
 :
 : Package
 : -------
+: .. toctree::
+:    :hidden:
+:
+:    CodeChat.iss
+:
 : The :doc:`CodeChat.iss <CodeChat.iss>` script then packages everything in ``dist/all`` into a single installer.
 cd ..\..
 "\Program Files (x86)\Inno Setup 5\ISCC.exe" CodeChat.iss

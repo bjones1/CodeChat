@@ -21,15 +21,16 @@ You may optionally install:
 
 Recent changes
 ==============
-- Current changes:
+- 17-Jan-2014:
 
   - Added a status bar to report build status, allowing the user to hide the build output window.
   - Fixed a code formatting bug that produces garbage in the HTML in some cases.
   - Added a timer to build after a short amount of idle time, rather than immediate builds.
   - Unnecessary double builds no longer occur.
   - Fixed a hang-on-close bug in Unix.
+  - Included missing syntax highligher for many languages.
 - 4-Nov-2013: Beta Doxygen support. Fixed crash when file with an unknown extension was loaded. Status bar now provides build results.
-- 24-Apr-2013: Add .bat, .ini, and .iss as extensions recognized by CodeChat.
+- 24-Apr-2013: Add ``.bat``, ``.ini``, and ``.iss`` as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
 - 3-Apr-2013: Fix to handle Unicode files correctly.
 - Finally included the GPL license.

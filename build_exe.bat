@@ -9,12 +9,12 @@
 :    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 :
 :
-: .. highlight:: BatchLexer
+: .. highlight:: bat
 :
 : ******************************************************************************
 : build_exe.bat - Build a self-contained executable for the CodeChat application
 : ******************************************************************************
-: This file creates a Windows executable using `Pyinstaller <http://www.pyinstaller.org/>`_. This is the first step in the :ref:`build system <build_system>`. To do so:
+: This file creates a Windows executable using `Pyinstaller <http://www.pyinstaller.org/>`_. This is the first step in the :ref:`build system <build_system>`.
 :
 : Convert CodeChat to an executable
 : =================================
@@ -42,10 +42,14 @@
 :   CodeChat entry point, from which Pyinstaller builds the application.
 ..\pyinstaller-git\pyinstaller.py -y --hidden-import=CodeChat.CodeToRest --runtime-hook=rthook_pyqt4.py --noconsole code_chat.py
 :
-: \3. Copy over template files which CodeChat uses for creating a new project and delete junk (which shouldn't be copied when crating a new project). **Note:** the first copy is really a kludgy symbolic link. I haven't found a better way to do this.
+: Copy template files
+: ===================
+: Copy over template files which CodeChat uses for creating a new project and delete junk (which shouldn't be copied when crating a new project). **Note:** the first copy is really a kludgy symbolic link. I haven't found a better way to do this.
 copy /Y default.css template
 xcopy /E /I template dist\code_chat\template
 del dist\code_chat\template\conf.py.rst
 :
-: \4. Finally, run the application to make sure it works. This also updates the generated documentation for packaging.
+: Run the resulting binary
+: ========================
+: Finally, run the application to make sure it works. This also updates the generated documentation for packaging, assuming this directory is selected as CodeChat's project directory.
 dist\code_chat\code_chat

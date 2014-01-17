@@ -36,6 +36,8 @@ import os
 #
 # Third-party imports
 # -------------------
+# .. _sip_api_2:
+#
 # The default Python 3 PyQt interface provides automatic conversion between several basic Qt data types and their Puthon equivalent. For Python 2, to preserve compatibility with older apps, manual conversion is required. These lines select the Python 3 approach and must be executed before any PyQt imports. See http://pyqt.sourceforge.net/Docs/PyQt4/incompatible_apis.html for more information.
 import sip
 sip.setapi('QString', 2)
