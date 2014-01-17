@@ -14,4 +14,4 @@
 # version.py - Give the release version of the CodeChat application as a date.
 # ****************************************************************************
 PROGRAM_DATE = \
-  '24-Apr-2013'
+  '17-Jan-2014'
