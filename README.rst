@@ -29,6 +29,7 @@ Recent changes
   - Unnecessary double builds no longer occur.
   - Fixed a hang-on-close bug in Unix.
   - Included missing syntax highligher for many languages.
+  - Fixed a marker removal bug.
 - 4-Nov-2013: Beta Doxygen support. Fixed crash when file with an unknown extension was loaded. Status bar now provides build results.
 - 24-Apr-2013: Add ``.bat``, ``.ini``, and ``.iss`` as extensions recognized by CodeChat.
 - 18-Apr-2013: Run Sphinx build in a separate process to provide a more responsive GUI.
