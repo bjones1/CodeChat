@@ -67,12 +67,7 @@ try:
     module_path = os.path.dirname(__file__)
 except NameError:
     module_path = ''
-
-# When frozen, I get a "ImportError: No module named Qsci". However, it does work correctly if I just convert the .ui to a .py module. Oh, well.
-try:
-    form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
-except (ImportError, IOError):
-    from CodeChat_ui import Ui_MainWindow as form_class
+form_class, base_class = uic.loadUiType(os.path.join(module_path, "CodeChat.ui"))
 #
 # CodeChatWindow
 # ==============
