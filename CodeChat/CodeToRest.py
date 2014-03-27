@@ -77,65 +77,71 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 #
 # Preserving indentation
 # ----------------------
-# Preserving indentation in code blocks is relatively straightforward. reST eats all whitespace common to a literal block, using that to set the indent. For example:
+# Preserving indentation in code blocks is relatively straightforward. reST eats
+# all whitespace common to a literal block, using that to set the indent. For
+# example:
 #
-# +--------------------------+-------------------------+
-# + Python source            + Translated to reST      +
-# +==========================+=========================+
-# | ::                       | One space indent ::     |
-# |                          |                         |
-# |  # One space indent      |   foo = 1               |
-# |   foo = 1                |                         |
-# |                          |                         |
-# |  # No indent             | No indent ::            |
-# |  bar = 2                 |                         |
-# |                          |  bar = 2                |
-# +--------------------------+-------------------------+
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      + Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | ::                       | One space indent ::     |::                                 |
+# |                          |                         |                                   |
+# |  # One space indent      |   foo = 1               | <p>One space indent</p>           |
+# |   foo = 1                |                         | <pre>foo = 1                      |
+# |                          |                         | </pre>                            |
+# |  # No indent             | No indent ::            | <p>No indent</p>                  |
+# |  bar = 2                 |                         | <pre>bar = 1                      |
+# |                          |  bar = 2                | </pre>                            |
+# +--------------------------+-------------------------+-----------------------------------+
 #
-# To fix this, code_to_rest adds an unindented marker (also removed during post-processing) at the beginning of each code block to preserve indents:
+# To fix this, code_to_rest adds an unindented marker (also removed during
+# post-processing) at the beginning of each code block to preserve indents:
 #
-# +--------------------------+-------------------------+
-# + Python source            + Translated to reST      +
-# +==========================+=========================+
-# | ::                       | One space indent ::     |
-# |                          |                         |
-# |  # One space indent      |  # wokifvzohtdlm        |
-# |   foo = 1                |   foo = 1               |
-# |                          |                         |
-# |  # No indent             |                         |
-# |  bar = 2                 | No indent::             |
-# |                          |                         |
-# |                          |  bar = 2                |
-# +--------------------------+-------------------------+
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      + Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | ::                       | One space indent ::     |::                                 |
+# |                          |                         |                                   |
+# |  # One space indent      |  # wokifvzohtdlm        | <p>One space indent</p>           |
+# |   foo = 1                |   foo = 1               | <pre> foo = 1                     |
+# |                          |                         | </pre>                            |
+# |  # No indent             |                         | <p>No indent</p>                  |
+# |  bar = 2                 | No indent::             | <pre>bar = 1                      |
+# |                          |                         | </pre>                            |
+# |                          |  bar = 2                |                                   |
+# +--------------------------+-------------------------+-----------------------------------+
 #
 # Preserving indentation for comments is more difficult. Blockquotes in reST are definted by common indentation, so that any number of (common) spaces define a blockquote:
 #
-# +--------------------------+-------------------------+
-# + Python source            + Translated to reST      +
-# +==========================+=========================+
-# | ::                       |   Two space indent      |
-# |                          |                         |
-# |    # Two space indent    |     Four space indent   |
-# |      # Four space indent |                         |
-# +--------------------------+-------------------------+
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      + Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | ::                       |[#f1]_                   |::                                 |
+# |                          |                         |                                   |
+# |    # Two space indent    |  Two space indent       | <p>Two space indent</p>           |
+# |      # Four space indent |                         | <blockquote><div>Four space indent|
+# |                          |    Four space indent    |    </div></blockquote>            |
+# +--------------------------+-------------------------+-----------------------------------+
 #
-# To reproduce this, the blockquote indent is defined in CSS to be one character. In addition, removed markers (one per space of indent) define a series of nested blockquotes. As the indent increases, additional markers must be inserted:
+# To reproduce this, the blockquote indent is defined in CSS to be one character. In addition, empty comments (one per space of indent) define a series of nested blockquotes. As the indent increases, additional empty comments must be inserted:
 #
-# +--------------------------+-------------------------+
-# + Python source            + Translated to reST      +
-# +==========================+=========================+
-# | ::                       |  # wokifvzohtdlm        |
-# |                          |                         |
-# |  # wokifvzohtdlm         |   # wokifvzohtdlm       |
-# |                          |                         |
-# |   # wokifvzohtdlm        |    Two space indent     |
-# |                          |                         |
-# |    # Two space indent    |     # wokifvzohtdlm     |
-# |                          |                         |
-# |     # wokifvzohtdlm      |      Four space indent  |
-# |                          |                         |
-# |      # Four space indent |                         |
-# +--------------------------+-------------------------+
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      | Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | ::                       |[#f1]_                   |::                                 |
+# |                          |                         |                                   |
+# |    # Two space indent    | ..                      | <blockquote><div>                 |
+# |      # Four space indent |                         |  <blockquote><div>Two space indent|
+# |                          |  Two space indent       |   <blockquote><div>               |
+# |                          |                         |    <blockquote><div>Four space    |
+# |                          |   ..                    |     indent                        |
+# |                          |                         |                                   |
+# |                          |    Four space indent    |                                   |
+# +--------------------------+-------------------------+-----------------------------------+
+#
+# .. [#f1] In a table, we need some text here so that the whitespace before
+#          the following lines won't be eaten. Outside a table this isn't
+#          necessary.
 #
 # Summary and implementation
 # --------------------------
@@ -195,7 +201,7 @@ def code_to_rest(language_specific_options, in_file, out_file):
                 # Get left margin correct by inserting a series of blockquotes
                 blockquote_indent = []
                 for i in range(len(comment_indent)):
-                    blockquote_indent.append('\n\n' + ' '*i + unique_remove_comment)
+                    blockquote_indent.append('\n\n' + ' '*i + '..')
                 blockquote_indent.append('\n')
                 current_line_list.insert(0, ''.join(blockquote_indent))
             if last_is_code:
