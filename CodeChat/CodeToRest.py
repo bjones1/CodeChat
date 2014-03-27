@@ -84,14 +84,14 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | One space indent ::     |::                                 |
+# | ::                       | One space indent ::     | ::                                |
 # |                          |                         |                                   |
-# |  # One space indent      |   foo = 1               | <p>One space indent</p>           |
-# |   foo = 1                |                         | <pre>foo = 1                      |
-# |                          |                         | </pre>                            |
-# |  # No indent             | No indent ::            | <p>No indent</p>                  |
-# |  bar = 2                 |                         | <pre>bar = 1                      |
-# |                          |  bar = 2                | </pre>                            |
+# |  # One space indent      |   foo = 1               |  <p>One space indent</p>          |
+# |   foo = 1                |                         |  <pre>foo = 1                     |
+# |                          |                         |  </pre>                           |
+# |  # No indent             | No indent ::            |  <p>No indent</p>                 |
+# |  bar = 2                 |                         |  <pre>bar = 1                     |
+# |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # To fix this, code_to_rest adds an unindented marker (also removed during
@@ -100,14 +100,15 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | One space indent ::     |::                                 |
+# | ::                       | One space indent ::     | ::                                |
 # |                          |                         |                                   |
-# |  # One space indent      |  # wokifvzohtdlm        | <p>One space indent</p>           |
-# |   foo = 1                |   foo = 1               | <pre> foo = 1                     |
-# |                          |                         | </pre>                            |
-# |  # No indent             |                         | <p>No indent</p>                  |
-# |  bar = 2                 | No indent::             | <pre>bar = 1                      |
-# |                          |                         | </pre>                            |
+# |  # One space indent      |  # wokifvzohtdlm        |  <p>One space indent</p>          |
+# |   foo = 1                |   foo = 1               |  <pre> foo = 1                    |
+# |                          |                         |  </pre>                           |
+# |  # No indent             |                         |  <p>No indent</p>                 |
+# |  bar = 2                 | No indent ::            |  <pre>bar = 1                     |
+# |                          |                         |  </pre>                           |
+# |                          |  # wokifvzohtdlm        |                                   |
 # |                          |  bar = 2                |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 #
@@ -116,11 +117,14 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       |[#f1]_                   |::                                 |
+# | ::                       | No indent               | ::                                |
 # |                          |                         |                                   |
-# |    # Two space indent    |  Two space indent       | <p>Two space indent</p>           |
-# |      # Four space indent |                         | <blockquote><div>Four space indent|
-# |                          |    Four space indent    |    </div></blockquote>            |
+# |  # No indent             |   Two space indent      |  <p>No indent</p>                 |
+# |    # Two space indent    |                         |  <blockquote><div>Two space indent|
+# |      # Four space indent |     Four space indent   |   <blockquote><div>Four space     |
+# |                          |                         |     indent                        |
+# |                          |                         |   </div></blockquote>             |
+# |                          |                         |  </div></blockquote>              |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # To reproduce this, the blockquote indent is defined in CSS to be one character. In addition, empty comments (one per space of indent) define a series of nested blockquotes. As the indent increases, additional empty comments must be inserted:
@@ -128,20 +132,20 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       |[#f1]_                   |::                                 |
+# | ::                       |No indent                | ::                                |
 # |                          |                         |                                   |
-# |    # Two space indent    | ..                      | <blockquote><div>                 |
-# |      # Four space indent |                         |  <blockquote><div>Two space indent|
-# |                          |  Two space indent       |   <blockquote><div>               |
-# |                          |                         |    <blockquote><div>Four space    |
-# |                          |   ..                    |     indent                        |
-# |                          |                         |                                   |
-# |                          |    Four space indent    |                                   |
+# |    # Two space indent    | ..                      |  <p>No indent</p>                 |
+# |      # Four space indent |                         |  <blockquote><div>                |
+# |                          |  Two space indent       |   <blockquote><div>Two space      |
+# |                          |                         |    indent                         |
+# |                          |   ..                    |    <blockquote><div>              |
+# |                          |                         |     <blockquote><div>Four space   |
+# |                          |    Four space indent    |      indent                       |
+# |                          |                         |     </blockquote></indent>        |
+# |                          |                         |    </blockquote></indent>         |
+# |                          |                         |   </blockquote></indent>          |
+# |                          |                         |  </blockquote></indent>           |
 # +--------------------------+-------------------------+-----------------------------------+
-#
-# .. [#f1] In a table, we need some text here so that the whitespace before
-#          the following lines won't be eaten. Outside a table this isn't
-#          necessary.
 #
 # Summary and implementation
 # --------------------------
