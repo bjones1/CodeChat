@@ -43,7 +43,7 @@ from sphinx.util.compat import Directive
 # Local application imports
 # -------------------------
 from LanguageSpecificOptions import LanguageSpecificOptions
-from CodeToRest import CodeToRestFile, code_to_rest_html_clean
+from CodeToRest import code_to_rest_file, code_to_rest_html_clean
 
 # Sphinx extension
 # ================
@@ -81,7 +81,7 @@ def sphinx_builder_inited(app):
             rest_file = source_file + app.config.source_suffix
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                CodeToRestFile(source_file, rest_file, lso)
+                code_to_rest_file(lso, source_file, rest_file)
             else:
                 pass
 

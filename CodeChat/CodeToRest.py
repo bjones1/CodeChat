@@ -22,19 +22,9 @@
 # *********************************************************
 # This module provides two basic functions: code_to_rest_ (and related helper
 # functions) to convert a source files to reST, and code_to_rest_html_clean_ to
-# remove temporary markers required for correct code_to_rest_ operation. The
-# typical flow would be:
-#
-# .. digraph:: overall_block_diagram
-#
-#    "Source code" -> "code_to_rest" [ label = ".py, .c, etc." ];
-#    "code_to_rest" -> "reST to HTML" [ label = "reST" ];
-#    "reST to HTML" -> "code_to_rest_html_clean"
-#      [ label = "HTML with temp. markers" ];
-#    "code_to_rest_html_clean" -> "Web browser" [ label = "final HTML" ];
-#
-# The reST to HTML conversion will typically be performed by
-# `docutils <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_.
+# remove temporary markers required for correct code_to_rest_ operation. A
+# simple wrapper to convert source code to reST, then to HTML, then to
+# cleaned HTML is given in code_to_html_.
 #
 # Imports
 # =======
@@ -43,13 +33,18 @@
 #
 # Standard library
 # ----------------
-# We need this to open and save text files in Unicode.
-import codecs
 # For code_to_rest_html_clean replacements.
 import re
 # For calling code_to_rest with a string
 from cStringIO import StringIO
-
+# To find a file's extension
+from os.path import splitext
+#
+# Third-party imports
+# -------------------
+# Used to open files with unknown encodings
+from docutils import io, core
+#
 # Local application imports
 # -------------------------
 from LanguageSpecificOptions import LanguageSpecificOptions
@@ -294,30 +289,42 @@ def code_to_rest(
     out_file.write('\n')
 
 # Wrap code_to_rest by opening in and out files.
-def CodeToRestFile(
+def code_to_rest_file(
+  language_specific_options,
+  # |lso|
   source_path,
-  # Path to a source code file to process.
-  rst_path,
+  # |source_path|
+  #
+  # .. |source_path| replace:: Path to a source code file to process.
+  rst_path):
   # Path to a destination reST file to create. It will be overwritten if it
   # already exists.
-  language_specific_options):
-  # |lso|
+    #
     print('Processing ' + source_path + ' to ' + rst_path)
-    with codecs.open(source_path, 'r', encoding = 'utf-8') as in_file:
-        with codecs.open(rst_path, mode = 'w', encoding = 'utf-8') as out_file:
-            code_to_rest(language_specific_options, in_file, out_file)
+    # Use docutil's I/O classes to better handle and sniff encodings.
+    # TODO: all user-specified encodings.
+    #
+    # Note: both these classes automatically close themselves after a
+    # read or write.
+    fi = io.FileInput(source_path=source_path)
+    fo = io.FileOutput(destination_path=rst_path)
+    rst = code_to_rest_string(language_specific_options, fi.read())
+    fo.write(rst)
 
 # Wrap code_to_rest by processing a string. It returns a string containing the
 # resulting reST.
-def CodeToRestString(
-  source_str,
-  # String containing source code to process.
-  language_specific_options):
+def code_to_rest_string(
+  language_specific_options,
   # |lso|
-  output_rst = StringIO()
-  code_to_rest(language_specific_options, StringIO(source_str),
-    output_rst)
-  return output_rst.getvalue()
+  source_str):
+  # |source_str|
+  #
+  # .. |source_str| replace:: String containing source code to process.
+    #
+    output_rst = StringIO()
+    code_to_rest(language_specific_options, StringIO(source_str),
+      output_rst)
+    return output_rst.getvalue()
 
 
 # code_to_rest_html_clean
@@ -348,3 +355,53 @@ def code_to_rest_html_clean(
     str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', str)
 
     return str
+
+# code_to_html
+# ============
+# This function implements the following processing steps.
+#
+# .. digraph:: overall_block_diagram
+#
+#    "Source code" -> "code_to_rest" [ label = ".py, .c, etc." ];
+#    "code_to_rest" -> "reST to HTML" [ label = "reST" ];
+#    "reST to HTML" -> "code_to_rest_html_clean"
+#      [ label = "HTML with temp. markers" ];
+#    "code_to_rest_html_clean" -> "Web browser" [ label = "final HTML" ];
+#
+# The reST to HTML conversion is performed by
+# `docutils <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_.
+def code_to_html_string(
+  language_specific_options,
+  # |lso|
+  source_str):
+  # |source_str|
+    #
+    #
+    rest = code_to_rest_string(language_specific_options, source_str)
+    html = core.publish_string(rest, writer_name='html',
+      settings_overrides={'stylesheet': 'CodeChat.css'})
+    html_clean = code_to_rest_html_clean(html)
+    return html_clean
+
+def code_to_html_file(
+  source_path,
+  # |source_path|
+  #
+  # .. |source_path| replace:: Path to a source code file to process.
+  html_path=None):
+  # Destination file name to hold the generated HTML. This file will be
+  # overwritten. If not supplied, source_path.html will be assumed.
+    #
+    if not html_path:
+        html_path = source_path + '.html'
+    lso = LanguageSpecificOptions()
+    lso.set_language(splitext(source_path)[1])
+    fi = io.FileInput(source_path=source_path)
+    fo = io.FileOutput(destination_path=html_path)
+
+    html = code_to_html_string(lso, fi.read())
+
+    fo.write(html)
+
+if __name__ == '__main__':
+    code_to_html_file('CodeToSphihnx.py')
