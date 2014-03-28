@@ -1,0 +1,8 @@
+# You'd think that package_data could be used, but that only works with
+# `binary distributions
+# <http://blog.codekills.net/2011/07/15/lies,-more-lies-and-python-packaging-documentation-on--package_data-/>`_.
+# So, include it in `MANIFEST.in
+# <http://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template>`_.
+include CodeChat/CodeChat.css
+# This is the wrong README, since it covers the CodeChat GUI. Exclude for now.
+exclude README.rst

@@ -24,18 +24,20 @@ build
 dist
 tre.pyd
 tre.dll
-CodeChat/CodeChat_ui.py
 warncode_chat.txt
 Install_CodeChat.exe
 template/default.css
 code_chat.spec
 
-# TRE flies
+# TRE files
 tre-0.8.0-src/.git
 tre-0.8.0-src/.gitignore
 tre-0.8.0-src/win32/Release
 tre-0.8.0-src/win32/tre.ncb
 tre-0.8.0-src/win32/tre.suo
 tre-0.8.0-src/win32/*.vcproj.*.user
+tre-0.8.0-src/win32/Debug/
 
 # Others
+MANIFEST
+CodeChat.egg-info/
