@@ -37,9 +37,9 @@ setup(name = "CodeChat",
       install_requires = ['Sphinx >= 1.1.0',
                           'Pygments >= 1.5',
                           ],
-      py_modules = ['CodeChat.CodeToRest',
-                    'CodeChat.CodeToRestSphinx',
-                    'CodeChat.LanguageSpecificOptions'
-                   ],
+      package_data = {'CodeChat' : ['CodeChat.css']},
+      packages = ['CodeChat'],
+      # Otherwise, we can't access the .css file.
+      zip_safe = False,
 #      scripts = ['code_chat.py'],
       )

@@ -6,3 +6,7 @@
 include CodeChat/CodeChat.css
 # This is the wrong README, since it covers the CodeChat GUI. Exclude for now.
 exclude README.rst
+# I have to use the packages keyword to get data files included in the binary
+# distribution, which is what I get when I do setup.py install. But that puts
+# too much in, so take out the extras. But this doesn't work.
+exclude CodeChat/*_test.py
