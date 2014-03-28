@@ -17,9 +17,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *******************************************************************
-# CodeToRest.py - a Sphinx extension to translate source code to reST
-# *******************************************************************
+# *********************************************************
+# CodeToRest.py - a module to translate source code to reST
+# *********************************************************
 # This module provides two basic functions: code_to_rest_ (and related helper
 # functions) to convert a source files to reST, and code_to_rest_html_clean_ to
 # remove temporary markers required for correct code_to_rest_ operation. The

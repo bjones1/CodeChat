@@ -24,8 +24,8 @@ import CodeChat.version
 #
 # General configuration
 # =====================
-# Add any `Sphinx extension module names <http://sphinx-doc.org/extensions.html>`_ here, as strings. They can be extensions coming with Sphinx (named ``sphinx.ext.*``) or your custom ones. **NOTE:** CodeChat relies on the ``CodeChat.CodeToRest`` extension; this must be present in every CodeChat project.
-extensions = ['sphinx.ext.pngmath', 'sphinx.ext.graphviz', 'CodeChat.CodeToRest']
+# Add any `Sphinx extension module names <http://sphinx-doc.org/extensions.html>`_ here, as strings. They can be extensions coming with Sphinx (named ``sphinx.ext.*``) or your custom ones. **NOTE:** CodeChat relies on the ``CodeChat.CodeToRestSphinx`` extension; this must be present in every CodeChat project.
+extensions = ['sphinx.ext.pngmath', 'sphinx.ext.graphviz', 'CodeChat.CodeToRestSphinx']
 
 # The suffix of source filenames.
 source_suffix = '.rst'

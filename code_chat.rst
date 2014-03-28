@@ -23,7 +23,7 @@ CodeChat application
 ====================
 CodeChat provides two largely separate core functions. First, it presents a GUI to the user, enabling editing of source code, display of the resulting web page, and synchronization between the two. Second, it invokes a code to web backend as necessary so that the resulting web pages reflect the code.
 
-In particular, :doc:`CodeChat.py <CodeChat/CodeChat.py>` implements the GUI, relying on :doc:`CodeChatUtils.py <CodeChat/CodeChatUtils.py>` for some supporting functionality and employing :doc:`FindLongestMatchingString.py <CodeChat/FindLongestMatchingString.py>` for the text matching underly web to code synchronization. `Sphinx <http://sphinx-doc.org/>`_, run in a separate process by :doc:`MultiprocessingSphinx.py <CodeChat/MultiprocessingSphinx.py>`, invokes the :doc:`CodeToRest.py <CodeChat/CodeToRest.py>` extension (which is specified in the Sphinx configuration file :doc:`conf.py <conf.py>`) to transform code into restructured text (the syntax Sphinx_ employs for markup), then produces web pages based on this input.
+In particular, :doc:`CodeChat.py <CodeChat/CodeChat.py>` implements the GUI, relying on :doc:`CodeChatUtils.py <CodeChat/CodeChatUtils.py>` for some supporting functionality and employing :doc:`FindLongestMatchingString.py <CodeChat/FindLongestMatchingString.py>` for the text matching underly web to code synchronization. `Sphinx <http://sphinx-doc.org/>`_, run in a separate process by :doc:`MultiprocessingSphinx.py <CodeChat/MultiprocessingSphinx.py>`, invokes the :doc:`CodeToRestSphinx.py <CodeChat/CodeToRestSphinx.py>` extension (which is specified in the Sphinx configuration file :doc:`conf.py <conf.py>`) to transform code into restructured text (the syntax Sphinx_ employs for markup), then produces web pages based on this input.
 
 .. toctree::
    :maxdepth: 1
@@ -35,6 +35,7 @@ In particular, :doc:`CodeChat.py <CodeChat/CodeChat.py>` implements the GUI, rel
    CodeChat/MultiprocessingSphinx.py
    CodeChat/FindLongestMatchingString.py
    CodeChat/CodeToRest.py
+   CodeChat/CodeToRestSphinx.py
    CodeChat/LanguageSpecificOptions.py
    CodeChat/version.py
    conf.py
@@ -42,7 +43,7 @@ In particular, :doc:`CodeChat.py <CodeChat/CodeChat.py>` implements the GUI, rel
 
 Unit testing
 ------------
-The following modules perform unit tests on portions of the application.
+The following modules perform unit tests on portions of the application. To run the tests, execute ``py.test`` in the CodeChat/CodeChat directory.
 
 .. toctree::
    :maxdepth: 1

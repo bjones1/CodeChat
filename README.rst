@@ -21,6 +21,10 @@ You may optionally install:
 
 Recent changes
 ==============
+- Current version
+
+  - Used ``..`` instead of marker to indent comments, producing cleaner reST.
+  - Split CodeToRest into CodeToRest, CodeToRestSphinx modules.
 - 17-Jan-2014:
 
   - Added a status bar to report build status, allowing the user to hide the build output window.
