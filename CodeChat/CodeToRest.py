@@ -42,8 +42,24 @@ from os.path import splitext
 #
 # Third-party imports
 # -------------------
+# This must be imported before docutils.io below to avoid the following eror
+# message::
+#  C:\Users\bjones\Documents\documentation\CodeChat>python
+#  Python 2.7.5 (default, May 15 2013, 22:43:36) [MSC v.1500 32 bit (Intel)] on win32
+#  Type "help", "copyright", "credits" or "license" for more information.
+#  >>> import docutils.io
+#  Traceback (most recent call last):
+#    File "<stdin>", line 1, in <module>
+#    File "C:\Python27\lib\site-packages\docutils\io.py", line 18, in <module>
+#      from docutils.utils.error_reporting import locale_encoding, ErrorString, ErrorOutput
+#    File "C:\Python27\lib\site-packages\docutils\utils\__init__.py", line 20, in <module>
+#      from docutils.io import FileOutput
+#  ImportError: cannot import name FileOutput
+import docutils.utils
 # Used to open files with unknown encodings
 from docutils import io, core
+# For the docutils default stylesheet
+from docutils.writers.html4css1 import Writer
 #
 # Local application imports
 # -------------------------
@@ -379,7 +395,8 @@ def code_to_html_string(
     #
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
-      settings_overrides={'stylesheet': 'CodeChat.css'})
+      settings_overrides={'stylesheet_path': Writer.default_stylesheet_path +
+      ',./CodeChat.css'})
     html_clean = code_to_rest_html_clean(html)
     return html_clean
 
@@ -404,4 +421,6 @@ def code_to_html_file(
     fo.write(html)
 
 if __name__ == '__main__':
-    code_to_html_file('CodeToSphihnx.py')
+    # Test code
+#    code_to_html_file('CodeToRestSphinx.py')
+    pass
