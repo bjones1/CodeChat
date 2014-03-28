@@ -19,40 +19,10 @@
 # =======
 # These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
-# Standard library
-# ----------------
-from cStringIO import StringIO
-
 # Local application imports
 # -------------------------
-from CodeToRest import code_to_rest
+from CodeToRest import CodeToRestString, code_to_rest_html_clean as s
 from LanguageSpecificOptions import LanguageSpecificOptions
-
-# CodeToRest tests
-# ================
-# Test the fixup code which removes junk lines used only to produce a desired indent.
-from CodeToRest import sphinx_html_page_context
-class TestSphinxHtmlPageContext(object):
-    # Given a string, return it after sphinx_html_page_context processes it.
-    def s(self, string):
-        context = {'body' : string}
-        sphinx_html_page_context(None, None, None, context, None)
-        return context['body']
-
-    # Show that normal text isn't changed
-    def test_1(self):
-        string = 'testing'
-        ret = self.s(string)
-        assert ret == string
-
-    # An empty comment before a heading.
-    def test_2(self):
-        string = '<blockquote>\n<div># wokifvzohtdlm</div></blockquote>'
-        ret = self.s(string)
-        assert ret == '<blockquote>\n</blockquote>'
-
-    # TODO: Many more test cases.
-
 
 class TestCodeToRest(object):
     # Given a string and a language, run it through code_to_rest and return the resulting string.
@@ -60,12 +30,10 @@ class TestCodeToRest(object):
         # Use a StringIO object to act like file IO which code_to_rest expects.
         lso = LanguageSpecificOptions()
         lso.set_language(extension)
-        in_stringIO = StringIO(in_string)
-        out_stringIO = StringIO()
-        code_to_rest(lso, in_stringIO, out_stringIO)
+        out_string = CodeToRestString(in_string, lso)
         # For convenience, create the removal string for the chosen language
         unique_remove_comment = lso.comment_string + ' ' + lso.unique_remove_str + '\n'
-        return out_stringIO.getvalue(), unique_remove_comment
+        return out_string, unique_remove_comment
 
     # A single line of code, without an ending \n
     def test_1(self):
@@ -133,3 +101,22 @@ class TestCodeToRest(object):
         ret, comment = self.t('//\r\n')
         # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
         assert ret == '\n\n'
+
+# CodeToRest tests
+# ================
+# Test the fixup code which removes junk lines used only to produce a desired indent.
+class TestCodeToRestHtmlClean(object):
+
+    # Show that normal text isn't changed
+    def test_1(self):
+        string = 'testing'
+        ret = s(string)
+        assert ret == string
+
+    # An empty comment before a heading.
+    def test_2(self):
+        string = '<blockquote>\n<div># wokifvzohtdlm</div></blockquote>'
+        ret = s(string)
+        assert ret == '<blockquote>\n</blockquote>'
+
+    # TODO: Many more test cases.
