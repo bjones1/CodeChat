@@ -4,27 +4,52 @@
 #
 #    This file is part of CodeChat.
 #
-#    CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#    CodeChat is free software: you can redistribute it and/or modify it under
+#    the terms of the GNU General Public License as published by the Free
+#    Software Foundation, either version 3 of the License, or (at your option)
+#    any later version.
 #
-#    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
+#    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#    details.
 #
-#    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+#    You should have received a copy of the GNU General Public License along
+#    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
 # *******************************************************************
 # CodeToRest.py - a Sphinx extension to translate source code to reST
 # *******************************************************************
-# .. module:: CodeToRest
+# This module provides two basic functions: code_to_rest_ (and related helper
+# functions) to convert a source files to reST, and code_to_rest_html_clean_ to
+# remove temporary markers required for correct code_to_rest_ operation. The
+# typical flow would be:
+#
+# .. digraph:: overall_block_diagram
+#
+#    "Source code" -> "code_to_rest" [ label = ".py, .c, etc." ];
+#    "code_to_rest" -> "reST to HTML" [ label = "reST" ];
+#    "reST to HTML" -> "code_to_rest_html_clean"
+#      [ label = "HTML with temp. markers" ];
+#    "code_to_rest_html_clean" -> "Web browser" [ label = "final HTML" ];
+#
+# The reST to HTML conversion will typically be performed by
+# `docutils <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_.
 #
 # Imports
 # =======
-# These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
+# These are listed in the order prescribed by `PEP 8
+# <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
 # Standard library
 # ----------------
 # We need this to open and save text files in Unicode.
-import re
 import codecs
+# For code_to_rest_html_clean replacements.
+import re
 import os.path
+# For calling code_to_rest with a string
+from cStringIO import StringIO
 
 # Third-party imports
 # -------------------
@@ -40,11 +65,19 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 
 # code_to_rest
 # ============
-# This routine transforms source code to reST, preserving all indentations of both source code and comments. To do so, the comment characters are stripped from comments and all code is placed inside literal blocks. In addition to this processing, several other difficulies arise: preserving the indentation of both source code and comments; preserving empty lines of code at the beginning or end of a block of code. In the following examples, examine both the source code and the resulting HTML to get the full picture, since the text below is (after all) in reST, and will be therefore be transformed to HTML.
+# This routine transforms source code to reST, preserving all indentations of
+# both source code and comments. To do so, the comment characters are stripped
+# from comments and all code is placed inside literal blocks. In addition to
+# this processing, several other difficulies arise: preserving the indentation
+# of both source code and comments; preserving empty lines of code at the
+# beginning or end of a block of code. In the following examples, examine both
+# the source code and the resulting HTML to get the full picture, since the text
+# below is (after all) in reST, and will be therefore be transformed to HTML.
 #
 # Preserving empty lines of code
 # ------------------------------
-# First, consider a method to preserve empty lines of code. Consider, for example, the following:
+# First, consider a method to preserve empty lines of code. Consider, for
+# example, the following:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
@@ -59,7 +92,12 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
 #
-# In this example, the blank line is lost, since reST allows the literal bock containing ``foo = 1`` to end with multiple blank lines; the resulting HTML contains only one newline between each of these lines. To solve this, some CSS hackery helps tighten up spacing between lines. In addition, this routine adds a marker, removed during post-processing, at the end of each code block to preserve blank lines. The new translation becomes:
+# In this example, the blank line is lost, since reST allows the literal bock
+# containing ``foo = 1`` to end with multiple blank lines; the resulting HTML
+# contains only one newline between each of these lines. To solve this, some CSS
+# hackery helps tighten up spacing between lines. In addition, this routine adds
+# a marker, removed during post-processing, at the end of each code block to
+# preserve blank lines. The new translation becomes:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
@@ -112,7 +150,10 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # |                          |  bar = 2                |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 #
-# Preserving indentation for comments is more difficult. Blockquotes in reST are definted by common indentation, so that any number of (common) spaces define a blockquote:
+# Preserving indentation for comments is more difficult. Blockquotes in reST are
+# defined by common indentation, so that any number of (common) spaces define a
+# blockquote. In addition, nested quotes lose the line break assocatied with a
+# paragraph (no space between ``Two space indent`` and ``Four space indent``.
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
@@ -127,24 +168,31 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 # |                          |                         |  </div></blockquote>              |
 # +--------------------------+-------------------------+-----------------------------------+
 #
-# To reproduce this, the blockquote indent is defined in CSS to be one character. In addition, empty comments (one per space of indent) define a series of nested blockquotes. As the indent increases, additional empty comments must be inserted:
+# To reproduce this, the blockquote indent is defined in CSS to be one character.
+# In addition, empty comments (one per space of indent) define a series of
+# nested blockquotes. As the indent increases, additional empty comments must be
+# inserted:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       |No indent                | ::                                |
+# | ::                       | No indent               | ::                                |
 # |                          |                         |                                   |
 # |    # Two space indent    | ..                      |  <p>No indent</p>                 |
 # |      # Four space indent |                         |  <blockquote><div>                |
-# |                          |  Two space indent       |   <blockquote><div>Two space      |
+# |                          |  ..                     |   <blockquote><div>Two space      |
 # |                          |                         |    indent                         |
-# |                          |   ..                    |    <blockquote><div>              |
+# |                          |   Two space indent      |   </div></blockquote>             |
+# |                          |                         |  </div></blockquote>              |
+# |                          | ..                      |  <blockquote><div>                |
+# |                          |                         |   <blockquote><div>               |
+# |                          |  ..                     |    <blockquote><div>              |
 # |                          |                         |     <blockquote><div>Four space   |
-# |                          |    Four space indent    |      indent                       |
-# |                          |                         |     </blockquote></indent>        |
-# |                          |                         |    </blockquote></indent>         |
-# |                          |                         |   </blockquote></indent>          |
-# |                          |                         |  </blockquote></indent>           |
+# |                          |   ..                    |      indent                       |
+# |                          |                         |     </div></blockquote>           |
+# |                          |    ..                   |    </div></blockquote>            |
+# |                          |                         |   </div></blockquote>             |
+# |                          |     Four space indent   |  </div></blockquote>              |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # Summary and implementation
@@ -153,18 +201,38 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 #
 # #. Code blocks must be preceeded and followed by a removed marker.
 #
-# #. Comments must be preeceded by a series of indented markers, one per space of indentation.
+# #. Comments must be preeceded by a series of empty comments, one per space of
+#    indentation.
 #
-# Therefore, the implemtation consists of a state machine. State transitions, such as code to comment or small comment indent to larger comment indent, provide an opportunity to apply the two rules above. Specifically, the state machine first reads a line, classifies it as code or comment with indent n, and updates the state. It then takes a state transition action as defined be the labels on the arrows below, prepending the resulting string and transforming the line. Finally, it outputs the prepended string and the line.
+# Therefore, the implemtation consists of a state machine. State transitions,
+# such as code to comment or small comment indent to larger comment indent,
+# provide an opportunity to apply the two rules above. Specifically, the state
+# machine first reads a line, classifies it as code or comment with indent n,
+# and updates the state. It then takes a state transition action as defined by
+# the labels on the arrows below, prepending the resulting string and
+# transforming the line. Finally, it outputs the prepended string and the line.
 #
 # .. digraph:: code_to_rest
 #
-#     "code" -> "comment" [ label = "closing code marker\l<newline>\lcomment indent marker(s)\lstrip comment string\l" ];
-#     "comment" -> "code" [ label = "<newline>\l::\l<newline>\lopening code marker\l<one space>\l" ];
-#     "comment" -> "comment" [ label = "<newline>\lif indent increases:\l  comment indent marker(s)\lstrip comment string\l" ];
+#     "code" -> "comment"
+#       [ label = "closing code marker\l<newline>\lempty comment indent(s)\lstrip comment string\l" ];
+#     "comment" -> "code"
+#       [ label = "<newline>\l::\l<newline>\lopening code marker\l<one space>\l" ];
+#     "comment" -> "comment"
+#       [ label = "<newline>\lempty comment indent(s)\lstrip comment string\l" ];
 #     "code" -> "code" [ label = "<one space>" ];
 #     "comment" [ label = "comment,\nindent = n" ]
-def code_to_rest(language_specific_options, in_file, out_file):
+def code_to_rest(
+  language_specific_options,
+  # |lso|
+  #
+  # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
+  #    <LanguageSpecificOptions.py>` which specifies the language to use in
+  #    translating the source code to reST.
+  in_file,
+  # An input file-like object, containing source code to be converted to reST.
+  out_file):
+  # An output file-like object, where the resulting reST will be written.
     unique_remove_comment = (language_specific_options.comment_string + ' ' +
       language_specific_options.unique_remove_str)
 
@@ -172,21 +240,31 @@ def code_to_rest(language_specific_options, in_file, out_file):
     last_is_code = False
     # Keep track of the indentation of comment
     comment_indent = ''
-    # A regular expression to recognize a comment, storing the whitespace before the comment in group 1. There are two recognized forms of comments: <optional whitespace> [ <comment string> <end of line> OR <comment string> <one char of whitespace> <anything to end of line> ].
-    comment_re = re.compile(r'(^\s*)((' + language_specific_options.comment_string + '$)|(' + language_specific_options.comment_string + '\s))')
+    # A regular expression to recognize a comment, storing the whitespace before
+    # the comment in group 1. There are two recognized forms of comments:
+    # <optional whitespace> [ <comment string> <end of line> OR <comment string>
+    # <one char of whitespace> <anything to end of line> ].
+    comment_re = re.compile(r'(^\s*)((' + language_specific_options.comment_string
+      + '$)|(' + language_specific_options.comment_string + '\s))')
 
     # Iterate through all lines in the input file
     for line in in_file:
-        # Determine the line type by looking for a comment. If this is a comment, save the number of spaces in this comment
+        # Determine the line type by looking for a comment. If this is a
+        # comment, save the number of spaces in this comment
         comment_match = re.search(comment_re, line)
         # Now, process this line. Strip off the trailing newline.
         line = line.rstrip('\n')
         current_line_list = [line]
         if not comment_match:
-            # Each line of code needs a space at the beginning, to indent it inside a literal block.
+            # Each line of code needs a space at the beginning, to indent it
+            # inside a literal block.
             current_line_list.insert(0, ' ')
             if not last_is_code:
-                # When transitioning from comment to code, prepend a \n\n:: after the last line. Put a marker at the beginning of the line so reST will preserve all indentation of the block. (Can't just prepend a <space>::, since this boogers up title underlines, which become ------ ::)
+                # When transitioning from comment to code, prepend a \n\n::
+                # after the last line. Put a marker at the beginning of the line
+                # so reST will preserve all indentation of the block. (Can't
+                # just prepend a <space>::, since this boogers up title
+                # underlines, which become ------ ::)
                 current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
             else:
                 # Otherwise, just prepend a newline
@@ -225,13 +303,60 @@ def code_to_rest(language_specific_options, in_file, out_file):
     out_file.write('\n')
 
 # Wrap code_to_rest by opening in and out files.
-def CodeToRest(source_path, rst_path, language_specific_options):
+def CodeToRestFile(
+  source_path,
+  # Path to a source code file to process.
+  rst_path,
+  # Path to a destination reST file to create. It will be overwritten if it
+  # already exists.
+  language_specific_options):
+  # |lso|
     print('Processing ' + source_path + ' to ' + rst_path)
     with codecs.open(source_path, 'r', encoding = 'utf-8') as in_file:
         with codecs.open(rst_path, mode = 'w', encoding = 'utf-8') as out_file:
             code_to_rest(language_specific_options, in_file, out_file)
 
+# Wrap code_to_rest by processing a string. It returns a string containing the
+# resulting reST.
+def CodeToRestString(
+  source_str,
+  # String containing source code to process.
+  language_specific_options):
+  # |lso|
+  output_rst = StringIO()
+  code_to_rest(language_specific_options, StringIO(source_str),
+    output_rst)
+  return output_rst.getvalue()
 
+
+# code_to_rest_html_clean
+# =======================
+# Clean up markers injected by code_to_rest. It returns a string containing
+# cleaned HTML.
+def code_to_rest_html_clean(
+  str):
+  # A string produced by translating the output of code_to_rest_ to HTML.
+    #
+    # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
+    str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)
+
+    # TODO: Add examples of where these are seen.
+    str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
+    str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
+    str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
+
+    # When an empty comment indented by at least two spaces preceeds a heading, like this:
+    ##   #
+    ## Foo
+    ## ---
+    # then the HTML produced is repeated <blockquote><div> then <div># wokifvzohtdlm</div>.
+    str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', str)
+
+    # The BatchLexer doesn't always recognize comments, treating then an un-hilighed code: just a blank line which says
+    ## : wokifvz-ohtdlm (dash added to keep this from disappearing)
+    str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', str)
+
+    return str
 
 # Sphinx extension
 # ================
@@ -269,7 +394,7 @@ def sphinx_builder_inited(app):
             rest_file = source_file + app.config.source_suffix
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                CodeToRest(source_file, rest_file, lso)
+                CodeToRestFile(source_file, rest_file, lso)
             else:
                 pass
 
@@ -278,35 +403,16 @@ def sphinx_builder_inited(app):
 def sphinx_html_page_context(app, pagename, templatename, context, doctree):
     env = app and app.builder.env
     if 'body' in context.keys():
-        str = context['body']
-# Clean up markers injected by code_to_rest.
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
-        str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)
-
-        # TODO: Add examples of where these are seen.
-        str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
-        str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
-        str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
-
-        # When an empty comment indented by at least two spaces preceeds a heading, like this:
-        ##   #
-        ## Foo
-        ## ---
-        # then the HTML produced is repeated <blockquote><div> then <div># wokifvzohtdlm</div>.
-        str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', str)
-
-        # The BatchLexer doesn't always recognize comments, treating then an un-hilighed code: just a blank line which says
-        ## : wokifvz-ohtdlm (dash added to keep this from disappearing)
-        str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', str)
+        s = context['body']
+        s = code_to_rest_html_clean(s)
 
         if hasattr(env, "codelinks"):
             for codelink in env.codelinks:
                 print(codelink)
-                str = re.sub('<span class="n">' + codelink['search'] + '</span>',
-                             '<span class="n"><a href="' + codelink['replace'] + '">' +  codelink['search'] + '</a></span>',
-                             str)
-        context['body'] = str
+                s = re.sub('<span class="n">' + codelink['search'] + '</span>',
+                           '<span class="n"><a href="' + codelink['replace'] + '">' +  codelink['search'] + '</a></span>',
+                           s)
+        context['body'] = s
 
 # CodeLink directive
 # ------------------
