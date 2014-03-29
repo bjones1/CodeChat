@@ -37,8 +37,8 @@
 import re
 # For calling code_to_rest with a string
 from cStringIO import StringIO
-# To find a file's extension
-from os.path import splitext
+# To find a file's extension and locate data files.
+import os.path
 #
 # Third-party imports
 # -------------------
@@ -396,7 +396,7 @@ def code_to_html_string(
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={'stylesheet_path': Writer.default_stylesheet_path +
-      ',./CodeChat.css'})
+      ',' + os.path.join(os.path.dirname(__file__), 'CodeChat.css')})
     html_clean = code_to_rest_html_clean(html)
     return html_clean
 
@@ -407,12 +407,12 @@ def code_to_html_file(
   # .. |source_path| replace:: Path to a source code file to process.
   html_path=None):
   # Destination file name to hold the generated HTML. This file will be
-  # overwritten. If not supplied, source_path.html will be assumed.
+  # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
     #
     if not html_path:
         html_path = source_path + '.html'
     lso = LanguageSpecificOptions()
-    lso.set_language(splitext(source_path)[1])
+    lso.set_language(os.path.splitext(source_path)[1])
     fi = io.FileInput(source_path=source_path)
     fo = io.FileOutput(destination_path=html_path)
 
