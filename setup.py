@@ -20,7 +20,7 @@ ez_setup.use_setuptools()
 from setuptools import setup
 
 setup(name = "CodeChat",
-      version = '0.0.7',
+      version = '0.0.8',
       description = "The CodeChat system for software documentation",
       author = "Bryan A. Jones",
       author_email = "bjones AT ece.msstate.edu",

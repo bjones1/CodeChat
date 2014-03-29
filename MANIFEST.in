@@ -1,12 +1,8 @@
-# You'd think that package_data could be used, but that only works with
-# `binary distributions
-# <http://blog.codekills.net/2011/07/15/lies,-more-lies-and-python-packaging-documentation-on--package_data-/>`_.
-# So, include it in `MANIFEST.in
-# <http://docs.python.org/2/distutils/sourcedist.html#the-manifest-in-template>`_.
-include CodeChat/CodeChat.css
-# This is the wrong README, since it covers the CodeChat GUI. Exclude for now.
-exclude README.rst
 # I have to use the packages keyword to get data files included in the binary
 # distribution, which is what I get when I do setup.py install. But that puts
-# too much in, so take out the extras. But this doesn't work.
+# too much in, so take out the extras.
 exclude CodeChat/*_test.py
+# Include a license with the installer, but not in the installed files.
+include LICENSE.html
+# Make sure ez_setup.py is also included with the installer.
+include ez_setup.py
