@@ -15,19 +15,13 @@ syntax: glob
 # CodeChat-generated files
 *.py.rst
 *.bat.rst
-*.iss.rst
 *.ini.rst
 _build
 
 # Files created when building a binary release
 build
 dist
-tre.pyd
-tre.dll
-warncode_chat.txt
-Install_CodeChat.exe
 template/default.css
-code_chat.spec
 
 # TRE files
 tre-0.8.0-src/.git
