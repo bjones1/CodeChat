@@ -20,7 +20,7 @@ ez_setup.use_setuptools()
 from setuptools import setup
 
 setup(name = "CodeChat",
-      version = '0.0.8',
+      version = '0.0.9',
       description = "The CodeChat system for software documentation",
       author = "Bryan A. Jones",
       author_email = "bjones AT ece.msstate.edu",
@@ -37,7 +37,7 @@ setup(name = "CodeChat",
       install_requires = ['Sphinx >= 1.1.0',
                           'Pygments >= 1.5',
                           ],
-      package_data = {'CodeChat' : ['CodeChat.css']},
+      package_data = {'CodeChat' : ['CodeChat.css', 'LICENSE.html']},
       packages = ['CodeChat'],
       # Otherwise, we can't access the .css file.
       zip_safe = False,

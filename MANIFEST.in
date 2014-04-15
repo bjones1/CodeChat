@@ -1,8 +1,2 @@
-# I have to use the packages keyword to get data files included in the binary
-# distribution, which is what I get when I do setup.py install. But that puts
-# too much in, so take out the extras.
-exclude CodeChat/*_test.py
-# Include a license with the installer, but not in the installed files.
-include LICENSE.html
 # Make sure ez_setup.py is also included with the installer.
 include ez_setup.py
