@@ -44,6 +44,7 @@ import os.path
 # -------------------
 # This must be imported before docutils.io below to avoid the following eror
 # message::
+#
 #  C:\Users\bjones\Documents\documentation\CodeChat>python
 #  Python 2.7.5 (default, May 15 2013, 22:43:36) [MSC v.1500 32 bit (Intel)] on win32
 #  Type "help", "copyright", "credits" or "license" for more information.
@@ -395,8 +396,8 @@ def code_to_html_string(
     #
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
-      settings_overrides={'stylesheet_path': Writer.default_stylesheet_path +
-      ',' + os.path.join(os.path.dirname(__file__), 'CodeChat.css')})
+      settings_overrides={'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
+                          'stylesheet_dirs': Writer.default_stylesheet_dirs +  [os.path.dirname(__file__)]})
     html_clean = code_to_rest_html_clean(html)
     return html_clean
 
