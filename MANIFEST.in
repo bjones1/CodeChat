@@ -1,2 +1,2 @@
-# Make sure ez_setup.py is also included with the installer.
-include ez_setup.py
+include CodeChat/CodeChat.css
+include CodeChat/LICENSE.html
