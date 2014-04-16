@@ -18,10 +18,9 @@ syntax: glob
 *.ini.rst
 _build
 
-# Files created when building a binary release
+# Files created when packaging
 build
 dist
-template/default.css
 
 # TRE files
 tre-0.8.0-src/.git
