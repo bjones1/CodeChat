@@ -13,4 +13,8 @@
 # *********************************
 # __init__.py - Package placeholder
 # *********************************
-# This file defines this directory as a Python package, which contains the CodeChat application.
+# This file defines this directory as a Python package, which contains the
+# CodeChat application.
+#
+# Give the version number, which is read by :doc:`../setup.py` during packaging.
+__version__ = '0.0.9'
