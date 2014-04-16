@@ -319,7 +319,7 @@ def code_to_rest_file(
     #
     print('Processing ' + source_path + ' to ' + rst_path)
     # Use docutil's I/O classes to better handle and sniff encodings.
-    # TODO: all user-specified encodings.
+    # TODO: allow user-specified encodings.
     #
     # Note: both these classes automatically close themselves after a
     # read or write.
@@ -393,7 +393,6 @@ def code_to_html_string(
   source_str):
   # |source_str|
     #
-    #
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
@@ -404,8 +403,6 @@ def code_to_html_string(
 def code_to_html_file(
   source_path,
   # |source_path|
-  #
-  # .. |source_path| replace:: Path to a source code file to process.
   html_path=None):
   # Destination file name to hold the generated HTML. This file will be
   # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
