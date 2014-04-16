@@ -144,4 +144,5 @@ setup(name = 'CodeChat',
                           'docutils >= 0.11',
                           ],
       packages = ['CodeChat'],
+      include_package_data = True,
       )

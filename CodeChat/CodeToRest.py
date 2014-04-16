@@ -396,7 +396,8 @@ def code_to_html_string(
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
-                          'stylesheet_dirs': Writer.default_stylesheet_dirs +  [os.path.dirname(__file__)]})
+                          'stylesheet_dirs': Writer.default_stylesheet_dirs + 
+                                             [os.path.join(os.path.dirname(__file__), 'template')]})
     html_clean = code_to_rest_html_clean(html)
     return html_clean
 
