@@ -24,46 +24,46 @@
 #
 # Packaging notes
 # ===============
-# Packaging on Python is a mess, IMHO. A quick summary: distutils can't
-# install dependencies from PyPi, so use setuptools. A source distribution is a
+# Packaging on Python is a mess, IMHO. It takes an easy job and makes it hard.
+#
+# A quick summary: distutils_ can't
+# install dependencies from PyPi_, so use setuptools_. A source distribution is a
 # good idea becaues it can run on a bare Python installation with no other
 # installs required, but there's no standard format (.zip?, .tar.gz?, etc.). An .egg is
-# nice, but requires setuptools/pip/ez_setup installed. The .whl (Python wheel)
+# nice, but requires setuptools/pip/ez_setup installed. The .whl
+# (`Python wheel <http://wheel.readthedocs.org/en/latest/>`_)
 # is the latest and greatest format that superceeds eggs, but with similar
 # problems (requires wheel to be installed).
 #
 # Reading to get up to speed:
 #
-# * `Python Packaging User Guide`_ - the most up-to-date reference I've found
-#   so far. Tells which tools to actually use.
+# * `Python Packaging User Guide <http://packaging.python.org/en/latest/>`_ -
+#   the most up-to-date reference I've found so far. Tells which tools to
+#   actually use. It was `forked <http://packaging.python.org/en/latest/history.html#id2>`__
+#   from `The Hitchhiker's Guide to Packaging <http://guide.python-distribute.org/>`_,
+#   which is outdated, unfortunately, but used to be helpful.
 #
-#   .. _`Python Packaging User Guide`: http://packaging.python.org/en/latest/
+# * `How To Package Your Python Code <http://www.scotttorborg.com/python-packaging/index.html>`_:
+#   A useful tutorial on what to do. Doesn't cover eggs/wheels, though.
 #
-# * `The Hitchhiker's Guide to Packaging`_: Outdated, unfortunatly, but used to
-#   be helpful.
+# * `distutils <http://docs.python.org/distutils/index.html>`_ - The built-in
+#   installer. Tells what to do, but not what actually happens. It doesn't have
+#   the ability to install dependencies from `PyPi <http://pypi.python.org>`_,
+#   which I need.
 #
-#   .. _`The Hitchhiker's Guide to Packaging`: http://guide.python-distribute.org/
-#
-# * `How To Package Your Python Code`_: A useful tutorial on what to do. Doesn't
-#   cover eggs/wheels, though.
-#
-#   .. _`How To Package Your Python Code`: http://www.scotttorborg.com/python-packaging/index.html
-#
-# * distutils_ - The built-in installer. Tells what to do, but not what actually
-#   happens. It doesn't have the ability to install dependencies
-#   from PyPi_, which I need.
-#
-#   .. _distutils: http://docs.python.org/distutils/index.html
-#   .. _PyPi: http://pypi.python.org>
-#
-# * setuptools_ - A distutils replacement which can install dependencies, so I
-#   use it.
-#
-#   .. _setuptools: https://pythonhosted.org/setuptools
+# * `setuptools <https://pythonhosted.org/setuptools>`_ - A distutils
+#   replacement which can install dependencies, so I use it.
 #
 # Questions / to do
 # =================
-# * Do I need to specify ez_setup.py in my MANIFEST.in?
+# * Build the docs and post them on the web. See
+#   http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi.
+# * Is there any reason for me to distribute my files as a wheel? It's helpful
+#   that the Python version is clearly specified (it's not in a source
+#   distribution and I can't figure out how to do that), but that's about it.
+# * I should probably provide the source distribution in .zip and .tar.gz
+#   formats.
+# * Use this to build Linux packages (fun).
 #
 # To package
 # ==========
@@ -79,12 +79,8 @@
 # ================
 # Otherwise known as the evils of setup.py.
 #
-# To package data files, I'm using ``include_package_data = True`` then putting
-# the files in MANIFEST.in (see
-# http://pythonhosted.org/setuptools/setuptools.html#including-data-files).
-#
-# For users who install this that don't have setuptools installed already (see
-# https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it):
+# For users who install this from source but don't have setuptools installed,
+# `auto-install it <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__.
 import ez_setup
 ez_setup.use_setuptools()
 
@@ -93,7 +89,7 @@ from setuptools import setup
 # PyPA copied code
 # ----------------
 # From https://github.com/pypa/sampleproject/blob/master/setup.py, find a
-# built-in version number.
+# built-in version number and read ``long_description`` from a file.
 import codecs
 import os
 import re
@@ -120,15 +116,15 @@ def find_version(*file_paths):
 # Get the long description from the relevant file
 with codecs.open('README.rst', encoding='utf-8') as f:
     readme_text = f.read()
-    # We just want text up to the first paragraph, so exclude the rest. Side note:
+    # We just want text up to the contents, so exclude the rest. Side note:
     # README.rst uses DOS newlines (\\r\\n), but
     # codecs (unlike Python's plain open)
     # does not translate DOS line endings to Unix. These are preserved;
     # see second note under
     # ``codecs.open`` in the `docs <https://docs.python.org/2/library/codecs.html>`__.
-    # Hence, the \\r\\n\\r\\n parameter to index below.
+    # Hence, search for the contents tag, not newlines.
     ##print(readme_text)
-    long_description = readme_text[:readme_text.index('\r\n\r\n')]
+    long_description = readme_text[:readme_text.index('.. contents::')]
     ##print(long_description)
 
 # My code
@@ -151,5 +147,8 @@ setup(name='CodeChat',
                   ],
       install_requires=['docutils >= 0.11', ],
       packages = ['CodeChat'],
+      # To package data files, I'm using ``include_package_data = True`` then putting
+      # the files in MANIFEST.in (see
+      # http://pythonhosted.org/setuptools/setuptools.html#including-data-files).
       include_package_data = True,
       )
