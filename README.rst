@@ -1,10 +1,9 @@
 ***************************************
 CodeChat, a programmer's word processor
 ***************************************
-Welcome to `CodeChat <https://bitbucket.org/bjones/documentation/overview>`_, a programmer's word processor. CodeChat_ encourages `literate programming <http://www.literateprogramming.com/>`_ by transforming source files into web pages and by providing a powerful editor which synchronizes between the source code view and the web view of a document. Some examples of the results:
+Welcome to `CodeChat <https://bitbucket.org/bjones/documentation/overview>`_, a programmer's word processor. CodeChat_ encourages `literate programming <http://www.literateprogramming.com/>`_ by transforming source files into web pages and by providing a powerful editor which synchronizes between the source code view and the web view of a document. CodeChat_ transforms plain-text source code into a beautiful and descriptive document, allowing you to record your ideas, helpful hyperlinks to on-line resources, include expressive images and diagrams, and much more.
 
-- Explaining to myself what my code should do helped me rewrite and fix `CodeToRest <https://dl.dropbox.com/u/2337351/CodeChat/doc/CodeChat/CodeToRest.py.html>`_.
-- Likewise, explaining how a micro air vehicle responds to force created by its rotors enabled me to develop a `simulation of it <https://dl.dropbox.com/u/2337351/MAV_class/Python_tutorial/mav3d_simulation.py.html>`_.
+.. contents::
 
 Getting started
 ===============
@@ -29,7 +28,7 @@ Sphinx_
 .. [#] http://sphinx-doc.org/index.html
 
 ReST
-====
+----
 "reStructuredText is an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax" [#]_. Helpful pages:
 
 * The excellent `reStructuredText primer <http://sphinx-doc.org/rest.html>`_ provided by the `Sphinx <http://sphinx-doc.org/index.html>`_ project.
@@ -37,9 +36,13 @@ ReST
 
 .. [#] http://docutils.sourceforge.net/rst.html
 
+Contributing
+============
+This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the CodeChat_ homepage!
+
 Recent changes
 ==============
-- Current version
+- 0.0.10a1, release 17-Apr-2014:
 
   - Revamped packaging.
   - Updated docs.
