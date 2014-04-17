@@ -80,7 +80,7 @@
 # Otherwise known as the evils of setup.py.
 #
 # To package data files, I'm using ``include_package_data = True`` then putting
-# the files in MANIFEST.in (see 
+# the files in MANIFEST.in (see
 # http://pythonhosted.org/setuptools/setuptools.html#including-data-files).
 #
 # For users who install this that don't have setuptools installed already (see
