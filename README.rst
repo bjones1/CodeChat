@@ -44,7 +44,7 @@ This is a fairly basic implementation; much improvement is needed! Please use th
 
 Recent changes
 ==============
-- 0.0.10a1, release 17-Apr-2014:
+- 0.0.10a3, release 17-Apr-2014:
 
   - Revamped packaging.
   - Updated docs.

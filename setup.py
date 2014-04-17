@@ -119,7 +119,17 @@ def find_version(*file_paths):
 
 # Get the long description from the relevant file
 with codecs.open('README.rst', encoding='utf-8') as f:
-    long_description = f.read()
+    readme_text = f.read()
+    # We just want text up to the first paragraph, so exclude the rest. Side note:
+    # README.rst uses DOS newlines (\\r\\n), but
+    # codecs (unlike Python's plain open)
+    # does not translate DOS line endings to Unix. These are preserved;
+    # see second note under
+    # ``codecs.open`` in the `docs <https://docs.python.org/2/library/codecs.html>`__.
+    # Hence, the \\r\\n\\r\\n parameter to index below.
+    ##print(readme_text)
+    long_description = readme_text[:readme_text.index('\r\n\r\n')]
+    ##print(long_description)
 
 # My code
 # -------
