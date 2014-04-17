@@ -24,4 +24,7 @@
 # CodeChat application.
 #
 # Give the version number, which is read by :doc:`../setup.py` during packaging.
-__version__ = '0.0.9'
+# This is chosen following the `version convention`_.
+#
+# .. _`version convention`: http://packaging.python.org/en/latest/tutorial.html#version
+__version__ = '0.0.10a1'
