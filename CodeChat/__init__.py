@@ -27,4 +27,4 @@
 # This is chosen following the `version convention`_.
 #
 # .. _`version convention`: http://packaging.python.org/en/latest/tutorial.html#version
-__version__ = '0.0.10a1'
+__version__ = '0.0.10a2'
