@@ -31,7 +31,7 @@ try:
 except ImportError:
     USER_SITE = None
 
-DEFAULT_VERSION = "3.3"
+DEFAULT_VERSION = "3.4.4"
 DEFAULT_URL = "https://pypi.python.org/packages/source/s/setuptools/"
 
 def _python_cmd(*args):
@@ -181,7 +181,7 @@ def has_powershell():
     try:
         try:
             subprocess.check_call(cmd, stdout=devnull, stderr=devnull)
-        except:
+        except Exception:
             return False
     finally:
         devnull.close()
@@ -199,7 +199,7 @@ def has_curl():
     try:
         try:
             subprocess.check_call(cmd, stdout=devnull, stderr=devnull)
-        except:
+        except Exception:
             return False
     finally:
         devnull.close()
@@ -217,7 +217,7 @@ def has_wget():
     try:
         try:
             subprocess.check_call(cmd, stdout=devnull, stderr=devnull)
-        except:
+        except Exception:
             return False
     finally:
         devnull.close()
