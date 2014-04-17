@@ -17,7 +17,9 @@ First, install `Enki <http://enki-editor.org/>`_, which hosts the CodeChat syste
 |    // ReST_ works *here*.                                 | .. code:: c                                               |
 |    //But not here -- a space must follow the comment.     |                                                           |
 |    /* Not here either. Only single-line comments work. */ |    //But not here -- a space must follow the comment.     |
-|                                                           |    /* Not here either. Only single-line comments work. */ |
+|    a = 1; // Not here either. Comments must be on a       |    /* Not here either. Only single-line comments work. */ |
+|    b = 2; // separate line, not following code.           |    a = 1; // Not here either. Comments must be on a       |
+|                                                           |    b = 2; // separate line, not following code.           |
 +-----------------------------------------------------------+-----------------------------------------------------------+
 
 Sphinx_
@@ -46,7 +48,7 @@ Recent changes
 
   - Revamped packaging.
   - Updated docs.
-  - Used ``..`` instead of marker to indent comments, producing cleaner reST.
+  - Used ``..`` instead of marker to indent comments, producing cleaner ReST.
   - Split CodeToRest into CodeToRest, CodeToRestSphinx modules.
 
 License
