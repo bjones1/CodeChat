@@ -227,16 +227,16 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 #     "code" -> "code" [ label = "<one space>" ];
 #     "comment" [ label = "comment,\nindent = n" ]
 def code_to_rest(
+  # An input file-like object, containing source code to be converted to reST.
+  in_file,
+  # An output file-like object, where the resulting reST will be written.
+  out_file,
   # |lso|
   #
   # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
   #    <LanguageSpecificOptions.py>` which specifies the language to use in
   #    translating the source code to reST.
-  language_specific_options,
-  # An input file-like object, containing source code to be converted to reST.
-  in_file,
-  # An output file-like object, where the resulting reST will be written.
-  out_file):
+  language_specific_options):
     #
     unique_remove_comment = (language_specific_options.comment_string + u' ' +
       language_specific_options.unique_remove_str)
@@ -314,6 +314,7 @@ def lso_from_ext(
   file_path):
     lso = LanguageSpecificOptions()
     lso.set_language(os.path.splitext(file_path)[1])
+    return lso
 
 # Wrap code_to_rest by opening in and out files.
 def code_to_rest_file(
@@ -355,8 +356,7 @@ def code_to_rest_string(
     # We don't use io.StringInput/Output here because it provides only a single
     # read/write operation, while code_to_rest_ expects to do many.
     output_rst = StringIO()
-    code_to_rest(language_specific_options, StringIO(source_str),
-      output_rst)
+    code_to_rest(StringIO(source_str), output_rst, language_specific_options)
     return output_rst.getvalue()
 
 
@@ -410,7 +410,7 @@ def code_to_html_string(
   # |lso|
   language_specific_options):
     #
-    rest = code_to_rest_string(language_specific_options, source_str)
+    rest = code_to_rest_string(source_str, language_specific_options)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
                           'stylesheet_dirs': Writer.default_stylesheet_dirs +
@@ -433,7 +433,7 @@ def code_to_html_file(
     fi = io.FileInput(source_path=source_path)
     fo = io.FileOutput(destination_path=html_path)
 
-    html = code_to_html_string(lso, fi.read())
+    html = code_to_html_string(fi.read(), lso)
 
     fo.write(html)
 
