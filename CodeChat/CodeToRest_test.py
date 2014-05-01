@@ -4,11 +4,18 @@
 #
 #    This file is part of CodeChat.
 #
-#    CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+#    CodeChat is free software: you can redistribute it and/or modify it under
+#    the terms of the GNU General Public License as published by the Free
+#    Software Foundation, either version 3 of the License, or (at your option)
+#    any later version.
 #
-#    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+#    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
+#    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#    details.
 #
-#    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+#    You should have received a copy of the GNU General Public License along
+#    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
 # *********************************
 # CodeToRest_test.py - Unit testing
@@ -21,16 +28,18 @@
 #
 # Local application imports
 # -------------------------
-from CodeToRest import CodeToRestString, code_to_rest_html_clean as s
+from CodeToRest import code_to_rest_string, code_to_rest_html_clean
 from LanguageSpecificOptions import LanguageSpecificOptions
 
+# This acutally tests using code_to_rest_string, since that makes code_to_rest
+# easy to call.
 class TestCodeToRest(object):
     # Given a string and a language, run it through code_to_rest and return the resulting string.
     def t(self, in_string, extension = '.c'):
         # Use a StringIO object to act like file IO which code_to_rest expects.
         lso = LanguageSpecificOptions()
         lso.set_language(extension)
-        out_string = CodeToRestString(in_string, lso)
+        out_string = code_to_rest_string(lso, in_string)
         # For convenience, create the removal string for the chosen language
         unique_remove_comment = lso.comment_string + ' ' + lso.unique_remove_str + '\n'
         return out_string, unique_remove_comment
@@ -73,17 +82,17 @@ class TestCodeToRest(object):
     # A singly indented single-line comment
     def test_7(self):
         ret, comment = self.t(' // testing')
-        assert ret == '\n\n' + comment + '\n testing\n'
+        assert ret == '\n\n..\n\n testing\n'
 
     # A doubly indented single-line comment
     def test_8(self):
         ret, comment = self.t('  // testing')
-        assert ret == '\n\n' + comment + '\n ' + comment + '\n  testing\n'
+        assert ret == '\n\n..\n\n ..\n\n  testing\n'
 
     # A doubly indented multi-line comment
     def test_9(self):
         ret, comment = self.t('  // testing\n  // more testing')
-        assert ret == '\n\n' + comment + '\n ' + comment + '\n  testing\n  more testing\n'
+        assert ret == '\n\n..\n\n ..\n\n  testing\n  more testing\n'
 
     # Code to comment transition
     def test_9a(self):
@@ -102,21 +111,21 @@ class TestCodeToRest(object):
         # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
         assert ret == '\n\n'
 
-# CodeToRest tests
-# ================
+# code_to_rest tests
+# ==================
 # Test the fixup code which removes junk lines used only to produce a desired indent.
 class TestCodeToRestHtmlClean(object):
 
     # Show that normal text isn't changed
     def test_1(self):
         string = 'testing'
-        ret = s(string)
+        ret = code_to_rest_html_clean(string)
         assert ret == string
 
     # An empty comment before a heading.
     def test_2(self):
         string = '<blockquote>\n<div># wokifvzohtdlm</div></blockquote>'
-        ret = s(string)
+        ret = code_to_rest_html_clean(string)
         assert ret == '<blockquote>\n</blockquote>'
 
     # TODO: Many more test cases.
