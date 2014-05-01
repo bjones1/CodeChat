@@ -18,7 +18,7 @@ try:
     from PyQt4.Qsci import QsciLexerCPP, QsciLexerPython
 except ImportError as e:
     QsciLexerCPP, QsciLexerPython = (None, None)
-    
+
 # ****************************************************************************************
 # LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
 # ****************************************************************************************
@@ -40,7 +40,7 @@ class LanguageSpecificOptions(object):
     # .. attribute:: unique_remove_str
     #
     #    A unique string to mark lines for removal in HTML.
-    unique_remove_str = 'wokifvzohtdlm'
+    unique_remove_str = u'wokifvzohtdlm'
 
     # .. attribute:: language_specific_options
     #
@@ -48,19 +48,19 @@ class LanguageSpecificOptions(object):
     extension_to_options = {
     ##  Pygments  lexer
     ##  Extension  Comment string, QScintilla lexer
-      '.c'      : ('//',           QsciLexerCPP),
-      '.cc'     : ('//',           QsciLexerCPP),
-      '.cpp'    : ('//',           QsciLexerCPP),
-      '.h'      : ('//',           QsciLexerCPP),
-      '.hh'     : ('//',           QsciLexerCPP),
-      '.hpp'    : ('//',           QsciLexerCPP),
-      '.py'     : ('#',            QsciLexerPython),
-      '.s'      : (';',            None),
-      '.php'    : ('#',            None),
-      '.m'      : ('%',            None),
-      '.bat'    : (':',            None),
-      '.ini'    : (';',            None),
-      '.iss'    : (';',            None),
+      u'.c'      : (u'//',           QsciLexerCPP),
+      u'.cc'     : (u'//',           QsciLexerCPP),
+      u'.cpp'    : (u'//',           QsciLexerCPP),
+      u'.h'      : (u'//',           QsciLexerCPP),
+      u'.hh'     : (u'//',           QsciLexerCPP),
+      u'.hpp'    : (u'//',           QsciLexerCPP),
+      u'.py'     : (u'#',            QsciLexerPython),
+      u'.s'      : (u';',            None),
+      u'.php'    : (u'#',            None),
+      u'.m'      : (u'%',            None),
+      u'.bat'    : (u':',            None),
+      u'.ini'    : (u';',            None),
+      u'.iss'    : (u';',            None),
     }
 
     # .. method:: set_language(extension)

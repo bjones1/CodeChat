@@ -39,9 +39,9 @@ class TestCodeToRest(object):
         # Use a StringIO object to act like file IO which code_to_rest expects.
         lso = LanguageSpecificOptions()
         lso.set_language(extension)
-        out_string = code_to_rest_string(lso, in_string)
+        out_string = code_to_rest_string(in_string, lso)
         # For convenience, create the removal string for the chosen language
-        unique_remove_comment = lso.comment_string + ' ' + lso.unique_remove_str + '\n'
+        unique_remove_comment = lso.comment_string + u' ' + lso.unique_remove_str + u'\n'
         return out_string, unique_remove_comment
 
     # A single line of code, without an ending \n
@@ -111,8 +111,20 @@ class TestCodeToRest(object):
         # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
         assert ret == '\n\n'
 
-# code_to_rest tests
-# ==================
+    # Make sure an empty string works.
+    def test_12(self):
+        ret, comment = self.t('')
+        assert ret == '\n'
+
+    # Make sure Unicode works. Be VERY careful with encodings here: using the
+    # string u'ю' instead of u'\u044e' below makes the test fail, since one
+    # encoding will be UTF-8 and the other Unicode (UCS-16?).
+    def test_13(self):
+        ret, comment = self.t(u'\u044e')
+        assert ret == u'\n\n::\n\n ' + comment + u' \u044e\n'
+
+# code_to_rest_html_clean tests
+# =============================
 # Test the fixup code which removes junk lines used only to produce a desired indent.
 class TestCodeToRestHtmlClean(object):
 

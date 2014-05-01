@@ -35,8 +35,9 @@
 # ----------------
 # For code_to_rest_html_clean replacements.
 import re
-# For calling code_to_rest with a string
-from cStringIO import StringIO
+# For calling code_to_rest with a string. While using cStringIO would be great,
+# it doesn't support Unicode, so we can't.
+from StringIO import StringIO
 # To find a file's extension and locate data files.
 import os.path
 #
@@ -226,29 +227,30 @@ from LanguageSpecificOptions import LanguageSpecificOptions
 #     "code" -> "code" [ label = "<one space>" ];
 #     "comment" [ label = "comment,\nindent = n" ]
 def code_to_rest(
-  language_specific_options,
   # |lso|
   #
   # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
   #    <LanguageSpecificOptions.py>` which specifies the language to use in
   #    translating the source code to reST.
-  in_file,
+  language_specific_options,
   # An input file-like object, containing source code to be converted to reST.
-  out_file):
+  in_file,
   # An output file-like object, where the resulting reST will be written.
-    unique_remove_comment = (language_specific_options.comment_string + ' ' +
+  out_file):
+    #
+    unique_remove_comment = (language_specific_options.comment_string + u' ' +
       language_specific_options.unique_remove_str)
 
     # Keep track of the type of the last line.
     last_is_code = False
     # Keep track of the indentation of comment
-    comment_indent = ''
+    comment_indent = u''
     # A regular expression to recognize a comment, storing the whitespace before
     # the comment in group 1. There are two recognized forms of comments:
     # <optional whitespace> [ <comment string> <end of line> OR <comment string>
     # <one char of whitespace> <anything to end of line> ].
-    comment_re = re.compile(r'(^\s*)((' + language_specific_options.comment_string
-      + '$)|(' + language_specific_options.comment_string + '\s))')
+    comment_re = re.compile(ur'(^\s*)((' + language_specific_options.comment_string
+      + u'$)|(' + language_specific_options.comment_string + u'\s))')
 
     # Iterate through all lines in the input file
     for line in in_file:
@@ -256,45 +258,45 @@ def code_to_rest(
         # comment, save the number of spaces in this comment
         comment_match = re.search(comment_re, line)
         # Now, process this line. Strip off the trailing newline.
-        line = line.rstrip('\n')
+        line = line.rstrip(u'\n')
         current_line_list = [line]
         if not comment_match:
             # Each line of code needs a space at the beginning, to indent it
             # inside a literal block.
-            current_line_list.insert(0, ' ')
+            current_line_list.insert(0, u' ')
             if not last_is_code:
                 # When transitioning from comment to code, prepend a \n\n::
                 # after the last line. Put a marker at the beginning of the line
                 # so reST will preserve all indentation of the block. (Can't
                 # just prepend a <space>::, since this boogers up title
                 # underlines, which become ------ ::)
-                current_line_list.insert(0, '\n\n::\n\n ' + unique_remove_comment + '\n')
+                current_line_list.insert(0, u'\n\n::\n\n ' + unique_remove_comment + u'\n')
             else:
                 # Otherwise, just prepend a newline
-                current_line_list.insert(0, '\n')
+                current_line_list.insert(0, u'\n')
         else:
             new_comment_indent = comment_match.group(1)
             # If indent changes or we were just in code, re-do it.
             redo_indent = ((new_comment_indent != comment_indent) or last_is_code)
             comment_indent = new_comment_indent
             # Remove the comment character (and one space, if it's there)
-            current_line_list = [re.sub(comment_re, r'\1', line)]
+            current_line_list = [re.sub(comment_re, ur'\1', line)]
             # Prepend a newline
-            current_line_list.insert(0, '\n')
+            current_line_list.insert(0, u'\n')
             # Add in left margin adjustments for a code to comment transition
             if redo_indent:
                 # Get left margin correct by inserting a series of blockquotes
                 blockquote_indent = []
                 for i in range(len(comment_indent)):
-                    blockquote_indent.append('\n\n' + ' '*i + '..')
-                blockquote_indent.append('\n')
-                current_line_list.insert(0, ''.join(blockquote_indent))
+                    blockquote_indent.append(u'\n\n' + u' '*i + u'..')
+                blockquote_indent.append(u'\n')
+                current_line_list.insert(0, u''.join(blockquote_indent))
             if last_is_code:
                 # Finish code off with a newline-preserving marker
-                current_line_list.insert(0, '\n ' + unique_remove_comment)
+                current_line_list.insert(0, u'\n ' + unique_remove_comment)
 
         # Convert to a string
-        line_str = ''.join(current_line_list)
+        line_str = u''.join(current_line_list)
         current_line_list = []
         # For debug:
         # line_str += str(line_type) + str(last_is_code)
@@ -303,19 +305,30 @@ def code_to_rest(
         last_is_code = not comment_match
 
     # At the end of the file, include a final newline
-    out_file.write('\n')
+    out_file.write(u'\n')
+
+# Choose a LanguageSpecificOptions class based on the given file's extension.
+def lso_from_ext(
+  # The path (and name)of a file. This file's extension will be used to create
+  # an instance of the LanguageSpecificOptions class.
+  file_path):
+    lso = LanguageSpecificOptions()
+    lso.set_language(os.path.splitext(file_path)[1])
 
 # Wrap code_to_rest by opening in and out files.
 def code_to_rest_file(
-  language_specific_options,
-  # |lso|
   source_path,
   # |source_path|
   #
   # .. |source_path| replace:: Path to a source code file to process.
-  rst_path):
+  rst_path,
   # Path to a destination reST file to create. It will be overwritten if it
   # already exists.
+  language_specific_options=None):
+  # |lsoNone|
+  #
+  # .. |lsoNone| replace:: |lso| None to determine the language based on the
+  #    given source_path's extension.
     #
     print('Processing ' + source_path + ' to ' + rst_path)
     # Use docutil's I/O classes to better handle and sniff encodings.
@@ -325,19 +338,22 @@ def code_to_rest_file(
     # read or write.
     fi = io.FileInput(source_path=source_path)
     fo = io.FileOutput(destination_path=rst_path)
+    lso = language_specific_options or lso_from_ext(source_path)
     rst = code_to_rest_string(language_specific_options, fi.read())
     fo.write(rst)
 
 # Wrap code_to_rest by processing a string. It returns a string containing the
 # resulting reST.
 def code_to_rest_string(
-  language_specific_options,
-  # |lso|
-  source_str):
   # |source_str|
   #
   # .. |source_str| replace:: String containing source code to process.
+  source_str,
+  # |lso|
+  language_specific_options):
     #
+    # We don't use io.StringInput/Output here because it provides only a single
+    # read/write operation, while code_to_rest_ expects to do many.
     output_rst = StringIO()
     code_to_rest(language_specific_options, StringIO(source_str),
       output_rst)
@@ -349,29 +365,30 @@ def code_to_rest_string(
 # Clean up markers injected by code_to_rest_. It returns a string containing
 # cleaned HTML.
 def code_to_rest_html_clean(
-  str):
   # A string produced by translating the output of code_to_rest_ to HTML.
+  _str):
     #
     # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
-    str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', str)
+    _str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', _str)
 
     # TODO: Add examples of where these are seen.
-    str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', str)
-    str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', str)
-    str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', str)
+    _str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', _str)
+    _str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', _str)
+    _str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', _str)
 
     # When an empty comment indented by at least two spaces preceeds a heading, like this:
     ##   #
     ## Foo
     ## ---
     # then the HTML produced is repeated <blockquote><div> then <div># wokifvzohtdlm</div>.
-    str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', str)
+    _str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', _str)
 
-    # The BatchLexer doesn't always recognize comments, treating then an un-hilighed code: just a blank line which says
+    # The BatchLexer doesn't always recognize comments, treating then as
+    # un-hilighed code: just a blank line which says
     ## : wokifvz-ohtdlm (dash added to keep this from disappearing)
-    str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', str)
+    _str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', _str)
 
-    return str
+    return _str
 
 # code_to_html
 # ============
@@ -388,10 +405,10 @@ def code_to_rest_html_clean(
 # The reST to HTML conversion is performed by
 # `docutils <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_.
 def code_to_html_string(
-  language_specific_options,
-  # |lso|
-  source_str):
   # |source_str|
+  source_str,
+  # |lso|
+  language_specific_options):
     #
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
@@ -402,16 +419,17 @@ def code_to_html_string(
     return html_clean
 
 def code_to_html_file(
-  source_path,
   # |source_path|
-  html_path=None):
+  source_path,
   # Destination file name to hold the generated HTML. This file will be
   # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
+  html_path=None,
+  # |lsoNone|
+  language_specific_options=None):
     #
     if not html_path:
         html_path = source_path + '.html'
-    lso = LanguageSpecificOptions()
-    lso.set_language(os.path.splitext(source_path)[1])
+    lso = language_specific_options or lso_from_ext(source_path)
     fi = io.FileInput(source_path=source_path)
     fo = io.FileOutput(destination_path=html_path)
 
@@ -421,5 +439,5 @@ def code_to_html_file(
 
 if __name__ == '__main__':
     # Test code
-#    code_to_html_file('CodeToRestSphinx.py')
+    code_to_html_file('CodeToRestSphinx.py')
     pass
