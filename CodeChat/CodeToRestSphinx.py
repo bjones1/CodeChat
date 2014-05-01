@@ -40,8 +40,6 @@ import os.path
 # Sphinx routines help to search for source files.
 from sphinx.util.matching import compile_matchers
 from sphinx.util import get_matching_docs
-# Needed to create a new Sphinx directive (codelink).
-from sphinx.util.compat import Directive
 
 # Local application imports
 # -------------------------
@@ -106,38 +104,6 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
                              '">' +  codelink['search'] + '</a></span>', s)
         context['body'] = s
 
-# CodeLink directive
-# ==================
-# This provides an experimental codelink directive to embed hyperlinks in code.
-class CodelinkDirective(Directive):
-    # this enables content in the directive
-    required_arguments = 1
-    optional_arguments = 100000
-
-    # When we encounter a codelink directive, save its args in the environment.
-    def run(self):
-        env = self.state.document.settings.env
-        if not hasattr(env, 'codelinks'):
-            env.codelinks = []
-        # The codelink directive's arguments give a search and replace string,
-        # in the format search=replace.
-        for arg in self.arguments:
-            search_replace = arg.split('=', 1)
-            sr_len = len(search_replace)
-#            print(arg, sr_len, search_replace)
-            assert sr_len <= 2
-            if sr_len == 2:
-                env.codelinks.append({'search' : search_replace[0],
-                                      'replace' : search_replace[1],
-                                     'docname' : env.docname})
-        return []
-
-def purge_codelinks(app, env, docname):
-    if not hasattr(env, 'codelinks'):
-        return
-    env.todo_all_todos = [codelink for codelink in env.codelinks
-                          if codelink['docname'] != docname]
-
 # Sphinx hooks
 # ============
 # This routine defines the entry point called by Sphinx to initialize this
@@ -146,6 +112,3 @@ def setup(app):
     # See sphinx_source_read() for more info.
     app.connect('html-page-context', sphinx_html_page_context)
     app.connect('builder-inited', sphinx_builder_inited)
-
-    app.add_directive('codelink', CodelinkDirective)
-    app.connect('env-purge-doc', purge_codelinks)
