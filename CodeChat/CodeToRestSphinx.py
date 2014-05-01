@@ -20,6 +20,9 @@
 # *************************************************************************
 # CodeToRestSphinx.py - a Sphinx extension to translate source code to reST
 # *************************************************************************
+# This modules supplies CodeToRest-related Sphinx extensions.
+#
+# .. contents::
 #
 # Imports
 # =======
@@ -45,25 +48,26 @@ from sphinx.util.compat import Directive
 from LanguageSpecificOptions import LanguageSpecificOptions
 from CodeToRest import code_to_rest_file, code_to_rest_html_clean
 
-# Sphinx extension
-# ================
-# The following functions supply CodeToRest-related Sphinx extensions.
-#
 # CodeToRest extension
-# --------------------
+# ====================
 # This extension provides the CodeToRest Sphinx extension. The overall process:
 #
-# #. Translate all source files to reST before Sphinx looks for reST source (``sphinx_builder_inited``).
-# #. When Sphinx has HTML ready to output, strip out gunk inserted by ``code_to_rest`` to format source files correctly (``sphinx_html_page_context``).
+# #. Translate all source files to reST before Sphinx looks for reST source
+#    (``sphinx_builder_inited``).
+# #. When Sphinx has HTML ready to output, strip out gunk inserted by
+#    ``code_to_rest`` to format source files correctly
+#    (``sphinx_html_page_context``).
 #
-# This function searches for source code and transforms it to reST before Sphinx searches for reST source.
+# This function searches for source code and transforms it to reST before Sphinx
+# searches for reST source.
 def sphinx_builder_inited(app):
     # Look for every extension of every supported langauge
     lso = LanguageSpecificOptions()
     for source_suffix in lso.extension_to_options.keys():
         # Choose the current language to process any file in
         lso.set_language(source_suffix)
-        # Find all source files with the given extension. This was copied almost verabtim from sphinx.environment.BuildEnvironment.find_files.
+        # Find all source files with the given extension. This was copied almost
+        # verabtim from sphinx.environment.BuildEnvironment.find_files.
         matchers = compile_matchers(
             app.config.exclude_patterns[:] +
             app.config.exclude_trees +
@@ -85,8 +89,9 @@ def sphinx_builder_inited(app):
             else:
                 pass
 
-
-# Sphinx emits this event when the HTML builder has created a context dictionary to render a template with. Do all necessary fix-up after the reST-to-code progress.
+# Sphinx emits this event when the HTML builder has created a context dictionary
+# to render a template with. Do all necessary fix-up after the reST-to-code
+# progress.
 def sphinx_html_page_context(app, pagename, templatename, context, doctree):
     env = app and app.builder.env
     if 'body' in context.keys():
@@ -97,12 +102,12 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
             for codelink in env.codelinks:
                 print(codelink)
                 s = re.sub('<span class="n">' + codelink['search'] + '</span>',
-                           '<span class="n"><a href="' + codelink['replace'] + '">' +  codelink['search'] + '</a></span>',
-                           s)
+                           '<span class="n"><a href="' + codelink['replace'] +
+                             '">' +  codelink['search'] + '</a></span>', s)
         context['body'] = s
 
 # CodeLink directive
-# ------------------
+# ==================
 # This provides an experimental codelink directive to embed hyperlinks in code.
 class CodelinkDirective(Directive):
     # this enables content in the directive
@@ -114,7 +119,8 @@ class CodelinkDirective(Directive):
         env = self.state.document.settings.env
         if not hasattr(env, 'codelinks'):
             env.codelinks = []
-        # The codelink directive's arguments give a search and replace string, in the format search=replace.
+        # The codelink directive's arguments give a search and replace string,
+        # in the format search=replace.
         for arg in self.arguments:
             search_replace = arg.split('=', 1)
             sr_len = len(search_replace)
@@ -133,8 +139,9 @@ def purge_codelinks(app, env, docname):
                           if codelink['docname'] != docname]
 
 # Sphinx hooks
-# ------------
-# This routine defines the entry point called by Sphinx to initialize this extension, per http://sphinx.pocoo.org/ext/appapi.htm.
+# ============
+# This routine defines the entry point called by Sphinx to initialize this
+# extension, per http://sphinx.pocoo.org/ext/appapi.htm.
 def setup(app):
     # See sphinx_source_read() for more info.
     app.connect('html-page-context', sphinx_html_page_context)

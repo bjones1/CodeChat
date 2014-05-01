@@ -26,6 +26,8 @@
 # simple wrapper to convert source code to reST, then to HTML, then to
 # cleaned HTML is given in code_to_html_.
 #
+# .. contents::
+#
 # Imports
 # =======
 # These are listed in the order prescribed by `PEP 8
