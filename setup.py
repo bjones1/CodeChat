@@ -63,17 +63,25 @@
 #   distribution and I can't figure out how to do that), but that's about it.
 # * I should probably provide the source distribution in .zip and .tar.gz
 #   formats.
-# * Use this to build Linux packages (fun).
+# * Use this to build Linux packages.
+#
+#   * Hopefully ``setup.py bdist_rpm``. But Tarek (the `author <https://bitbucket.org/tarek/distribute/wiki/Home>`_ of distribute) says `bdist_rpm is dead <http://ziade.org/2011/03/25/bdist_rpm-is-dead-long-life-to-py2rpm/>`__, and suggests his own tool, pypi2rpm, which is `mostly inactive <https://bitbucket.org/tarek/pypi2rpm>`__.
+#   * Maybe `stdeb <https://pypi.python.org/pypi/stdeb>`_, but this is also mostly inactive.
+#   * There's `up-to-date docs <https://wiki.debian.org/Python/LibraryStyleGuide>`__ on Debian Python builds that doesn't seem too painful.
+#   * The `openSUSE packing python page <https://en.opensuse.org/openSUSE:Packaging_Python>`_ is up to date, and suggests using `py2pack <https://pypi.python.org/pypi/py2pack>`_, another recently-updated tool.
+#
+#   Based on the above discussion, my ideas:
+#
+#   * Host all my builds on OBS, and create a cross-platform build there.
+#   * Use py2pack to generate an openSUSE package, then manually edit as necessary to get it building with Fedora.
+#   * Use stdeb to generate the Debian package, then hand-edit per the Debian docs.
+# * Add a `setup.cfg <https://docs.python.org/2/distutils/configfile.html>`_ with defaults.
 #
 # To package
 # ==========
-# * Create a source distribution:
+# * Create a source distribution, a built distribution, then upload both:
 #
-#   ``python setup.py sdist``
-#
-# * Create a binary distribution:
-#
-#   ``python setup.py bdist_wheel``
+#   ``python setup.py sdist bdist_wheel upload``
 #
 # Packaging script
 # ================
