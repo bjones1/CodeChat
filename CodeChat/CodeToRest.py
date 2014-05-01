@@ -346,7 +346,7 @@ def code_to_rest_string(
 
 # code_to_rest_html_clean
 # =======================
-# Clean up markers injected by code_to_rest. It returns a string containing
+# Clean up markers injected by code_to_rest_. It returns a string containing
 # cleaned HTML.
 def code_to_rest_html_clean(
   str):
@@ -396,7 +396,7 @@ def code_to_html_string(
     rest = code_to_rest_string(language_specific_options, source_str)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
-                          'stylesheet_dirs': Writer.default_stylesheet_dirs + 
+                          'stylesheet_dirs': Writer.default_stylesheet_dirs +
                                              [os.path.join(os.path.dirname(__file__), 'template')]})
     html_clean = code_to_rest_html_clean(html)
     return html_clean
