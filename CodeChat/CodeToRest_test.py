@@ -116,12 +116,10 @@ class TestCodeToRest(object):
         ret, comment = self.t('')
         assert ret == '\n'
 
-    # Make sure Unicode works. Be VERY careful with encodings here: using the
-    # string u'ю' instead of u'\u044e' below makes the test fail, since one
-    # encoding will be UTF-8 and the other Unicode (UCS-16?).
+    # Make sure Unicode works.
     def test_13(self):
-        ret, comment = self.t(u'\u044e')
-        assert ret == u'\n\n::\n\n ' + comment + u' \u044e\n'
+        ret, comment = self.t(u'ю')
+        assert ret == u'\n\n::\n\n ' + comment + u' ю\n'
 
 # code_to_rest_html_clean tests
 # =============================

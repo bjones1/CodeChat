@@ -43,24 +43,9 @@ import os.path
 #
 # Third-party imports
 # -------------------
-# This must be imported before docutils.io below to avoid the following eror
-# message::
-#
-#  C:\Users\bjones\Documents\documentation\CodeChat>python
-#  Python 2.7.5 (default, May 15 2013, 22:43:36) [MSC v.1500 32 bit (Intel)] on win32
-#  Type "help", "copyright", "credits" or "license" for more information.
-#  >>> import docutils.io
-#  Traceback (most recent call last):
-#    File "<stdin>", line 1, in <module>
-#    File "C:\Python27\lib\site-packages\docutils\io.py", line 18, in <module>
-#      from docutils.utils.error_reporting import locale_encoding, ErrorString, ErrorOutput
-#    File "C:\Python27\lib\site-packages\docutils\utils\__init__.py", line 20, in <module>
-#      from docutils.io import FileOutput
-#  ImportError: cannot import name FileOutput
-import docutils.utils
-# Used to open files with unknown encodings
+# Used to open files with unknown encodings and to run docutils itself.
 from docutils import io, core
-# For the docutils default stylesheet
+# For the docutils default stylesheet.
 from docutils.writers.html4css1 import Writer
 #
 # Local application imports
@@ -233,7 +218,7 @@ def code_to_rest(
   out_file,
   # |lso|
   #
-  # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
+  # .. |lso| replace:: An instance of `LanguageSpecificOptions
   #    <LanguageSpecificOptions.py>` which specifies the language to use in
   #    translating the source code to reST.
   language_specific_options):
@@ -308,7 +293,7 @@ def code_to_rest(
     out_file.write(u'\n')
 
 # Choose a LanguageSpecificOptions class based on the given file's extension.
-def lso_from_ext(
+def _lso_from_ext(
   # The path (and name)of a file. This file's extension will be used to create
   # an instance of the LanguageSpecificOptions class.
   file_path):
@@ -339,7 +324,7 @@ def code_to_rest_file(
     # read or write.
     fi = io.FileInput(source_path=source_path)
     fo = io.FileOutput(destination_path=rst_path)
-    lso = language_specific_options or lso_from_ext(source_path)
+    lso = language_specific_options or _lso_from_ext(source_path)
     rst = code_to_rest_string(language_specific_options, fi.read())
     fo.write(rst)
 
@@ -408,13 +393,27 @@ def code_to_html_string(
   # |source_str|
   source_str,
   # |lso|
-  language_specific_options):
+  language_specific_options,
+  # A file-like object where warnings and errors will be written, or None to
+  # send them to stderr.
+  warning_stream=None):
     #
     rest = code_to_rest_string(source_str, language_specific_options)
     html = core.publish_string(rest, writer_name='html',
-      settings_overrides={'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
-                          'stylesheet_dirs': Writer.default_stylesheet_dirs +
-                                             [os.path.join(os.path.dirname(__file__), 'template')]})
+      settings_overrides={
+        # Include our custom css file: provide the path to the default css and
+        # then to our css. Omitting the Write.default_stylesheet means it
+        # won't be place in the output!
+        'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
+        'stylesheet_dirs': Writer.default_stylesheet_dirs +
+                           [os.path.join(os.path.dirname(__file__), 'template')],
+        # Make sure to use Unicode everywhere.
+        'output_encoding': 'unicode',
+        'input_encoding' : 'unicode',
+        # Don't stop processing, no matter what.
+        'halt_level'     : 5,
+        # Capture errors to a string and return it.
+        'warning_stream' : warning_stream})
     html_clean = code_to_rest_html_clean(html)
     return html_clean
 
@@ -427,11 +426,10 @@ def code_to_html_file(
   # |lsoNone|
   language_specific_options=None):
     #
-    if not html_path:
-        html_path = source_path + '.html'
-    lso = language_specific_options or lso_from_ext(source_path)
+    html_path = html_path or source_path + '.html'
+    lso = language_specific_options or _lso_from_ext(source_path)
     fi = io.FileInput(source_path=source_path)
-    fo = io.FileOutput(destination_path=html_path)
+    fo = io.FileOutput(destination_path=html_path, encoding='utf8')
 
     html = code_to_html_string(fi.read(), lso)
 
