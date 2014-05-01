@@ -44,12 +44,19 @@ This is a fairly basic implementation; much improvement is needed! Please use th
 
 Recent changes
 ==============
-- 0.0.10a3, release 17-Apr-2014:
+- 0.0.11a1, released 1-May-2014:
+
+  - Fixed Unicode errors.
+  - Removed incorrect extra spacing between code and comments.
+  - Fixed unit tests and added a few more.
+  - Removed unused CodeLink directive.
+
+- 0.0.10a3, released 17-Apr-2014:
 
   - Revamped packaging.
   - Updated docs.
   - Used ``..`` instead of marker to indent comments, producing cleaner ReST.
-  - Split CodeToRest into CodeToRest, CodeToRestSphinx modules.
+  - Split ``CodeToRest`` into ``CodeToRest``, ``CodeToRestSphinx`` modules.
 
 License
 =======
