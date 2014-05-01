@@ -60,6 +60,9 @@ p, blockquote, div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, 
       Also, note that this will need to be duplicated for all highlighted
       languages (yuck). I can't find a CSS rule to select class named using a
       regular expression. */
+/* This line handles docutils output. */
+pre.literal-block + *,
+/* The remaining lines handle Sphinx output. */
 div.highlight-none + *,
 div.highlight-nasm + *,
 div.highlight-c + *,
