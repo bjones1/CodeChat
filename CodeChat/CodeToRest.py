@@ -305,18 +305,20 @@ def _lso_from_ext(
 
 # Wrap code_to_rest by opening in and out files.
 def code_to_rest_file(
-  source_path,
   # |source_path|
   #
   # .. |source_path| replace:: Path to a source code file to process.
-  rst_path,
+  source_path,
   # Path to a destination reST file to create. It will be overwritten if it
   # already exists.
-  language_specific_options=None):
+  rst_path,
   # |lsoNone|
   #
   # .. |lsoNone| replace:: |lso| None to determine the language based on the
   #    given source_path's extension.
+  language_specific_options=None,
+  # Default encoding
+  output_encoding='utf-8'):
     #
     print('Processing ' + source_path + ' to ' + rst_path)
     # Use docutil's I/O classes to better handle and sniff encodings.
@@ -325,9 +327,9 @@ def code_to_rest_file(
     # Note: both these classes automatically close themselves after a
     # read or write.
     fi = io.FileInput(source_path=source_path)
-    fo = io.FileOutput(destination_path=rst_path)
+    fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     lso = language_specific_options or _lso_from_ext(source_path)
-    rst = code_to_rest_string(language_specific_options, fi.read())
+    rst = code_to_rest_string(fi.read(), language_specific_options)
     fo.write(rst)
 
 # Wrap code_to_rest by processing a string. It returns a string containing the
@@ -426,12 +428,14 @@ def code_to_html_file(
   # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
   html_path=None,
   # |lsoNone|
-  language_specific_options=None):
+  language_specific_options=None,
+  # Default encoding
+  output_encoding='utf-8'):
     #
     html_path = html_path or source_path + '.html'
     lso = language_specific_options or _lso_from_ext(source_path)
     fi = io.FileInput(source_path=source_path)
-    fo = io.FileOutput(destination_path=html_path, encoding='utf8')
+    fo = io.FileOutput(destination_path=html_path, encoding=output_encoding)
 
     html = code_to_html_string(fi.read(), lso)
 

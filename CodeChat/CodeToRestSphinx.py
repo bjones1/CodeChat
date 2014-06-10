@@ -83,7 +83,7 @@ def sphinx_builder_inited(app):
             rest_file = source_file + app.config.source_suffix
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                code_to_rest_file(lso, source_file, rest_file)
+                code_to_rest_file(source_file, rest_file, lso, app.config.html_output_encoding)
             else:
                 pass
 
