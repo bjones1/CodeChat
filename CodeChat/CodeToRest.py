@@ -303,7 +303,23 @@ def _lso_from_ext(
     lso.set_language(os.path.splitext(file_path)[1])
     return lso
 
-# Wrap code_to_rest by opening in and out files.
+# Wrap code_to_rest by processing a string. It returns a string containing the
+# resulting reST.
+def code_to_rest_string(
+  # |source_str|
+  #
+  # .. |source_str| replace:: String containing source code to process.
+  source_str,
+  # |lso|
+  language_specific_options):
+    #
+    # We don't use io.StringInput/Output here because it provides only a single
+    # read/write operation, while code_to_rest_ expects to do many.
+    output_rst = StringIO()
+    code_to_rest(StringIO(source_str), output_rst, language_specific_options)
+    return output_rst.getvalue()
+
+# Wrap code_to_rest_string by opening in and out files.
 def code_to_rest_file(
   # |source_path|
   #
@@ -337,22 +353,6 @@ def code_to_rest_file(
     lso = language_specific_options or _lso_from_ext(source_path)
     rst = code_to_rest_string(fi.read(), language_specific_options)
     fo.write(rst)
-
-# Wrap code_to_rest by processing a string. It returns a string containing the
-# resulting reST.
-def code_to_rest_string(
-  # |source_str|
-  #
-  # .. |source_str| replace:: String containing source code to process.
-  source_str,
-  # |lso|
-  language_specific_options):
-    #
-    # We don't use io.StringInput/Output here because it provides only a single
-    # read/write operation, while code_to_rest_ expects to do many.
-    output_rst = StringIO()
-    code_to_rest(StringIO(source_str), output_rst, language_specific_options)
-    return output_rst.getvalue()
 
 
 # code_to_rest_html_clean
@@ -451,5 +451,5 @@ def code_to_html_file(
 
 if __name__ == '__main__':
     # Test code
-    code_to_html_file('CodeToRestSphinx.py')
+    #code_to_html_file('CodeToRestSphinx.py')
     pass
