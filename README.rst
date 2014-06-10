@@ -5,12 +5,22 @@ Welcome to `CodeChat <https://bitbucket.org/bjones/documentation/overview>`_, a 
 
 .. contents::
 
-Getting started
-===============
-First, install `Enki <http://enki-editor.org/>`_, which hosts the CodeChat system. Next, open some source code of a supported format [#]_. In the ``Settings | Settings | CodeChat`` panel, click ``Enable`` then ``OK``. Now, any properly-formatted comments will be interpreted as ReST_. For example:
+Installation
+============
+First, `install <https://pip.pypa.io/en/latest/installing.html>`_
+`pip <https://pip.pypa.io/en/latest/index.html#>`_ if you
+don't yet have it. Then, from a command prompt, run ``pip install -U CodeChat``.
+The `-U flag <https://pip.pypa.io/en/latest/reference/pip_install.html#cmdoption-U>`_
+upgrades CodeChat to the latest version if it's already installed.
+
+Next install `Enki <http://enki-editor.org/>`_, which hosts the CodeChat system.
+
+Use
+===
+Open some source code of a supported format [#]_. In the ``Settings | Settings | CodeChat`` panel, click ``Enable`` then ``OK``. Now, any properly-formatted comments will be interpreted as ReST_. For example:
 
 +-----------------------------------------------------------+-----------------------------------------------------------+
-+ Source code                                               +                                                           +
++ Source code                                               + CodeChat results                                          +
 +===========================================================+===========================================================+
 | .. code:: c                                               | ReST_ works *here*.                                       |
 |                                                           |                                                           |
@@ -44,14 +54,19 @@ This is a fairly basic implementation; much improvement is needed! Please use th
 
 Recent changes
 ==============
-- 0.0.11a1, released 1-May-2014:
+- 0.0.12, not yet released:
+   - Fixes so that CodeChat's Sphinx extension now works.
+   - File encoding can now be specified.
+   - Installaiton instructions added and docs reworked.
+
+- 0.0.11, released 1-May-2014:
 
   - Fixed Unicode errors.
   - Removed incorrect extra spacing between code and comments.
   - Fixed unit tests and added a few more.
   - Removed unused CodeLink directive.
 
-- 0.0.10a3, released 17-Apr-2014:
+- 0.0.10, released 17-Apr-2014:
 
   - Revamped packaging.
   - Updated docs.
