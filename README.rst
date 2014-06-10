@@ -56,9 +56,9 @@ Recent changes
 ==============
 - 0.0.12, not yet released:
 
-   - Fixes so that CodeChat's Sphinx extension now works.
-   - File encoding can now be specified.
-   - Installaiton instructions added and docs reworked.
+  - Fixes so that CodeChat's Sphinx extension now works.
+  - File encoding can now be specified.
+  - Installaiton instructions added and docs reworked.
 
 - 0.0.11, released 1-May-2014:
 
