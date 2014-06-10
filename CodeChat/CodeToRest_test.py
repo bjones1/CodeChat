@@ -22,6 +22,10 @@
 # *********************************
 # This test bench exercises the CodeToRest module.
 #
+# To do:
+#
+# - Add many more tests for the significant number of untested routines.
+#
 # Imports
 # =======
 # These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.

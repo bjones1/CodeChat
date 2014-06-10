@@ -55,6 +55,7 @@ This is a fairly basic implementation; much improvement is needed! Please use th
 Recent changes
 ==============
 - 0.0.12, not yet released:
+
    - Fixes so that CodeChat's Sphinx extension now works.
    - File encoding can now be specified.
    - Installaiton instructions added and docs reworked.

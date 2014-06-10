@@ -61,8 +61,6 @@
 # * Is there any reason for me to distribute my files as a wheel? It's helpful
 #   that the Python version is clearly specified (it's not in a source
 #   distribution and I can't figure out how to do that), but that's about it.
-# * I should probably provide the source distribution in .zip and .tar.gz
-#   formats.
 # * Use this to build Linux packages.
 #
 #   * Hopefully ``setup.py bdist_rpm``. But Tarek (the `author <https://bitbucket.org/tarek/distribute/wiki/Home>`_ of distribute) says `bdist_rpm is dead <http://ziade.org/2011/03/25/bdist_rpm-is-dead-long-life-to-py2rpm/>`__, and suggests his own tool, pypi2rpm, which is `mostly inactive <https://bitbucket.org/tarek/pypi2rpm>`__.
