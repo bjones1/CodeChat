@@ -221,7 +221,7 @@ def code_to_rest(
   # |lso|
   #
   # .. |lso| replace:: An instance of `LanguageSpecificOptions
-  #    <LanguageSpecificOptions.py>` which specifies the language to use in
+  #    <LanguageSpecificOptions.py>`_ which specifies the language to use in
   #    translating the source code to reST.
   language_specific_options):
     #
@@ -317,16 +317,22 @@ def code_to_rest_file(
   # .. |lsoNone| replace:: |lso| None to determine the language based on the
   #    given source_path's extension.
   language_specific_options=None,
-  # Default encoding
+  # |input_encoding|
+  #
+  # .. |input_encoding| replace:: Encoding to use for the input file. The
+  #       default of None detects the encoding of the input file.
+  input_encoding=None,
+  # |output_encoding|
+  #
+  # .. |output_encoding| replace:: Encoding to use for the output file.
   output_encoding='utf-8'):
-    #
+
     print('Processing ' + source_path + ' to ' + rst_path)
     # Use docutil's I/O classes to better handle and sniff encodings.
-    # TODO: allow user-specified encodings.
     #
     # Note: both these classes automatically close themselves after a
     # read or write.
-    fi = io.FileInput(source_path=source_path)
+    fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     lso = language_specific_options or _lso_from_ext(source_path)
     rst = code_to_rest_string(fi.read(), language_specific_options)
@@ -401,7 +407,7 @@ def code_to_html_string(
   # A file-like object where warnings and errors will be written, or None to
   # send them to stderr.
   warning_stream=None):
-    #
+
     rest = code_to_rest_string(source_str, language_specific_options)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={
@@ -429,12 +435,14 @@ def code_to_html_file(
   html_path=None,
   # |lsoNone|
   language_specific_options=None,
-  # Default encoding
+  # |input_encoding|
+  input_encoding=None,
+  # |output_encoding|
   output_encoding='utf-8'):
-    #
+
     html_path = html_path or source_path + '.html'
     lso = language_specific_options or _lso_from_ext(source_path)
-    fi = io.FileInput(source_path=source_path)
+    fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=html_path, encoding=output_encoding)
 
     html = code_to_html_string(fi.read(), lso)
