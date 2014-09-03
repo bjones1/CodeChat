@@ -20,12 +20,12 @@
 # Note that not all possible configuration values are present in this file.
 #
 # Use the CodeChat version date in its generated documentation.
-import CodeChat.version
+import CodeChat
 #
 # General configuration
 # =====================
 # Add any `Sphinx extension module names <http://sphinx-doc.org/extensions.html>`_ here, as strings. They can be extensions coming with Sphinx (named ``sphinx.ext.*``) or your custom ones. **NOTE:** CodeChat relies on the ``CodeChat.CodeToRestSphinx`` extension; this must be present in every CodeChat project.
-extensions = ['sphinx.ext.pngmath', 'sphinx.ext.graphviz', 'CodeChat.CodeToRestSphinx']
+extensions = ['CodeChat.CodeToRestSphinx', 'sphinx.ext.graphviz']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -34,16 +34,16 @@ source_suffix = '.rst'
 ##source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'contents'
+master_doc = 'index'
 
 # General information about the project.
 project = u'CodeChat'
-copyright = u'2013, Bryan A. Jones'
+copyright = u'2014, Bryan A. Jones'
 
 # The version info for the project you're documenting, which acts as replacement for |version| and |release|, and is also used in various other places throughout the built documents.
 #
 # The short X.Y version.
-version = CodeChat.version.PROGRAM_DATE
+version = CodeChat.__version__
 # The full version, including alpha/beta/rc tags. For simplicity, use the same string.
 release = version
 

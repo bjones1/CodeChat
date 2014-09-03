@@ -220,8 +220,8 @@ def code_to_rest(
   out_file,
   # |lso|
   #
-  # .. |lso| replace:: An instance of `LanguageSpecificOptions
-  #    <LanguageSpecificOptions.py>`_ which specifies the language to use in
+  # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
+  #    <LanguageSpecificOptions.py>` which specifies the language to use in
   #    translating the source code to reST.
   language_specific_options):
     #
@@ -330,7 +330,7 @@ def code_to_rest_file(
   rst_path,
   # |lsoNone|
   #
-  # .. |lsoNone| replace:: |lso| None to determine the language based on the
+  # .. |lsoNone| replace:: None to determine the language based on the
   #    given source_path's extension.
   language_specific_options=None,
   # |input_encoding|
