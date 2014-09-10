@@ -40,7 +40,7 @@ master_doc = 'index'
 project = u'CodeChat'
 copyright = u'2014, Bryan A. Jones'
 
-# The version info for the project you're documenting, which acts as replacement for |version| and |release|, and is also used in various other places throughout the built documents.
+# The version info for the project you're documenting, which acts as replacement for ``|version|`` and ``|release|``, and is also used in various other places throughout the built documents.
 #
 # The short X.Y version.
 version = CodeChat.__version__
