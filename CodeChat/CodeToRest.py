@@ -47,7 +47,8 @@ import os.path
 # -------------------
 # Used to open files with unknown encodings and to run docutils itself.
 from docutils import io, core
-# For the docutils default stylesheet.
+# For the docutils default stylesheet and template
+import docutils.writers.html4css1
 from docutils.writers.html4css1 import Writer
 #
 # Local application imports
@@ -412,11 +413,15 @@ def code_to_html_string(
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={
         # Include our custom css file: provide the path to the default css and
-        # then to our css. Omitting the Write.default_stylesheet means it
-        # won't be place in the output!
+        # then to our css. The stylesheet dirs must include docutils defaults.
+        # However, Write.default_stylesheet_dirs doesn't work when frozen,
+        # because (I think) it relies on a relative path wihch the frozen
+        # environment doesn't have. So, rebuild that path manually.
         'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
-        'stylesheet_dirs': Writer.default_stylesheet_dirs +
-                           [os.path.join(os.path.dirname(__file__), 'template')],
+        'stylesheet_dirs': ['.', os.path.dirname(docutils.writers.html4css1.__file__),
+                           os.path.join(os.path.dirname(__file__), 'template')],
+        # The default template uses a relative path, which doesn't work when frozen ???.
+        'template': os.path.join(os.path.dirname(docutils.writers.html4css1.__file__), Writer.default_template),
         # Make sure to use Unicode everywhere.
         'output_encoding': 'unicode',
         'input_encoding' : 'unicode',
