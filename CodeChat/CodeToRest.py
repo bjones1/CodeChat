@@ -344,7 +344,8 @@ def code_to_rest_file(
   # .. |output_encoding| replace:: Encoding to use for the output file.
   output_encoding='utf-8'):
 
-    print('Processing ' + source_path + ' to ' + rst_path)
+    print('Processing ' + os.path.basename(source_path) + ' to ' +
+          os.path.basename(rst_path))
     # Use docutil's I/O classes to better handle and sniff encodings.
     #
     # Note: both these classes automatically close themselves after a
