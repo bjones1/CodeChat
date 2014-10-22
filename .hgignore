@@ -11,6 +11,7 @@
 syntax: glob
 # Python compiled files
 *.pyc
+*.pyo
 
 # CodeChat-generated files
 *.py.rst
