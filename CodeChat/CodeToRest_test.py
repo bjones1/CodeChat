@@ -32,8 +32,8 @@
 #
 # Local application imports
 # -------------------------
-from CodeToRest import code_to_rest_string, code_to_rest_html_clean
-from LanguageSpecificOptions import LanguageSpecificOptions
+from .CodeToRest import code_to_rest_string, code_to_rest_html_clean
+from .LanguageSpecificOptions import LanguageSpecificOptions
 
 # This acutally tests using code_to_rest_string, since that makes code_to_rest
 # easy to call.

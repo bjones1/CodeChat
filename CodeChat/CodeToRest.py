@@ -53,7 +53,7 @@ from docutils.writers.html4css1 import Writer
 #
 # Local application imports
 # -------------------------
-from LanguageSpecificOptions import LanguageSpecificOptions
+from .LanguageSpecificOptions import LanguageSpecificOptions
 
 # code_to_rest
 # ============

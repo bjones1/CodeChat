@@ -77,9 +77,13 @@
 #
 # To package
 # ==========
-# * Create a source distribution, a built distribution, then upload both:
+# Create a source distribution, a built distribution, then upload both:
 #
 #   ``python setup.py sdist bdist_wheel upload``
+#
+# For `development <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_
+#
+#  ``python setup.py develop``
 #
 # Packaging script
 # ================

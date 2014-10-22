@@ -43,8 +43,8 @@ from sphinx.util import get_matching_docs
 
 # Local application imports
 # -------------------------
-from LanguageSpecificOptions import LanguageSpecificOptions
-from CodeToRest import code_to_rest_file, code_to_rest_html_clean
+from .LanguageSpecificOptions import LanguageSpecificOptions
+from .CodeToRest import code_to_rest_file, code_to_rest_html_clean
 
 # CodeToRest extension
 # ====================
@@ -59,15 +59,16 @@ from CodeToRest import code_to_rest_file, code_to_rest_html_clean
 # This function searches for source code and transforms it to reST before Sphinx
 # searches for reST source.
 def sphinx_builder_inited(app):
-    # Look for every extension of every supported langauge
+    # Look for every extension of every supported langauge.
     lso = LanguageSpecificOptions()
     for source_suffix in lso.extension_to_options.keys():
-        # Choose the current language to process any file in
+        # Choose the current language to process any file in.
         lso.set_language(source_suffix)
         # Find all source files with the given extension. This was copied almost
-        # verabtim from sphinx.environment.BuildEnvironment.find_files.
+        # verabtim from ``sphinx.environment.BuildEnvironment.find_files``.
         matchers = compile_matchers(
             app.config.exclude_patterns[:] +
+            app.config.html_extra_path +
             app.config.exclude_trees +
             [d + app.config.source_suffix for d in app.config.unused_docs] +
             ['**/' + d for d in app.config.exclude_dirnames] +
@@ -75,12 +76,13 @@ def sphinx_builder_inited(app):
         )
         docs = set(get_matching_docs(
             app.srcdir, source_suffix, exclude_matchers = matchers))
+
         # This can return an empty filename; remove it.
         docs -= set([''])
-        # Now, translate any old or missing files
+        # Now, translate any old or missing files.
         for source_file_noext in docs:
-            source_file = source_file_noext + source_suffix
-            rest_file = source_file + app.config.source_suffix
+            source_file = os.path.join(app.env.srcdir, source_file_noext + source_suffix)
+            rest_file = os.path.join(app.env.srcdir, source_file + app.config.source_suffix)
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
                 code_to_rest_file(source_file, rest_file, lso, app.config.html_output_encoding)
