@@ -155,7 +155,7 @@ setup(name='CodeChat',
                    'Topic :: Software Development :: Documentation',
                    'Topic :: Text Processing :: Markup',
                   ],
-      install_requires=['docutils >= 0.12', ],
+      install_requires=['docutils >= 0.11', ],
       packages = ['CodeChat'],
       # To package data files, I'm using ``include_package_data = True`` then putting
       # the files in MANIFEST.in (see

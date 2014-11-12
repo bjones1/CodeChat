@@ -18,3 +18,4 @@
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
 include CodeChat/LICENSE.html
+include CodeChat/template/*
