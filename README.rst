@@ -34,7 +34,15 @@ Open some source code of a supported format [#]_. In the ``Settings | Settings |
 
 Sphinx_
 -------
-"Sphinx is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features, including the ability to link together many documents (such as all the files in a program's source code). Enki_ will soon support Sphinx.
+"Sphinx is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features, including the ability to link together many documents (such as all the files in a program's source code). To use Sphinx with Enki_:
+
+#. Go to ``Settings | Settings | CodeChat`` and enable Sphinx and CodeChat.
+
+#. Choose a project directory, which contains source code to document.
+
+#. Click OK. Then, open a source file in the project directory you select.
+
+#. Open the Preview pane, where the source code will be displayed.
 
 .. [#] Currently, only single-line comments in C/C++, Python, reST, assembly (.s), BASH scripts, PHP, MATLAB scripts, DOS batch (.bat) files, .ini, and .iss files are supported.
 .. [#] http://sphinx-doc.org/index.html
@@ -54,7 +62,12 @@ This is a fairly basic implementation; much improvement is needed! Please use th
 
 Recent changes
 ==============
-- 0.0.12, not yet released:
+- 0.0.16 - 0.0.13, 11-Nov-2014:
+
+  - Improved Sphinx template: doesn't replace default.css.
+  - Updated CSS to work better with docutils.
+
+- 0.0.12, released 1-Sep-2014:
 
   - Fixes so that CodeChat's Sphinx extension now works.
   - File encoding can now be specified.

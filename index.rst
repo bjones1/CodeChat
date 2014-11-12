@@ -1,4 +1,4 @@
-.. Copyright (C) 2012-2013 Bryan A. Jones.
+.. Copyright (C) 2012-2014 Bryan A. Jones.
 
    This file is part of CodeChat.
 
@@ -62,7 +62,7 @@ Installation
 
    setup.py
 
-.. Hidden items (source code from external sites,
+.. Hidden items (source code from external sites).
 
 .. toctree::
    :hidden:
