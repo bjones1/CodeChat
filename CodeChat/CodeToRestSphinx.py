@@ -66,9 +66,16 @@ def sphinx_builder_inited(app):
         lso.set_language(source_suffix)
         # Find all source files with the given extension. This was copied almost
         # verabtim from ``sphinx.environment.BuildEnvironment.find_files``.
+        #
+        # `html_extra_path <http://sphinx-doc.org/config.html#build-config>`_
+        # was added in Sphinx 1.2. Support earlier versions as well.
+        try:
+            ep = app.config.html_extra_path
+        except:
+            ep = ''
         matchers = compile_matchers(
             app.config.exclude_patterns[:] +
-            app.config.html_extra_path +
+            ep +
             app.config.exclude_trees +
             [d + app.config.source_suffix for d in app.config.unused_docs] +
             ['**/' + d for d in app.config.exclude_dirnames] +
