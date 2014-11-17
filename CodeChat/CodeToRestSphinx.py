@@ -72,7 +72,7 @@ def sphinx_builder_inited(app):
         try:
             ep = app.config.html_extra_path
         except:
-            ep = ''
+            ep = []
         matchers = compile_matchers(
             app.config.exclude_patterns[:] +
             ep +
