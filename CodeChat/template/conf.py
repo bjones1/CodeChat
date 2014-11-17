@@ -10,9 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *************************************************************************************
-# template/conf_codechat.py - Template configuration file for a Sphinx CodeChat project
-# *************************************************************************************
+# ****************************************************************************
+# template/conf.py - Template configuration file for a Sphinx CodeChat project
+# ****************************************************************************
 # This file configures Sphinx, which transforms restructured text (reST) into
 # html. See Sphinx `build configuration file docs <http://sphinx-doc.org/config.html>`_
 # for more information on the settings below.
@@ -241,6 +241,15 @@ html_show_sourcelink = False
 ##html_use_opensearch = ''
 
 # `html_file_suffix <http://sphinx-doc.org/config.html#confval-html_file_suffix>`_:
-# This is the file name suffix for HTML files (e.g. ".xhtml"). **CodeChat
-# note:** do no change; CodeChat assumes a ``.html`` extension.
+# This is the file name suffix for HTML files (e.g. ".xhtml").
 ##html_file_suffix = None
+# **CodeChat note:** `Enki <http://enki-editor.org/>`_, which hosts CodeChat,
+# needs to know this value. So, save it toa file for Enki to read.
+import codecs
+try:
+    with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
+        f.write(html_file_suffix)
+except NameError, TypeError:
+    # If html_file_suffix isn't defined (NameError) or is None (TypeError), Enki
+    # will assume ``.html.``.
+    pass
