@@ -62,30 +62,38 @@ This is a fairly basic implementation; much improvement is needed! Please use th
 
 Recent changes
 ==============
+- Development version:
+   - Remove unused PyQt dependencies.
+   - Modernize documentation style in ``LanguageSpecificOptions.py``.
+
+- 0.0.17, 17-Nov-2014:
+   - Support Sphinx versions before 1.2.
+   - Move non-CodeChat templates to Enki.
+
 - 0.0.16 - 0.0.13, 11-Nov-2014:
 
-  - Improved Sphinx template: doesn't replace default.css.
-  - Updated CSS to work better with docutils.
+   - Improved Sphinx template: doesn't replace default.css.
+   - Updated CSS to work better with docutils.
 
 - 0.0.12, released 1-Sep-2014:
 
-  - Fixes so that CodeChat's Sphinx extension now works.
-  - File encoding can now be specified.
-  - Installaiton instructions added and docs reworked.
+   - Fixes so that CodeChat's Sphinx extension now works.
+   - File encoding can now be specified.
+   - Installaiton instructions added and docs reworked.
 
 - 0.0.11, released 1-May-2014:
 
-  - Fixed Unicode errors.
-  - Removed incorrect extra spacing between code and comments.
-  - Fixed unit tests and added a few more.
-  - Removed unused CodeLink directive.
+   - Fixed Unicode errors.
+   - Removed incorrect extra spacing between code and comments.
+   - Fixed unit tests and added a few more.
+   - Removed unused CodeLink directive.
 
 - 0.0.10, released 17-Apr-2014:
 
-  - Revamped packaging.
-  - Updated docs.
-  - Used ``..`` instead of marker to indent comments, producing cleaner ReST.
-  - Split ``CodeToRest`` into ``CodeToRest``, ``CodeToRestSphinx`` modules.
+   - Revamped packaging.
+   - Updated docs.
+   - Used ``..`` instead of marker to indent comments, producing cleaner ReST.
+   - Split ``CodeToRest`` into ``CodeToRest``, ``CodeToRestSphinx`` modules.
 
 License
 =======
