@@ -26,7 +26,7 @@
 # Give the version number, which is read by :doc:`../setup.py` during packaging.
 # This is chosen following the `version convention
 # <http://packaging.python.org/en/latest/tutorial.html#version>`_.
-__version__ = '0.0.17'
+__version__ = '0.0.18'
 
 # Import all the non-test modules in this package.
 from . import CodeToRest, CodeToRestSphinx, LanguageSpecificOptions
