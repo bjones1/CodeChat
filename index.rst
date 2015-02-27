@@ -1,4 +1,4 @@
-.. Copyright (C) 2012-2014 Bryan A. Jones.
+.. Copyright (C) 2012-2015 Bryan A. Jones.
 
    This file is part of CodeChat.
 
@@ -21,8 +21,6 @@ User documentation
    :maxdepth: 2
 
    README
-   CodeChat/template/index
-   CodeChat/template/conf_codechat.py
    CodeChat/template/conf.py
 
 
@@ -61,13 +59,6 @@ Installation
    :maxdepth: 2
 
    setup.py
-
-.. Hidden items (source code from external sites).
-
-.. toctree::
-   :hidden:
-
-   ez_setup.py
 
 ################
 Index and search

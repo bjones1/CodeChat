@@ -135,8 +135,11 @@ exclude_patterns = [
                     # Ignore setup.py output.
                     'build',
                     'dist',
+                    'CodeChat.egg-info',
                     # Ignore Sphinx output.
                     '_build',
+                    # Ignore file from external web site.
+                    'ez_setup.py',
                     ]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
