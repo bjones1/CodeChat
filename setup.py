@@ -1,6 +1,6 @@
 # .. -*- coding: utf-8 -*-
 #
-#    Copyright (C) 2012-2014 Bryan A. Jones.
+#    Copyright (C) 2012-2015 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -27,10 +27,10 @@
 # Packaging on Python is a mess, IMHO. It takes an easy job and makes it hard.
 #
 # A quick summary: distutils_ can't
-# install dependencies from PyPi_, so use setuptools_. A source distribution is a
-# good idea becaues it can run on a bare Python installation with no other
-# installs required, but there's no standard format (.zip?, .tar.gz?, etc.). An .egg is
-# nice, but requires setuptools/pip/ez_setup installed. The .whl
+# install dependencies from PyPi_, so use setuptools_. A source distribution is
+# a good idea becaues it can run on a bare Python installation with no other
+# installs required, but there's no standard format (.zip?, .tar.gz?, etc.). An
+# .egg is nice, but requires setuptools/pip/ez_setup installed. The .whl
 # (`Python wheel <http://wheel.readthedocs.org/en/latest/>`_)
 # is the latest and greatest format that superceeds eggs, but with similar
 # problems (requires wheel to be installed).
@@ -56,24 +56,8 @@
 #
 # Questions / to do
 # =================
-# * Build the docs and post them on the web. See
-#   http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi.
-# * Is there any reason for me to distribute my files as a wheel? It's helpful
-#   that the Python version is clearly specified (it's not in a source
-#   distribution and I can't figure out how to do that), but that's about it.
-# * Use this to build Linux packages.
-#
-#   * Hopefully ``setup.py bdist_rpm``. But Tarek (the `author <https://bitbucket.org/tarek/distribute/wiki/Home>`_ of distribute) says `bdist_rpm is dead <http://ziade.org/2011/03/25/bdist_rpm-is-dead-long-life-to-py2rpm/>`__, and suggests his own tool, pypi2rpm, which is `mostly inactive <https://bitbucket.org/tarek/pypi2rpm>`__.
-#   * Maybe `stdeb <https://pypi.python.org/pypi/stdeb>`_, but this is also mostly inactive.
-#   * There's `up-to-date docs <https://wiki.debian.org/Python/LibraryStyleGuide>`__ on Debian Python builds that doesn't seem too painful.
-#   * The `openSUSE packing python page <https://en.opensuse.org/openSUSE:Packaging_Python>`_ is up to date, and suggests using `py2pack <https://pypi.python.org/pypi/py2pack>`_, another recently-updated tool.
-#
-#   Based on the above discussion, my ideas:
-#
-#   * Host all my builds on OBS, and create a cross-platform build there.
-#   * Use py2pack to generate an openSUSE package, then manually edit as necessary to get it building with Fedora.
-#   * Use stdeb to generate the Debian package, then hand-edit per the Debian docs.
-# * Add a `setup.cfg <https://docs.python.org/2/distutils/configfile.html>`_ with defaults.
+# * Add a `setup.cfg <https://docs.python.org/2/distutils/configfile.html>`_
+#   with defaults.
 #
 # To package
 # ==========
@@ -81,84 +65,102 @@
 #
 #   ``python setup.py sdist bdist_wheel upload``
 #
-# For `development <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_
+# To `upload docs <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
+# which are placed `here <http://pythonhosted.org/CodeChat/>`__
+# (make sure to run Sphinx first, so the docs will be current):
+#
+#    ``python setup.py upload_docs --upload-dir=_build\html``
+#
+# For `development <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
 #  ``python setup.py develop``
 #
+# Yajo has `packaged this for Linux <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
+# Thanks so much.
+#
 # Packaging script
 # ================
-# Otherwise known as the evils of setup.py.
+# Otherwise known as the evils of ``setup.py``.
 #
 # For users who install this from source but don't have setuptools installed,
-# `auto-install it <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__.
+# `auto-install it <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__. When packing for Linux, downloads are blocked so we must specify
+# a very old already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
+# Leave this as a `patch <https://build.opensuse.org/package/view_file/home:yajo:enki/python-codechat/python-codechat.offline_setuptools.patch?expand=1>`_
+# so that we normally uses a more modern version.
 import ez_setup
 ez_setup.use_setuptools()
 
-from setuptools import setup
+# For version number.
+import CodeChat
 
 # PyPA copied code
 # ----------------
-# From https://github.com/pypa/sampleproject/blob/master/setup.py, find a
-# built-in version number and read ``long_description`` from a file.
-import codecs
-import os
-import re
+# From `PyPA's sample setup.py <https://github.com/pypa/sampleproject/blob/master/setup.py>`__,
+# read ``long_description`` from a file. This code was last updated on
+# 21-Feb-2015 based on `this head <https://github.com/pypa/sampleproject/commit/3df8e577d7926051c364af1c8772c7ff3f97a396>`_.
+from setuptools import setup, find_packages  # Always prefer setuptools over distutils
+from codecs import open  # To use a consistent encoding
+from os import path
 
-here = os.path.abspath(os.path.dirname(__file__))
-
-# Read the version number from a source file.
-# Why read it, and not import?
-# see https://groups.google.com/d/topic/pypa-dev/0PkjVpcxTzQ/discussion
-def find_version(*file_paths):
-    # Open in Latin-1 so that we avoid encoding errors.
-    # Use codecs.open for Python 2 compatibility
-    with codecs.open(os.path.join(here, *file_paths), 'r', 'latin1') as f:
-        version_file = f.read()
-
-    # The version line must have the form
-    # __version__ = 'ver'
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
+here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
-with codecs.open('README.rst', encoding='utf-8') as f:
+with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     readme_text = f.read()
     # We just want text up to the contents, so exclude the rest. Side note:
-    # README.rst uses DOS newlines (\\r\\n), but
-    # codecs (unlike Python's plain open)
-    # does not translate DOS line endings to Unix. These are preserved;
-    # see second note under
-    # ``codecs.open`` in the `docs <https://docs.python.org/2/library/codecs.html>`__.
+    # README.rst uses DOS newlines (\\r\\n), but codecs (unlike Python's plain
+    # open) does not translate DOS line endings to Unix. These are preserved;
+    # see second note under ``codecs.open`` in the `docs <https://docs.python.org/2/library/codecs.html>`__.
     # Hence, search for the contents tag, not newlines.
-    ##print(readme_text)
     long_description = readme_text[:readme_text.index('.. contents::')]
-    ##print(long_description)
 
 # My code
 # -------
-setup(name='CodeChat',
-      version=find_version('CodeChat', '__init__.py'),
-      description="The CodeChat system for software documentation",
-      long_description=long_description,
-      author="Bryan A. Jones",
-      author_email="bjones AT ece.msstate.edu",
-      url='https://bitbucket.org/bjones/documentation/overview',
-      classifiers=['Development Status :: 3 - Alpha',
-                   'Intended Audience :: Developers',
-                   'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-                   'Operating System :: OS Independent',
-                   'Natural Language :: English',
-                   'Programming Language :: Python',
-                   'Topic :: Software Development :: Documentation',
-                   'Topic :: Text Processing :: Markup',
-                  ],
-      install_requires=['docutils >= 0.12', ],
-      packages = ['CodeChat'],
-      # To package data files, I'm using ``include_package_data = True`` then putting
-      # the files in MANIFEST.in (see
-      # http://pythonhosted.org/setuptools/setuptools.html#including-data-files).
-      include_package_data = True,
-      )
+setup(
+    # This must comply with `PEP 0426 <http://legacy.python.org/dev/peps/pep-0426/#name>`_'s
+    # name requirements.
+    name='CodeChat',
+
+    # Projects should comply with the `version scheme <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
+    # specified in PEP440. I use this so that my Sphinx  docs will have the same
+    # version number. There are a lot of alternatives in `Single-sourcing the
+    # Project Version <https://packaging.python.org/en/latest/single_source_version.html>`_.
+    # I picked this because it seems simple and matches my Sphinx code.
+    version=CodeChat.__version__,
+
+    description="The CodeChat system for software documentation",
+    long_description=long_description,
+
+    # The project's main homepage.
+    url='https://bitbucket.org/bjones/documentation/overview',
+
+    # Obscure my e-mail address to help defeat spam-bots.
+    author="Bryan A. Jones",
+    author_email="bjones AT ece.msstate.edu",
+
+    license='GPLv3+',
+
+    # These are taken from the `full list <https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_.
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Operating System :: OS Independent',
+        'Natural Language :: English',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Software Development :: Documentation',
+        'Topic :: Text Processing :: Markup',
+    ],
+
+    keywords='literate programming',
+
+    packages = ['CodeChat'],
+
+    # This will be installed by pip when this project is installed. For more on
+    # using “install_requires” see `install_requires vs Requirements files <https://packaging.python.org/en/latest/requirements.html>`_.
+    install_requires=['docutils>=0.12'],
+
+    # To package data files, I'm using ``include_package_data = True`` then
+    # putting the files in ``MANIFEST.in``. See `including data files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
+    include_package_data = True,
+)
