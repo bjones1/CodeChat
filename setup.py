@@ -106,13 +106,7 @@ here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    readme_text = f.read()
-    # We just want text up to the contents, so exclude the rest. Side note:
-    # README.rst uses DOS newlines (\\r\\n), but codecs (unlike Python's plain
-    # open) does not translate DOS line endings to Unix. These are preserved;
-    # see second note under ``codecs.open`` in the `docs <https://docs.python.org/2/library/codecs.html>`__.
-    # Hence, search for the contents tag, not newlines.
-    long_description = readme_text[:readme_text.index('.. contents::')]
+    long_description = f.read()
 
 # My code
 # -------
