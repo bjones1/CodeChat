@@ -1,6 +1,6 @@
 # .. -*- coding: utf-8 -*-
 #
-#    Copyright (C) 2012-2014 Bryan A. Jones.
+#    Copyright (C) 2012-2015 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -26,7 +26,7 @@
 # Give the version number, which is read by :doc:`../setup.py` during packaging.
 # This is chosen following the `version convention
 # <http://packaging.python.org/en/latest/tutorial.html#version>`_.
-__version__ = '0.0.18'
+__version__ = '0.0.19a1'
 
 # Import all the non-test modules in this package.
 from . import CodeToRest, CodeToRestSphinx, LanguageSpecificOptions

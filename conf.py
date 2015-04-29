@@ -132,6 +132,8 @@ master_doc = 'index'
 # default, Enki will instruct Sphinx to place all Sphinx output in ``_build``;
 # this directory should therefore be excluded from the list of source files.
 exclude_patterns = [
+                    # Ignore Mercurial repo.
+                    '.hg',
                     # Ignore setup.py output.
                     'build',
                     'dist',
@@ -160,7 +162,7 @@ keep_warnings = True
 # theme to use for HTML and HTML Help pages.  **CodeChat note:** Only the
 # ``default`` theme has been tested to work with CodeChat. Others may or may
 # not work correctly.
-html_theme = 'default'
+html_theme = 'alabaster'
 
 # `html_theme_options <http://sphinx-doc.org/config.html#confval-html_theme_options>`_:
 # Theme options are theme-specific and customize the look and feel of a theme
