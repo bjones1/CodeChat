@@ -20,7 +20,9 @@
 # *********************************
 # CodeToRest_test.py - Unit testing
 # *********************************
-# This test bench exercises the CodeToRest module.
+# This test bench exercises the CodeToRest module. To run, execute ``py.test``
+# from the command line. Note the period in this command -- ``pytest`` does
+# **NOT** work (it is a completely different program).
 #
 # To do:
 #
