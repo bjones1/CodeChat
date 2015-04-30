@@ -1,6 +1,6 @@
 # .. -*- coding: utf-8 -*-
 #
-#    Copyright (C) 2012-2013 Bryan A. Jones.
+#    Copyright (C) 2012-2015 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #

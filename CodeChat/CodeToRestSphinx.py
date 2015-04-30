@@ -1,6 +1,6 @@
 # .. -*- coding: utf-8 -*-
 #
-#    Copyright (C) 2012-2013 Bryan A. Jones.
+#    Copyright (C) 2012-2015 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -64,9 +64,9 @@ def sphinx_builder_inited(app):
     for source_suffix in lso.extension_to_options.keys():
         # Choose the current language to process any file in.
         lso.set_language(source_suffix)
-        
+
         # This part of the code has turned into a giant hack, trying to deal
-        # with various versions of Sphinx. For now, leave it and gradually 
+        # with various versions of Sphinx. For now, leave it and gradually
         # remove portions as support for older Sphinx versions fades.
         #
         # Find all source files with the given extension. This was copied almost
@@ -92,7 +92,7 @@ def sphinx_builder_inited(app):
             gmd_source_suffix = source_suffix
         except:
             et = []
-            # Per the documentation on `templates_path 
+            # Per the documentation on `templates_path
             # <http://sphinx-doc.org/config.html#confval-templates_path>`_, this
             # value is added to the list of excludes starting in v 1.3. Put it
             # here, which isn't executed for pre-1.3 Sphinx.
@@ -104,7 +104,7 @@ def sphinx_builder_inited(app):
             # The v1.3 source expects ``source_suffix`` to be a list.
             gmd_source_suffix = [source_suffix]
 
-        # Build a list of file patterns to exclude, then gather docs that should 
+        # Build a list of file patterns to exclude, then gather docs that should
         # be processed after applying these excludes.
         matchers = compile_matchers(
             app.config.exclude_patterns[:] +
@@ -119,7 +119,7 @@ def sphinx_builder_inited(app):
             app.srcdir, gmd_source_suffix, exclude_matchers=matchers))
         # ``get_matching_docs`` can return an empty filename; remove it.
         docs -= set([''])
-        
+
         # Now, translate any old or missing files.
         for source_file_noext in docs:
             source_file = os.path.join(app.env.srcdir, source_file_noext +
