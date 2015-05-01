@@ -45,6 +45,7 @@ from sphinx.util import get_matching_docs
 # -------------------------
 from .LanguageSpecificOptions import LanguageSpecificOptions
 from .CodeToRest import code_to_rest_file, code_to_rest_html_clean
+from . import __version__
 
 # CodeToRest extension
 # ====================
@@ -159,9 +160,13 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
 
 # Sphinx hooks
 # ============
-# This routine defines the entry point called by Sphinx to initialize this
-# extension, per http://sphinx.pocoo.org/ext/appapi.htm.
+# This routine defines the `entry point
+# <http://sphinx-doc.org/extdev/appapi.html>`_ called by Sphinx to initialize
+# this extension.
 def setup(app):
     # See sphinx_source_read() for more info.
     app.connect('html-page-context', sphinx_html_page_context)
     app.connect('builder-inited', sphinx_builder_inited)
+    # Return `extension metadata <http://sphinx-doc.org/extdev/index.html>`_.
+    return {'version' : __version__,
+            'parallel_read_safe' : True }
