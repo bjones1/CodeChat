@@ -21,6 +21,7 @@ User documentation
    :maxdepth: 2
 
    README
+   style_guide.py
    CodeChat/template/conf.py
 
 

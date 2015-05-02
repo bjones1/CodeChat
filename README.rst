@@ -90,104 +90,14 @@ Reference
 =========
 * For basic reST syntax, see the `reST primer`_.
 * For additional Sphinx-specific commands, refer to `markup constructs`_.
-* For examples of literate programming in use, see below.
 
-Style guide
------------
-In using CodeChat with Sphinx, I've developed a set of guidelines to make my code more consistent and readable:
-
-* Carefully organize your code using sections. Based on Sphinx recommendations for `sections <http://sphinx-doc.org/rest.html#sections>`_, use:
-
-  * In a toc-containing document use # with overline, for parts.
-  * In each source file, use a single * with overline near the top of the file, giving the name of the file and a very brief description.
-  * In a source file, use multiple =, for sections. Then, repeat for finer-grained items, as shown below.
-  * Use - for subsections.
-  * Use ^ for subsubsections.
-  * Use " for subsubsubsections.
-
-* Rather than leaving blank lines between code and a section, place empty comments. This makes the resulting HTML look better by suppressing an unnecessary newline. Specifically:
-
-   +-----------------+-----------------+
-   | Do              | Do not          |
-   +=================+=================+
-   | .. code::       | .. code::       |
-   |                 |                 |
-   |    void foo() { |    void foo() { |
-   |    }            |    }            |
-   |    //           |                 |
-   |    // Section   |    // Section   |
-   |    // =======   |    // =======   |
-   +-----------------+-----------------+
-
-* Headings must be placed on the far left of a file, even if it doesn't following the indentation of the source.
-
-   +-----------------+---------------------+
-   | Do              | Do not              |
-   +===============+=+=====================+
-   | .. code::       | .. code::           |
-   |                 |                     |
-   |    void foo() { |    void foo() {     |
-   |    // Variables |        // Variables |
-   |    // --------- |        // --------- |
-   |        int i;   |        int i;       |
-   |    }            |    }                |
-   +-----------------+---------------------+
-
-* Document functions, classes, parameters, etc. on the preeceding line.
-
-  .. code::
-
-     // Compute the number of bananas needed to provide a balanced diet.
-     //
-     // Return value: Amount of bananas, in pounds, needed.
-     float banans_for_balanced_diet(
-       // Amount of apples available, in pounds.
-       float f_apples,
-       // Amount of oranges available, in pounds.
-       float f_orangs) {
-
-         // Per `myPlate <http://www.choosemyplate.gov/food-groups/fruits-amount.pdf>`_,
-         // the following calculations determine the needed mass of bananas.
-         /// ...Code omitted...
-      }
-
-* Insert a per-source file table of contents (such as the one at the beginning of this file) to provide a quick overview of the file's structure.
-
-* Avoid long lines; wrap your lines at 80 characters. Many editors aren't configured to wrap lines nicely, or can't do it well. They certainly won't wrap bulleted lists, indentation, etc. well. Make sure your code is readable in a plain text editor or IDE, not only when viewed using CodeChat. For example:
-
-  * This will look a lot better and read more easily in most text editors when
-    it is wrapped nicely.
-
-* `Avoid tabs <http://tarantsov.com/hackers-coding-style-guide/why-tabs-should-be-avoided.html>`_. They make the resulting HTML less predictable. A tab after the inital comment character(s) won't be recognized as a reST-formatted comment.
-
-* Use in-line `hyperlinks <http://sphinx-doc.org/rest.html#external-links>`_ (as in the document), rather than separating the links and its definition. Include hyperlinks to essential information you find while searching the web: that magic post from stackoverflow that solved (or promised to and didn't) your problem. Link to a reference manual when calling from a documented API. Link to other parts of your code that cooperate with the lines you're documenting.
-
-* When commenting code out, use ``///`` (C, C++ -- although ``#if 0`` / ``#endif`` is better), ``##`` in Python, etc. Use similar structure to get a monospaced font when necessary. For example:
-
-  .. code::
-
-     # Don't do this now, still debugging.
-     ##os.exit(0)
-
-     ##        Max  Prefix   Hit ratio
-     dump_objs(23,  'test_', 3.05)
-
-* Use directives, such as `note <http://docutils.sourceforge.net/docs/ref/rst/directives.html#note>`_, to place highly visible reminders in your code.
-
-  .. note::
-
-     Need to work on this..
-
-* Create diagrams, such as state diagrams, flow charts, etc. by `embedding Graphviz statements <http://sphinx-doc.org/ext/graphviz.html>`_ in your source code. It's painful to get started, but changing them as the code changes is a snap.
-
-* Embed `figures <http://sphinx-doc.org/rest.html#images>`_ to better explain your program. For example, use external drawing programs to produce diagrams. Take a screenshot of a GUI or some graphical result from your code. Scan and mark up a datasheet, showing what choices you made in your code. Take a picture of your code in use -- GPS nagivation on a smart phone, etc.
-
-* Avoid the use of `Sphinx domains <http://sphinx-doc.org/domains.html>`_. They're helpful when writing a separate document which describes code; literate programming intermingles code and documentation to produce an executable document, making it much easier to keep the content updated and relevant.
+.. _examples:
 
 Examples
 --------
 Some examples of literate programming using CodeChat:
 
+* The `style guide <style_guide.py.html>`_ for literate programming. Read this first.
 * `CodeChat itself <https://pythonhosted.org/CodeChat/>`_:
 
   * Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#preserving-empty-lines-of-code>`_.
