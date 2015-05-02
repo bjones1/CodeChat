@@ -1,3 +1,7 @@
+.. note::
+
+   **IMPORTANT:** If the hyperlinks in this document don't work, view it at its `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket page, for example, only renders this file, but not the links.
+
 *****************************
 A programmer's word processor
 *****************************
