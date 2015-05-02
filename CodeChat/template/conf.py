@@ -146,10 +146,8 @@ keep_warnings = True
 # `Options for HTML output <http://sphinx-doc.org/config.html#options-for-html-output>`_
 # --------------------------------------------------------------------------------------
 # `html_theme <http://sphinx-doc.org/config.html#confval-html_theme>`_: The
-# theme to use for HTML and HTML Help pages.  **CodeChat note:** Only the
-# ``default`` theme has been tested to work with CodeChat. Others may or may
-# not work correctly.
-html_theme = 'default'
+# theme to use for HTML and HTML Help pages.
+##html_theme = 'default'
 
 # `html_theme_options <http://sphinx-doc.org/config.html#confval-html_theme_options>`_:
 # Theme options are theme-specific and customize the look and feel of a theme
