@@ -149,13 +149,6 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
     if 'body' in context.keys():
         s = context['body']
         s = code_to_rest_html_clean(s)
-
-        if hasattr(env, "codelinks"):
-            for codelink in env.codelinks:
-                print(codelink)
-                s = re.sub('<span class="n">' + codelink['search'] + '</span>',
-                           '<span class="n"><a href="' + codelink['replace'] +
-                             '">' +  codelink['search'] + '</a></span>', s)
         context['body'] = s
 
 # Sphinx hooks
@@ -165,11 +158,11 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
 # this extension.
 def setup(app):
     # Translate source files to .rst files before Sphinx looks for them after
-    # the `builder-inited 
+    # the `builder-inited
     # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_ even is
     # emitted.
     app.connect('builder-inited', sphinx_builder_inited)
-    # Add an `html-page-context 
+    # Add an `html-page-context
     # <http://sphinx-doc.org/extdev/appapi.html#event-html-page-context>`_ hook
     # to clean up the generated HTML.
     app.connect('html-page-context', sphinx_html_page_context)
