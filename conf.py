@@ -160,7 +160,7 @@ keep_warnings = True
 # --------------------------------------------------------------------------------------
 # `html_theme <http://sphinx-doc.org/config.html#confval-html_theme>`_: The
 # theme to use for HTML and HTML Help pages.
-##html_theme = 'default'
+html_theme = 'alabaster'
 
 # `html_theme_options <http://sphinx-doc.org/config.html#confval-html_theme_options>`_:
 # Theme options are theme-specific and customize the look and feel of a theme
