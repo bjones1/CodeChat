@@ -170,7 +170,7 @@ html_theme_options = { "nosidebar" : "true" }
 
 # `html_style <http://sphinx-doc.org/config.html#confval-html_style>`_: The
 # style sheet to use for HTML pages.
-html_style = 'CodeChat.css'
+##html_style = None
 
 # `html_theme_path <http://sphinx-doc.org/config.html#confval-html_theme_path>`_:
 # Add any paths that contain custom themes here, relative to this directory.

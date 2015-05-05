@@ -167,6 +167,9 @@ def setup(app):
     # See sphinx_source_read() for more info.
     app.connect('html-page-context', sphinx_html_page_context)
     app.connect('builder-inited', sphinx_builder_inited)
+    # Add the CodeChat.css style sheet using `add_stylesheet
+    # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
+    app.add_stylesheet('CodeChat.css')
     # Return `extension metadata <http://sphinx-doc.org/extdev/index.html>`_.
     return {'version' : __version__,
             'parallel_read_safe' : True }
