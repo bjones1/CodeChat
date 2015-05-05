@@ -11,8 +11,7 @@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@
 CodeChat's table of contents
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-Welcome to CodeChat's documentation! Documentation for this program is divided
-into the following two sections.
+Welcome to CodeChat's documentation! For new users, begin by reading :doc:`README`. For others, documentation for this program is divided into the following two sections.
 
 ##################
 User documentation
@@ -22,20 +21,21 @@ User documentation
 
    README
    style_guide.py
+   install
    CodeChat/template/conf.py
 
 
-############################
-Implementation documentation
-############################
+#######################
+Developer documentation
+#######################
 .. toctree::
    :maxdepth: 2
 
-   CodeChat/__init__.py
+   history
    CodeChat/CodeToRest.py
    CodeChat/CodeToRestSphinx.py
    CodeChat/LanguageSpecificOptions.py
-   history
+   CodeChat/__init__.py
 
 *******
 Testing
@@ -46,17 +46,17 @@ Testing
    CodeChat/CodeToRest_test.py
    CodeChat/pytest.ini
 
-*************
-Documentation
-*************
+************************
+Documentation generation
+************************
 .. toctree::
    :maxdepth: 2
 
    conf.py
 
-************
-Installation
-************
+*********
+Packaging
+*********
 .. toctree::
    :maxdepth: 2
 

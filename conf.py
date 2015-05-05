@@ -10,9 +10,9 @@
 #
 #    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ****************************************************************
-# conf.py - Sphinx configuration for use by CodeChat documentation
-# ****************************************************************
+# **********************************************************************
+# conf.py - Sphinx configuration for generating CodeChat's documentation
+# **********************************************************************
 # This file configures Sphinx, which transforms restructured text (reST) into
 # html. See Sphinx `build configuration file docs <http://sphinx-doc.org/config.html>`_
 # for more information on the settings below.

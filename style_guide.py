@@ -47,37 +47,30 @@
 #
 # * Rather than leaving blank lines between code and a section, place empty
 #   comments. This makes the resulting HTML look better by suppressing an
-#   unnecessary newline. For example:
+#   unnecessary newline. For example, correct use is:
+    def foo():
+        pass
 #
-# Correct:
-# ========
-def foo():
-    pass
-#
-# Note comment character suppresses a newline.
-# --------------------------------------------
-#
-# Incorrect
-# =========
-def foo():
-    pass
+# Title
+# -----
+#   Note that the comment character before the section title suppress a newline.
+#   Incorrect:
+    def foo():
+        pass
 
-# Note the extra newline above.
-# -----------------------------
+# Title
+# -----
+#   Note the unnecesary newline before the section title above.
 #
 # * Headings must be placed on the far left of a file, even if it doesn't
-#   follow the indentation of the source.
-#
-# Correct
-# =======
+#   follow the indentation of the source. For example:
 def foo(*args):
     if args:
 # Check pre-conditions
 # ---------------------
         assert args[0] > 1
 #
-# Incorrect
-# =========
+# Incorrect:
 def foo(*args):
     if args:
         # Check pre-conditions
@@ -109,11 +102,7 @@ def foo(*args):
 # * Avoid long lines; wrap your lines at 80 characters. Many editors aren't
 #   configured to wrap lines nicely, or can't do it well. They certainly won't
 #   wrap bulleted lists, indentation, etc. well. Make sure your code is readable
-#   in a plain text editor or IDE, not only when viewed using CodeChat. For
-#   example:
-#
-#   * This will look a lot better and read more easily in most text editors when
-#     it is wrapped nicely.
+#   in a plain text editor or IDE, not only when viewed using CodeChat.
 #
 # * `Avoid tabs <http://tarantsov.com/hackers-coding-style-guide/why-tabs-should-be-avoided.html>`_.
 #   They make the resulting HTML less predictable. A tab after the inital

@@ -1,31 +1,44 @@
-.. note::
-
-   **IMPORTANT:** If the hyperlinks in this document don't work, view it at its `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket page, for example, only renders this file, but not the links.
-
 *****************************
 A programmer's word processor
 *****************************
 
+.. warning::
+
+   If the hyperlinks in this document don't work, view it at its `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket page, for example, only renders this file, but not its links.
+
 `CodeChat <https://bitbucket.org/bjones/documentation/overview>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
+
+Some examples of literate programming using CodeChat:
+
+* `CodeChat itself <https://pythonhosted.org/CodeChat/>`_:
+
+  * Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#preserving-empty-lines-of-code>`_.
+  * Use of GraphViz to illustrate a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
+  * Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
+  * Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
+
+* CodeChat is used for code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
 
 .. contents:: Contents
    :local:
 
 Tutorial
 ========
-This tutorial shows how the `Enki <http://enki-editor.org/>`_ text editor, integrated with the CodeChat_ literate programming plug-in, provides a powerful environment for creating expressive programs. Or, take a look at some examples_ to see this ideas in action.
+This tutorial shows how the `Enki <http://enki-editor.org/>`_ text editor, integrated with the CodeChat_ literate programming plug-in, provides a powerful environment for creating expressive programs.
 
 Basic restructuredText
 ----------------------
 CodeChat relies on `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ (`reST <http://docutils.sourceforge.net/rst.html>`_) in comments to provide human-readable markup. "ReStructuredText is an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax" [#]_. So, this tutorial beings by exploring reST using Enki.
 
-First, install Enki_, which hosts the CodeChat_ system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/downloads>`_, then unzip this in a directory of your choice. Now, open the source for this document, ``<location of unzipped CodeChat files>/README.rst``, in Enki. Move around the document, noticing that the text and web view are automatically synchronized. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try ``<location of unzipped CodeChat files>/CodeChat/LICENSE.html``, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
+First, install Enki_, which hosts the CodeChat_ system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/get/tip.zip>`_, then unzip this in a directory of your choice. Now, open the source for this document, ``<location of unzipped CodeChat files>/README.rst``, in Enki. Move around the document, noticing that the text and web view are automatically synchronized [#]_. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try ``<location of unzipped CodeChat files>/CodeChat/LICENSE.html``, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
 
 Now, explore creating your own reST file: create a new file, then save it with an extension of ``.rst``. Based on the very helpful `reST primer <http://sphinx-doc.org/rest.html>`_, try out some syntax: create headings, include a hyperlink, add an image, use inline markup. When errors occur, they are reported in the log window and typically in-line in the resulting web page. When a page is complete, the save icon in the preview window stores the resulting HTML to disk.
 
 By design, reST operates on one file at a time. To create a web site consisting of multiple, interlinked documents, we turn to Sphinx, wihch adds this ability to reStructuredText.
 
 .. [#] http://docutils.sourceforge.net/rst.html
+
+.. [#] Assuming TRE is installed. Follow the `TRE build instructions <https://github.com/bjones1/tre/blob/master/INSTALL.rst>`_ if not.
 
 Basic Sphinx_
 -------------
@@ -44,14 +57,15 @@ One important note: when refering to files in subdirectories, a forward slash **
 
 Creating a new project
 ^^^^^^^^^^^^^^^^^^^^^^
-To create a new Sphinx project, first create an empty directory to hold your project's files. In ``Settings | Settings | Sphinx``, select this directory as the project directory then click OK. A dialog box will pop up, asking if you'd like some default files copied. Click yes. Open the generated ``index.rst`` file. To add a file to your project, use ``File | New`` in Enki to create a new file, then save it as ``README.rst``. Generate some content in README.rst, including at least one heading, but notice that it isn't being rendered. To fix this, include it in your Sphinx project: in ``index.rst``, add it to your ``toctree`` directive::
+To create a new Sphinx project, first create an empty directory to hold your project's files. In ``Settings | Settings | Sphinx``, select this directory as the project directory then click OK. In ``Settings | Settings | Literate programming``, **uncheck** ``Enable CodeChat``; otherwise, Enki will create not just a Sphinx project, but a CodeChat-enabled Sphinx project. Next, create a new file and save it with the .rst extension in the empty directory you created.
+A dialog box will pop up, asking if you'd like some default files copied. Click yes. Open the generated ``index.rst`` file. Generate some content in this file, including at least one heading, but notice that it generates a warning in the log window. To fix this, include it in your Sphinx project: in ``index.rst`` by adding it to your ``toctree`` directive. Assuming the name of the file you created was ``README.rst``, the syntax is::
 
    .. toctree::
       :maxdepth: 2
 
       README
 
-When you switch back to ``README.rst``, it will now be rendered and included in your project.
+When you switch back to ``README.rst``, it will now be included in your project.
 
 .. [#] http://sphinx-doc.org/index.html
 
@@ -92,24 +106,11 @@ Now, create a new Sphinx with CodeChat project. First, choose a directory in whi
 
 Reference
 =========
-* For basic reST syntax, see the `reST primer`_.
-* For additional Sphinx-specific commands, refer to `markup constructs`_.
-
-.. _examples:
-
-Examples
---------
-Some examples of literate programming using CodeChat:
+With a basic knowledge of this literate programming system, the following pages provide helpful reference information.
 
 * The `style guide <style_guide.py.html>`_ for literate programming. Read this first.
-* `CodeChat itself <https://pythonhosted.org/CodeChat/>`_:
-
-  * Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#preserving-empty-lines-of-code>`_.
-  * Use of GraphViz to illustrate a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
-  * Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
-  * Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
-
-* CodeChat is used for code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
+* For basic reST syntax, see the `reST primer`_.
+* For additional Sphinx-specific commands, refer to `markup constructs`_.
 
 Contributing
 ============
