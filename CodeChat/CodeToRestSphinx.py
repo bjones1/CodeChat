@@ -164,9 +164,15 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
 # <http://sphinx-doc.org/extdev/appapi.html>`_ called by Sphinx to initialize
 # this extension.
 def setup(app):
-    # See sphinx_source_read() for more info.
-    app.connect('html-page-context', sphinx_html_page_context)
+    # Translate source files to .rst files before Sphinx looks for them after
+    # the `builder-inited 
+    # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_ even is
+    # emitted.
     app.connect('builder-inited', sphinx_builder_inited)
+    # Add an `html-page-context 
+    # <http://sphinx-doc.org/extdev/appapi.html#event-html-page-context>`_ hook
+    # to clean up the generated HTML.
+    app.connect('html-page-context', sphinx_html_page_context)
     # Add the CodeChat.css style sheet using `add_stylesheet
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
     app.add_stylesheet('CodeChat.css')
