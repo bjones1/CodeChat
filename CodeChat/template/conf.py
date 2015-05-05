@@ -27,6 +27,8 @@
 #   to show the default.
 #
 import sys, os
+import sphinx
+from CodeChat.LanguageSpecificOptions import LanguageSpecificOptions
 
 # If extensions (or modules to document with autodoc) are in another directory, add these directories to sys.path here. If the directory is relative to the documentation root, use os.path.abspath to make it absolute, as shown here.
 ##sys.path.insert(0, os.path.abspath('.'))
@@ -110,6 +112,17 @@ templates_path = ['_templates']
 # `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_:
 # The suffix of source filenames.
 source_suffix = '.rst'
+# **CodeChat note:** Sphinx v1.3 allows source_suffix to be a list. Take
+# advantage of this if possible by adding suffixes for all supported source
+# files.
+try:
+    assert sphinx.version_info[0] >= 1 and sphinx.version_info[1] >= 3
+    # Make source_suffix a list if it isn't already.
+    if not isinstance(source_suffix, list):
+        source_suffix = [source_suffix]
+    source_suffix += LanguageSpecificOptions.extension_to_options.keys()
+except:
+    pass
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
@@ -222,10 +235,8 @@ html_use_smartypants = True
 ##html_split_index = False
 
 # `html_show_sourcelink <http://sphinx-doc.org/config.html#confval-html_show_sourcelink>`_:
-# If true, links to the reST sources are added to the pages. **CodeChat note:**
-# at this time, the sourcelink doesn't show the original source code, making it
-# (mostly) useless.
-html_show_sourcelink = False
+# If true, links to the reST sources are added to the pages.
+html_show_sourcelink = True
 
 # `html_show_sphinx <http://sphinx-doc.org/config.html#confval-html_show_sphinx>`_:
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.

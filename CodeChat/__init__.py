@@ -23,7 +23,7 @@
 # This file defines this directory as a Python package, which contains the
 # CodeChat application.
 #
-# Give the version number, which is read by :doc:`../setup.py` during packaging.
+# Give the version number, which is read by :doc:`../setup` during packaging.
 # This is chosen following the `version convention
 # <http://packaging.python.org/en/latest/tutorial.html#version>`_.
 __version__ = '0.0.19a1'

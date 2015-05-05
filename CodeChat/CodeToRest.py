@@ -222,7 +222,7 @@ def code_to_rest(
   # |lso|
   #
   # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
-  #    <LanguageSpecificOptions.py>` which specifies the language to use in
+  #    <LanguageSpecificOptions>` which specifies the language to use in
   #    translating the source code to reST.
   language_specific_options):
     #

@@ -32,7 +32,6 @@
 # Standard library
 # ----------------
 # For code_to_rest_html_clean replacements.
-import re
 import os.path
 
 # Third-party imports
@@ -44,7 +43,8 @@ from sphinx.util import get_matching_docs
 # Local application imports
 # -------------------------
 from .LanguageSpecificOptions import LanguageSpecificOptions
-from .CodeToRest import code_to_rest_file, code_to_rest_html_clean
+from .CodeToRest import code_to_rest_string, code_to_rest_file, \
+  code_to_rest_html_clean
 from . import __version__
 
 # CodeToRest extension
@@ -59,7 +59,7 @@ from . import __version__
 #
 # This function searches for source code and transforms it to reST before Sphinx
 # searches for reST source.
-def sphinx_builder_inited(app):
+def builder_inited(app):
     # Look for every extension of every supported langauge.
     lso = LanguageSpecificOptions()
     for source_suffix in lso.extension_to_options.keys():
@@ -137,19 +137,33 @@ def sphinx_builder_inited(app):
             rest_file = os.path.join(app.env.srcdir, source_file + app_source_suffix)
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                print(source_file, rest_file)
                 code_to_rest_file(source_file, rest_file, lso,
                                   app.config.html_output_encoding)
 
 # Sphinx emits this event when the HTML builder has created a context dictionary
 # to render a template with. Do all necessary fix-up after the reST-to-code
 # progress.
-def sphinx_html_page_context(app, pagename, templatename, context, doctree):
+def html_page_context(app, pagename, templatename, context, doctree):
     env = app and app.builder.env
     if 'body' in context.keys():
         s = context['body']
         s = code_to_rest_html_clean(s)
         context['body'] = s
+
+# The source-read_ event occurs when a source file is read. If it's code, this
+# routine changes it into reST.
+def source_read(app, docname, source):
+    # The docname doesn't provide an extension. Look up the full name and
+    # extension using `doc2path
+    # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
+    full_path = app.env.doc2path(docname)
+    ext = os.path.splitext(full_path)[1]
+    # See if it's an extension we should process.
+    if (ext in LanguageSpecificOptions.extension_to_options.keys()):
+        # Pick the correct lso, then transform to reST.
+        lso = LanguageSpecificOptions()
+        lso.set_language(ext)
+        source[0] = code_to_rest_string(source[0], lso)
 
 # Sphinx hooks
 # ============
@@ -157,15 +171,24 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
 # <http://sphinx-doc.org/extdev/appapi.html>`_ called by Sphinx to initialize
 # this extension.
 def setup(app):
-    # Translate source files to .rst files before Sphinx looks for them after
-    # the `builder-inited
-    # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_ event is
-    # emitted.
-    app.connect('builder-inited', sphinx_builder_inited)
+    try:
+        # See if we're using at least Sphinx v1.3 using `require_sphinx
+        # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
+        app.require_sphinx('1.3')
+        # If so, then we can use the `source-read
+        # <http://sphinx-doc.org/extdev/appapi.html#sphinx.version_info>`_ event
+        # hook instead of uglyness below.
+        app.connect('source-read', source_read)
+    except:
+        # Translate source files to .rst files before Sphinx looks for them
+        # after the `builder-inited
+        # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
+        # event is emitted.
+        app.connect('builder-inited', builder_inited)
     # Add an `html-page-context
     # <http://sphinx-doc.org/extdev/appapi.html#event-html-page-context>`_ hook
     # to clean up the generated HTML.
-    app.connect('html-page-context', sphinx_html_page_context)
+    app.connect('html-page-context', html_page_context)
     # Add the CodeChat.css style sheet using `add_stylesheet
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
     app.add_stylesheet('CodeChat.css')
