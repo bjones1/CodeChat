@@ -26,7 +26,7 @@
 # style_guide.py - Style recommendations for CodeChat
 # ***************************************************
 # In using CodeChat with Sphinx, I've developed a set of guidelines to make my
-# code more consistent and readable. These are my recommendations. Refer to the :ref:`examples` to see these principles applied to actual source code.
+# code more consistent and readable. These are my recommendations. Refer to the examples in :doc:`README` to see these principles applied to actual source code.
 #
 # * Carefully organize your code using sections. Based on Sphinx recommendations
 #   for `sections <http://sphinx-doc.org/rest.html#sections>`_, use:
