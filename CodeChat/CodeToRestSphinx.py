@@ -159,7 +159,7 @@ def sphinx_html_page_context(app, pagename, templatename, context, doctree):
 def setup(app):
     # Translate source files to .rst files before Sphinx looks for them after
     # the `builder-inited
-    # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_ even is
+    # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_ event is
     # emitted.
     app.connect('builder-inited', sphinx_builder_inited)
     # Add an `html-page-context

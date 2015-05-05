@@ -1,10 +1,10 @@
+.. note::
+
+   If the hyperlinks in this document don't work, view it at the `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket and PyPI pages, only renders this file, but not all its linked documents.
+
 *****************************
 A programmer's word processor
 *****************************
-
-.. warning::
-
-   If the hyperlinks in this document don't work, view it at its `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket page, for example, only renders this file, but not all its linked documents.
 
 `CodeChat <https://bitbucket.org/bjones/documentation/overview>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
 
@@ -17,6 +17,7 @@ Some examples of literate programming using CodeChat:
   * Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
   * Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
 
+* Use of a screenshot to demonstrate the operation of a `3-D simulation <>`_.
 * CodeChat is used for code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
 
 .. contents:: Contents
