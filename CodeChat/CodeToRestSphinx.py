@@ -65,11 +65,6 @@ def builder_inited(app):
     for source_suffix in lso.extension_to_options.keys():
         # Choose the current language to process any file in.
         lso.set_language(source_suffix)
-
-        # This part of the code has turned into a giant hack, trying to deal
-        # with various versions of Sphinx. For now, leave it and gradually
-        # remove portions as support for older Sphinx versions fades.
-        #
         # Find all source files with the given extension. This was copied almost
         # verabtim from ``sphinx.environment.BuildEnvironment.find_files``.
         #
@@ -79,66 +74,28 @@ def builder_inited(app):
             ep = app.config.html_extra_path
         except:
             ep = []
-
-        # The deprecated config values ``exclude_trees``, ``exclude_dirnames``
-        # and ``unused_docs`` were removed in `Sphinx 1.3b1
-        # <http://sphinx-doc.org/changes.html#release-1-3b1-released-oct-10-2014>`_.
-        # Keep going if these aren't available.
-        try:
-            et = app.config.exclude_trees
-            tp = []
-            ed = ['**/' + d for d in app.config.exclude_dirnames]
-            ud = [d + app.config.source_suffix for d in app.config.unused_docs]
-            more_excludes = ''
-            gmd_source_suffix = source_suffix
-        except:
-            et = []
-            # Per the documentation on `templates_path
-            # <http://sphinx-doc.org/config.html#confval-templates_path>`_, this
-            # value is added to the list of excludes starting in v 1.3. Put it
-            # here, which isn't executed for pre-1.3 Sphinx.
-            tp = app.config.templates_path
-            ed = []
-            ud = []
-            # The v1.3 source adds one more exclude.
-            more_excludes = '*.lproj/**'
-            # The v1.3 source expects ``source_suffix`` to be a list.
-            gmd_source_suffix = [source_suffix]
-
-        # Build a list of file patterns to exclude, then gather docs that should
-        # be processed after applying these excludes.
         matchers = compile_matchers(
             app.config.exclude_patterns[:] +
             ep +
-            tp +
-            et +
-            ud +
-            ed +
-            ['**/_sources', '.#*', more_excludes]
+            app.config.exclude_trees +
+            [d + app.config.source_suffix for d in app.config.unused_docs] +
+            ['**/' + d for d in app.config.exclude_dirnames] +
+            ['**/_sources', '.#*']
         )
         docs = set(get_matching_docs(
-            app.srcdir, gmd_source_suffix, exclude_matchers=matchers))
+            app.srcdir, source_suffix, exclude_matchers = matchers))
+
         # ``get_matching_docs`` can return an empty filename; remove it.
         docs -= set([''])
-
         # Now, translate any old or missing files.
         for source_file_noext in docs:
-            source_file = os.path.join(app.env.srcdir, source_file_noext +
-                                       source_suffix)
-            # Starting in `Sphinx 1.3
-            # <http://sphinx-doc.org/changes.html#release-1-3-released-mar-10-2015>`_,
-            # ``source_suffix`` can be a list, not just a string. Handle both
-            # cases.
-            if isinstance(app.config.source_suffix, str):
-                app_source_suffix = app.config.source_suffix
-            else:
-                app_source_suffix = app.config.source_suffix[0]
-
-            rest_file = os.path.join(app.env.srcdir, source_file + app_source_suffix)
+            source_file = os.path.join(app.env.srcdir, source_file_noext + source_suffix)
+            rest_file = os.path.join(app.env.srcdir, source_file + app.config.source_suffix)
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                code_to_rest_file(source_file, rest_file, lso,
-                                  app.config.html_output_encoding)
+                code_to_rest_file(source_file, rest_file, lso, app.config.html_output_encoding)
+            else:
+                pass
 
 # Sphinx emits this event when the HTML builder has created a context dictionary
 # to render a template with. Do all necessary fix-up after the reST-to-code
