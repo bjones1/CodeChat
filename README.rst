@@ -1,3 +1,13 @@
+.. Copyright (C) 2012-2015 Bryan A. Jones.
+
+   This file is part of CodeChat.
+
+   CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+   CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+
 .. note::
 
    If the hyperlinks in this document don't work, view it at the `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket and PyPI pages, only renders this file, but not all its linked documents.
