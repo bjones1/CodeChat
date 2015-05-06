@@ -27,10 +27,10 @@ Examples
 Some examples of literate programming using CodeChat:
 
 * Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <https://pythonhosted.org/CodeChat/>`_
-* Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#preserving-empty-lines-of-code>`_.
-* Use of GraphViz to illustrate a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
-* Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
-* Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
+* Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.html#preserving-empty-lines-of-code>`_.
+* Use of GraphViz to illustrate a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.html#summary-and-implementation>`_.
+* Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.html>`_.
+* Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.html>`_
 * Use of a screenshot to demonstrate the operation of a `3-D simulation <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/homework_1_solution.html>`_.
 * Use of equations and diagrams in `scientific computing <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/mav3d_simulation.html#dynamics>`_.
 * Use of equations to explain the resulting code for an `integrator <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/integrating_omega_3d.html>`_.
