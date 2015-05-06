@@ -16,7 +16,7 @@ A programmer's word processor
 
 Tutorial
 ========
-The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into using CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
+The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
 
 Examples
 ========
