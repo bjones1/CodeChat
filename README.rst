@@ -8,19 +8,15 @@
 
    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-.. note::
-
-   If the hyperlinks in this document don't work, view it at the `documentation home page <https://pythonhosted.org/CodeChat/README.html>`_ instead. The Bitbucket and PyPI pages, only renders this file, but not all its linked documents.
-
 *****************************
 A programmer's word processor
 *****************************
 
-`CodeChat <https://bitbucket.org/bjones/documentation/overview>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
+`CodeChat <https://pythonhosted.org/CodeChat/README.html>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
 
 Tutorial
 ========
-The :doc:`tutorial` guides new users into using CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
+The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into using CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
 
 Examples
 ========
