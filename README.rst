@@ -17,16 +17,19 @@ A programmer's word processor
 .. Note that hyperlinks don't use the typical :doc: syntax here, because:
 
    1. This same file will be processed by reST-only tools on the Bitbucket and PyPI pages, so :doc: will produce errors.
-   
+
    2. Pointing to the doc homepage causes Bitbucket and PyPI links to automatically refer users to the full documentation set, rather than the single file (this one) hosted automatically there.
-   
+
 Background
 ==========
- Put simply, literate programming (LP) is the realization that a program is a document written to and for fellow programmers, not simply a list of instructions for a computer. LP tools simply produce a nicely-formatted document which contains the code intermixed with explanatory prose. `Knuth <http://www-cs-faculty.stanford.edu/~uno/lp.html>`_ coined the term and developed `CWEB <http://www.literateprogramming.com/cweb.pdf>`_, an LP tool.
+ Put simply, literate programming (LP) is the realization that a program is a document written to and for fellow programmers, not simply a list of instructions for a computer. LP tools therefore produce a nicely-formatted document which contains the code intermixed with explanatory prose. `Donald Knuth <http://en.wikipedia.org/wiki/Donald_Knuth>`_ introducted literate programming using his WEB tool in his seminal `paper <http://www.literateprogramming.com/knuthweb.pdf>`_. Per Figure 1 of this paper_, the WEB system takes a ``.w`` document as input then produces either a "tangled" source file for compilation or a "woven" document as a ``.tex`` file. The document is beautiful; the WEB source is difficult to digest (see Figure 2a-c); the source code is completely unreadable (see Figure 3). While a plethora of `tools <http://en.wikipedia.org/wiki/Literate_programming#Tools>`_ developed over the years attempt to address these problems, only one `LP-inspired <http://rant.gulbrandsen.priv.no/udoc/history>`_ variant has gained widespread acceptance: documentation generators, such as `Doxygen <http://www.doxygen.org>`_ and `JavaDoc <http://www.oracle.com/technetwork/java/javase/documentation/index-jsp-135444.html>`_, which extract documentation directly from source code, rather than extracting source code from the documentation, as WEB and most LP tools do. CodeChat addresses these LP weaknesses by producing a doucment directly from the code; employing human-readable markup (reStructuredText); and by supporting a GUI to make editing an LP document-program faster and easier.
+
 
 Tutorial
 ========
 The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
+
+.. _tutorial-examples:
 
 Examples
 ========
