@@ -14,6 +14,16 @@ A programmer's word processor
 
 `CodeChat <https://pythonhosted.org/CodeChat/README.html>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
 
+.. Note that hyperlinks don't use the typical :doc: syntax here, because:
+
+   1. This same file will be processed by reST-only tools on the Bitbucket and PyPI pages, so :doc: will produce errors.
+   
+   2. Pointing to the doc homepage causes Bitbucket and PyPI links to automatically refer users to the full documentation set, rather than the single file (this one) hosted automatically there.
+   
+Background
+==========
+ Put simply, literate programming (LP) is the realization that a program is a document written to and for fellow programmers, not simply a list of instructions for a computer. LP tools simply produce a nicely-formatted document which contains the code intermixed with explanatory prose. `Knuth <http://www-cs-faculty.stanford.edu/~uno/lp.html>`_ coined the term and developed `CWEB <http://www.literateprogramming.com/cweb.pdf>`_, an LP tool.
+
 Tutorial
 ========
 The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
