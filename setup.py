@@ -39,12 +39,7 @@
 #
 # * `Python Packaging User Guide <http://packaging.python.org/en/latest/>`_ -
 #   the most up-to-date reference I've found so far. Tells which tools to
-#   actually use. It was `forked <http://packaging.python.org/en/latest/history.html#id2>`__
-#   from `The Hitchhiker's Guide to Packaging <http://guide.python-distribute.org/>`_,
-#   which is outdated, unfortunately, but used to be helpful.
-#
-# * `How To Package Your Python Code <http://www.scotttorborg.com/python-packaging/index.html>`_:
-#   A useful tutorial on what to do. Doesn't cover eggs/wheels, though.
+#   actually use.
 #
 # * `distutils <http://docs.python.org/distutils/index.html>`_ - The built-in
 #   installer. Tells what to do, but not what actually happens. It doesn't have
