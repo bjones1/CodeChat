@@ -177,9 +177,8 @@ html_theme = 'alabaster'
 
 # `html_theme_options <http://sphinx-doc.org/config.html#confval-html_theme_options>`_:
 # Theme options are theme-specific and customize the look and feel of a theme
-# further. **CodeChat note:** Enki shows code next to HTML output; including the
-# sidebar wastes valuable space. Turn this off by default.
-html_theme_options = { "nosidebar" : "true" }
+# further.
+##html_theme_options = {}
 
 # `html_style <http://sphinx-doc.org/config.html#confval-html_style>`_: The
 # style sheet to use for HTML pages.
