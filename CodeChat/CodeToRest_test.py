@@ -37,12 +37,12 @@
 from .CodeToRest import code_to_rest_string, code_to_rest_html_clean
 from .LanguageSpecificOptions import LanguageSpecificOptions
 
-# This acutally tests using code_to_rest_string, since that makes code_to_rest
-# easy to call.
+# This acutally tests using ``code_to_rest_string``, since that makes
+# ``code_to_rest`` easy to call.
 class TestCodeToRest(object):
-    # Given a string and a language, run it through code_to_rest and return the resulting string.
+    # Given a string and a language, run it through ``code_to_rest`` and return
+    # the resulting string.
     def t(self, in_string, extension = '.c'):
-        # Use a StringIO object to act like file IO which code_to_rest expects.
         lso = LanguageSpecificOptions()
         lso.set_language(extension)
         out_string = code_to_rest_string(in_string, lso)
@@ -50,57 +50,58 @@ class TestCodeToRest(object):
         unique_remove_comment = lso.comment_string + u' ' + lso.unique_remove_str + u'\n'
         return out_string, unique_remove_comment
 
-    # A single line of code, without an ending \n
+    # A single line of code, without an ending ``\n``.
     def test_1(self):
         ret, comment = self.t('testing')
         assert ret ==  '\n\n::\n\n ' + comment + ' testing\n'
 
-    # A single line of code, with an ending \n.
+    # A single line of code, with an ending ``\n``.
     def test_2(self):
         ret, comment = self.t('testing\n')
         assert ret == '\n\n::\n\n ' + comment + ' testing\n'
 
-    # Several lines of code, with arbitrary indents
+    # Several lines of code, with arbitrary indents.
     def test_3(self):
         ret, comment = self.t('testing\n  test 1\n test 2\n   test 3')
         assert ret == '\n\n::\n\n ' + comment + ' testing\n   test 1\n  test 2\n    test 3\n'
 
-    # A single line comment, no trailing \n
+    # A single line comment, no trailing ``\n``.
     def test_4(self):
         ret, comment = self.t('// testing')
         assert ret == '\ntesting\n'
 
-    # A single line comment, trailing \n
+    # A single line comment, trailing ``\n``.
     def test_5(self):
         ret, comment = self.t('// testing\n')
         assert ret == '\ntesting\n'
 
-    # A multi line comment
+    # A multi-line comment.
     def test_5a(self):
         ret, comment = self.t('// testing\n// more testing')
         assert ret == '\ntesting\nmore testing\n'
 
-    # A single line comment with no space after the comment should be treated like code
+    # A single line comment with no space after the comment should be treated
+    # like code.
     def test_6(self):
         ret, comment = self.t('//testing')
         assert ret == '\n\n::\n\n ' + comment + ' //testing\n'
 
-    # A singly indented single-line comment
+    # A singly indented single-line comment.
     def test_7(self):
         ret, comment = self.t(' // testing')
         assert ret == '\n\n..\n\n testing\n'
 
-    # A doubly indented single-line comment
+    # A doubly indented single-line comment.
     def test_8(self):
         ret, comment = self.t('  // testing')
         assert ret == '\n\n..\n\n ..\n\n  testing\n'
 
-    # A doubly indented multi-line comment
+    # A doubly indented multi-line comment.
     def test_9(self):
         ret, comment = self.t('  // testing\n  // more testing')
         assert ret == '\n\n..\n\n ..\n\n  testing\n  more testing\n'
 
-    # Code to comment transition
+    # Code to comment transition.
     def test_9a(self):
         ret, comment = self.t('testing\n// test')
         assert ret == '\n\n::\n\n ' + comment + ' testing\n ' + comment + '\ntest\n'
@@ -108,13 +109,16 @@ class TestCodeToRest(object):
     # A line with just the comment char, but no trailing space.
     def test_10(self):
         ret, comment = self.t('//')
-        # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
+        # Two newlines: one gets added since code_to_rest prepends a ``\n``,
+        # assuming a previous line existed; the second comes from the end of
+        # ``code_to_rest``, where a final ``\n`` is appended to make sure the
+        # file ends with a newline.
         assert ret == '\n\n'
 
-    # A line with just the comment char, with a Microsoft-style line end
+    # A line with just the comment char, with a Microsoft-style line end.
     def test_11(self):
         ret, comment = self.t('//\r\n')
-        # Two newlines: one gets added since code_to_rest prepends a \n, assuming a previous line existed; the second comes from the end of code_to_test, where a final \n is appended to make sure the file ends with a newlines.
+        # Two newlines: see comment in ``test_10``.
         assert ret == '\n\n'
 
     # Make sure an empty string works.
@@ -129,7 +133,8 @@ class TestCodeToRest(object):
 
 # code_to_rest_html_clean tests
 # =============================
-# Test the fixup code which removes junk lines used only to produce a desired indent.
+# Test the fixup code which removes junk lines used only to produce a desired
+# indent.
 class TestCodeToRestHtmlClean(object):
 
     # Show that normal text isn't changed

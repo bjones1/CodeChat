@@ -17,15 +17,15 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ****************************************************************************************
-# LanguageSpecificOptions.py - assist in providing language-specific settings for CodeChat
-# ****************************************************************************************
+# ****************************************************************************
+# LanguageSpecificOptions.py - provide language-specific settings for CodeChat
+# ****************************************************************************
 #
 # LanguageSpecificOptions
 # =======================
-# For each programming language supported, ``set_language`` specifies:
-#
+# For each programming language supported, ``set_language`` specifies
 # comment_string:
+#
 #    The string indicating the beginning of a comment in the chosen programming
 #    language, or None if the CodeToRest process isn't supported. This must end
 #    in a space for the regular expression in format to work. The space also
