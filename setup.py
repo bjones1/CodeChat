@@ -56,8 +56,7 @@
 #
 # Questions / to do
 # =================
-# * Add a `setup.cfg <https://docs.python.org/2/distutils/configfile.html>`_
-#   with defaults.
+# * None at this time.
 #
 # To package
 # ==========
@@ -65,17 +64,20 @@
 #
 #   ``python setup.py sdist bdist_wheel upload``
 #
-# To `upload docs <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
+# To `upload docs 
+# <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
 # which are placed `here <http://pythonhosted.org/CodeChat/>`__
 # (make sure to run Sphinx first, so the docs will be current):
 #
 #    ``python setup.py upload_docs --upload-dir=_build\html``
 #
-# For `development <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
+# For `development 
+# <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
 #  ``python setup.py develop``
 #
-# Yajo has `packaged this for Linux <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
+# Yajo has `packaged this for Linux 
+# <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
 # Thanks so much.
 #
 # Packaging script
@@ -83,21 +85,23 @@
 # Otherwise known as the evils of ``setup.py``.
 #
 # For users who install this from source but don't have setuptools installed,
-# `auto-install it <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__. When packing for Linux, downloads are blocked so we must specify
-# a very old already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
-# Leave this as a `patch <https://build.opensuse.org/package/view_file/home:yajo:enki/python-codechat/python-codechat.offline_setuptools.patch?expand=1>`_
+# `auto-install it 
+# <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__. 
+# When packing for Linux, downloads are blocked so we must specify a very old
+# already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
+# Leave this as a `patch
+# <https://build.opensuse.org/package/view_file/home:yajo:enki/python-codechat/python-codechat.offline_setuptools.patch?expand=1>`_
 # so that we normally uses a more modern version.
 import ez_setup
 ez_setup.use_setuptools()
 
-# For version number.
-import CodeChat
-
 # PyPA copied code
 # ----------------
-# From `PyPA's sample setup.py <https://github.com/pypa/sampleproject/blob/master/setup.py>`__,
+# From `PyPA's sample setup.py
+# <https://github.com/pypa/sampleproject/blob/master/setup.py>`__,
 # read ``long_description`` from a file. This code was last updated on
-# 26-May-2015 based on `this commit <https://github.com/pypa/sampleproject/commit/4687e26c8a61e72ae401ec94fc1e5c0e17465b73>`_.
+# 26-May-2015 based on `this commit
+# <https://github.com/pypa/sampleproject/commit/4687e26c8a61e72ae401ec94fc1e5c0e17465b73>`_.
 #
 # Always prefer setuptools over distutils
 from setuptools import setup, find_packages
@@ -114,14 +118,17 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 # My code
 # -------
 setup(
-    # This must comply with `PEP 0426 <http://legacy.python.org/dev/peps/pep-0426/#name>`_'s
+    # This must comply with `PEP 0426
+    # <http://legacy.python.org/dev/peps/pep-0426/#name>`_'s
     # name requirements.
     name='CodeChat',
 
-    # Projects should comply with the `version scheme <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
+    # Projects should comply with the `version scheme
+    # <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
     # specified in PEP440. I use this so that my Sphinx docs will have the same
     # version number. There are a lot of alternatives in `Single-sourcing the
-    # Project Version <https://packaging.python.org/en/latest/single_source_version.html>`_.
+    # Project Version
+    # <https://packaging.python.org/en/latest/single_source_version.html>`_.
     # I picked this because it seems simple and matches my Sphinx code.
     version=CodeChat.__version__,
 
