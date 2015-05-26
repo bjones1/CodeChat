@@ -97,9 +97,12 @@ import CodeChat
 # ----------------
 # From `PyPA's sample setup.py <https://github.com/pypa/sampleproject/blob/master/setup.py>`__,
 # read ``long_description`` from a file. This code was last updated on
-# 21-Feb-2015 based on `this head <https://github.com/pypa/sampleproject/commit/3df8e577d7926051c364af1c8772c7ff3f97a396>`_.
-from setuptools import setup, find_packages  # Always prefer setuptools over distutils
-from codecs import open  # To use a consistent encoding
+# 26-May-2015 based on `this commit <https://github.com/pypa/sampleproject/commit/4687e26c8a61e72ae401ec94fc1e5c0e17465b73>`_.
+#
+# Always prefer setuptools over distutils
+from setuptools import setup, find_packages
+# To use a consistent encoding
+from codecs import open
 from os import path
 
 here = path.abspath(path.dirname(__file__))
@@ -116,7 +119,7 @@ setup(
     name='CodeChat',
 
     # Projects should comply with the `version scheme <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
-    # specified in PEP440. I use this so that my Sphinx  docs will have the same
+    # specified in PEP440. I use this so that my Sphinx docs will have the same
     # version number. There are a lot of alternatives in `Single-sourcing the
     # Project Version <https://packaging.python.org/en/latest/single_source_version.html>`_.
     # I picked this because it seems simple and matches my Sphinx code.
@@ -141,6 +144,7 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
         'Natural Language :: English',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Topic :: Software Development :: Documentation',
         'Topic :: Text Processing :: Markup',
@@ -148,13 +152,29 @@ setup(
 
     keywords='literate programming',
 
-    packages = ['CodeChat'],
+    packages=['CodeChat'],
 
-    # This will be installed by pip when this project is installed. For more on
-    # using “install_requires” see `install_requires vs Requirements files <https://packaging.python.org/en/latest/requirements.html>`_.
+    # List run-time dependencies here.  These will be installed by pip when
+    # your project is installed. For an analysis of "install_requires" vs pip's
+    # requirements files see:
+    # https://packaging.python.org/en/latest/requirements.html
+    #
+    # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py 
+    # <CodeChat/CodeToRest>` can be executed from the command line and requires
+    # only ``docutils`` to run, :doc:`CodeToRestSphinx.py 
+    # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
     install_requires=['docutils>=0.12'],
 
-    # To package data files, I'm using ``include_package_data = True`` then
+    # List additional groups of dependencies here (e.g. development
+    # dependencies). You can install these using the following syntax,
+    # for example:
+    #
+    #    ``$ pip install -e .[dev,test]``
+    extras_require={
+        'test': ['py.test'],
+    },
+
+    # To package data files, I'm using ``include_package_data=True`` then
     # putting the files in ``MANIFEST.in``. See `including data files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
-    include_package_data = True,
+    include_package_data=True,
 )
