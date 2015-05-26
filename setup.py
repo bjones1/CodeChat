@@ -59,19 +59,19 @@
 #
 #   ``python setup.py sdist bdist_wheel upload``
 #
-# To `upload docs 
+# To `upload docs
 # <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
 # which are placed `here <http://pythonhosted.org/CodeChat/>`__
 # (make sure to run Sphinx first, so the docs will be current):
 #
 #    ``python setup.py upload_docs --upload-dir=_build\html``
 #
-# For `development 
+# For `development
 # <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
 #  ``python setup.py develop``
 #
-# Yajo has `packaged this for Linux 
+# Yajo has `packaged this for Linux
 # <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
 # Thanks so much.
 #
@@ -80,8 +80,8 @@
 # Otherwise known as the evils of ``setup.py``.
 #
 # For users who install this from source but don't have setuptools installed,
-# `auto-install it 
-# <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__. 
+# `auto-install it
+# <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__.
 # When packing for Linux, downloads are blocked so we must specify a very old
 # already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
 # Leave this as a `patch
@@ -103,12 +103,34 @@ from setuptools import setup, find_packages
 # To use a consistent encoding
 from codecs import open
 from os import path
+# Imports for `version parse code`_.
+import sys
+import os
+import re
+import io
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
+
+# This code was copied from `version parse code`_. See ``version`` in the call
+# to ``setup`` below.
+def read(*names, **kwargs):
+    with io.open(
+        os.path.join(os.path.dirname(__file__), *names),
+        encoding=kwargs.get("encoding", "utf8")
+    ) as fp:
+        return fp.read()
+
+def find_version(*file_paths):
+    version_file = read(*file_paths)
+    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
+                              version_file, re.M)
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
 
 # My code
 # -------
@@ -124,8 +146,11 @@ setup(
     # version number. There are a lot of alternatives in `Single-sourcing the
     # Project Version
     # <https://packaging.python.org/en/latest/single_source_version.html>`_.
-    # I picked this because it seems simple and matches my Sphinx code.
-    version=CodeChat.__version__,
+    # While I like something simple, such as ``import CodeChat`` then
+    # ``version=CodeChat.__version__`` here, this means any dependeninces of
+    # :doc:`__init__.py <CodeChat/__init__>` will be requred to run setup,
+    # a bad thing. So, instead I read the file in ``setup.py`` and parse the version with a regex (see `version parse code <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).
+    version=find_version("CodeChat", "__init__.py"),
 
     description="The CodeChat system for software documentation",
     long_description=long_description,
@@ -161,9 +186,9 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     #
-    # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py 
+    # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
     # <CodeChat/CodeToRest>` can be executed from the command line and requires
-    # only ``docutils`` to run, :doc:`CodeToRestSphinx.py 
+    # only ``docutils`` to run, :doc:`CodeToRestSphinx.py
     # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
     install_requires=['docutils>=0.12'],
 
