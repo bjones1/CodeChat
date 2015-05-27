@@ -59,7 +59,7 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # ============
 # This routine transforms source code to reST, preserving all indentations of
 # both source code and comments. To do so, the comment characters are stripped
-# from comments and all code is placed inside literal blocks. In addition to
+# from comments and all code is placed inside code blocks. In addition to
 # this processing, several other difficulies arise: preserving the indentation
 # of both source code and comments; preserving empty lines of code at the
 # beginning or end of a block of code. In the following examples, examine both
@@ -88,21 +88,30 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # containing ``foo = 1`` to end with multiple blank lines; the resulting HTML
 # contains only one newline between each of these lines. To solve this, some CSS
 # hackery helps tighten up spacing between lines. In addition, this routine adds
-# a marker, removed during post-processing, at the end of each code block to
-# preserve blank lines. The new translation becomes:
+# a one-line fence, removed during processing, at the beginning and end of each
+# code block to preserve blank lines. The new translation becomes:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something ::         | ::                                |
+# | ::                       | Do something            | .. code:: html                    |
 # |                          |                         |                                   |
-# |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
+# |  # Do something          | .. fenced-code::        |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
-# |                          |  # wokifvzohtdlm        |                                   |
-# |  # Do something else     |                         |  </pre>                           |
-# |  bar = 2                 | Do something else ::    |  <p>Do something else:</p>        |
-# |                          |                         |  <pre>bar = 2                     |
-# |                          |  bar = 2                |  </pre>                           |
+# |                          |    Beginning fence      |                                   |
+# |  # Do something else     |    foo = 1              |  </pre>                           |
+# |  bar = 2                 |                         |  <p>Do something else:</p>        |
+# |                          |    Ending fence         |  <pre>bar = 2                     |
+# |                          |                         |  </pre>                           |
+# |                          | Do something else       |                                   |
+# |                          |                         |                                   |
+# |                          | .. fenced-code::        |                                   |
+# |                          |                         |                                   |
+# |                          |    Beginning fence      |                                   |
+# |                          |    bar = 2              |                                   |
+# |                          |    Ending fence         |                                   |
+# |                          |                         |                                   |
+# |                          |                         |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # Preserving indentation
@@ -199,7 +208,7 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # Therefore, the implemtation consists of a state machine. State transitions,
 # such as code to comment or small comment indent to larger comment indent,
 # provide an opportunity to apply the two rules above. Specifically, the state
-# machine first reads a line, classifies it as code or comment with indent n,
+# machine first reads a line, classifies it as code or comment with indent *n*,
 # and updates the state. It then takes a state transition action as defined by
 # the labels on the arrows below, prepending the resulting string and
 # transforming the line. Finally, it outputs the prepended string and the line.
@@ -209,7 +218,7 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 #     "code" -> "comment"
 #       [ label = "closing code marker\l<newline>\lempty comment indent(s)\lstrip comment string\l" ];
 #     "comment" -> "code"
-#       [ label = "<newline>\l::\l<newline>\lopening code marker\l<one space>\l" ];
+#       [ label = "<newline>\l.. fenced-code::\l<newline>\lopening code marker\l<one space>\l" ];
 #     "comment" -> "comment"
 #       [ label = "<newline>\lempty comment indent(s)\lstrip comment string\l" ];
 #     "code" -> "code" [ label = "<one space>" ];
@@ -253,12 +262,10 @@ def code_to_rest(
             # inside a literal block.
             current_line_list.insert(0, u' ')
             if not last_is_code:
-                # When transitioning from comment to code, prepend a \n\n::
+                # When transitioning from comment to code, prepend a ``\n\n.. fenced-code::``
                 # after the last line. Put a marker at the beginning of the line
-                # so reST will preserve all indentation of the block. (Can't
-                # just prepend a <space>::, since this boogers up title
-                # underlines, which become ------ ::)
-                current_line_list.insert(0, u'\n\n::\n\n ' + unique_remove_comment + u'\n')
+                # so reST will preserve all indentation of the block.
+                current_line_list.insert(0, u'\n\n.. fenced-code::\n\n ' + unique_remove_comment + u'\n')
             else:
                 # Otherwise, just prepend a newline
                 current_line_list.insert(0, u'\n')
@@ -292,7 +299,11 @@ def code_to_rest(
         out_file.write(line_str)
         last_is_code = not comment_match
 
-    # At the end of the file, include a final newline
+    # Provide a closing fence if we ended with code.
+    if last_is_code:
+        out_file.write(u'\n ' + unique_remove_comment)
+
+    # At the end of the file, include a final newline.
     out_file.write(u'\n')
 
 # Choose a LanguageSpecificOptions class based on the given file's extension.
@@ -357,50 +368,14 @@ def code_to_rest_file(
     fo.write(rst)
 
 
-# code_to_rest_html_clean
-# =======================
-# Clean up markers injected by code_to_rest_. It returns a string containing
-# cleaned HTML.
-def code_to_rest_html_clean(
-  # A string produced by translating the output of code_to_rest_ to HTML.
-  _str):
-    #
-    # Note that a <pre> tag on a line by itself does NOT produce a newline in the html, hence <pre>\n in the replacement text.
-    _str = re.sub('<pre>[^\n]*' + LanguageSpecificOptions.unique_remove_str + '[^\n]*\n', '<pre>\n', _str)
-
-    # TODO: Add examples of where these are seen.
-    _str = re.sub('<span class="\w+">[^<]*' + LanguageSpecificOptions.unique_remove_str + '</span>\n', '', _str)
-    _str = re.sub('<p>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</p>', '', _str)
-    _str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '</pre>', '\n</pre>', _str)
-
-    # When an empty comment indented by at least two spaces preceeds a heading, like this:
-    ##   #
-    ## Foo
-    ## ---
-    # then the HTML produced is repeated <blockquote><div> then <div># wokifvzohtdlm</div>.
-    _str = re.sub('<div>[^<]*' + LanguageSpecificOptions.unique_remove_str + '</div>', '', _str)
-
-    # The BatchLexer doesn't always recognize comments, treating then as
-    # un-hilighed code: just a blank line which says
-    ## : wokifvz-ohtdlm (dash added to keep this from disappearing)
-    _str = re.sub('\n[^\n]*' + LanguageSpecificOptions.unique_remove_str + '\n', '\n', _str)
-
-    return _str
-
 # code_to_html
 # ============
-# This function implements the following processing steps.
+# To convert source code to HTML:
 #
-# .. digraph:: overall_block_diagram
-#
-#    "Source code" -> "code_to_rest" [ label = ".py, .c, etc." ];
-#    "code_to_rest" -> "reST to HTML" [ label = "reST" ];
-#    "reST to HTML" -> "code_to_rest_html_clean"
-#      [ label = "HTML with temp. markers" ];
-#    "code_to_rest_html_clean" -> "Web browser" [ label = "final HTML" ];
-#
-# The reST to HTML conversion is performed by
-# `docutils <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_.
+# #. ``code_to_rest`` converts source code to reST.
+# #. `docutils
+#    <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_
+#    converts reST to HTML.
 def code_to_html_string(
   # |source_str|
   source_str,
@@ -430,8 +405,7 @@ def code_to_html_string(
         'halt_level'     : 5,
         # Capture errors to a string and return it.
         'warning_stream' : warning_stream})
-    html_clean = code_to_rest_html_clean(html)
-    return html_clean
+    return html
 
 def code_to_html_file(
   # |source_path|
@@ -454,14 +428,14 @@ def code_to_html_file(
     html = code_to_html_string(fi.read(), lso)
 
     fo.write(html)
-    
-    
+
+
 from docutils.parsers.rst.directives.body import CodeBlock
-# Create a fenced code block: the first and last lines are presumed to be 
+# Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
 #
-# See the `directive docs 
+# See the `directive docs
 # <http://docutils.sourceforge.net/docs/howto/rst-directives.html>`_ for more
 # information.
 class FencedCodeBlock(CodeBlock):
@@ -472,7 +446,7 @@ class FencedCodeBlock(CodeBlock):
         # Remove the fences, the process the block.
         self.content = self.content[1:-1]
         return CodeBlock.run(self)
-    
+
 from docutils.parsers.rst import directives
 directives.register_directive('fenced-code', FencedCodeBlock)
 

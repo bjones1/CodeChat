@@ -24,9 +24,7 @@
 # from the command line. Note the period in this command -- ``pytest`` does
 # **NOT** work (it is a completely different program).
 #
-# To do:
-#
-# - Add many more tests for the significant number of untested routines.
+# .. highlight:: none
 #
 # Imports
 # =======
@@ -43,7 +41,7 @@ from docutils import core
 #
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, code_to_rest_html_clean
+from .CodeToRest import code_to_rest_string
 from .LanguageSpecificOptions import LanguageSpecificOptions
 
 # This acutally tests using ``code_to_rest_string``, since that makes
@@ -62,17 +60,17 @@ class TestCodeToRest(object):
     # A single line of code, without an ending ``\n``.
     def test_1(self):
         ret, comment = self.t('testing')
-        assert ret ==  '\n\n::\n\n ' + comment + ' testing\n'
+        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment
 
     # A single line of code, with an ending ``\n``.
     def test_2(self):
         ret, comment = self.t('testing\n')
-        assert ret == '\n\n::\n\n ' + comment + ' testing\n'
+        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment
 
     # Several lines of code, with arbitrary indents.
     def test_3(self):
         ret, comment = self.t('testing\n  test 1\n test 2\n   test 3')
-        assert ret == '\n\n::\n\n ' + comment + ' testing\n   test 1\n  test 2\n    test 3\n'
+        assert ret == '\n\n.. fenced-code::\n\n ' + comment + ' testing\n   test 1\n  test 2\n    test 3\n ' + comment
 
     # A single line comment, no trailing ``\n``.
     def test_4(self):
@@ -93,7 +91,7 @@ class TestCodeToRest(object):
     # like code.
     def test_6(self):
         ret, comment = self.t('//testing')
-        assert ret == '\n\n::\n\n ' + comment + ' //testing\n'
+        assert ret == '\n\n.. fenced-code::\n\n ' + comment + ' //testing\n ' + comment
 
     # A singly indented single-line comment.
     def test_7(self):
@@ -113,7 +111,7 @@ class TestCodeToRest(object):
     # Code to comment transition.
     def test_9a(self):
         ret, comment = self.t('testing\n// test')
-        assert ret == '\n\n::\n\n ' + comment + ' testing\n ' + comment + '\ntest\n'
+        assert ret == '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment + '\ntest\n'
 
     # A line with just the comment char, but no trailing space.
     def test_10(self):
@@ -138,24 +136,38 @@ class TestCodeToRest(object):
     # Make sure Unicode works.
     def test_13(self):
         ret, comment = self.t(u'ю')
-        assert ret == u'\n\n::\n\n ' + comment + u' ю\n'
+        assert ret == u'\n\n.. fenced-code::\n\n ' + comment + u' ю\n ' + comment
 
-# code_to_rest_html_clean tests
-# =============================
-# Test the fixup code which removes junk lines used only to produce a desired
-# indent.
-class TestCodeToRestHtmlClean(object):
-    # Show that normal text isn't changed
-    def test_1(self):
-        string = 'testing'
-        ret = code_to_rest_html_clean(string)
-        assert ret == string
+    # Code to comment transition.
+    def test_14(self):
+        ret, comment = self.t('testing\n// Comparing')
+        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment + '\nComparing\n'
 
-    # An empty comment before a heading.
-    def test_2(self):
-        string = '<blockquote>\n<div># wokifvzohtdlm</div></blockquote>'
-        ret = code_to_rest_html_clean(string)
-        assert ret == '<blockquote>\n</blockquote>'
+    # Code to comment transition, with leading blank code lines.
+    def test_15(self):
+        ret, comment = self.t('\ntesting\n// Comparing')
+        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' \n testing\n ' + comment + '\nComparing\n'
+
+    # Code to comment transition, with trailing blank code lines.
+    def test_16(self):
+        ret, comment = self.t('testing\n\n// Comparing')
+        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n \n ' + comment + '\nComparing\n'
+
+    # Comment to code transition.
+    def test_17(self):
+        ret, comment = self.t('// testing\nComparing')
+        assert ret ==  '\ntesting\n\n.. fenced-code::\n\n ' + comment + ' Comparing\n ' + comment
+
+    # Comment to code transition, with leading blank code lines.
+    def test_18(self):
+        ret, comment = self.t('// testing\n\nComparing')
+        assert ret ==  '\ntesting\n\n.. fenced-code::\n\n ' + comment + ' \n Comparing\n ' + comment
+
+    # Comment to code transition, with trailing blank code lines.
+    def test_19(self):
+        ret, comment = self.t('// testing\nComparing\n\n')
+        assert ret ==  '\ntesting\n\n.. fenced-code::\n\n ' + comment + ' Comparing\n \n ' + comment
+
 
 # Fenced code block testing
 # =========================
@@ -197,9 +209,38 @@ class TestRestToHtml(object):
         assert ('Content block expected for the '
         in self.t('.. fenced-code::\n\n First fence\n Second fence\n') )
 
+# Check newline preservation **without** syntax highlighting
+# ----------------------------------------------------------
     # Check output of a one-line code block surrounded by fences.
     def test_6(self):
         assert (self.t('.. fenced-code::\n\n First fence\n testing\n Second fence\n') ==
                 '<pre class="code literal-block">\ntesting\n</pre>')
+
+    # Check that leading newlines are preserved.
+    def test_7(self):
+        assert (self.t('.. fenced-code::\n\n First fence\n\n testing\n Second fence\n') ==
+                '<pre class="code literal-block">\n\ntesting\n</pre>')
+
+    # Check that trailing newlines are preserved.
+    def test_8(self):
+        assert (self.t('.. fenced-code::\n\n First fence\n testing\n\n Second fence\n') ==
+                '<pre class="code literal-block">\ntesting\n\n</pre>')
+
+# Check newline preservation **with** syntax highlighting
+# -------------------------------------------------------
+    # Check output of a one-line syntax-highlighted code block surrounded by fences.
+    def test_9(self):
+        assert (self.t('.. fenced-code:: python\n\n First fence\n testing\n Second fence\n') ==
+                '<pre class="code python literal-block">\n<span class="name">testing</span>\n</pre>')
+
+    # Check that leading newlines are preserved with syntax highlighting.
+    def test_10(self):
+        assert (self.t('.. fenced-code:: python\n\n First fence\n\n testing\n Second fence\n') ==
+                '<pre class="code python literal-block">\n\n<span class="name">testing</span>\n</pre>')
+
+    # Check that trailing newlines are preserved with syntax highlighting.
+    def test_11(self):
+        assert (self.t('.. fenced-code:: python\n\n First fence\n testing\n\n Second fence\n') ==
+                '<pre class="code python literal-block">\n<span class="name">testing</span>\n\n</pre>')
 
 

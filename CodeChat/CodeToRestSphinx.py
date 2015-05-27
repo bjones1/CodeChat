@@ -43,8 +43,7 @@ from sphinx.util import get_matching_docs
 # Local application imports
 # -------------------------
 from .LanguageSpecificOptions import LanguageSpecificOptions
-from .CodeToRest import code_to_rest_string, code_to_rest_file, \
-  code_to_rest_html_clean
+from .CodeToRest import code_to_rest_string, code_to_rest_file
 from . import __version__
 
 # CodeToRest extension
@@ -97,16 +96,6 @@ def builder_inited(app):
             else:
                 pass
 
-# Sphinx emits this event when the HTML builder has created a context dictionary
-# to render a template with. Do all necessary fix-up after the reST-to-code
-# progress.
-def html_page_context(app, pagename, templatename, context, doctree):
-    env = app and app.builder.env
-    if 'body' in context.keys():
-        s = context['body']
-        s = code_to_rest_html_clean(s)
-        context['body'] = s
-
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
 def source_read(app, docname, source):
@@ -142,10 +131,6 @@ def setup(app):
         # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
         # event is emitted.
         app.connect('builder-inited', builder_inited)
-    # Add an `html-page-context
-    # <http://sphinx-doc.org/extdev/appapi.html#event-html-page-context>`_ hook
-    # to clean up the generated HTML.
-    app.connect('html-page-context', html_page_context)
     # Add the CodeChat.css style sheet using `add_stylesheet
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
     app.add_stylesheet('CodeChat.css')
