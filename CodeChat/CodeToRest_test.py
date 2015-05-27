@@ -41,7 +41,7 @@ from docutils import core
 #
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string
+from .CodeToRest import code_to_rest_string, code_to_html_file
 from .LanguageSpecificOptions import LanguageSpecificOptions
 
 # This acutally tests using ``code_to_rest_string``, since that makes
@@ -243,4 +243,8 @@ class TestRestToHtml(object):
         assert (self.t('.. fenced-code:: python\n\n First fence\n testing\n\n Second fence\n') ==
                 '<pre class="code python literal-block">\n<span class="name">testing</span>\n \n</pre>')
 
-
+# Poor coverage of code_to_html_file
+# ==================================
+class TestCodeToHtmlFile(object):
+    def test_1(self):
+        code_to_html_file('CodeToRestSphinx.py')

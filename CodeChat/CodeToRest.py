@@ -505,7 +505,3 @@ class FencedCodeBlock(CodeBlock):
 # Register the new fenced code block directive with docutils.
 directives.register_directive('fenced-code', FencedCodeBlock)
 
-if __name__ == '__main__':
-    # Test code
-    #code_to_html_file('CodeToRestSphinx.py')
-    pass
