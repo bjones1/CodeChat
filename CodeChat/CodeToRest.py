@@ -434,7 +434,6 @@ def code_to_html_file(
 
 
 from docutils.parsers.rst.directives.body import CodeBlock
-from docutils import nodes
 # Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
@@ -478,6 +477,26 @@ class FencedCodeBlock(CodeBlock):
 
         # Now, process the resulting contents as a code block.
         nodeList = CodeBlock.run(self)
+
+        # Sphinx fix: if the current `highlight
+        # <http://sphinx-doc.org/markup/code.html>`_ language is ``python``,
+        # "Normal Python code is only highlighted if it is parseable" (quoted
+        # from the previous link). This means code snippets, such as
+        # ``def foo():`` won't be highlighted: Python wants ``def foo(): pass``,
+        # for example. To get around this, setting the ``highlight_args`` option
+        # "Force"=True skips the parsing. I found this in
+        # ``Sphinx.highlighting.highlight_block`` (see the ``force`` argument)
+        # and in ``Sphinx.writers.html.HTMLWriter.visit_literal_block``, where
+        # the ``code-block`` directive (which supports fragments of code, not
+        # just parsable code) has ``highlight_args['force'] = True`` set. This
+        # should be ignored by docutils, so it's done for both Sphinx and
+        # docutils.
+        #
+        # Note that the nodeList returned by the CodeBlock directive contains
+        # only a single ``literal_block`` node. The setting should be applied to
+        # it.
+        nodeList[0]['highlight_args'] = {'force' : True}
+
         return nodeList
 
 from docutils.parsers.rst import directives
