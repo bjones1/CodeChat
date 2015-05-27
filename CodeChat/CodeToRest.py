@@ -74,14 +74,14 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something ::         | ::                                |
+# | ::                       | Do something ::         | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
+# |                          | Do something else ::    |  </pre>                           |
+# |  # Do something else     |                         |  <p>Do something else:</p>        |
+# |  bar = 2                 |  bar = 2                |  <pre>bar = 2                     |
 # |                          |                         |  </pre>                           |
-# |  # Do something else     | Do something else ::    |  <p>Do something else:</p>        |
-# |  bar = 2                 |                         |  <pre>bar = 2                     |
-# |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # In this example, the blank line is lost, since reST allows the literal bock
@@ -94,7 +94,7 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something            | .. code:: html                    |
+# | ::                       | Do something            | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # Do something          | .. fenced-code::        |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
@@ -116,39 +116,42 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 #
 # Preserving indentation
 # ----------------------
-# Preserving indentation in code blocks is relatively straightforward. reST eats
-# all whitespace common to a literal block, using that to set the indent. For
-# example:
+# The same fence approach also preserves indentation. Without the fences,
+# indendentation is consumed by the reST parser:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | One space indent ::     | ::                                |
+# | ::                       | One space indent ::     | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # One space indent      |   foo = 1               |  <p>One space indent</p>          |
 # |   foo = 1                |                         |  <pre>foo = 1                     |
+# |  # No indent             | No indent ::            |  </pre>                           |
+# |  bar = 2                 |                         |  <p>No indent</p>                 |
+# |                          |  bar = 2                |  <pre>bar = 1                     |
 # |                          |                         |  </pre>                           |
-# |  # No indent             | No indent ::            |  <p>No indent</p>                 |
-# |  bar = 2                 |                         |  <pre>bar = 1                     |
-# |                          |  bar = 2                |  </pre>                           |
 # +--------------------------+-------------------------+-----------------------------------+
 #
-# To fix this, code_to_rest adds an unindented marker (also removed during
-# post-processing) at the beginning of each code block to preserve indents:
+# With fences added:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | One space indent ::     | ::                                |
+# | ::                       | One space indent        | .. code-block:: html              |
 # |                          |                         |                                   |
-# |  # One space indent      |  # wokifvzohtdlm        |  <p>One space indent</p>          |
-# |   foo = 1                |   foo = 1               |  <pre> foo = 1                    |
+# |  # One space indent      | .. fenced-code::        |  <p>One space indent</p>          |
+# |   foo = 1                |                         |  <pre> foo = 1                    |
+# |  # No indent             |    Beginning fence      |  </pre>                           |
+# |  bar = 2                 |     foo = 1             |  <p>No indent</p>                 |
+# |                          |    Ending fence         |  <pre>bar = 1                     |
 # |                          |                         |  </pre>                           |
-# |  # No indent             |                         |  <p>No indent</p>                 |
-# |  bar = 2                 | No indent ::            |  <pre>bar = 1                     |
-# |                          |                         |  </pre>                           |
-# |                          |  # wokifvzohtdlm        |                                   |
-# |                          |  bar = 2                |                                   |
+# |                          | No indent               |                                   |
+# |                          |                         |                                   |
+# |                          | .. fenced-code::        |                                   |
+# |                          |                         |                                   |
+# |                          |    Beginning fence      |                                   |
+# |                          |    bar = 1              |                                   |
+# |                          |    Ending fence         |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # Preserving indentation for comments is more difficult. Blockquotes in reST are
@@ -159,7 +162,7 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | No indent               | ::                                |
+# | ::                       | No indent               | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # No indent             |   Two space indent      |  <p>No indent</p>                 |
 # |    # Two space indent    |                         |  <blockquote><div>Two space indent|
@@ -177,7 +180,7 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | No indent               | ::                                |
+# | ::                       | No indent               | .. code-block:: html              |
 # |                          |                         |                                   |
 # |    # Two space indent    | ..                      |  <p>No indent</p>                 |
 # |      # Four space indent |                         |  <blockquote><div>                |
@@ -234,7 +237,7 @@ def code_to_rest(
   #    <LanguageSpecificOptions>` which specifies the language to use in
   #    translating the source code to reST.
   language_specific_options):
-    
+
     unique_remove_comment = (language_specific_options.comment_string + u' ' +
       language_specific_options.unique_remove_str)
 
@@ -472,7 +475,7 @@ class FencedCodeBlock(CodeBlock):
                 if self.content[-i - 1]:
                     break
                 self.content[-i - 1] = ' '
-                
+
         # Now, process the resulting contents as a code block.
         nodeList = CodeBlock.run(self)
         return nodeList
