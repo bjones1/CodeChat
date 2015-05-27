@@ -219,12 +219,12 @@ class TestRestToHtml(object):
     # Check that leading newlines are preserved.
     def test_7(self):
         assert (self.t('.. fenced-code::\n\n First fence\n\n testing\n Second fence\n') ==
-                '<pre class="code literal-block">\n\ntesting\n</pre>')
+                '<pre class="code literal-block">\n \ntesting\n</pre>')
 
     # Check that trailing newlines are preserved.
     def test_8(self):
         assert (self.t('.. fenced-code::\n\n First fence\n testing\n\n Second fence\n') ==
-                '<pre class="code literal-block">\ntesting\n\n</pre>')
+                '<pre class="code literal-block">\ntesting\n \n</pre>')
 
 # Check newline preservation **with** syntax highlighting
 # -------------------------------------------------------
@@ -236,11 +236,11 @@ class TestRestToHtml(object):
     # Check that leading newlines are preserved with syntax highlighting.
     def test_10(self):
         assert (self.t('.. fenced-code:: python\n\n First fence\n\n testing\n Second fence\n') ==
-                '<pre class="code python literal-block">\n\n<span class="name">testing</span>\n</pre>')
+                '<pre class="code python literal-block">\n \n<span class="name">testing</span>\n</pre>')
 
     # Check that trailing newlines are preserved with syntax highlighting.
     def test_11(self):
         assert (self.t('.. fenced-code:: python\n\n First fence\n testing\n\n Second fence\n') ==
-                '<pre class="code python literal-block">\n<span class="name">testing</span>\n\n</pre>')
+                '<pre class="code python literal-block">\n<span class="name">testing</span>\n \n</pre>')
 
 

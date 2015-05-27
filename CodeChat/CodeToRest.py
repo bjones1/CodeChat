@@ -234,7 +234,7 @@ def code_to_rest(
   #    <LanguageSpecificOptions>` which specifies the language to use in
   #    translating the source code to reST.
   language_specific_options):
-    #
+    
     unique_remove_comment = (language_specific_options.comment_string + u' ' +
       language_specific_options.unique_remove_str)
 
@@ -431,6 +431,7 @@ def code_to_html_file(
 
 
 from docutils.parsers.rst.directives.body import CodeBlock
+from docutils import nodes
 # Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
@@ -443,9 +444,38 @@ class FencedCodeBlock(CodeBlock):
         # The content must contain at least two lines (the fences).
         if len(self.content) < 2:
             raise self.error('Fenced code block must contain at least two lines.')
-        # Remove the fences, the process the block.
+        # Remove the fences.
         self.content = self.content[1:-1]
-        return CodeBlock.run(self)
+        #
+        # By default, the Pygments `stripnl
+        # <http://pygments.org/docs/lexers/>`_ option is True, causing Pygments
+        # to drop any empty lines. The reST parser converts a line containing
+        # only spaces to an empty line, which  will then be stripped by Pygments
+        # if these are leading or trailing newlines. So, add a space back in to
+        # keep these lines from being dropped.
+        #
+        # So, first add spaces from the beginning of the lines until we reach
+        # the first non-blank line.
+        processedAllContent = True
+        for i in range(len(self.content)):
+            if self.content[i]:
+                processedAllContent = False
+                break
+            self.content[i] = ' '
+        # If we've seen all the content, then don't do it again -- we'd be
+        # adding unnecessary spaces. Otherwise, walk from the end of the content
+        # backwards, adding spaces until the first non-blank line.
+        if not processedAllContent:
+            for i in range(len(self.content)):
+                # Recall Python indexing: while 0 is the first elemment in a
+                # list, -1 is the last element, so offset all indices by -1.
+                if self.content[-i - 1]:
+                    break
+                self.content[-i - 1] = ' '
+                
+        # Now, process the resulting contents as a code block.
+        nodeList = CodeBlock.run(self)
+        return nodeList
 
 from docutils.parsers.rst import directives
 directives.register_directive('fenced-code', FencedCodeBlock)
