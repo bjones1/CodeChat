@@ -18,6 +18,9 @@ History of recent changes
    - Add support for Sphinx v1.3. Process source files in memory, instead of creating ``.rst`` files. This allows source links to refer to the source code, not the intermediate ``.rst`` files.
    - Creation of a tutorial.
    - Support for all Sphinx themes.
+   - Use of fenced code blocks to more cleanly include code in reST.
+   - Support for Sphinx's conf.py ``highlight_language = 'python'``.
+   - Improved CSS for better layout of paragraphs following code.
 
 - 0.0.18, 11-Feb-2015:
 
