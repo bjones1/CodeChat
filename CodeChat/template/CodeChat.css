@@ -54,13 +54,23 @@ p, blockquote, div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, 
     margin-bottom: 0px;
 }
 
-/* 4. Remove the top margin of all comments which follow code, placing them
+/* 4. Paragraphs have a non-zero margin-top, which adds a blank line when it
+      follows code. Remove this.
+*/
+div p:first-child {
+  margin-top: 0px;
+}
+
+/* 5. Remove the top margin of all comments which follow code, placing them
       next to code. Note that Sphinx encloses code in a
       <div class="highlight-language_name"> element.
 
       Also, note that this will need to be duplicated for all highlighted
       languages (yuck). I can't find a CSS rule to select class named using a
-      regular expression. */
+      regular expression.
+
+      Note: This isn't needed for the new alabaster theme. Why? Is there
+      a workaround / better way to do this? */
 /* This line handles docutils output. */
 pre.literal-block + *,
 /* The remaining lines handle Sphinx output. */
@@ -72,10 +82,3 @@ div.highlight-python3 + * {
   margin-top: 0px;
 }
 
-/* 5. Indents in code are matched by a series of nested blockquotes, one nest
-      per space. Inside this nest, each blockquote has a margin-top which the
-      previous rule doesn't see. Fix this special case by zeroing these nested
-      margin-tops. */
-blockquote blockquote {
-  margin-top: 0px;
-}
