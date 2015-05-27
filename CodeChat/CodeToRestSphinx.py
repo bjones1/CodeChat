@@ -48,13 +48,14 @@ from . import __version__
 
 # CodeToRest extension
 # ====================
-# This extension provides the CodeToRest Sphinx extension. The overall process:
+# This extension provides the CodeToRest Sphinx extension. There are two
+# implementations:
 #
-# #. Translate all source files to reST before Sphinx looks for reST source
-#    (``sphinx_builder_inited``).
-# #. When Sphinx has HTML ready to output, strip out gunk inserted by
-#    ``code_to_rest`` to format source files correctly
-#    (``sphinx_html_page_context``).
+# * Pre 1.3 Sphinx: translate all source files to reST before Sphinx looks for 
+#   reST source (``sphinx_builder_inited``). This leaves a lot of gunky ``.rst``
+#   files around in the source directory.
+# * 1.3 and newer Sphinx: translate a source file in place to reST 
+#   (``source_read``). Much cleaner.
 #
 # This function searches for source code and transforms it to reST before Sphinx
 # searches for reST source.
