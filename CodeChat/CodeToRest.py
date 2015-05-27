@@ -454,6 +454,27 @@ def code_to_html_file(
     html = code_to_html_string(fi.read(), lso)
 
     fo.write(html)
+    
+    
+from docutils.parsers.rst.directives.body import CodeBlock
+# Create a fenced code block: the first and last lines are presumed to be 
+# fences, which keep the parser from discarding whitespace. Drop these, then
+# treat everything else as code.
+#
+# See the `directive docs 
+# <http://docutils.sourceforge.net/docs/howto/rst-directives.html>`_ for more
+# information.
+class FencedCodeBlock(CodeBlock):
+    def run(self):
+        # The content must contain at least two lines (the fences).
+        if len(self.content) < 2:
+            raise self.error('Fenced code block must contain at least two lines.')
+        # Remove the fences, the process the block.
+        self.content = self.content[1:-1]
+        return CodeBlock.run(self)
+    
+from docutils.parsers.rst import directives
+directives.register_directive('fenced-code', FencedCodeBlock)
 
 if __name__ == '__main__':
     # Test code

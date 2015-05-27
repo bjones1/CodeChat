@@ -32,6 +32,15 @@
 # =======
 # These are listed in the order prescribed by `PEP 8 <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
+# Library imports
+# ---------------
+import re
+#
+# Third-party imports
+# -------------------
+# Used to run docutils.
+from docutils import core
+#
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, code_to_rest_html_clean
@@ -136,7 +145,6 @@ class TestCodeToRest(object):
 # Test the fixup code which removes junk lines used only to produce a desired
 # indent.
 class TestCodeToRestHtmlClean(object):
-
     # Show that normal text isn't changed
     def test_1(self):
         string = 'testing'
@@ -149,4 +157,49 @@ class TestCodeToRestHtmlClean(object):
         ret = code_to_rest_html_clean(string)
         assert ret == '<blockquote>\n</blockquote>'
 
-    # TODO: Many more test cases.
+# Fenced code block testing
+# =========================
+# Use docutils to test converting a fenced code block to HTML.
+class TestRestToHtml(object):
+    # Use docutils to convert reST to HTML, then look at the resulting string.
+    def t(self, rest):
+        html = core.publish_string(rest, writer_name='html')
+        # Snip out just the body. Note that ``.`` needs the `re.DOTALL flag
+        # <https://docs.python.org/2/library/re.html#re.DOTALL>`_ so that it
+        # can match newlines.
+        bodyMo = re.search('<body>\n(.*)</body>', html, re.DOTALL)
+        body = bodyMo.group(1)
+        # docutils wraps the resulting HTML in a <div>. Strip that out as well.
+        divMo = re.search('<div class="document">\n\n\n(.*)\n</div>', body, re.DOTALL)
+        div = divMo.group(1)
+        return div
+
+    # Test the harness -- can we pass a simple string through properly?
+    def test_1(self):
+        assert self.t('testing') == '<p>testing</p>'
+
+    # Test the harness -- can we pass some code through properly?
+    def test_2(self):
+        assert (self.t('.. code::\n\n testing') ==
+                '<pre class="code literal-block">\ntesting\n</pre>')
+
+    # See if a fenced code block that's too short produces an error.
+    def test_3(self):
+        assert ('Fenced code block must contain at least two lines.' in
+                self.t('.. fenced-code::') )
+    def test_4(self):
+        assert ('Fenced code block must contain at least two lines.' in
+                self.t('.. fenced-code::\n\n First fence') )
+
+    # Verify that a fenced code block with just fences complains about empty
+    # output.
+    def test_5(self):
+        assert ('Content block expected for the '
+        in self.t('.. fenced-code::\n\n First fence\n Second fence\n') )
+
+    # Check output of a one-line code block surrounded by fences.
+    def test_6(self):
+        assert (self.t('.. fenced-code::\n\n First fence\n testing\n Second fence\n') ==
+                '<pre class="code literal-block">\ntesting\n</pre>')
+
+
