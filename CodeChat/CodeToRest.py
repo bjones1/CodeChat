@@ -47,6 +47,10 @@ import os.path
 # -------------------
 # Used to open files with unknown encodings and to run docutils itself.
 from docutils import io, core
+# Import CodeBlock as a base class for FencedCodeBlock.
+from docutils.parsers.rst.directives.body import CodeBlock
+# Import directives to register the new FencedCodeBlock directive.
+from docutils.parsers.rst import directives
 # For the docutils default stylesheet and template
 import docutils.writers.html4css1
 from docutils.writers.html4css1 import Writer
@@ -433,7 +437,6 @@ def code_to_html_file(
     fo.write(html)
 
 
-from docutils.parsers.rst.directives.body import CodeBlock
 # Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
@@ -499,7 +502,7 @@ class FencedCodeBlock(CodeBlock):
 
         return nodeList
 
-from docutils.parsers.rst import directives
+# Register the new fenced code block directive with docutils.
 directives.register_directive('fenced-code', FencedCodeBlock)
 
 if __name__ == '__main__':
