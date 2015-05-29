@@ -253,6 +253,8 @@ class TestCodeToHtmlFile(object):
 # ==================================================
 from .CodeToRest import *
 from pygments.token import Token
+from pygments import lex
+from pygments.lexers import get_lexer_by_name
 import os
 
 remove_comment_chars_c = remove_comment_chars(*COMMENT_DELIMITER_LENGTHS['C'])
@@ -270,13 +272,14 @@ class TestCodeToRestNew(object):
         try:
             with open(test_py_file, 'w') as f:
                 f.write(test_py_code)
-            token_list = list(code_file_to_lexer('usedToTestLexer.py'))
-            print(token_list)
+            code_str, lexer = list(code_file_to_lexer('usedToTestLexer.py'))
+            token_list = list( lex(code_str, lexer) )
             assert token_list == test_token_list
         finally:
             os.unlink(test_py_file)
 
-        token_list = list(code_str_to_lexer(test_py_code, 'python'))
+        lexer = get_lexer_by_name('python')
+        token_list = list( lex(test_py_code, lexer) )
         assert token_list == test_token_list
 
     test_c_code = \
@@ -292,7 +295,8 @@ main(){
 
     # Check grouping of a list of tokens.
     def test_2(self):
-        token_iter = code_str_to_lexer(self.test_c_code, 'c')
+        lexer = get_lexer_by_name('c')
+        token_iter = lex(self.test_c_code, lexer)
         # Capture both group and string for help in debugging.
         token_group = list(group_lexer_tokens(token_iter))
         # But split the two into separate lists for unit tests.
@@ -313,14 +317,16 @@ main(){
         # Note that this will add a newline to the lexed output, since the
         # `ensurenl <http://pygments.org/docs/lexers/>`_ option is True by
         # default.
-        token_iter = code_str_to_lexer('', 'c')
+        lexer = get_lexer_by_name('python')
+        token_iter = lex('', lexer)
         # Capture both group and string for help in debugging.
         token_group = list(group_lexer_tokens(token_iter))
         assert token_group == [(WHITESPACE_GROUP, u'\n')]
 
     # Check gathering of groups by newlines.
     def test_4(self):
-        token_iter = code_str_to_lexer(self.test_c_code, 'c')
+        lexer = get_lexer_by_name('c')
+        token_iter = lex(self.test_c_code, lexer)
         token_group = group_lexer_tokens(token_iter)
         gathered_group = list(gather_groups_on_newlines(token_group))
         expected_group = [
@@ -543,7 +549,8 @@ main(){
 
     # From code to classification.
     def test_10(self):
-        token_iter = code_str_to_lexer(self.test_c_code, 'c')
+        lexer = get_lexer_by_name('c')
+        token_iter = lex(self.test_c_code, lexer)
         token_group = group_lexer_tokens(token_iter)
         gathered_group = gather_groups_on_newlines(token_group)
         classified_group = list( classify_groups(gathered_group, remove_comment_chars_c) )
@@ -565,7 +572,6 @@ main(){
           [(-1, u'\n'),
            (-1, u'code\n'),
            (-1, u'\n')], out_stringio)
-        print(out_stringio.getvalue())
         assert (out_stringio.getvalue() == 
 # Note: Not using a """ string, since the string trailing whitespace option in
 # Enki would remove some of the one-space lines.
@@ -584,7 +590,6 @@ main(){
           [(0, u'\n'),
            (0, u'comment\n'),
            (0, u'\n')], out_stringio)
-        print(out_stringio.getvalue())
         assert (out_stringio.getvalue() == 
 """
 comment
@@ -596,7 +601,6 @@ comment
           [(3, u'\n'),
            (3, u'comment\n'),
            (3, u'\n')], out_stringio)
-        print(out_stringio.getvalue())
         assert (out_stringio.getvalue() == 
 """.. raw:: html
 

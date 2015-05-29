@@ -538,7 +538,17 @@ from pygments.token import Token
 
 # Run the entire process
 # ----------------------
-# Given code and a lexer for it, output rest.
+# Given code and a lexer for it, output reST. Use one of the routine from
+# step 1 below to obtain the lexer and code_str. For example:
+#
+# .. code-block:: python
+#    :linenos:
+#
+#    code_str, lexer = code_file_to_lexer('test.py')
+#    -or-
+#    lexer = get_lexer_by_name('python')
+#    -then-
+#    lexer_to_rest(code_str, lexer, out_file)
 def lexer_to_rest(
   # The code to translate to reST.
   code_str,
@@ -547,7 +557,7 @@ def lexer_to_rest(
   # See out_file_.
   out_file):
 
-    # Invoke the lexer (step 1 of the rewrite_).
+    # Invoke the lexer (provided by step 1 of the rewrite_).
     token_iter = lex(code_str, lexer)
 
     # Group the tokens (step 2 of the rewrite_).
@@ -604,25 +614,7 @@ def code_file_to_lexer(
     lexer = get_lexer_for_filename(source_path, **lexer_options)
 
     # Invoke the lexer.
-    return lex(fi.read(), lexer)
-
-# Given a string containing source code, invoke the lexer on it.
-def code_str_to_lexer(
-  # |source_str|
-  source_str,
-  # One of the short names from the `available lexers
-  # <http://pygments.org/docs/lexers/>`_.
-  lexer_name,
-  # See the same parameter in code_file_to_lexer.
-  **lexer_options):
-
-    # `Request
-    # <http://pygments.org/docs/api/#pygments.lexers.get_lexer_by_name>`__
-    # a Pygments lexer given its short name (alias).
-    lexer = get_lexer_by_name(lexer_name, **lexer_options)
-
-    # Invoke the lexer.
-    return lex(source_str, lexer)
+    return fi.read(), lexer
 
 # Step #2 of the rewrite_
 # -----------------------
