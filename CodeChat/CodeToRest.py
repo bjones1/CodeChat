@@ -513,7 +513,7 @@ directives.register_directive('fenced-code', FencedCodeBlock)
 # #. Combine tokens from the lexer into three groups: whitespace, comment, or
 #    other.
 # #. Make a per-line list of [group, string], so that the last string in each
-#    list ends with a newline. Change the group of multi-line comments that
+#    list ends with a newline. Change the group of block comments that
 #    actually span multiple lines.
 # #. Classify each line. If a line contains OTHER_GROUP, or the first
 #    non-comment character of the first comment isn't a space or newline,
@@ -658,16 +658,16 @@ def group_lexer_tokens(
 # Supporting routines and definitions
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # Define the groups into which tokens will be placed.
-(WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, OTHER_GROUP,
+(WHITESPACE_GROUP, INLINE_COMMENT_GROUP, OTHER_GROUP,
  # A ``/* comment */``-style comment contained in one string.
- MULTI_LINE_COMMENT_GROUP,
+ BLOCK_COMMENT_GROUP,
  # Grouping is::
  #
- #    /* MULTI_LINE_COMMENT_START_GROUP,
- #       MULTI_LINE_COMMENT_BODY_GROUP, (repeats for all comment body)
- #       MULTI_LINE_COMMENT_END_GROUP */
- MULTI_LINE_COMMENT_START_GROUP, MULTI_LINE_COMMENT_BODY_GROUP,
- MULTI_LINE_COMMENT_END_GROUP) = range(7)
+ #    /* BLOCK_COMMENT_START_GROUP,
+ #       BLOCK_COMMENT_BODY_GROUP, (repeats for all comment body)
+ #       BLOCK_COMMENT_END_GROUP */
+ BLOCK_COMMENT_START_GROUP, BLOCK_COMMENT_BODY_GROUP,
+ BLOCK_COMMENT_END_GROUP) = range(7)
 
 # Given a tokentype, group it.
 def group_for_tokentype(
@@ -683,9 +683,9 @@ def group_for_tokentype(
         return WHITESPACE_GROUP
     if tokentype in Token.Comment and tokentype not in Token.Comment.Preproc:
         if tokentype not in Token.Comment.Multiline:
-            return SINGLE_LINE_COMMENT_GROUP
+            return INLINE_COMMENT_GROUP
         else:
-            return MULTI_LINE_COMMENT_GROUP
+            return BLOCK_COMMENT_GROUP
     return OTHER_GROUP
 
 
@@ -702,27 +702,27 @@ def gather_groups_on_newlines(
 
     # Accumulate until we find a newline, then yield that.
     for (group, string) in iter_grouped:
-        # A given group (such as a multiline string) may extend across multiple
+        # A given group (such as a block string) may extend across multiple
         # newlines. Split these groups apart first.
         splitlines = string.splitlines(True)
-        # Look for multi-line comments spread across multiple lines and label
+        # Look for block comments spread across multiple lines and label
         # them  correctly.
-        if len(splitlines) > 1 and group == MULTI_LINE_COMMENT_GROUP:
-            group = MULTI_LINE_COMMENT_START_GROUP
+        if len(splitlines) > 1 and group == BLOCK_COMMENT_GROUP:
+            group = BLOCK_COMMENT_START_GROUP
         for split_str_index in range(len(splitlines)):
             # Accumulate results.
             split_str = splitlines[split_str_index]
             l.append( (group, split_str) )
 
-            # For multi-line comments, move from a start to a body group.
-            if group == MULTI_LINE_COMMENT_START_GROUP:
-                group = MULTI_LINE_COMMENT_BODY_GROUP
-            # If the next line is the last line, update the multi-line
+            # For block comments, move from a start to a body group.
+            if group == BLOCK_COMMENT_START_GROUP:
+                group = BLOCK_COMMENT_BODY_GROUP
+            # If the next line is the last line, update the block
             # group.
             is_next_to_last_line = split_str_index == len(splitlines) - 2
             if (is_next_to_last_line and
-                group == MULTI_LINE_COMMENT_BODY_GROUP):
-                group = MULTI_LINE_COMMENT_END_GROUP
+                group == BLOCK_COMMENT_BODY_GROUP):
+                group = BLOCK_COMMENT_END_GROUP
 
             # Yield when we find a newline, then clear our accumulator.
             if split_str.endswith('\n'):
@@ -748,13 +748,13 @@ def classify_groups(
   # string).
   remove_comment_chars_):
 
-    # Keep track of multi-line comment state.
-    is_multiline_rest_comment = False
+    # Keep track of block comment state.
+    is_block_rest_comment = False
 
     # Walk through groups.
     for l in iter_gathered_groups:
 
-        if is_rest_comment(l, is_multiline_rest_comment, remove_comment_chars_):
+        if is_rest_comment(l, is_block_rest_comment, remove_comment_chars_):
 
             first_group, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
@@ -765,9 +765,9 @@ def classify_groups(
             else:
                 type_ = 0
 
-            # Update the multiline reST state.
-            if l[0][0] == MULTI_LINE_COMMENT_START_GROUP:
-                is_multiline_rest_comment = True
+            # Update the block reST state.
+            if l[0][0] == BLOCK_COMMENT_START_GROUP:
+                is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
             string = ''.join([remove_comment_chars_(group, string) 
@@ -775,15 +775,15 @@ def classify_groups(
             # Remove the inital whitespace character from the first comment,
             # but not from body or end comments.
             if ( len(string) and
-                first_group not in (MULTI_LINE_COMMENT_BODY_GROUP,
-                                    MULTI_LINE_COMMENT_END_GROUP) ):
+                first_group not in (BLOCK_COMMENT_BODY_GROUP,
+                                    BLOCK_COMMENT_END_GROUP) ):
                 string = string[1:]
 
         # Everything else is considered code.
         else:
             type_ = -1
             string = ''.join([string for group, string in l])
-            is_multiline_rest_comment = False
+            is_block_rest_comment = False
 
         yield type_, string
 
@@ -807,14 +807,14 @@ def remove_comment_chars(
       # The string corresponding to this group.
       string):
 
-        if group == SINGLE_LINE_COMMENT_GROUP:
+        if group == INLINE_COMMENT_GROUP:
             return string[len_inline_comment_delim:]
-        if group == MULTI_LINE_COMMENT_GROUP:
+        if group == BLOCK_COMMENT_GROUP:
             return string[ len_opening_block_comment_delim:
                           -len_closing_block_comment_delim]
-        if group == MULTI_LINE_COMMENT_START_GROUP:
+        if group == BLOCK_COMMENT_START_GROUP:
             return string[len_opening_block_comment_delim:]
-        if group == MULTI_LINE_COMMENT_END_GROUP:
+        if group == BLOCK_COMMENT_END_GROUP:
             return string[:-len_closing_block_comment_delim]
         else:
             return string
@@ -824,11 +824,11 @@ def remove_comment_chars(
 # Determine if the given line is a comment to be interpreted by reST.
 # Supports ``remove_comment_chars``, ``classify_groups``.
 def is_rest_comment(
-  # A list of (group, string) representing a single line.
+  # A sequence of (group, string) representing a single line.
   line_list,
-  # True if this line contains the body or end of a multi-line comment
+  # True if this line contains the body or end of a block comment
   # that will be interpreted by reST.
-  is_multiline_rest_comment,
+  is_block_rest_comment,
   # See remove_comment_chars_.
   remove_comment_chars_):
 
@@ -852,14 +852,14 @@ def is_rest_comment(
     #
     #  #. // comment, //\n -> reST comment
     #  #. //comment -> not a reST comment.
-    #  #. /* comment, /*\n, or any multi-line body or end for which its
-    #     multi-line start was a reST comment.
+    #  #. /* comment, /*\n, or any block comment body or end for which its
+    #     block start was a reST comment.
     first_char_is_rest = (len(first_comment_text) > 0 and
                           first_comment_text[0] in (' ', '\n'))
-    is_multiline_body_or_end = first_group in (MULTI_LINE_COMMENT_BODY_GROUP,
-                                               MULTI_LINE_COMMENT_END_GROUP)
-    if ( (first_char_is_rest and not is_multiline_body_or_end) or
-         (is_multiline_rest_comment and is_multiline_body_or_end) ):
+    is_block_body_or_end = first_group in (BLOCK_COMMENT_BODY_GROUP,
+                                               BLOCK_COMMENT_END_GROUP)
+    if ( (first_char_is_rest and not is_block_body_or_end) or
+         (is_block_rest_comment and is_block_body_or_end) ):
         return True
     return False
 
