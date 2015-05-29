@@ -512,12 +512,14 @@ directives.register_directive('fenced-code', FencedCodeBlock)
 # #. Combine tokens from the lexer into three groups: whitespace, comment, or
 #    other.
 # #. Make per-line list of [group, string], so that the last string in each
-#    list ends with a newline.
-# #. Classify each line:
+#    list ends with a newline. Change the group of multi-line comments that
+#    actually span multiple lines.
+# #. Classify each line. If a line contains OTHER_GROUP, or the first
+#    non-comment character of the first comment isn't a space or newline,
+#    it's code. Otherwise, it's a comment.
 #
-#    * [whitespace] comment [whitespace] -> comment n, where n = len(leading
-#      whitespace).
-#    * Anything else - > code.
+#    For comments, remove the leading whitespace and all comment characters
+#    (the // or #, for example).
 #
 #    Note that mixed code and comments is hard: reST will still apply some of
 #    its parsing rules to an inline code block or inline literal, meaning
@@ -575,8 +577,16 @@ def code_str_to_lexer(
     return lex(source_str, lexer)
 
 # Define the groups into which tokens will be placed.
-(WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, MULTI_LINE_COMMENT_GROUP,
-  OTHER_GROUP) = 'W', 'S', 'M', 'O'
+(WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, OTHER_GROUP,
+ # A /* comment */-style comment contained in one string.
+ MULTI_LINE_COMMENT_GROUP,
+ # Grouping is::
+ #
+ #    /* MULTI_LINE_COMMENT_START_GROUP,
+ #       MULTI_LINE_COMMENT_BODY_GROUP, (repeats for all comment body)
+ #       MULTI_LINE_COMMENT_END_GROUP */
+ MULTI_LINE_COMMENT_START_GROUP, MULTI_LINE_COMMENT_BODY_GROUP,
+ MULTI_LINE_COMMENT_END_GROUP) = range(7)
 
 # Given a tokentype, group it.
 def group_for_tokentype(
@@ -637,11 +647,28 @@ def gather_groups_on_newlines(
 
     # Accumulate until we find a newline, then yield that.
     for (group, string) in iter_grouped:
-        # A given group (such as a multiline comment) may extend across multiple
+        # A given group (such as a multiline string) may extend across multiple
         # newlines. Split these groups apart first.
-        for split_str in string.splitlines(True):
+        splitlines = string.splitlines(True)
+        # Look for multi-line comments spread across multiple lines and label
+        # them  correctly.
+        if len(splitlines) > 1 and group == MULTI_LINE_COMMENT_GROUP:
+            group = MULTI_LINE_COMMENT_START_GROUP
+        for split_str_index in range(len(splitlines)):
             # Accumulate results.
+            split_str = splitlines[split_str_index]
             l.append( (group, split_str) )
+
+            # For multi-line comments, move from a start to a body group.
+            if group == MULTI_LINE_COMMENT_START_GROUP:
+                group = MULTI_LINE_COMMENT_BODY_GROUP
+            # If the next line is the last line, update the multi-line
+            # group.
+            is_next_to_last_line = split_str_index == len(splitlines) - 2
+            if (is_next_to_last_line and
+                group == MULTI_LINE_COMMENT_BODY_GROUP):
+                group = MULTI_LINE_COMMENT_END_GROUP
+
             # Yield when we find a newline, then clear our accumulator.
             if split_str.endswith('\n'):
                 yield l
@@ -668,41 +695,55 @@ def remove_comment_chars(
         return string[len_single_line_comment:]
     if group == MULTI_LINE_COMMENT_GROUP:
         return string[len_multi_line_comment:-len_multi_line_comment]
+    if group == MULTI_LINE_COMMENT_START_GROUP:
+        return string[len_multi_line_comment:]
+    if group == MULTI_LINE_COMMENT_END_GROUP:
+        return string[:-len_multi_line_comment]
     else:
         return string
 
-# Determine if the given line is a comment.
-def is_comment(
+# Determine if the given line is a comment to be interpreted by reST.
+def is_rest_comment(
   # A list of (group, string) representing a single line.
   line_list,
+  # True if this line contains the body or end of a multi-line comment
+  # that will be interpreted by reST.
+  is_multiline_rest_comment,
   # See the same parameter in remove_comment_chars above.
   len_single_line_comment,
   # See the same parameter in remove_comment_chars above.
   len_multi_line_comment):
 
-    # Transform this into a string of group characters.
-    group_string = ''.join([group for group, string_ in line_list])
+    # See if there is any OTHER_GROUP in this line. If so, it's not a reST 
+    # comment.
+    group_tuple, string_tuple = zip(*line_list)
+    if OTHER_GROUP in group_tuple:
+        return False
+    # If there's no comments (meaning the entire line is whitespace), it's not a
+    # reST comment.
+    if group_tuple == (WHITESPACE_GROUP, ):
+        return False
 
-    # A comment must be of the form: [whitespace] comment [whitespace|comment]* eol.
-    comment = SINGLE_LINE_COMMENT_GROUP + MULTI_LINE_COMMENT_GROUP
-    pattern = (WHITESPACE_GROUP + '?[' + comment + '][' + WHITESPACE_GROUP +
-               comment + ']*$')
-    print(pattern)
-    print(group_string)
-    if re.match(pattern, group_string):
-        print('match')
-        # Note that //comment isn't treated as a comment, but // comment
-        # is. That is, the first character of the first comment (not
-        # including the comment character(s) themselves) must be either
-        # whitespace or blank.
-        first_comment_index = 1 if group_string[0] == WHITESPACE_GROUP else 0
-        group, string_ = line_list[first_comment_index]
-        rc = remove_comment_chars(group, string_, len_single_line_comment,
-                                  len_multi_line_comment)
-        if len(rc) == 0 or rc[0] in string.whitespace:
-            return True
-
-    # If any of these conditions fail, it's not a comment.
+    # Find the first comment. There may be whitespace preceeding it, so select
+    # the correct index.
+    first_comment_index = 1 if group_tuple[0] == WHITESPACE_GROUP else 0
+    first_group = group_tuple[first_comment_index]
+    first_string = string_tuple[first_comment_index]
+    first_comment_text = remove_comment_chars(first_group, first_string,
+      len_single_line_comment, len_multi_line_comment)
+    # The cases are::
+    #
+    #  #. // comment, //\n -> reST comment
+    #  #. //comment -> not a reST comment.
+    #  #. /* comment, /*\n, or any multi-line body or end for which its
+    #     multi-line start was a reST comment.
+    first_char_is_rest = (len(first_comment_text) > 0 and
+                          first_comment_text[0] in (' ', '\n'))
+    is_multiline_body_or_end = first_group in (MULTI_LINE_COMMENT_BODY_GROUP,
+                                               MULTI_LINE_COMMENT_END_GROUP)
+    if ( (first_char_is_rest and not is_multiline_body_or_end) or
+         (is_multiline_rest_comment and is_multiline_body_or_end) ):
+        return True
     return False
 
 # Classify the output of ``gather_groups_on_newlines`` into either a code or
@@ -717,29 +758,43 @@ def classify_groups(
   # See the same parameter in remove_comment_chars above.
   len_multi_line_comment):
 
+    # Keep track of multi-line comment state.
+    is_multiline_rest_comment = False
+
     # Walk through groups.
     for l in iter_gathered_groups:
 
-        if is_comment(l, len_single_line_comment, len_multi_line_comment):
-            first_group = l[0][0]
+        if is_rest_comment(l, is_multiline_rest_comment,
+                           len_single_line_comment, len_multi_line_comment):
+
+            first_group, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
             if first_group == WHITESPACE_GROUP:
-                first_group, first_string = l.pop()
+                # Encode this whitespace in the type, then drop it.
                 type_ = len(first_string)
+                l.pop(0)
             else:
                 type_ = 0
+
+            # Update the multiline reST state.
+            if l[0][0] == MULTI_LINE_COMMENT_START_GROUP:
+                is_multiline_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
             string = ''.join([remove_comment_chars(group, string,
               len_single_line_comment, len_multi_line_comment)
               for group, string in l])
-            # Remove the inital whitespace character from the first comment.
-            if len(string):
+            # Remove the inital whitespace character from the first comment,
+            # but not from body or end comments.
+            if ( len(string) and
+                first_group not in (MULTI_LINE_COMMENT_BODY_GROUP,
+                                    MULTI_LINE_COMMENT_END_GROUP) ):
                 string = string[1:]
 
         # Everything else is considered code.
         else:
             type_ = -1
             string = ''.join([string for group, string in l])
+            is_multiline_rest_comment = False
 
         yield type_, string

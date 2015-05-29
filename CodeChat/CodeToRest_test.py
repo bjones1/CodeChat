@@ -251,11 +251,7 @@ class TestCodeToHtmlFile(object):
 
 # In development: tests of new Pygments-based parser
 # ==================================================
-from .CodeToRest import code_file_to_lexer, code_str_to_lexer, \
-    group_lexer_tokens, WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, \
-    MULTI_LINE_COMMENT_GROUP, OTHER_GROUP, \
-    gather_groups_on_newlines, classify_groups, remove_comment_chars, \
-    is_comment
+from .CodeToRest import *
 from pygments.token import Token
 import os
 class TestCodeToRestNew(object):
@@ -284,7 +280,8 @@ class TestCodeToRestNew(object):
     test_c_code = \
 """#include <stdio.h>
 
-/* A multi-line
+/* A multi-
+   line
    comment */
 
 main(){
@@ -324,12 +321,12 @@ main(){
         token_iter = code_str_to_lexer(self.test_c_code, 'c')
         token_group = group_lexer_tokens(token_iter)
         gathered_group = list(gather_groups_on_newlines(token_group))
-        print gathered_group
         expected_group = [
           [(OTHER_GROUP, u'#include <stdio.h>\n')],
           [(WHITESPACE_GROUP, u'\n')],
-          [(MULTI_LINE_COMMENT_GROUP, u'/* A multi-line\n')],
-          [(MULTI_LINE_COMMENT_GROUP, u'   comment */'),
+          [(MULTI_LINE_COMMENT_START_GROUP, u'/* A multi-\n')],
+          [(MULTI_LINE_COMMENT_BODY_GROUP, u'   line\n')],
+          [(MULTI_LINE_COMMENT_END_GROUP, u'   comment */'),
            (WHITESPACE_GROUP, u'\n')],
           [(WHITESPACE_GROUP, u'\n')],
           [(OTHER_GROUP, u'main(){'), (WHITESPACE_GROUP, u'\n')],
@@ -355,11 +352,150 @@ main(){
         assert (remove_comment_chars(MULTI_LINE_COMMENT_GROUP,
                                      u'/* comment */', 2, 2) == u' comment ')
 
-# Misc tests
-# ----------
     def test_4e(self):
-        assert is_comment([
-          (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')], 2, 2)
+        assert (remove_comment_chars(MULTI_LINE_COMMENT_START_GROUP,
+                                     u'/* comment\n', 2, 2) == u' comment\n')
+
+    def test_4f(self):
+        assert (remove_comment_chars(MULTI_LINE_COMMENT_BODY_GROUP,
+                                     u'comment\n', 2, 2) == u'comment\n')
+
+    def test_4g(self):
+        assert (remove_comment_chars(MULTI_LINE_COMMENT_END_GROUP,
+                                     u'comment */', 2, 2) == u'comment ')
+
+# is_rest_comment tests
+# ---------------------
+    # newline only
+    def test_4aa1(self):
+        assert not is_rest_comment([
+          (WHITESPACE_GROUP, u'\n')], False, 2, 2)
+
+    # // comments with and without preceeding whitespace.
+    def test_4aa(self):
+        assert is_rest_comment([
+          (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')], False, 2, 2)
+
+    def test_4ab(self):
+        assert is_rest_comment([
+          (SINGLE_LINE_COMMENT_GROUP, u'//\n')], False, 2, 2)
+
+    def test_4ac(self):
+        assert is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')], False, 2, 2)
+
+    def test_4ad(self):
+        assert is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (SINGLE_LINE_COMMENT_GROUP, u'//\n')], False, 2, 2)
+
+    # //comments with and without preceeding whitespace.
+    def test_4ae(self):
+        assert not is_rest_comment([
+          (SINGLE_LINE_COMMENT_GROUP, u'//comment\n')], False, 2, 2)
+
+    def test_4af(self):
+        assert not is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (SINGLE_LINE_COMMENT_GROUP, u'//comment\n')], False, 2, 2)
+
+    ## A /**/ comment.
+    def test_4ag1(self):
+        assert not is_rest_comment([
+          (MULTI_LINE_COMMENT_GROUP, u'/**/')], False, 2, 2)
+
+    ## A /* */ comment.
+    def test_4ag2(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_GROUP, u'/* */')], False, 2, 2)
+
+    ## /* comments */ with and without preceeding whitespace.
+    def test_4ag(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment */')], False, 2, 2)
+
+    def test_4ah(self):
+        assert is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment */')], False, 2, 2)
+
+    ## /*comments */ with and without preceeding whitespace.
+    def test_4ai(self):
+        assert not is_rest_comment([
+          (MULTI_LINE_COMMENT_GROUP, u'/*comment */')], False, 2, 2)
+
+    def test_4aj(self):
+        assert not is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_GROUP, u'/*comment */')], False, 2, 2)
+
+    ## /* comments with and without preceeding whitespace.
+    def test_4ak(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_START_GROUP, u'/* comment\n')], False, 2, 2)
+
+    def test_4al(self):
+        assert is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_START_GROUP, u'/* comment\n')], False, 2, 2)
+
+    ## /*comments with and without preceeding whitespace.
+    def test_4am(self):
+        assert not is_rest_comment([
+          (MULTI_LINE_COMMENT_START_GROUP, u'/*comment\n')], False, 2, 2)
+
+    def test_4an(self):
+        assert not is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_START_GROUP, u'/*comment\n')], False, 2, 2)
+
+    # multi-line body and end comments.
+    def test_4ao(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_BODY_GROUP, u'comment\n')], True, 2, 2)
+
+    def test_4ao1(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_BODY_GROUP, u'\n')], True, 2, 2)
+
+    def test_4ap(self):
+        assert not is_rest_comment([
+          (MULTI_LINE_COMMENT_BODY_GROUP, u'comment\n')], False, 2, 2)
+
+    def test_4aq(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_END_GROUP, u'comment */')], True, 2, 2)
+
+    def test_4ar(self):
+        assert not is_rest_comment([
+          (MULTI_LINE_COMMENT_END_GROUP, u'comment */')], False, 2, 2)
+
+    ## Multiple /* comments */ on a line.
+    def test_4as(self):
+        assert is_rest_comment([
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment1 */'),
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_GROUP, u'/*comment2 */')], False, 2, 2)
+
+    def test_4at(self):
+        assert is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment1 */'),
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_GROUP, u'/*comment2 */')], False, 2, 2)
+
+    # Mixed comments and code.
+    def test_4au(self):
+        assert not is_rest_comment([
+          (WHITESPACE_GROUP, u'  '),
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment */'),
+          (OTHER_GROUP, u'foo();')], False, 2, 2)
+
+    def test_4av(self):
+        assert not is_rest_comment([
+          (MULTI_LINE_COMMENT_END_GROUP, u'comment */'),
+          (OTHER_GROUP, u'foo();')], True, 2, 2)
 
 # Classifier tests
 # ----------------
@@ -376,32 +512,46 @@ main(){
           (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')]], 2, 2) )
         assert cg == [(2, u'comment\n')]
 
-    # Test whitespace comment whitespace.
-    def xtest_7(self):
+    # Test code.
+    def test_7(self):
         cg = list( classify_groups([[
           (WHITESPACE_GROUP, u'  '),
-          (SINGLE_LINE_COMMENT_GROUP, u'/* comment */'),
+          (OTHER_GROUP, u'foo();'),
           (WHITESPACE_GROUP, u'\n')]], 2, 2) )
-        assert cg == [(2, u'comment \n')]
+        assert cg == [(-1, u'  foo();\n')]
 
-    # Test comment whitespace.
+    # Test multi-line comments.
     def test_8(self):
-        cg = list( classify_groups([[
-          (MULTI_LINE_COMMENT_GROUP, u'/* comment */'),
-          (WHITESPACE_GROUP, u'\n')]], 2, 2) )
-        assert cg == [(0, u'comment \n')]
+        cg = list( classify_groups([
+          [(MULTI_LINE_COMMENT_START_GROUP, u'/* multi-\n')],
+          [(MULTI_LINE_COMMENT_BODY_GROUP,  u'   line\n')],
+          [(MULTI_LINE_COMMENT_END_GROUP,   u'   comment */')]], 2, 2) )
+        assert cg == [(0, u'multi-\n'),
+                      (0, u'   line\n'),
+                      (0, u'   comment ')]
 
-    # Test code whitespace.
     def test_9(self):
-        cg = list( classify_groups([[
-          (OTHER_GROUP, u'main()'), (WHITESPACE_GROUP, u'\n')]], 2, 2) )
-        assert cg == [(-1, u'main()\n')]
+        cg = list( classify_groups([
+          [(MULTI_LINE_COMMENT_START_GROUP, u'/*multi-\n')],
+          [(MULTI_LINE_COMMENT_BODY_GROUP,  u'  line\n')],
+          [(MULTI_LINE_COMMENT_END_GROUP,   u'  comment*/')]], 2, 2) )
+        assert cg == [(-1, u'/*multi-\n'),
+                      (-1, u'  line\n'),
+                      (-1, u'  comment*/')]
 
-    # Test whitespae comment code.
+    # From code to classification.
     def test_10(self):
-        cg = list( classify_groups([[
-          (WHITESPACE_GROUP, u'    '),
-          (MULTI_LINE_COMMENT_GROUP, u'/* comment */'),
-          (OTHER_GROUP, u'foo();')]], 2, 2) )
-        assert cg == [(-1, u'    /* comment */foo();')]
+        token_iter = code_str_to_lexer(self.test_c_code, 'c')
+        token_group = group_lexer_tokens(token_iter)
+        gathered_group = gather_groups_on_newlines(token_group)
+        classified_group = list( classify_groups(gathered_group, 2, 2) )
+        assert classified_group == [(-1, u'#include <stdio.h>\n'), 
+                                    (-1, u'\n'), 
+                                    ( 0, u'A multi-\n'), 
+                                    ( 0, u'   line\n'), 
+                                    ( 0, u'   comment \n'), 
+                                    (-1, u'\n'), 
+                                    (-1, u'main(){\n'), 
+                                    ( 2,   u'Empty.\n'), 
+                                    (-1, u'}\n')]
 
