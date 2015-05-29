@@ -248,3 +248,160 @@ class TestRestToHtml(object):
 class TestCodeToHtmlFile(object):
     def test_1(self):
         code_to_html_file('CodeToRestSphinx.py')
+
+# In development: tests of new Pygments-based parser
+# ==================================================
+from .CodeToRest import code_file_to_lexer, code_str_to_lexer, \
+    group_lexer_tokens, WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, \
+    MULTI_LINE_COMMENT_GROUP, OTHER_GROUP, \
+    gather_groups_on_newlines, classify_groups, remove_comment_chars, \
+    is_comment
+from pygments.token import Token
+import os
+class TestCodeToRestNew(object):
+    # Check that a simple file or string is tokenized correctly.
+    def test_1(self):
+        test_py_file = 'usedToTestLexer.py'
+        test_py_code = '# A comment\nan_identifier\n'
+        test_token_list = [(Token.Comment, u'# A comment'),
+                           (Token.Text, u'\n'),
+                           (Token.Name, u'an_identifier'),
+                           (Token.Text, u'\n')]
+
+        # Use a try/finally to remove the test_py_file even on a test failure.
+        try:
+            with open(test_py_file, 'w') as f:
+                f.write(test_py_code)
+            token_list = list(code_file_to_lexer('usedToTestLexer.py'))
+            print(token_list)
+            assert token_list == test_token_list
+        finally:
+            os.unlink(test_py_file)
+
+        token_list = list(code_str_to_lexer(test_py_code, 'python'))
+        assert token_list == test_token_list
+
+    test_c_code = \
+"""#include <stdio.h>
+
+/* A multi-line
+   comment */
+
+main(){
+  // Empty.
+}\n"""
+
+    # Check grouping of a list of tokens.
+    def test_2(self):
+        token_iter = code_str_to_lexer(self.test_c_code, 'c')
+        # Capture both group and string for help in debugging.
+        token_group = list(group_lexer_tokens(token_iter))
+        # But split the two into separate lists for unit tests.
+        group_list, string_list = zip(*token_group)
+        assert group_list == (
+          OTHER_GROUP,               # The #include.
+          WHITESPACE_GROUP,          # Up to the /* comment */.
+          MULTI_LINE_COMMENT_GROUP,  # The /* comment */.
+          WHITESPACE_GROUP,          # Up to the code.
+          OTHER_GROUP,               # main(){.
+          WHITESPACE_GROUP,          # Up to the // comment.
+          SINGLE_LINE_COMMENT_GROUP, # // commnet.
+          OTHER_GROUP,               # Closing }.
+          WHITESPACE_GROUP, )        # Final \n.
+
+    # Check grouping of an empty string.
+    def test_3(self):
+        # Note that this will add a newline to the lexed output, since the
+        # `ensurenl <http://pygments.org/docs/lexers/>`_ option is True by
+        # default.
+        token_iter = code_str_to_lexer('', 'c')
+        # Capture both group and string for help in debugging.
+        token_group = list(group_lexer_tokens(token_iter))
+        assert token_group == [(WHITESPACE_GROUP, u'\n')]
+
+    # Check gathering of groups by newlines.
+    def test_4(self):
+        token_iter = code_str_to_lexer(self.test_c_code, 'c')
+        token_group = group_lexer_tokens(token_iter)
+        gathered_group = list(gather_groups_on_newlines(token_group))
+        print gathered_group
+        expected_group = [
+          [(OTHER_GROUP, u'#include <stdio.h>\n')],
+          [(WHITESPACE_GROUP, u'\n')],
+          [(MULTI_LINE_COMMENT_GROUP, u'/* A multi-line\n')],
+          [(MULTI_LINE_COMMENT_GROUP, u'   comment */'),
+           (WHITESPACE_GROUP, u'\n')],
+          [(WHITESPACE_GROUP, u'\n')],
+          [(OTHER_GROUP, u'main(){'), (WHITESPACE_GROUP, u'\n')],
+          [(WHITESPACE_GROUP, u'  '),
+           (SINGLE_LINE_COMMENT_GROUP, u'// Empty.\n')],
+          [(OTHER_GROUP, u'}'), (WHITESPACE_GROUP, u'\n')] ]
+        assert gathered_group == expected_group
+
+# remove_comment_chars tests
+# --------------------------
+    def test_4a(self):
+        assert remove_comment_chars(WHITESPACE_GROUP, u'    ', 2, 2) == u'    '
+
+    def test_4b(self):
+        assert (remove_comment_chars(OTHER_GROUP, u'an_identifier', 2, 2) ==
+                u'an_identifier')
+
+    def test_4c(self):
+        assert (remove_comment_chars(SINGLE_LINE_COMMENT_GROUP,
+                                     u'// comment\n', 2, 2) == u' comment\n')
+
+    def test_4d(self):
+        assert (remove_comment_chars(MULTI_LINE_COMMENT_GROUP,
+                                     u'/* comment */', 2, 2) == u' comment ')
+
+# Misc tests
+# ----------
+    def test_4e(self):
+        assert is_comment([
+          (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')], 2, 2)
+
+# Classifier tests
+# ----------------
+    # Test comment.
+    def test_5(self):
+        cg = list( classify_groups([[
+          (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')]], 2, 2) )
+        assert cg == [(0, u'comment\n')]
+
+    # Test whitespace comment.
+    def test_6(self):
+        cg = list( classify_groups([[
+          (WHITESPACE_GROUP, u'  '),
+          (SINGLE_LINE_COMMENT_GROUP, u'// comment\n')]], 2, 2) )
+        assert cg == [(2, u'comment\n')]
+
+    # Test whitespace comment whitespace.
+    def xtest_7(self):
+        cg = list( classify_groups([[
+          (WHITESPACE_GROUP, u'  '),
+          (SINGLE_LINE_COMMENT_GROUP, u'/* comment */'),
+          (WHITESPACE_GROUP, u'\n')]], 2, 2) )
+        assert cg == [(2, u'comment \n')]
+
+    # Test comment whitespace.
+    def test_8(self):
+        cg = list( classify_groups([[
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment */'),
+          (WHITESPACE_GROUP, u'\n')]], 2, 2) )
+        assert cg == [(0, u'comment \n')]
+
+    # Test code whitespace.
+    def test_9(self):
+        cg = list( classify_groups([[
+          (OTHER_GROUP, u'main()'), (WHITESPACE_GROUP, u'\n')]], 2, 2) )
+        assert cg == [(-1, u'main()\n')]
+
+    # Test whitespae comment code.
+    def test_10(self):
+        cg = list( classify_groups([[
+          (WHITESPACE_GROUP, u'    '),
+          (MULTI_LINE_COMMENT_GROUP, u'/* comment */'),
+          (OTHER_GROUP, u'foo();')]], 2, 2) )
+        assert cg == [(-1, u'    /* comment */foo();')]
+

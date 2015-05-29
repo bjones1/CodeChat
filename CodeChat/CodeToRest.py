@@ -21,10 +21,10 @@
 # CodeToRest.py - a module to translate source code to reST
 # *********************************************************
 # This module provides two basic functions: code_to_rest_ (and related helper
-# functions) to convert a source files to reST, and code_to_rest_html_clean_ to
-# remove temporary markers required for correct code_to_rest_ operation. A
-# simple wrapper to convert source code to reST, then to HTML, then to
-# cleaned HTML is given in code_to_html_.
+# functions) to convert a source files to reST, and the FencedCodeBlock
+# directive to remove temporary markers (fences) required for correct
+# code_to_rest_ operation. A simple wrapper to convert source code to reST,
+# then to HTML, then to cleaned HTML is given in code_to_html_.
 #
 # .. contents::
 #
@@ -35,10 +35,10 @@
 #
 # Standard library
 # ----------------
-# For code_to_rest_html_clean replacements.
+# For code_to_rest parsing.
 import re
-# For calling code_to_rest with a string. While using cStringIO would be great,
-# it doesn't support Unicode, so we can't.
+# For calling code_to_rest with a string. While using cStringIO would be
+# great, it doesn't support Unicode, so we can't.
 from StringIO import StringIO
 # To find a file's extension and locate data files.
 import os.path
@@ -487,7 +487,7 @@ class FencedCodeBlock(CodeBlock):
         # from the previous link). This means code snippets, such as
         # ``def foo():`` won't be highlighted: Python wants ``def foo(): pass``,
         # for example. To get around this, setting the ``highlight_args`` option
-        # "Force"=True skips the parsing. I found this in
+        # "force"=True skips the parsing. I found this in
         # ``Sphinx.highlighting.highlight_block`` (see the ``force`` argument)
         # and in ``Sphinx.writers.html.HTMLWriter.visit_literal_block``, where
         # the ``code-block`` directive (which supports fragments of code, not
@@ -504,4 +504,242 @@ class FencedCodeBlock(CodeBlock):
 
 # Register the new fenced code block directive with docutils.
 directives.register_directive('fenced-code', FencedCodeBlock)
+#
+# Idea for code_to_rest rewrite
+# =============================
+# Use the Pygments lexer for better analysis!
+#
+# #. Combine tokens from the lexer into three groups: whitespace, comment, or
+#    other.
+# #. Make per-line list of [group, string], so that the last string in each
+#    list ends with a newline.
+# #. Classify each line:
+#
+#    * [whitespace] comment [whitespace] -> comment n, where n = len(leading
+#      whitespace).
+#    * Anything else - > code.
+#
+#    Note that mixed code and comments is hard: reST will still apply some of
+#    its parsing rules to an inline code block or inline literal, meaning
+#    that leading or trailing spaces and backticks will not be preserved,
+#    instead parsing incorrectly. For example ::
+#
+#       :code:` Testing `
+#
+#    renders incorrectly.
+#
+# #. Run a state machine to output the corresponding reST.
+#
+from pygments import lex
+from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
+from pygments.token import Token
+import string
+# Given a file containing source code, invoke the lexer on it.
+def code_file_to_lexer(
+  # |source_path|
+  source_path,
+  # |input_encoding|
+  input_encoding=None,
+  # Lexer `options <http://pygments.org/docs/lexers/>`_.
+  **lexer_options):
 
+    # Use docutil's I/O classes to better handle and sniff encodings.
+    #
+    # Note: This classe automatically close itself after a read.
+    fi = io.FileInput(source_path=source_path, encoding=input_encoding)
+
+    # `Request
+    # <http://pygments.org/docs/api/#pygments.lexers.get_lexer_for_filename>`_
+    # a Pygments lexer for this file.
+    lexer = get_lexer_for_filename(source_path, **lexer_options)
+
+    # Invoke the lexer.
+    return lex(fi.read(), lexer)
+
+# Given a string containing source code, invoke the lexer on it.
+def code_str_to_lexer(
+  # |source_str|
+  source_str,
+  # One of the short names from the `available lexers
+  # <http://pygments.org/docs/lexers/>`_.
+  lexer_name,
+  # See the same parameter in code_file_to_lexer.
+  **lexer_options):
+
+    # `Request
+    # <http://pygments.org/docs/api/#pygments.lexers.get_lexer_by_name>`__
+    # a Pygments lexer given its short name (alias).
+    lexer = get_lexer_by_name(lexer_name, **lexer_options)
+
+    # Invoke the lexer.
+    return lex(source_str, lexer)
+
+# Define the groups into which tokens will be placed.
+(WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, MULTI_LINE_COMMENT_GROUP,
+  OTHER_GROUP) = 'W', 'S', 'M', 'O'
+
+# Given a tokentype, group it.
+def group_for_tokentype(
+  # The tokentype to place into a group.
+  tokentype):
+
+    # The list of Pygments `tokens <http://pygments.org/docs/tokens/>`_ lists
+    # ``Token.Text`` (how a newline is classified) and ``Token.Whitespace``.
+    # Consider either as whitespace. However, note that preprocessor directives
+    # are considered as a type of comment by Pygments; for our grouping,
+    # consider them code.
+    if tokentype in Token.Text or tokentype in Token.Whitespace:
+        return WHITESPACE_GROUP
+    if tokentype in Token.Comment and tokentype not in Token.Comment.Preproc:
+        if tokentype not in Token.Comment.Multiline:
+            return SINGLE_LINE_COMMENT_GROUP
+        else:
+            return MULTI_LINE_COMMENT_GROUP
+    return OTHER_GROUP
+
+
+def group_lexer_tokens(
+  # An interable of (tokentype, value) pairs provided by the lexer, per
+  # `get_tokens
+  # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
+  iter_token):
+
+    # Keep track of the current group and string.
+    tokentype, current_string = iter_token.next()
+    current_group = group_for_tokentype(tokentype)
+
+    # Walk through tokens.
+    for tokentype, string in iter_token:
+        group = group_for_tokentype(tokentype)
+
+        # If there's a change in group, yield what we've accumulated so far,
+        # then initialize the state to the newly-found group and string.
+        if current_group != group:
+            yield current_group, current_string
+            current_group = group
+            current_string = string
+        # Otherwise, keep accumulating.
+        else:
+            current_string += string
+
+    # Output final pair, if we have it.
+    if current_string:
+        yield current_group, current_string
+
+# Given an iterable of groups, break them into lists based on newlines.
+def gather_groups_on_newlines(
+  # An iterable of (group, string) pairs provided by
+  # ``group_lexer_tokens``.
+  iter_grouped):
+
+    # Keep a list of (group, string) tuples we're accumulating.
+    l = []
+
+    # Accumulate until we find a newline, then yield that.
+    for (group, string) in iter_grouped:
+        # A given group (such as a multiline comment) may extend across multiple
+        # newlines. Split these groups apart first.
+        for split_str in string.splitlines(True):
+            # Accumulate results.
+            l.append( (group, split_str) )
+            # Yield when we find a newline, then clear our accumulator.
+            if split_str.endswith('\n'):
+                yield l
+                l = []
+
+    # Output final group, if one is still accumulating.
+    if l:
+        yield l
+
+# Given a (group, string) tuple, return the string with comment characters
+# removed if it is a comment, or just the string if it's not a comment.
+def remove_comment_chars(
+  # The group this string was classified into.
+  group,
+  # The string corresponding to this group.
+  string,
+  # Number of characters in a single-line comment
+  len_single_line_comment,
+  # Number of characters in a multi-line comment. I assume the start and end
+  # characters are the same length: <-- and -->, /* and */, etc.
+  len_multi_line_comment):
+
+    if group == SINGLE_LINE_COMMENT_GROUP:
+        return string[len_single_line_comment:]
+    if group == MULTI_LINE_COMMENT_GROUP:
+        return string[len_multi_line_comment:-len_multi_line_comment]
+    else:
+        return string
+
+# Determine if the given line is a comment.
+def is_comment(
+  # A list of (group, string) representing a single line.
+  line_list,
+  # See the same parameter in remove_comment_chars above.
+  len_single_line_comment,
+  # See the same parameter in remove_comment_chars above.
+  len_multi_line_comment):
+
+    # Transform this into a string of group characters.
+    group_string = ''.join([group for group, string_ in line_list])
+
+    # A comment must be of the form: [whitespace] comment [whitespace|comment]* eol.
+    comment = SINGLE_LINE_COMMENT_GROUP + MULTI_LINE_COMMENT_GROUP
+    pattern = (WHITESPACE_GROUP + '?[' + comment + '][' + WHITESPACE_GROUP +
+               comment + ']*$')
+    print(pattern)
+    print(group_string)
+    if re.match(pattern, group_string):
+        print('match')
+        # Note that //comment isn't treated as a comment, but // comment
+        # is. That is, the first character of the first comment (not
+        # including the comment character(s) themselves) must be either
+        # whitespace or blank.
+        first_comment_index = 1 if group_string[0] == WHITESPACE_GROUP else 0
+        group, string_ = line_list[first_comment_index]
+        rc = remove_comment_chars(group, string_, len_single_line_comment,
+                                  len_multi_line_comment)
+        if len(rc) == 0 or rc[0] in string.whitespace:
+            return True
+
+    # If any of these conditions fail, it's not a comment.
+    return False
+
+# Classify the output of ``gather_groups_on_newlines`` into either a code or
+# comment with n leading whitespace types. Remove all comment characters.
+def classify_groups(
+  # An iterable of [(group1, string1_no_newline), (group2, string2_no_newline),
+  # ..., (groupN, stringN_ending_newline)], produced by
+  # ``gather_groups_on_newlines``.
+  iter_gathered_groups,
+  # See the same parameter in remove_comment_chars above.
+  len_single_line_comment,
+  # See the same parameter in remove_comment_chars above.
+  len_multi_line_comment):
+
+    # Walk through groups.
+    for l in iter_gathered_groups:
+
+        if is_comment(l, len_single_line_comment, len_multi_line_comment):
+            first_group = l[0][0]
+            # The type = # of leading whitespace characters, or 0 if none.
+            if first_group == WHITESPACE_GROUP:
+                first_group, first_string = l.pop()
+                type_ = len(first_string)
+            else:
+                type_ = 0
+
+            # Strip all comment characters off the strings and combine them.
+            string = ''.join([remove_comment_chars(group, string,
+              len_single_line_comment, len_multi_line_comment)
+              for group, string in l])
+            # Remove the inital whitespace character from the first comment.
+            if len(string):
+                string = string[1:]
+
+        # Everything else is considered code.
+        else:
+            type_ = -1
+            string = ''.join([string for group, string in l])
+
+        yield type_, string
