@@ -504,14 +504,15 @@ class FencedCodeBlock(CodeBlock):
 
 # Register the new fenced code block directive with docutils.
 directives.register_directive('fenced-code', FencedCodeBlock)
+# .. _rewrite:
 #
 # Idea for code_to_rest rewrite
 # =============================
-# Use the Pygments lexer for better analysis!
-#
+# #. Create a Pygments lexer for the language in use: ``code_file_to_lexer``,
+#    ``code_str_to_lexer``.
 # #. Combine tokens from the lexer into three groups: whitespace, comment, or
 #    other.
-# #. Make per-line list of [group, string], so that the last string in each
+# #. Make a per-line list of [group, string], so that the last string in each
 #    list ends with a newline. Change the group of multi-line comments that
 #    actually span multiple lines.
 # #. Classify each line. If a line contains OTHER_GROUP, or the first
@@ -536,6 +537,9 @@ from pygments import lex
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
 from pygments.token import Token
 import string
+
+# Step #1 of the rewrite_
+# -----------------------
 # Given a file containing source code, invoke the lexer on it.
 def code_file_to_lexer(
   # |source_path|
@@ -576,9 +580,42 @@ def code_str_to_lexer(
     # Invoke the lexer.
     return lex(source_str, lexer)
 
+# Step #2 of the rewrite_
+# -----------------------
+# Given tokens, group them.
+def group_lexer_tokens(
+  # An interable of (tokentype, value) pairs provided by the lexer, per
+  # `get_tokens
+  # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
+  iter_token):
+
+    # Keep track of the current group and string.
+    tokentype, current_string = iter_token.next()
+    current_group = group_for_tokentype(tokentype)
+
+    # Walk through tokens.
+    for tokentype, string in iter_token:
+        group = group_for_tokentype(tokentype)
+
+        # If there's a change in group, yield what we've accumulated so far,
+        # then initialize the state to the newly-found group and string.
+        if current_group != group:
+            yield current_group, current_string
+            current_group = group
+            current_string = string
+        # Otherwise, keep accumulating.
+        else:
+            current_string += string
+
+    # Output final pair, if we have it.
+    if current_string:
+        yield current_group, current_string
+
+# Supporting routines and definitions
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # Define the groups into which tokens will be placed.
 (WHITESPACE_GROUP, SINGLE_LINE_COMMENT_GROUP, OTHER_GROUP,
- # A /* comment */-style comment contained in one string.
+ # A ``/* comment */``-style comment contained in one string.
  MULTI_LINE_COMMENT_GROUP,
  # Grouping is::
  #
@@ -608,34 +645,8 @@ def group_for_tokentype(
     return OTHER_GROUP
 
 
-def group_lexer_tokens(
-  # An interable of (tokentype, value) pairs provided by the lexer, per
-  # `get_tokens
-  # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
-  iter_token):
-
-    # Keep track of the current group and string.
-    tokentype, current_string = iter_token.next()
-    current_group = group_for_tokentype(tokentype)
-
-    # Walk through tokens.
-    for tokentype, string in iter_token:
-        group = group_for_tokentype(tokentype)
-
-        # If there's a change in group, yield what we've accumulated so far,
-        # then initialize the state to the newly-found group and string.
-        if current_group != group:
-            yield current_group, current_string
-            current_group = group
-            current_string = string
-        # Otherwise, keep accumulating.
-        else:
-            current_string += string
-
-    # Output final pair, if we have it.
-    if current_string:
-        yield current_group, current_string
-
+# Step #3 of the rewrite_
+# -----------------------
 # Given an iterable of groups, break them into lists based on newlines.
 def gather_groups_on_newlines(
   # An iterable of (group, string) pairs provided by
@@ -678,74 +689,8 @@ def gather_groups_on_newlines(
     if l:
         yield l
 
-# Given a (group, string) tuple, return the string with comment characters
-# removed if it is a comment, or just the string if it's not a comment.
-def remove_comment_chars(
-  # The group this string was classified into.
-  group,
-  # The string corresponding to this group.
-  string,
-  # Number of characters in a single-line comment
-  len_single_line_comment,
-  # Number of characters in a multi-line comment. I assume the start and end
-  # characters are the same length: <-- and -->, /* and */, etc.
-  len_multi_line_comment):
-
-    if group == SINGLE_LINE_COMMENT_GROUP:
-        return string[len_single_line_comment:]
-    if group == MULTI_LINE_COMMENT_GROUP:
-        return string[len_multi_line_comment:-len_multi_line_comment]
-    if group == MULTI_LINE_COMMENT_START_GROUP:
-        return string[len_multi_line_comment:]
-    if group == MULTI_LINE_COMMENT_END_GROUP:
-        return string[:-len_multi_line_comment]
-    else:
-        return string
-
-# Determine if the given line is a comment to be interpreted by reST.
-def is_rest_comment(
-  # A list of (group, string) representing a single line.
-  line_list,
-  # True if this line contains the body or end of a multi-line comment
-  # that will be interpreted by reST.
-  is_multiline_rest_comment,
-  # See the same parameter in remove_comment_chars above.
-  len_single_line_comment,
-  # See the same parameter in remove_comment_chars above.
-  len_multi_line_comment):
-
-    # See if there is any OTHER_GROUP in this line. If so, it's not a reST 
-    # comment.
-    group_tuple, string_tuple = zip(*line_list)
-    if OTHER_GROUP in group_tuple:
-        return False
-    # If there's no comments (meaning the entire line is whitespace), it's not a
-    # reST comment.
-    if group_tuple == (WHITESPACE_GROUP, ):
-        return False
-
-    # Find the first comment. There may be whitespace preceeding it, so select
-    # the correct index.
-    first_comment_index = 1 if group_tuple[0] == WHITESPACE_GROUP else 0
-    first_group = group_tuple[first_comment_index]
-    first_string = string_tuple[first_comment_index]
-    first_comment_text = remove_comment_chars(first_group, first_string,
-      len_single_line_comment, len_multi_line_comment)
-    # The cases are::
-    #
-    #  #. // comment, //\n -> reST comment
-    #  #. //comment -> not a reST comment.
-    #  #. /* comment, /*\n, or any multi-line body or end for which its
-    #     multi-line start was a reST comment.
-    first_char_is_rest = (len(first_comment_text) > 0 and
-                          first_comment_text[0] in (' ', '\n'))
-    is_multiline_body_or_end = first_group in (MULTI_LINE_COMMENT_BODY_GROUP,
-                                               MULTI_LINE_COMMENT_END_GROUP)
-    if ( (first_char_is_rest and not is_multiline_body_or_end) or
-         (is_multiline_rest_comment and is_multiline_body_or_end) ):
-        return True
-    return False
-
+# Step #4 of the rewrite_
+# -----------------------
 # Classify the output of ``gather_groups_on_newlines`` into either a code or
 # comment with n leading whitespace types. Remove all comment characters.
 def classify_groups(
@@ -798,3 +743,137 @@ def classify_groups(
             is_multiline_rest_comment = False
 
         yield type_, string
+
+# Supporting routines
+# ^^^^^^^^^^^^^^^^^^^
+# Given a (group, string) tuple, return the string with comment characters
+# removed if it is a comment, or just the string if it's not a comment.
+def remove_comment_chars(
+  # The group this string was classified into.
+  group,
+  # The string corresponding to this group.
+  string,
+  # Number of characters in a single-line comment
+  len_single_line_comment,
+  # Number of characters in a multi-line comment. I assume the start and end
+  # characters are the same length: ``/*`` and ``*/``, etc.
+  len_multi_line_comment):
+
+    if group == SINGLE_LINE_COMMENT_GROUP:
+        return string[len_single_line_comment:]
+    if group == MULTI_LINE_COMMENT_GROUP:
+        return string[len_multi_line_comment:-len_multi_line_comment]
+    if group == MULTI_LINE_COMMENT_START_GROUP:
+        return string[len_multi_line_comment:]
+    if group == MULTI_LINE_COMMENT_END_GROUP:
+        return string[:-len_multi_line_comment]
+    else:
+        return string
+
+# Determine if the given line is a comment to be interpreted by reST.
+# Supports ``remove_comment_chars``, ``classify_groups``.
+def is_rest_comment(
+  # A list of (group, string) representing a single line.
+  line_list,
+  # True if this line contains the body or end of a multi-line comment
+  # that will be interpreted by reST.
+  is_multiline_rest_comment,
+  # See the same parameter in remove_comment_chars above.
+  len_single_line_comment,
+  # See the same parameter in remove_comment_chars above.
+  len_multi_line_comment):
+
+    # See if there is any OTHER_GROUP in this line. If so, it's not a reST
+    # comment.
+    group_tuple, string_tuple = zip(*line_list)
+    if OTHER_GROUP in group_tuple:
+        return False
+    # If there's no comments (meaning the entire line is whitespace), it's not a
+    # reST comment.
+    if group_tuple == (WHITESPACE_GROUP, ):
+        return False
+
+    # Find the first comment. There may be whitespace preceeding it, so select
+    # the correct index.
+    first_comment_index = 1 if group_tuple[0] == WHITESPACE_GROUP else 0
+    first_group = group_tuple[first_comment_index]
+    first_string = string_tuple[first_comment_index]
+    first_comment_text = remove_comment_chars(first_group, first_string,
+      len_single_line_comment, len_multi_line_comment)
+    # The cases are::
+    #
+    #  #. // comment, //\n -> reST comment
+    #  #. //comment -> not a reST comment.
+    #  #. /* comment, /*\n, or any multi-line body or end for which its
+    #     multi-line start was a reST comment.
+    first_char_is_rest = (len(first_comment_text) > 0 and
+                          first_comment_text[0] in (' ', '\n'))
+    is_multiline_body_or_end = first_group in (MULTI_LINE_COMMENT_BODY_GROUP,
+                                               MULTI_LINE_COMMENT_END_GROUP)
+    if ( (first_char_is_rest and not is_multiline_body_or_end) or
+         (is_multiline_rest_comment and is_multiline_body_or_end) ):
+        return True
+    return False
+
+# Step #5 of the rewrite_
+# -----------------------
+# Generate reST from the classified code.
+def generate_rest(
+  # An iterable of (type, string) pairs, one per line.
+  classified_lines,
+  # .. _out_file:
+  #
+  # A file-like output to which the reST text is written.
+  out_file):
+
+    # Keep track of the current type. Begin with a 0-indent comment.
+    current_type = -2
+
+    for type_, string in classified_lines:
+        # See if there's a change in state.
+        if current_type != type_:
+            # Exit the current state.
+            exit_state(current_type, out_file)
+
+            # Enter the new state.
+            #
+            # Code state: emit the beginning of a fenced block.
+            if type_ == -1:
+                out_file.write('.. fenced-code::\n\n Beginning fence\n')
+            # Comment state: emit an opening indent for non-zero indents.
+            elif type_ > 0:
+                out_file.write('.. raw:: html\n\n <div style="margin-left:' +
+                               str(0.5*type_) + 'em;">\n\n')
+
+        # Output string based on state. All code needs an inital space to
+        # place it inside the fenced-code block.
+        if type_ == -1:
+            out_file.write(' ')
+        out_file.write(string)
+
+        # Update the state.
+        current_type = type_
+
+    # When done, exit the last state.
+    exit_state(current_type, out_file)
+
+# Supporting routines
+# ^^^^^^^^^^^^^^^^^^^
+# Output text produce when exiting a state. Supports ``generate_rest`` above.
+def exit_state(
+  # The type (classification) of the last line.
+  type_,
+  # See out_file_.
+  out_file):
+
+    # Code state: emit an ending fence.
+    if type_ == -1:
+        out_file.write(' Ending fence\n\n')
+    # Comment state: emit a closing indent.
+    elif type_ > 0:
+        out_file.write('\n.. raw:: html\n\n </div>\n\n')
+    # Initial state. Nothing needed.
+    else:
+        pass
+
+

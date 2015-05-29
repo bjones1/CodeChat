@@ -545,13 +545,68 @@ main(){
         token_group = group_lexer_tokens(token_iter)
         gathered_group = gather_groups_on_newlines(token_group)
         classified_group = list( classify_groups(gathered_group, 2, 2) )
-        assert classified_group == [(-1, u'#include <stdio.h>\n'), 
-                                    (-1, u'\n'), 
-                                    ( 0, u'A multi-\n'), 
-                                    ( 0, u'   line\n'), 
-                                    ( 0, u'   comment \n'), 
-                                    (-1, u'\n'), 
-                                    (-1, u'main(){\n'), 
-                                    ( 2,   u'Empty.\n'), 
+        assert classified_group == [(-1, u'#include <stdio.h>\n'),
+                                    (-1, u'\n'),
+                                    ( 0, u'A multi-\n'),
+                                    ( 0, u'   line\n'),
+                                    ( 0, u'   comment \n'),
+                                    (-1, u'\n'),
+                                    (-1, u'main(){\n'),
+                                    ( 2,   u'Empty.\n'),
                                     (-1, u'}\n')]
+
+# reST generation tests
+# ---------------------
+    def test_11(self):
+        out_stringio = StringIO()
+        generated_rest = generate_rest(
+          [(-1, u'\n'),
+           (-1, u'code\n'),
+           (-1, u'\n')], out_stringio)
+        print(out_stringio.getvalue())
+        assert (out_stringio.getvalue() == 
+# Note: Not using a """ string, since the string trailing whitespace option in
+# Enki would remove some of the one-space lines.
+'.. fenced-code::\n' +
+'\n' +
+' Beginning fence\n' +
+' \n'
+' code\n' +
+' \n' +
+' Ending fence\n' +
+'\n')
+
+    def test_12(self):
+        out_stringio = StringIO()
+        generated_rest = generate_rest(
+          [(0, u'\n'),
+           (0, u'comment\n'),
+           (0, u'\n')], out_stringio)
+        print(out_stringio.getvalue())
+        assert (out_stringio.getvalue() == 
+"""
+comment
+
+""")
+    def test_13(self):
+        out_stringio = StringIO()
+        generated_rest = generate_rest(
+          [(3, u'\n'),
+           (3, u'comment\n'),
+           (3, u'\n')], out_stringio)
+        print(out_stringio.getvalue())
+        assert (out_stringio.getvalue() == 
+""".. raw:: html
+
+ <div style="margin-left:1.5em;">
+
+
+comment
+
+
+.. raw:: html
+
+ </div>
+
+""")
 
