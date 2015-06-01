@@ -35,8 +35,6 @@
 #
 # Standard library
 # ----------------
-# For code_to_rest parsing.
-import re
 # For calling code_to_rest with a string. While using cStringIO would be
 # great, it doesn't support Unicode, so we can't.
 from StringIO import StringIO
@@ -54,10 +52,14 @@ from docutils.parsers.rst import directives
 # For the docutils default stylesheet and template
 import docutils.writers.html4css1
 from docutils.writers.html4css1 import Writer
+from pygments import lex
+from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
+    get_lexer_for_mimetype
+from pygments.token import Token
 #
 # Local application imports
 # -------------------------
-from .LanguageSpecificOptions import LanguageSpecificOptions
+# None.
 
 # code_to_rest
 # ============
@@ -212,146 +214,57 @@ from .LanguageSpecificOptions import LanguageSpecificOptions
 # #. Comments must be preeceded by a series of empty comments, one per space of
 #    indentation.
 #
-# Therefore, the implemtation consists of a state machine. State transitions,
-# such as code to comment or small comment indent to larger comment indent,
-# provide an opportunity to apply the two rules above. Specifically, the state
-# machine first reads a line, classifies it as code or comment with indent *n*,
-# and updates the state. It then takes a state transition action as defined by
-# the labels on the arrows below, prepending the resulting string and
-# transforming the line. Finally, it outputs the prepended string and the line.
-#
-# .. digraph:: code_to_rest
-#
-#     "code" -> "comment"
-#       [ label = "closing code marker\l<newline>\lempty comment indent(s)\lstrip comment string\l" ];
-#     "comment" -> "code"
-#       [ label = "<newline>\l.. fenced-code::\l<newline>\lopening code marker\l<one space>\l" ];
-#     "comment" -> "comment"
-#       [ label = "<newline>\lempty comment indent(s)\lstrip comment string\l" ];
-#     "code" -> "code" [ label = "<one space>" ];
-#     "comment" [ label = "comment,\nindent = n" ]
-def code_to_rest(
-  # An input file-like object, containing source code to be converted to reST.
-  in_file,
-  # An output file-like object, where the resulting reST will be written.
-  out_file,
-  # |lso|
-  #
-  # .. |lso| replace:: An instance of :doc:`LanguageSpecificOptions
-  #    <LanguageSpecificOptions>` which specifies the language to use in
-  #    translating the source code to reST.
-  language_specific_options):
 
-    unique_remove_comment = (language_specific_options.comment_string + u' ' +
-      language_specific_options.unique_remove_str)
+# Provide several ways to find a lexer. Provide any of the following arguments,
+# and this function will return the appropriate lexer for it.
+def get_lexer(
+  # The lexer itself, which will simply be returned.
+  lexer=None,
+  # The `short name <http://pygments.org/docs/lexers/>`_, or alias, of the
+  # lexer to use.
+  alias=None,
+  # The filename of the source file to lex.
+  filename=None,
+  # The MIME type of the source ile to lex.
+  mimetype=None,
+  # Optional arguments for the lexer.
+  **options):
 
-    # Keep track of the type of the last line.
-    last_is_code = False
-    # Keep track of the indentation of comment
-    comment_indent = u''
-    # A regular expression to recognize a comment, storing the whitespace before
-    # the comment in group 1. There are two recognized forms of comments:
-    # <optional whitespace> [ <comment string> <end of line> OR <comment string>
-    # <one char of whitespace> <anything to end of line> ].
-    comment_re = re.compile(ur'(^\s*)((' + language_specific_options.comment_string
-      + u'$)|(' + language_specific_options.comment_string + u'\s))')
+    if lexer:
+        return lexer
+    if alias:
+        return get_lexer_by_name(alias, **options)
+    if filename:
+        return get_lexer_for_filename(filename, **options)
+    if mimetype:
+        return get_lexer_for_mimetype(mimetype, **options)
 
-    # Iterate through all lines in the input file
-    for line in in_file:
-        # Determine the line type by looking for a comment. If this is a
-        # comment, save the number of spaces in this comment
-        comment_match = re.search(comment_re, line)
-        # Now, process this line. Strip off the trailing newline.
-        line = line.rstrip(u'\n')
-        current_line_list = [line]
-        if not comment_match:
-            # Each line of code needs a space at the beginning, to indent it
-            # inside a literal block.
-            current_line_list.insert(0, u' ')
-            if not last_is_code:
-                # When transitioning from comment to code, prepend a ``\n\n.. fenced-code::``
-                # after the last line. Put a marker at the beginning of the line
-                # so reST will preserve all indentation of the block.
-                current_line_list.insert(0, u'\n\n.. fenced-code::\n\n ' + unique_remove_comment + u'\n')
-            else:
-                # Otherwise, just prepend a newline
-                current_line_list.insert(0, u'\n')
-        else:
-            new_comment_indent = comment_match.group(1)
-            # If indent changes or we were just in code, re-do it.
-            redo_indent = ((new_comment_indent != comment_indent) or last_is_code)
-            comment_indent = new_comment_indent
-            # Remove the comment character (and one space, if it's there)
-            current_line_list = [re.sub(comment_re, ur'\1', line)]
-            # Prepend a newline
-            current_line_list.insert(0, u'\n')
-            # Add in left margin adjustments for a code to comment transition
-            if redo_indent:
-                # Get left margin correct by inserting a series of blockquotes
-                blockquote_indent = []
-                for i in range(len(comment_indent)):
-                    blockquote_indent.append(u'\n\n' + u' '*i + u'..')
-                blockquote_indent.append(u'\n')
-                current_line_list.insert(0, u''.join(blockquote_indent))
-            if last_is_code:
-                # Finish code off with a newline-preserving marker
-                current_line_list.insert(0, u'\n ' + unique_remove_comment)
 
-        # Convert to a string
-        line_str = u''.join(current_line_list)
-        current_line_list = []
-        # For debug:
-        # line_str += str(line_type) + str(last_is_code)
-        # We're done!
-        out_file.write(line_str)
-        last_is_code = not comment_match
-
-    # Provide a closing fence if we ended with code.
-    if last_is_code:
-        out_file.write(u'\n ' + unique_remove_comment)
-
-    # At the end of the file, include a final newline.
-    out_file.write(u'\n')
-
-# Choose a LanguageSpecificOptions class based on the given file's extension.
-def _lso_from_ext(
-  # The path (and name)of a file. This file's extension will be used to create
-  # an instance of the LanguageSpecificOptions class.
-  file_path):
-    lso = LanguageSpecificOptions()
-    lso.set_language(os.path.splitext(file_path)[1])
-    return lso
 
 # Wrap code_to_rest by processing a string. It returns a string containing the
 # resulting reST.
 def code_to_rest_string(
-  # |source_str|
+  # See code_str_.
+  code_str,
+  # .. _options:
   #
-  # .. |source_str| replace:: String containing source code to process.
-  source_str,
-  # |lso|
-  language_specific_options):
+  # Specify the lexer (see ``get_lexer`` arguments, and provide it any other
+  # needed options.
+  **options):
     #
     # We don't use io.StringInput/Output here because it provides only a single
     # read/write operation, while code_to_rest_ expects to do many.
     output_rst = StringIO()
-    code_to_rest(StringIO(source_str), output_rst, language_specific_options)
+    lexer_to_rest(code_str, get_lexer(**options), output_rst)
     return output_rst.getvalue()
 
 # Wrap code_to_rest_string by opening in and out files.
 def code_to_rest_file(
-  # |source_path|
-  #
   # .. |source_path| replace:: Path to a source code file to process.
   source_path,
   # Path to a destination reST file to create. It will be overwritten if it
   # already exists.
   rst_path,
-  # |lsoNone|
-  #
-  # .. |lsoNone| replace:: None to determine the language based on the
-  #    given source_path's extension.
-  language_specific_options=None,
   # |input_encoding|
   #
   # .. |input_encoding| replace:: Encoding to use for the input file. The
@@ -368,10 +281,9 @@ def code_to_rest_file(
     #
     # Note: both these classes automatically close themselves after a
     # read or write.
-    fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
-    lso = language_specific_options or _lso_from_ext(source_path)
-    rst = code_to_rest_string(fi.read(), language_specific_options)
+    code_str, lexer = code_file_to_lexer(source_path)
+    rst = code_to_rest_string(code_str, lexer=lexer)
     fo.write(rst)
 
 
@@ -384,15 +296,15 @@ def code_to_rest_file(
 #    <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_
 #    converts reST to HTML.
 def code_to_html_string(
-  # |source_str|
-  source_str,
-  # |lso|
-  language_specific_options,
+  # See code_str_.
+  code_str,
   # A file-like object where warnings and errors will be written, or None to
   # send them to stderr.
-  warning_stream=None):
+  warning_stream=None,
+  # See options_.
+  **options):
 
-    rest = code_to_rest_string(source_str, language_specific_options)
+    rest = code_to_rest_string(code_str, **options)
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={
         # Include our custom css file: provide the path to the default css and
@@ -420,19 +332,17 @@ def code_to_html_file(
   # Destination file name to hold the generated HTML. This file will be
   # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
   html_path=None,
-  # |lsoNone|
-  language_specific_options=None,
   # |input_encoding|
   input_encoding=None,
   # |output_encoding|
   output_encoding='utf-8'):
 
     html_path = html_path or source_path + '.html'
-    lso = language_specific_options or _lso_from_ext(source_path)
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=html_path, encoding=output_encoding)
 
-    html = code_to_html_string(fi.read(), lso)
+    code_str, lexer = code_file_to_lexer(source_path)
+    html = code_to_html_string(code_str, lexer=lexer)
 
     fo.write(html)
 
@@ -532,10 +442,6 @@ directives.register_directive('fenced-code', FencedCodeBlock)
 #    renders incorrectly.
 #
 # #. Run a state machine to output the corresponding reST.
-from pygments import lex
-from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
-from pygments.token import Token
-
 # Run the entire process
 # ----------------------
 # Given code and a lexer for it, output reST. Use one of the routine from
@@ -550,8 +456,12 @@ from pygments.token import Token
 #    -then-
 #    lexer_to_rest(code_str, lexer, out_file)
 def lexer_to_rest(
+  # .. _code_str:
+  #
   # The code to translate to reST.
   code_str,
+  # .. _lexer:
+  #
   # The lexer used to analyze the code.
   lexer,
   # See out_file_.
@@ -588,13 +498,14 @@ COMMENT_DELIMITER_LENGTHS = {
   'C++':            ( 2,      2,            2),
   'Java':           ( 2,      2,            2),
   ##                  #,    N/A,          N/A
-  'python':         ( 1,   None,         None),
+  'Python':         ( 1,   None,         None),
   }
 
 
 # Step #1 of the rewrite_
 # -----------------------
-# Given a file containing source code, invoke the lexer on it.
+# Given a file containing source code, read it to a string and find a lexer for
+# it.
 def code_file_to_lexer(
   # |source_path|
   source_path,
@@ -627,6 +538,7 @@ def group_lexer_tokens(
 
     # Keep track of the current group and string.
     tokentype, current_string = iter_token.next()
+    print(tokentype, current_string)
     current_group = group_for_tokentype(tokentype)
 
     # Walk through tokens.
@@ -762,11 +674,11 @@ def classify_groups(
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
-            string = ''.join([remove_comment_chars_(group, string) 
+            string = ''.join([remove_comment_chars_(group, string)
                               for group, string in l])
-            # Remove the inital whitespace character from the first comment,
+            # Remove the inital space character from the first comment,
             # but not from body or end comments.
-            if ( len(string) and
+            if ( len(string) and string[0] == ' ' and
                 first_group not in (BLOCK_COMMENT_BODY_GROUP,
                                     BLOCK_COMMENT_END_GROUP) ):
                 string = string[1:]
@@ -879,10 +791,10 @@ def generate_rest(
             #
             # Code state: emit the beginning of a fenced block.
             if type_ == -1:
-                out_file.write('.. fenced-code::\n\n Beginning fence\n')
+                out_file.write('\n.. fenced-code::\n\n Beginning fence\n')
             # Comment state: emit an opening indent for non-zero indents.
             elif type_ > 0:
-                out_file.write('.. raw:: html\n\n <div style="margin-left:' +
+                out_file.write('\n.. raw:: html\n\n <div style="margin-left:' +
                                str(0.5*type_) + 'em;">\n\n')
 
         # Output string based on state. All code needs an inital space to

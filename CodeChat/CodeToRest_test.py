@@ -42,7 +42,6 @@ from docutils import core
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, code_to_html_file
-from .LanguageSpecificOptions import LanguageSpecificOptions
 
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
@@ -50,123 +49,108 @@ class TestCodeToRest(object):
     # Given a string and a language, run it through ``code_to_rest`` and return
     # the resulting string.
     def t(self, in_string, extension = '.c'):
-        lso = LanguageSpecificOptions()
-        lso.set_language(extension)
-        out_string = code_to_rest_string(in_string, lso)
-        # For convenience, create the removal string for the chosen language
-        unique_remove_comment = lso.comment_string + u' ' + lso.unique_remove_str + u'\n'
-        return out_string, unique_remove_comment
+        return code_to_rest_string(in_string, filename='foo' + extension)
 
     # A single line of code, without an ending ``\n``.
     def test_1(self):
-        ret, comment = self.t('testing')
-        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment
+        ret = self.t('testing')
+        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\n'
 
     # A single line of code, with an ending ``\n``.
     def test_2(self):
-        ret, comment = self.t('testing\n')
-        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment
+        ret = self.t('testing\n')
+        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\n'
 
     # Several lines of code, with arbitrary indents.
     def test_3(self):
-        ret, comment = self.t('testing\n  test 1\n test 2\n   test 3')
-        assert ret == '\n\n.. fenced-code::\n\n ' + comment + ' testing\n   test 1\n  test 2\n    test 3\n ' + comment
+        ret = self.t('testing\n  test 1\n test 2\n   test 3')
+        assert ret == '\n.. fenced-code::\n\n Beginning fence\n testing\n   test 1\n  test 2\n    test 3\n Ending fence\n\n'
 
     # A single line comment, no trailing ``\n``.
     def test_4(self):
-        ret, comment = self.t('// testing')
-        assert ret == '\ntesting\n'
+        ret = self.t('// testing')
+        assert ret == 'testing\n'
 
     # A single line comment, trailing ``\n``.
     def test_5(self):
-        ret, comment = self.t('// testing\n')
-        assert ret == '\ntesting\n'
+        ret = self.t('// testing\n')
+        assert ret == 'testing\n'
 
     # A multi-line comment.
     def test_5a(self):
-        ret, comment = self.t('// testing\n// more testing')
-        assert ret == '\ntesting\nmore testing\n'
+        ret = self.t('// testing\n// more testing')
+        assert ret == 'testing\nmore testing\n'
 
     # A single line comment with no space after the comment should be treated
     # like code.
     def test_6(self):
-        ret, comment = self.t('//testing')
-        assert ret == '\n\n.. fenced-code::\n\n ' + comment + ' //testing\n ' + comment
+        ret = self.t('//testing')
+        assert ret == '\n.. fenced-code::\n\n Beginning fence\n //testing\n Ending fence\n\n'
 
     # A singly indented single-line comment.
     def test_7(self):
-        ret, comment = self.t(' // testing')
-        assert ret == '\n\n..\n\n testing\n'
+        ret = self.t(' // testing')
+        assert ret == '\n.. raw:: html\n\n <div style="margin-left:0.5em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n'
 
     # A doubly indented single-line comment.
     def test_8(self):
-        ret, comment = self.t('  // testing')
-        assert ret == '\n\n..\n\n ..\n\n  testing\n'
+        ret = self.t('  // testing')
+        assert ret == '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n'
 
     # A doubly indented multi-line comment.
     def test_9(self):
-        ret, comment = self.t('  // testing\n  // more testing')
-        assert ret == '\n\n..\n\n ..\n\n  testing\n  more testing\n'
+        ret = self.t('  // testing\n  // more testing')
+        assert ret == '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\nmore testing\n\n.. raw:: html\n\n </div>\n\n'
 
     # Code to comment transition.
     def test_9a(self):
-        ret, comment = self.t('testing\n// test')
-        assert ret == '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment + '\ntest\n'
+        ret = self.t('testing\n// test')
+        assert ret == '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\ntest\n'
 
     # A line with just the comment char, but no trailing space.
     def test_10(self):
-        ret, comment = self.t('//')
-        # Two newlines: one gets added since code_to_rest prepends a ``\n``,
-        # assuming a previous line existed; the second comes from the end of
-        # ``code_to_rest``, where a final ``\n`` is appended to make sure the
-        # file ends with a newline.
-        assert ret == '\n\n'
-
-    # A line with just the comment char, with a Microsoft-style line end.
-    def test_11(self):
-        ret, comment = self.t('//\r\n')
-        # Two newlines: see comment in ``test_10``.
-        assert ret == '\n\n'
+        ret = self.t('//')
+        assert ret == '\n'
 
     # Make sure an empty string works.
     def test_12(self):
-        ret, comment = self.t('')
-        assert ret == '\n'
+        ret = self.t('')
+        assert ret == u'\n.. fenced-code::\n\n Beginning fence\n \n Ending fence\n\n'
 
     # Make sure Unicode works.
     def test_13(self):
-        ret, comment = self.t(u'ю')
-        assert ret == u'\n\n.. fenced-code::\n\n ' + comment + u' ю\n ' + comment
+        ret = self.t(u'ю')
+        assert ret == u'\n.. fenced-code::\n\n Beginning fence\n ю\n Ending fence\n\n'
 
     # Code to comment transition.
     def test_14(self):
-        ret, comment = self.t('testing\n// Comparing')
-        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n ' + comment + '\nComparing\n'
+        ret = self.t('testing\n// Comparing')
+        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\nComparing\n'
 
     # Code to comment transition, with leading blank code lines.
     def test_15(self):
-        ret, comment = self.t('\ntesting\n// Comparing')
-        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' \n testing\n ' + comment + '\nComparing\n'
+        ret = self.t(' \ntesting\n// Comparing')
+        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n  \n testing\n Ending fence\n\nComparing\n'
 
     # Code to comment transition, with trailing blank code lines.
     def test_16(self):
-        ret, comment = self.t('testing\n\n// Comparing')
-        assert ret ==  '\n\n.. fenced-code::\n\n ' + comment + ' testing\n \n ' + comment + '\nComparing\n'
+        ret = self.t('testing\n\n// Comparing')
+        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n \n Ending fence\n\nComparing\n'
 
     # Comment to code transition.
     def test_17(self):
-        ret, comment = self.t('// testing\nComparing')
-        assert ret ==  '\ntesting\n\n.. fenced-code::\n\n ' + comment + ' Comparing\n ' + comment
+        ret = self.t('// testing\nComparing')
+        assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
 
     # Comment to code transition, with leading blank code lines.
     def test_18(self):
-        ret, comment = self.t('// testing\n\nComparing')
-        assert ret ==  '\ntesting\n\n.. fenced-code::\n\n ' + comment + ' \n Comparing\n ' + comment
+        ret = self.t('// testing\n\nComparing')
+        assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n \n Comparing\n Ending fence\n\n'
 
     # Comment to code transition, with trailing blank code lines.
     def test_19(self):
-        ret, comment = self.t('// testing\nComparing\n\n')
-        assert ret ==  '\ntesting\n\n.. fenced-code::\n\n ' + comment + ' Comparing\n \n ' + comment
+        ret = self.t('// testing\nComparing\n\n')
+        assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
 
 
 # Fenced code block testing
@@ -372,6 +356,23 @@ main(){
         assert (remove_comment_chars_c(BLOCK_COMMENT_END_GROUP,
                                      u'comment */') == u'comment ')
 
+    # Newlines should be preserved.
+    def test_4h(self):
+        assert (remove_comment_chars_c(INLINE_COMMENT_GROUP,
+                                     u'//\n') == u'\n')
+
+    def test_4i(self):
+        assert (remove_comment_chars_c(BLOCK_COMMENT_START_GROUP,
+                                     u'/*\n') == u'\n')
+
+    def test_4j(self):
+        assert (remove_comment_chars_c(BLOCK_COMMENT_BODY_GROUP,
+                                     u'\n') == u'\n')
+
+    def test_4k(self):
+        assert (remove_comment_chars_c(BLOCK_COMMENT_END_GROUP,
+                                     u'*/') == u'')
+
 # is_rest_comment tests
 # ---------------------
     # newline only
@@ -572,9 +573,10 @@ main(){
           [(-1, u'\n'),
            (-1, u'code\n'),
            (-1, u'\n')], out_stringio)
-        assert (out_stringio.getvalue() == 
+        assert (out_stringio.getvalue() ==
 # Note: Not using a """ string, since the string trailing whitespace option in
 # Enki would remove some of the one-space lines.
+'\n' +
 '.. fenced-code::\n' +
 '\n' +
 ' Beginning fence\n' +
@@ -590,7 +592,7 @@ main(){
           [(0, u'\n'),
            (0, u'comment\n'),
            (0, u'\n')], out_stringio)
-        assert (out_stringio.getvalue() == 
+        assert (out_stringio.getvalue() ==
 """
 comment
 
@@ -601,8 +603,9 @@ comment
           [(3, u'\n'),
            (3, u'comment\n'),
            (3, u'\n')], out_stringio)
-        assert (out_stringio.getvalue() == 
-""".. raw:: html
+        assert (out_stringio.getvalue() ==
+"""
+.. raw:: html
 
  <div style="margin-left:1.5em;">
 
