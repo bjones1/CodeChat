@@ -490,15 +490,94 @@ def lexer_to_rest(
 
 # Supporting definitions
 # ^^^^^^^^^^^^^^^^^^^^^^
-# Based on the lexer class, define comment delimiter lengths.
+# Based on the lexer class, define comment delimiter lengths. Based on the info
+# provided at
+# http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments.
 COMMENT_DELIMITER_LENGTHS = {
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,           */
   'C':              ( 2,      2,            2),
   'C++':            ( 2,      2,            2),
   'Java':           ( 2,      2,            2),
+  'ActionScript':   ( 2,      2,            2),
+  'C#':             ( 2,      2,            2),
+  'D':              ( 2,      2,            2),
+  'Go':             ( 2,      2,            2),
+  'JavaScript':     ( 2,      2,            2),
+  'Objective-C':    ( 2,      2,            2),
+  'Rust':           ( 2,      2,            2),
+  'Scala':          ( 2,      2,            2),
+  'Sass':           ( 2,      2,            2),
+  'Swift':          ( 2,      2,            2),
+  'verilog':        ( 2,      2,            2),
   ##                  #,    N/A,          N/A
   'Python':         ( 1,   None,         None),
+  ##                  #      /*            */
+  'GAS':            ( 1,      2,            2),
+  ##                  ;, %comment\n, %endcomment
+  'NASM':           ( 1,      9,           11),
+  ##                  ;      /*,           */
+  'autohotkey':     ( 1,      2,            2),
+  ##                 --      /*,           */
+  'SQL':            ( 2,      2,            2),
+  # Note: PHP allows # or // as an inline comment. We only support #.
+  ##                  #      /*,           */
+  'PHP':            ( 1,      2,            2),
+  ##                         /*,           */
+  'CSS':            (None,    2,            2),
+  ##                       <!--,          -->
+  'HTML':           (None,    4,            3),
+  ##                  %      /*,           */
+  'Prolog':         ( 1,      2,            2),
+
+  # Note: still entering data from here on down. I've finished through the block
+  # comments using /* ~ */.
+
+  ##                  C or !
+  'Fortran':        ( 1,   None,         None),
+  ##                  :
+  # Note: for simplicity, I don't support :: or REM as a valid comment type.
+  # Something for future work.
+  'Batchfile':      ( 1,   None,         None),
+  ##                  ⍝
+  'APL':            ( 1,   None,         None),
+  ##                  #
+  # This covers csh and sh as well.
+  'Bash':           ( 1,   None,         None),
+  'Tcsh':           ( 1,   None,         None),
+  'Perl':           ( 1,   None,         None),
+  'Perl6':          ( 1,   None,         None),
+  'Ruby':           ( 1,   None,         None),
+  'PowerShell':     ( 1,   None,         None),
+  'S':              ( 1,   None,         None),
+  'Makefile':       ( 1,   None,         None),
+  'Nimrod':         ( 1,   None,         None),
+  ##                  %
+  'TeX':            ( 1,   None,         None),
+  ##                  %
+  'Matlab':         ( 1,   None,         None),
+  'Erlang':         ( 1,   None,         None),
+  ##                  '
+  'QBasic':         ( 1,   None,         None),
+  'VB.net':         ( 1,   None,         None),
+  ##                 //
+  'Delphi':         ( 2,   None,         None),
+  ##                  ;
+  'AutoIt':         ( 1,   None,         None),
+  'Common Lisp':    ( 1,   None,         None),
+  'Clojure':        ( 1,   None,         None),
+  'REBOL':          ( 1,   None,         None),
+  'Scheme':         ( 1,   None,         None),
+  'LLVM':           ( 1,   None,         None),
+  ##                 --
+  'Haskell':        ( 2,   None,         None),
+  'Ada':            ( 2,   None,         None),
+  'AppleScript':    ( 2,   None,         None),
+  'Eiffel':         ( 2,   None,         None),
+  'Lua':            ( 2,   None,         None),
+  'Vhdl':           ( 2,   None,         None),
+  # Note: COBOL supports * and *> and inline comment. We only support *.
+  'COBOL':          ( 2,   None,         None),
   }
 
 
@@ -538,7 +617,6 @@ def group_lexer_tokens(
 
     # Keep track of the current group and string.
     tokentype, current_string = iter_token.next()
-    print(tokentype, current_string)
     current_group = group_for_tokentype(tokentype)
 
     # Walk through tokens.
