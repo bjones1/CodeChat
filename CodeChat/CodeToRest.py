@@ -530,8 +530,8 @@ COMMENT_DELIMITER_LENGTHS = {
   ##                  %      /*,           */
   'Prolog':         ( 1,      2,            2),
 
-  # Note: still entering data from here on down. I've finished through the block
-  # comments using /* ~ */.
+  ## Note: still entering data from here on down. I've finished through the block
+  ## comments using /* ~ */.
 
   ##                  C or !
   'Fortran':        ( 1,   None,         None),
@@ -576,7 +576,7 @@ COMMENT_DELIMITER_LENGTHS = {
   'Eiffel':         ( 2,   None,         None),
   'Lua':            ( 2,   None,         None),
   'Vhdl':           ( 2,   None,         None),
-  # Note: COBOL supports * and *> and inline comment. We only support *.
+  ## Note: COBOL supports * and *> and inline comment. We only support *.
   'COBOL':          ( 2,   None,         None),
   }
 
@@ -832,12 +832,16 @@ def is_rest_comment(
     first_comment_text = remove_comment_chars_(first_group, first_string)
     # The cases are::
     #
-    #  #. // comment, //\n -> reST comment
+    #  #. // comment, //\n, # -> reST comment. Note that in some languages
+    #     (Python is one example), the \n isn't included in the comment.
     #  #. //comment -> not a reST comment.
     #  #. /* comment, /*\n, or any block comment body or end for which its
     #     block start was a reST comment.
-    first_char_is_rest = (len(first_comment_text) > 0 and
-                          first_comment_text[0] in (' ', '\n'))
+    #  # /**/ -> a reST comment. (I could see this either as reST or not;
+    #    because it was simpler, I picked reST.)
+    first_char_is_rest = ( (len(first_comment_text) > 0 and
+                          first_comment_text[0] in (' ', '\n')) or
+                          len(first_comment_text) == 0 )
     is_block_body_or_end = first_group in (BLOCK_COMMENT_BODY_GROUP,
                                                BLOCK_COMMENT_END_GROUP)
     if ( (first_char_is_rest and not is_block_body_or_end) or
@@ -860,6 +864,7 @@ def generate_rest(
     current_type = -2
 
     for type_, string in classified_lines:
+
         # See if there's a change in state.
         if current_type != type_:
             # Exit the current state.

@@ -152,6 +152,15 @@ class TestCodeToRest(object):
         ret = self.t('// testing\nComparing\n\n')
         assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
 
+    #
+    def test_20(self):
+        ret = self.t('# testing\n#\n# Trying\n', '.py')
+        assert ret ==  'testing\n\nTrying\n'
+
+    def test_21(self):
+        ret = self.t('#\n', '.py')
+        assert ret ==  '\n'
+
 
 # Fenced code block testing
 # =========================
@@ -242,6 +251,8 @@ from pygments.lexers import get_lexer_by_name
 import os
 
 remove_comment_chars_c = remove_comment_chars(*COMMENT_DELIMITER_LENGTHS['C'])
+remove_comment_chars_py = remove_comment_chars(
+  *COMMENT_DELIMITER_LENGTHS['Python'])
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
@@ -411,7 +422,7 @@ main(){
 
     ## A /**/ comment.
     def test_4ag1(self):
-        assert not is_rest_comment([
+        assert is_rest_comment([
           (BLOCK_COMMENT_GROUP, u'/**/')], False, remove_comment_chars_c)
 
     ## A /* */ comment.
@@ -505,6 +516,11 @@ main(){
         assert not is_rest_comment([
           (BLOCK_COMMENT_END_GROUP, u'comment */'),
           (OTHER_GROUP, u'foo();')], True, remove_comment_chars_c)
+
+    def test_4aw(self):
+        assert is_rest_comment([
+          (INLINE_COMMENT_GROUP, u'#'),
+          (WHITESPACE_GROUP, u'\n')], True, remove_comment_chars_py)
 
 # Classifier tests
 # ----------------
