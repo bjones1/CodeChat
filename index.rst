@@ -24,6 +24,8 @@ User documentation
    style_guide.py
    install
    CodeChat/template/conf.py
+   CodeChat/template/CodeChat.css
+   CodeChat/LICENSE.html
 
 
 #######################
@@ -35,7 +37,6 @@ Developer documentation
    history
    CodeChat/CodeToRest.py
    CodeChat/CodeToRestSphinx.py
-   CodeChat/LanguageSpecificOptions.py
    CodeChat/__init__.py
 
 *******
@@ -54,6 +55,7 @@ Documentation generation
    :maxdepth: 2
 
    conf.py
+   CodeChat.css
 
 *********
 Packaging

@@ -30,7 +30,6 @@ import sys, os
 import sphinx
 # Use the CodeChat version date in its generated documentation.
 import CodeChat
-from CodeChat.LanguageSpecificOptions import LanguageSpecificOptions
 #
 # If extensions (or modules to document with autodoc) are in another directory, add these directories to sys.path here. If the directory is relative to the documentation root, use os.path.abspath to make it absolute, as shown here.
 ##sys.path.insert(0, os.path.abspath('.'))
@@ -119,7 +118,7 @@ try:
     # Make source_suffix a list if it isn't already.
     if not isinstance(source_suffix, list):
         source_suffix = [source_suffix]
-    source_suffix += LanguageSpecificOptions.extension_to_options.keys()
+    source_suffix += CodeChat.CodeToRestSphinx.SUPPORTED_EXTENSIONS
 except:
     pass
 

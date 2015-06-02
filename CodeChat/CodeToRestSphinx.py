@@ -39,32 +39,63 @@ import os.path
 # Sphinx routines help to search for source files.
 from sphinx.util.matching import compile_matchers
 from sphinx.util import get_matching_docs
+from pygments.lexers import get_all_lexers
+import pygments.util
 
 # Local application imports
 # -------------------------
-from .LanguageSpecificOptions import LanguageSpecificOptions
-from .CodeToRest import code_to_rest_string, code_to_rest_file
+from .CodeToRest import code_to_rest_string, code_to_rest_file, \
+    COMMENT_DELIMITER_LENGTHS
 from . import __version__
+
+# Supported extensions
+# --------------------
+# Compute a list of supported filename extensions: supported by the lexer and
+# by CodeChat (inline / block comment info in COMMENT_DELIMITER_LENGTHS).
+SUPPORTED_EXTENSIONS = set()
+# Per `get_all_lexers
+# <http://pygments.org/docs/api/#pygments.lexers.get_all_lexers>`_, we get a
+# tuple. Pick out only the filename and examine it.
+for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
+    # Pick only filenames we have comment info for.
+    if longname in COMMENT_DELIMITER_LENGTHS:
+        for fnp in filename_patterns:
+            # Take just the extension, which is what Sphinx expects.
+            ext = os.path.splitext(fnp)[1]
+            # Wrap ext in a list so set won't treat it each character in the
+            # string as a separate element.
+            SUPPORTED_EXTENSIONS = SUPPORTED_EXTENSIONS.union([ext])
+
+# Now, do some fixup on this list:
+#
+# * ``Makefile.*`` turns into ``.*`` as an extension. Remove this.
+#   Likewise, ``Sconscript`` turns into an empty string, which confuses
+#   Sphinx. Remove this also.
+SUPPORTED_EXTENSIONS -= set(['.*', ''])
+# * Expand ``.php[345]``.
+SUPPORTED_EXTENSIONS -= set(['.php[345]'])
+SUPPORTED_EXTENSIONS |= set(['.php', '.php3', '.php4', '.php5'])
+# Convert this to a list.
+SUPPORTED_EXTENSIONS = list(SUPPORTED_EXTENSIONS)
 
 # CodeToRest extension
 # ====================
 # This extension provides the CodeToRest Sphinx extension. There are two
 # implementations:
 #
-# * Pre 1.3 Sphinx: translate all source files to reST before Sphinx looks for 
+# * Pre 1.3 Sphinx: translate all source files to reST before Sphinx looks for
 #   reST source (``sphinx_builder_inited``). This leaves a lot of gunky ``.rst``
 #   files around in the source directory.
-# * 1.3 and newer Sphinx: translate a source file in place to reST 
+# * 1.3 and newer Sphinx: translate a source file in place to reST
 #   (``source_read``). Much cleaner.
 #
 # This function searches for source code and transforms it to reST before Sphinx
 # searches for reST source.
 def builder_inited(app):
-    # Look for every extension of every supported langauge.
-    lso = LanguageSpecificOptions()
-    for source_suffix in lso.extension_to_options.keys():
-        # Choose the current language to process any file in.
-        lso.set_language(source_suffix)
+    # Look for every extension of every supported langauge. Add it if we support
+    # that language.
+
+    for source_suffix in SUPPORTED_EXTENSIONS:
         # Find all source files with the given extension. This was copied almost
         # verabtim from ``sphinx.environment.BuildEnvironment.find_files``.
         #
@@ -93,7 +124,7 @@ def builder_inited(app):
             rest_file = os.path.join(app.env.srcdir, source_file + app.config.source_suffix)
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                code_to_rest_file(source_file, rest_file, lso, app.config.html_output_encoding)
+                code_to_rest_file(source_file, rest_file, app.config.html_output_encoding)
             else:
                 pass
 
@@ -104,13 +135,12 @@ def source_read(app, docname, source):
     # extension using `doc2path
     # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
     full_path = app.env.doc2path(docname)
-    ext = os.path.splitext(full_path)[1]
     # See if it's an extension we should process.
-    if (ext in LanguageSpecificOptions.extension_to_options.keys()):
-        # Pick the correct lso, then transform to reST.
-        lso = LanguageSpecificOptions()
-        lso.set_language(ext)
-        source[0] = code_to_rest_string(source[0], lso)
+    try:
+        source[0] = code_to_rest_string(source[0], filename=full_path)
+    except KeyError, pygments.util.ClassNotFound:
+        # We Don't support this language.
+        pass
 
 # Sphinx hooks
 # ============
