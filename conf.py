@@ -151,6 +151,8 @@ exclude_patterns = [
                     '_build',
                     # Ignore file from external web site.
                     'ez_setup.py',
+                    # Ignore test output.
+                    'CodeChat/CodeToRestSphinx.py.html',
                     ]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The

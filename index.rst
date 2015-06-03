@@ -25,8 +25,6 @@ User documentation
    install
    CodeChat/template/conf.py
    CodeChat/template/CodeChat.css
-   CodeChat/LICENSE.html
-
 
 #######################
 Developer documentation
@@ -46,7 +44,6 @@ Testing
    :maxdepth: 2
 
    CodeChat/CodeToRest_test.py
-   CodeChat/pytest.ini
 
 ************************
 Documentation generation
@@ -70,3 +67,10 @@ Index and search
 ################
 * :ref:`genindex`
 * :ref:`search`
+
+.. Ignore the following files. They're linked to elsewhere.
+
+.. toctree::
+   :hidden:
+   
+   CodeChat/LICENSE.html

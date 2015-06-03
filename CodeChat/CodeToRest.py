@@ -227,7 +227,7 @@ def get_lexer(
   filename=None,
   # The MIME type of the source ile to lex.
   mimetype=None,
-  # Optional arguments for the lexer.
+  # See options_.
   **options):
 
     if lexer:
@@ -512,6 +512,7 @@ COMMENT_DELIMITER_LENGTHS = {
   'verilog':        ( 2,      2,            2),
   ##                  #,    N/A,          N/A
   'Python':         ( 1,   None,         None),
+  'Python 3':       ( 1,   None,         None),
   ##                  #      /*            */
   'GAS':            ( 1,      2,            2),
   ##                  ;, %comment\n, %endcomment
