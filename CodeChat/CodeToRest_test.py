@@ -32,6 +32,7 @@
 #
 # Library imports
 # ---------------
+from StringIO import StringIO
 import re
 #
 # Third-party imports
@@ -45,7 +46,6 @@ from pygments.lexers import get_lexer_by_name
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, code_to_html_file
-from .CodeToRest import *
 from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
   _generate_rest, _GROUP
@@ -160,7 +160,9 @@ class TestCodeToRest(object):
         ret = self.t('// testing\nComparing\n\n')
         assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
 
-    #
+# Other languages
+# ---------------
+    # A bit of Python testing.
     def test_20(self):
         ret = self.t('# testing\n#\n# Trying\n', '.py')
         assert ret ==  'testing\n\nTrying\n'
@@ -168,6 +170,18 @@ class TestCodeToRest(object):
     def test_21(self):
         ret = self.t('#\n', '.py')
         assert ret ==  '\n'
+
+    def test_22(self):
+        ret = self.t(' \nfoo()\n\n# bar\n', '.py')
+        assert ( ret ==
+                '\n.. fenced-code::\n\n Beginning fence\n  \n foo()\n \n Ending fence\n\nbar\n')
+
+    # Some CSS.
+    def test_21(self):
+        ret = self.t(' \ndiv {}\n\n/* comment */\n')
+        assert (ret ==
+          '\n.. fenced-code::\n\n Beginning fence\n  \n div {}\n \n Ending fence\n\ncomment \n' )
+
 
 
 # Fenced code block testing
@@ -331,11 +345,11 @@ main(){
 # remove_comment_chars tests
 # --------------------------
     def test_4a(self):
-        assert _remove_comment_delim(_GROUP.whitespace, 
+        assert _remove_comment_delim(_GROUP.whitespace,
           u'    ', c_lexer) == u'    '
 
     def test_4b(self):
-        assert ( _remove_comment_delim(_GROUP.other, u'an_identifier', c_lexer) 
+        assert ( _remove_comment_delim(_GROUP.other, u'an_identifier', c_lexer)
                 == u'an_identifier' )
 
     def test_4c(self):

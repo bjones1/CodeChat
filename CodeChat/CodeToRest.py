@@ -20,9 +20,9 @@
 # *********************************************************
 # CodeToRest.py - a module to translate source code to reST
 # *********************************************************
-# The API_ lists four function which convert source code into either reST or 
+# The API_ lists four function which convert source code into either reST or
 # HTML. For a discussion on how this is accomplished, the lexer_to_rest_
-# function forms the core of the alogorithm; Step_5_ gives a detailed 
+# function forms the core of the alogorithm; Step_5_ gives a detailed
 # explanation of how the code is translated to reST.
 #
 # .. contents::
@@ -250,7 +250,7 @@ def _lexer_to_rest(
     #
     # Then classify.
     classified_group = _classify_groups(gathered_group, lexer)
-    
+
     # \5. Run a state machine to output the corresponding reST.
     _generate_rest(classified_group, out_file)
 #
@@ -292,8 +292,8 @@ def _group_lexer_tokens(
 # A simple enumerate I like, taken from one of the snippet on `stackoverflow
 # <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_. What I want: a set of unique identifiers that will be named nicely,
 # rather than printed as a number. Really, just a way to create a class whose
-# members contain a string representation of their name. Perhaps the best 
-# solution is `enum34 <https://pypi.python.org/pypi/enum34>`_, based on `PEP 
+# members contain a string representation of their name. Perhaps the best
+# solution is `enum34 <https://pypi.python.org/pypi/enum34>`_, based on `PEP
 # 0435 <https://www.python.org/dev/peps/pep-0435/>`_, but I don't want an extra
 # dependency just for this.
 class Enum(frozenset):
@@ -324,11 +324,12 @@ def _group_for_tokentype(
 
     # The list of Pygments `tokens <http://pygments.org/docs/tokens/>`_ lists
     # ``Token.Text`` (how a newline is classified) and ``Token.Whitespace``.
-    # Consider either as whitespace. However, note that preprocessor directives
-    # are considered as a type of comment by Pygments; for our grouping,
-    # consider them code.
+    # Consider either as whitespace.
     if tokentype in Token.Text or tokentype in Token.Whitespace:
         return _GROUP.whitespace
+    # There is a Token.Comment, but this can refer to inline or block comments, 
+    # or even other things (preprocessors statements). Therefore, restrict
+    # classification as follows.
     if tokentype in Token.Comment and tokentype not in Token.Comment.Preproc:
         if tokentype not in Token.Comment.Multiline:
             return _GROUP.inline_comment
@@ -400,7 +401,6 @@ def _classify_groups(
 
     # Walk through groups.
     for l in iter_gathered_groups:
-        print(l)
 
         if _is_rest_comment(l, is_block_rest_comment, lexer):
 
@@ -453,7 +453,7 @@ def _remove_comment_delim(
     # Number of characters in an opening block comment.
     len_opening_block_comment_delim,
     # Number of characters in an closing block comment.
-    len_closing_block_comment_delim) = COMMENT_DELIMITER_LENGTHS[lexer.name]
+    len_closing_block_comment_delim) = _COMMENT_DELIMITER_LENGTHS[lexer.name]
 
     if group == _GROUP.inline_comment:
         return string[len_inline_comment_delim:]
@@ -468,10 +468,33 @@ def _remove_comment_delim(
         return string
 
 
+# Return a string with the given delimiter removed from its beginning.
+def _remove_beginning_comment_delim(
+  # Either the number of characters in the beginning delimiter, or a tuple of
+  # strings which give all valie beginning comment delimiters.
+  beginning_comment_delim,
+  # The string which start with the delimiter to be removed.
+  string):
+
+    # If we already know the number of characters in the delimiter, we're done!
+    # Just return the substring.
+    if isinstance(beginning_comment_delim, int):
+        return string[beginning_comment_delim:]
+    # Otherwise, we must search for one of the known delimiters in the  given
+    # string.
+    else:
+        for bcd in beginning_comment_delim:
+            # If we find it at the beginning of the string, strip it off.
+            if string.find(bcd) == 0:
+                return string[len(bcd):]
+
+        # Not found -- panic.
+        assert False
+
 # Based on the lexer class, define comment delimiter lengths. Based on the info
-# provided at the `Wikipedia page 
+# provided at the `Wikipedia page
 # <http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments>`_.
-COMMENT_DELIMITER_LENGTHS = {
+_COMMENT_DELIMITER_LENGTHS = {
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,           */
   'C':              ( 2,      2,            2),
@@ -725,7 +748,7 @@ def _is_rest_comment(
 #
 # To fix this, the `raw directive
 # <http://docutils.sourceforge.net/docs/ref/rst/directives.html#raw-data-pass-through>`_
-# is used to insert a pair of ``<div>`` and ``<div>`` HTML elements which set 
+# is used to insert a pair of ``<div>`` and ``<div>`` HTML elements which set
 # the left margin of indented text based on how many spaces (0.5 em = 1 space).
 #
 # +--------------------------+-------------------------+-----------------------------------+
@@ -763,7 +786,7 @@ def _is_rest_comment(
 #
 #    :code:` Testing `
 #
-# renders incorrectly. So, mixed lines are simply translated as code, meaning 
+# renders incorrectly. So, mixed lines are simply translated as code, meaning
 # reST markup can't be applied to the comments.
 #
 # Summary and implementation
@@ -778,7 +801,7 @@ def _is_rest_comment(
 # .. _generate_rest:
 #
 # Generate reST from the classified code. To do this, create a state machine,
-# where current_type defines the state. When the state changes, exit the 
+# where current_type defines the state. When the state changes, exit the
 # previous state (output a closing fence or closing ``</div>``, then enter the
 # new state (output a fenced code block or an opening ``<div style=...>``.
 def _generate_rest(
@@ -793,7 +816,6 @@ def _generate_rest(
     current_type = -2
 
     for type_, string in classified_lines:
-        print(type_, string)
 
         # See if there's a change in state.
         if current_type != type_:

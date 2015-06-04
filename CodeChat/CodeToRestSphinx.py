@@ -45,7 +45,7 @@ import pygments.util
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, code_to_rest_file, \
-    COMMENT_DELIMITER_LENGTHS
+    _COMMENT_DELIMITER_LENGTHS
 from . import __version__
 
 # Supported extensions
@@ -58,7 +58,7 @@ SUPPORTED_EXTENSIONS = set()
 # tuple. Pick out only the filename and examine it.
 for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
     # Pick only filenames we have comment info for.
-    if longname in COMMENT_DELIMITER_LENGTHS:
+    if longname in _COMMENT_DELIMITER_LENGTHS:
         for fnp in filename_patterns:
             # Take just the extension, which is what Sphinx expects.
             ext = os.path.splitext(fnp)[1]
