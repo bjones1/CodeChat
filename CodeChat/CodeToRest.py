@@ -248,13 +248,8 @@ def _lexer_to_rest(
     # \4. Classify each line. For reST-formatted comments, remove the leading
     #     whitespace and all comment characters (the // or #, for example).
     #
-    # First, get a function which will remove comment delimiters based on the
-    # selected lexer.
-    remove_comment_chars_specific = _remove_comment_chars(
-      *COMMENT_DELIMITER_LENGTHS[lexer.name])
     # Then classify.
-    classified_group = _classify_groups(gathered_group,
-      remove_comment_chars_specific)
+    classified_group = _classify_groups(gathered_group, lexer)
     
     # \5. Run a state machine to output the corresponding reST.
     _generate_rest(classified_group, out_file)
@@ -477,9 +472,8 @@ def _classify_groups(
   iter_gathered_groups,
   # .. _remove_comment_chars:
   #
-  # A function which will remove comment characters based on the passed (group,
-  # string).
-  remove_comment_chars_):
+  # See lexer_.
+  lexer):
 
     # Keep track of block comment state.
     is_block_rest_comment = False
@@ -488,7 +482,7 @@ def _classify_groups(
     for l in iter_gathered_groups:
         print(l)
 
-        if _is_rest_comment(l, is_block_rest_comment, remove_comment_chars_):
+        if _is_rest_comment(l, is_block_rest_comment, lexer):
 
             first_group, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
@@ -504,7 +498,7 @@ def _classify_groups(
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
-            string = ''.join([remove_comment_chars_(group, string)
+            string = ''.join([_remove_comment_delim(group, string, lexer)
                               for group, string in l])
             # Remove the inital space character from the first comment,
             # but not from body or end comments.
@@ -524,37 +518,34 @@ def _classify_groups(
 #
 # Supporting routines
 # ^^^^^^^^^^^^^^^^^^^
-# Return a function which removes comment characters from a (group, string)
-# based on these lexer-specific parameters:
-def _remove_comment_chars(
-  # Number of characters in a single-line comment delimiter.
-  len_inline_comment_delim,
-  # Number of characters in an opening block comment.
-  len_opening_block_comment_delim,
-  # Number of characters in an closing block comment.
-  len_closing_block_comment_delim):
+# Given a (group, string) tuple, return the string with comment delimiter
+# removed if it is a comment, or just the string if it's not a comment.
+def _remove_comment_delim(
+  # The group this string was classified into.
+  group,
+  # The string corresponding to this group.
+  string,
+  # See lexer_.
+  lexer):
 
-    # Given a (group, string) tuple, return the string with comment characters
-    # removed if it is a comment, or just the string if it's not a comment.
-    def _remove_comment_chars_specific(
-      # The group this string was classified into.
-      group,
-      # The string corresponding to this group.
-      string):
+    # Number of characters in a single-line comment delimiter.
+    (len_inline_comment_delim,
+    # Number of characters in an opening block comment.
+    len_opening_block_comment_delim,
+    # Number of characters in an closing block comment.
+    len_closing_block_comment_delim) = COMMENT_DELIMITER_LENGTHS[lexer.name]
 
-        if group == INLINE_COMMENT_GROUP:
-            return string[len_inline_comment_delim:]
-        if group == BLOCK_COMMENT_GROUP:
-            return string[ len_opening_block_comment_delim:
-                          -len_closing_block_comment_delim]
-        if group == BLOCK_COMMENT_START_GROUP:
-            return string[len_opening_block_comment_delim:]
-        if group == BLOCK_COMMENT_END_GROUP:
-            return string[:-len_closing_block_comment_delim]
-        else:
-            return string
-
-    return _remove_comment_chars_specific
+    if group == INLINE_COMMENT_GROUP:
+        return string[len_inline_comment_delim:]
+    if group == BLOCK_COMMENT_GROUP:
+        return string[ len_opening_block_comment_delim:
+                      -len_closing_block_comment_delim]
+    if group == BLOCK_COMMENT_START_GROUP:
+        return string[len_opening_block_comment_delim:]
+    if group == BLOCK_COMMENT_END_GROUP:
+        return string[:-len_closing_block_comment_delim]
+    else:
+        return string
 
 
 # Determine if the given line is a comment to be interpreted by reST.
@@ -565,8 +556,8 @@ def _is_rest_comment(
   # True if this line contains the body or end of a block comment
   # that will be interpreted by reST.
   is_block_rest_comment,
-  # See remove_comment_chars_.
-  remove_comment_chars_):
+  # See lexer_.
+  lexer):
 
     # See if there is any OTHER_GROUP in this line. If so, it's not a reST
     # comment.
@@ -583,7 +574,7 @@ def _is_rest_comment(
     first_comment_index = 1 if group_tuple[0] == WHITESPACE_GROUP else 0
     first_group = group_tuple[first_comment_index]
     first_string = string_tuple[first_comment_index]
-    first_comment_text = remove_comment_chars_(first_group, first_string)
+    first_comment_text = _remove_comment_delim(first_group, first_string, lexer)
     # The cases are::
     #
     #  #. // comment, //\n, # -> reST comment. Note that in some languages
