@@ -289,19 +289,34 @@ def _group_lexer_tokens(
 #
 # Supporting routines and definitions
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+# A simple enumerate I like, taken from one of the snippet on `stackoverflow
+# <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_. What I want: a set of unique identifiers that will be named nicely,
+# rather than printed as a number. Really, just a way to create a class whose
+# members contain a string representation of their name. Perhaps the best 
+# solution is `enum34 <https://pypi.python.org/pypi/enum34>`_, based on `PEP 
+# 0435 <https://www.python.org/dev/peps/pep-0435/>`_, but I don't want an extra
+# dependency just for this.
+class Enum(frozenset):
+    def __getattr__(self, name):
+        if name in self:
+            return name
+        raise AttributeError
+
 # Define the groups into which tokens will be placed.
-(WHITESPACE_GROUP, INLINE_COMMENT_GROUP, OTHER_GROUP,
- # A ``/* comment */``-style comment contained in one string.
- BLOCK_COMMENT_GROUP,
- # Grouping is::
- #
- #    /* BLOCK_COMMENT_START_GROUP,
- #       BLOCK_COMMENT_BODY_GROUP, (repeats for all comment body)
- #       BLOCK_COMMENT_END_GROUP */
- BLOCK_COMMENT_START_GROUP, BLOCK_COMMENT_BODY_GROUP,
- BLOCK_COMMENT_END_GROUP) = range(7)
+_GROUP = Enum(
+  # The basic classification used by group_for_tokentype_.
+  ('whitespace inline_comment other ' +
+  # A ``/* comment */``-style comment contained in one string.
+  'block_comment ' +
+  # Grouping is::
+  #
+  #    /* BLOCK_COMMENT_START
+  #       BLOCK_COMMENT_BODY, (repeats for all comment body)
+  #       BLOCK_COMMENT_END */
+  'block_comment_start block_comment_body block_comment_end ').split())
 
-
+# .. _group_for_tokentype:
+#
 # Given a tokentype, group it.
 def _group_for_tokentype(
   # The tokentype to place into a group.
@@ -313,13 +328,13 @@ def _group_for_tokentype(
     # are considered as a type of comment by Pygments; for our grouping,
     # consider them code.
     if tokentype in Token.Text or tokentype in Token.Whitespace:
-        return WHITESPACE_GROUP
+        return _GROUP.whitespace
     if tokentype in Token.Comment and tokentype not in Token.Comment.Preproc:
         if tokentype not in Token.Comment.Multiline:
-            return INLINE_COMMENT_GROUP
+            return _GROUP.inline_comment
         else:
-            return BLOCK_COMMENT_GROUP
-    return OTHER_GROUP
+            return _GROUP.block_comment
+    return _GROUP.other
 #
 #
 # Step #3 of lexer_to_rest_
@@ -340,22 +355,22 @@ def _gather_groups_on_newlines(
         splitlines = string.splitlines(True)
         # Look for block comments spread across multiple lines and label
         # them  correctly.
-        if len(splitlines) > 1 and group == BLOCK_COMMENT_GROUP:
-            group = BLOCK_COMMENT_START_GROUP
+        if len(splitlines) > 1 and group == _GROUP.block_comment:
+            group = _GROUP.block_comment_start
         for split_str_index in range(len(splitlines)):
             # Accumulate results.
             split_str = splitlines[split_str_index]
             l.append( (group, split_str) )
 
             # For block comments, move from a start to a body group.
-            if group == BLOCK_COMMENT_START_GROUP:
-                group = BLOCK_COMMENT_BODY_GROUP
+            if group == _GROUP.block_comment_start:
+                group = _GROUP.block_comment_body
             # If the next line is the last line, update the block
             # group.
             is_next_to_last_line = split_str_index == len(splitlines) - 2
             if (is_next_to_last_line and
-                group == BLOCK_COMMENT_BODY_GROUP):
-                group = BLOCK_COMMENT_END_GROUP
+                group == _GROUP.block_comment_body):
+                group = _GROUP.block_comment_end
 
             # Yield when we find a newline, then clear our accumulator.
             if split_str.endswith('\n'):
@@ -392,7 +407,7 @@ def _classify_groups(
 
             first_group, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
-            if first_group == WHITESPACE_GROUP:
+            if first_group == _GROUP.whitespace:
                 # Encode this whitespace in the type, then drop it.
                 type_ = len(first_string)
                 l.pop(0)
@@ -400,7 +415,7 @@ def _classify_groups(
                 type_ = 0
 
             # Update the block reST state.
-            if l[0][0] == BLOCK_COMMENT_START_GROUP:
+            if l[0][0] == _GROUP.block_comment_start:
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
@@ -409,8 +424,8 @@ def _classify_groups(
             # Remove the inital space character from the first comment,
             # but not from body or end comments.
             if ( len(string) and string[0] == ' ' and
-                first_group not in (BLOCK_COMMENT_BODY_GROUP,
-                                    BLOCK_COMMENT_END_GROUP) ):
+                first_group not in (_GROUP.block_comment_body,
+                                    _GROUP.block_comment_end) ):
                 string = string[1:]
 
         # Everything else is considered code.
@@ -441,14 +456,14 @@ def _remove_comment_delim(
     # Number of characters in an closing block comment.
     len_closing_block_comment_delim) = COMMENT_DELIMITER_LENGTHS[lexer.name]
 
-    if group == INLINE_COMMENT_GROUP:
+    if group == _GROUP.inline_comment:
         return string[len_inline_comment_delim:]
-    if group == BLOCK_COMMENT_GROUP:
+    if group == _GROUP.block_comment:
         return string[ len_opening_block_comment_delim:
                       -len_closing_block_comment_delim]
-    if group == BLOCK_COMMENT_START_GROUP:
+    if group == _GROUP.block_comment_start:
         return string[len_opening_block_comment_delim:]
-    if group == BLOCK_COMMENT_END_GROUP:
+    if group == _GROUP.block_comment_end:
         return string[:-len_closing_block_comment_delim]
     else:
         return string
@@ -557,19 +572,19 @@ def _is_rest_comment(
   # See lexer_.
   lexer):
 
-    # See if there is any OTHER_GROUP in this line. If so, it's not a reST
+    # See if there is any _GROUP.other in this line. If so, it's not a reST
     # comment.
     group_tuple, string_tuple = zip(*line_list)
-    if OTHER_GROUP in group_tuple:
+    if _GROUP.other in group_tuple:
         return False
     # If there's no comments (meaning the entire line is whitespace), it's not a
     # reST comment.
-    if group_tuple == (WHITESPACE_GROUP, ):
+    if group_tuple == (_GROUP.whitespace, ):
         return False
 
     # Find the first comment. There may be whitespace preceeding it, so select
     # the correct index.
-    first_comment_index = 1 if group_tuple[0] == WHITESPACE_GROUP else 0
+    first_comment_index = 1 if group_tuple[0] == _GROUP.whitespace else 0
     first_group = group_tuple[first_comment_index]
     first_string = string_tuple[first_comment_index]
     first_comment_text = _remove_comment_delim(first_group, first_string, lexer)
@@ -585,8 +600,8 @@ def _is_rest_comment(
     first_char_is_rest = ( (len(first_comment_text) > 0 and
                           first_comment_text[0] in (' ', '\n')) or
                           len(first_comment_text) == 0 )
-    is_block_body_or_end = first_group in (BLOCK_COMMENT_BODY_GROUP,
-                                               BLOCK_COMMENT_END_GROUP)
+    is_block_body_or_end = first_group in (_GROUP.block_comment_body,
+                                               _GROUP.block_comment_end)
     if ( (first_char_is_rest and not is_block_body_or_end) or
          (is_block_rest_comment and is_block_body_or_end) ):
         return True
