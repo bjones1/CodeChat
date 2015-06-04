@@ -160,6 +160,27 @@ class TestCodeToRest(object):
         ret = self.t('// testing\nComparing\n\n')
         assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
 
+    # Block comments.
+    def test_19_1(self):
+        ret = self.t('/* multi-\nline\ncomment */\n')
+        assert ret == 'multi-\nline\ncomment \n'
+
+    def test_19_2(self):
+        ret = self.t('/*multi-\nline\ncomment */\n')
+        assert ret == '\n.. fenced-code::\n\n Beginning fence\n /*multi-\n line\n comment */\n Ending fence\n\n'
+
+    def test_19_3(self):
+        ret = self.t('/* block */ //inline\n')
+        assert ret == 'block  inline\n'
+
+    def test_19_4(self):
+        ret = self.t('/* block */ /**/\n')
+        assert ret == 'block  \n'
+
+    def test_19_5(self):
+        ret = self.t('/* multi-\nline\ncomment */ //inline\n')
+        assert ret == 'multi-\nline\ncomment  inline\n'
+
 # Other languages
 # ---------------
     # A bit of Python testing.
@@ -181,6 +202,11 @@ class TestCodeToRest(object):
         ret = self.t(' \ndiv {}\n\n/* comment */\n')
         assert (ret ==
           '\n.. fenced-code::\n\n Beginning fence\n  \n div {}\n \n Ending fence\n\ncomment \n' )
+
+    def test_22(self):
+        ret = self.t('/*multi-\nline\ncomment */\n', '.css')
+        ret = self.t('/* multi-\nline\ncomment */\n')
+        assert ret == 'multi-\nline\ncomment \n'
 
 
 
