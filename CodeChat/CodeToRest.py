@@ -357,9 +357,8 @@ def _gather_groups_on_newlines(
         # them  correctly.
         if len(splitlines) > 1 and group == _GROUP.block_comment:
             group = _GROUP.block_comment_start
-        for split_str_index in range(len(splitlines)):
+        for index, split_str in enumerate(splitlines):
             # Accumulate results.
-            split_str = splitlines[split_str_index]
             l.append( (group, split_str) )
 
             # For block comments, move from a start to a body group.
@@ -367,7 +366,7 @@ def _gather_groups_on_newlines(
                 group = _GROUP.block_comment_body
             # If the next line is the last line, update the block
             # group.
-            is_next_to_last_line = split_str_index == len(splitlines) - 2
+            is_next_to_last_line = index == len(splitlines) - 2
             if (is_next_to_last_line and
                 group == _GROUP.block_comment_body):
                 group = _GROUP.block_comment_end
@@ -869,8 +868,8 @@ class _FencedCodeBlock(CodeBlock):
         # So, first add spaces from the beginning of the lines until we reach
         # the first non-blank line.
         processedAllContent = True
-        for i in range(len(self.content)):
-            if self.content[i]:
+        for i, content in enumerate(self.content):
+            if content:
                 processedAllContent = False
                 break
             self.content[i] = ' '
@@ -878,7 +877,7 @@ class _FencedCodeBlock(CodeBlock):
         # adding unnecessary spaces. Otherwise, walk from the end of the content
         # backwards, adding spaces until the first non-blank line.
         if not processedAllContent:
-            for i in range(len(self.content)):
+            for i, _ in enumerate(self.content):
                 # Recall Python indexing: while 0 is the first elemment in a
                 # list, -1 is the last element, so offset all indices by -1.
                 if self.content[-i - 1]:
