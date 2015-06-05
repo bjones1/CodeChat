@@ -58,30 +58,16 @@ ef = u' Ending fence\n\n'
 class TestCodeToRest(object):
 # C-like language tests
 # ---------------------
-    # Given a string and a language, run it through ``code_to_rest_string`` and
-    # return the resulting string.
-    def t(self, in_string, alias = 'C'):
-        return code_to_rest_string(in_string, alias=alias)
-    
     # multi-test: Check that the given code's output is correct over several 
     # C-like languages.
-    def mt(self, code_str, expected_rest_str):
-        assert self.t(code_str, 'C') == expected_rest_str
-        assert self.t(code_str, 'C++') == expected_rest_str
-        assert self.t(code_str, 'Java') == expected_rest_str
-        assert self.t(code_str, 'ActionScript') == expected_rest_str
-        assert self.t(code_str, 'C#') == expected_rest_str
-        assert self.t(code_str, 'D') == expected_rest_str
-        assert self.t(code_str, 'Go') == expected_rest_str
-        assert self.t(code_str, 'JavaScript') == expected_rest_str
-        assert self.t(code_str, 'Objective-C') == expected_rest_str
-        assert self.t(code_str, 'Rust') == expected_rest_str
-        assert self.t(code_str, 'Scala') == expected_rest_str
-        assert self.t(code_str, 'Swift') == expected_rest_str
-        assert self.t(code_str, 'verilog') == expected_rest_str
-        assert self.t(code_str, 'systemverilog') == expected_rest_str
-
-    # A single line of code, without an ending ``\n``.
+    def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++', 
+      'Java', 'ActionScript', 'C#', 'D', 'Go', 'JavaScript', 'Objective-C',
+      'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog')):
+        
+        for alias in alias_seq:
+            rest = code_to_rest_string(code_str, alias=alias)
+            assert rest == expected_rest_str
+            
     def test_1(self):
         self.mt('testing', bf + ' testing\n' + ef)
 
@@ -195,30 +181,27 @@ class TestCodeToRest(object):
 # ---------------
     # A bit of Python testing.
     def test_20(self):
-        ret = self.t('# testing\n#\n# Trying\n', 'Python')
-        assert ret ==  'testing\n\nTrying\n'
+        self.mt('# testing\n#\n# Trying\n', 'testing\n\nTrying\n', 
+                ('Python', 'Python3'))
 
     def test_21(self):
-        ret = self.t('#\n', 'Python')
-        assert ret ==  '\n'
+        self.mt('#\n', '\n', ('Python', 'Python3'))
 
     def test_22(self):
-        ret = self.t(' \nfoo()\n\n# bar\n', 'Python')
-        assert ( ret ==
-                bf + '  \n foo()\n \n' + ef + 'bar\n')
+        self.mt(' \nfoo()\n\n# bar\n', bf + '  \n foo()\n \n' + ef + 'bar\n',
+                ('Python', 'Python3'))
 
     # Some CSS.
     def xtest_23(self):
-        ret = self.t(' \ndiv {}\n\n/* comment */\n', '.css')
-        assert (ret ==
-          bf + '  \n div {}\n \n' + ef + 'comment \n' )
+        self.mt(' \ndiv {}\n\n/* comment */\n', 
+                bf + '  \n div {}\n \n' + ef + 'comment \n', ['CSS'])
 
     def xtest_24(self):
-        ret = self.t('/* multi-\nline\ncomment */\n', '.css')
-        assert ret == 'multi-\nline\ncomment \n'
+        self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n',
+                ['CSS'])
 
     def xtest_25(self):
-        ret = self.t(
+        self.mt(
 """/*
 *************************************************
 CodeChat.css - Style sheet for CodeChat docs
@@ -230,8 +213,7 @@ CodeChat.css - Style sheet for CodeChat docs
 Stylesheet for use with CodeChat's extensions to Docutils.
 */
 
-""", '.css')
-        assert ret == 'multi-\nline\ncomment \n'
+""", 'multi-\nline\ncomment \n', ['CSS'])
 
 
 # Fenced code block testing
