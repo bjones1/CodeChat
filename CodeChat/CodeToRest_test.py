@@ -56,146 +56,154 @@ from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
 bf = u'\n.. fenced-code::\n\n Beginning fence\n'
 ef = u' Ending fence\n\n'
 class TestCodeToRest(object):
-    # Given a string and a language, run it through ``code_to_rest`` and return
-    # the resulting string.
-    def t(self, in_string, extension = '.c'):
-        return code_to_rest_string(in_string, filename='foo' + extension)
+# C-like language tests
+# ---------------------
+    # Given a string and a language, run it through ``code_to_rest_string`` and
+    # return the resulting string.
+    def t(self, in_string, alias = 'C'):
+        return code_to_rest_string(in_string, alias=alias)
+    
+    # multi-test: Check that the given code's output is correct over several 
+    # C-like languages.
+    def mt(self, code_str, expected_rest_str):
+        assert self.t(code_str, 'C') == expected_rest_str
+        assert self.t(code_str, 'C++') == expected_rest_str
+        assert self.t(code_str, 'Java') == expected_rest_str
+        assert self.t(code_str, 'ActionScript') == expected_rest_str
+        assert self.t(code_str, 'C#') == expected_rest_str
+        assert self.t(code_str, 'D') == expected_rest_str
+        assert self.t(code_str, 'Go') == expected_rest_str
+        assert self.t(code_str, 'JavaScript') == expected_rest_str
+        assert self.t(code_str, 'Objective-C') == expected_rest_str
+        assert self.t(code_str, 'Rust') == expected_rest_str
+        assert self.t(code_str, 'Scala') == expected_rest_str
+        assert self.t(code_str, 'Swift') == expected_rest_str
+        assert self.t(code_str, 'verilog') == expected_rest_str
+        assert self.t(code_str, 'systemverilog') == expected_rest_str
 
     # A single line of code, without an ending ``\n``.
     def test_1(self):
-        ret = self.t('testing')
-        assert ret ==  bf + ' testing\n' + ef
+        self.mt('testing', bf + ' testing\n' + ef)
 
     # A single line of code, with an ending ``\n``.
     def test_2(self):
-        ret = self.t('testing\n')
-        assert ret ==  bf + ' testing\n' + ef
+        self.mt('testing\n', bf + ' testing\n' + ef)
 
     # Several lines of code, with arbitrary indents.
     def test_3(self):
-        ret = self.t('testing\n  test 1\n test 2\n   test 3')
-        assert ret == bf + ' testing\n   test 1\n  test 2\n    test 3\n' + ef
+        self.mt('testing\n  test 1\n test 2\n   test 3',
+          bf + ' testing\n   test 1\n  test 2\n    test 3\n' + ef)
 
     # A single line comment, no trailing ``\n``.
     def test_4(self):
-        ret = self.t('// testing')
-        assert ret == 'testing\n'
+        self.mt('// testing', 'testing\n')
 
     # A single line comment, trailing ``\n``.
     def test_5(self):
-        ret = self.t('// testing\n')
-        assert ret == 'testing\n'
+        self.mt('// testing\n', 'testing\n')
 
     # A multi-line comment.
     def test_5a(self):
-        ret = self.t('// testing\n// more testing')
-        assert ret == 'testing\nmore testing\n'
+        self.mt('// testing\n// more testing', 'testing\nmore testing\n')
 
     # A single line comment with no space after the comment should be treated
     # like code.
     def test_6(self):
-        ret = self.t('//testing')
-        assert ret == bf + ' //testing\n' + ef
+        self.mt('//testing', bf + ' //testing\n' + ef)
 
     # A singly indented single-line comment.
     def test_7(self):
-        ret = self.t(' // testing')
-        assert ret == '\n.. raw:: html\n\n <div style="margin-left:0.5em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n'
+        self.mt(' // testing', '\n.. raw:: html\n' + 
+                '\n <div style="margin-left:0.5em;">\n\ntesting\n' + 
+                '\n.. raw:: html\n\n </div>\n\n')
 
     # A doubly indented single-line comment.
     def test_8(self):
-        ret = self.t('  // testing')
-        assert ret == '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n'
+        self.mt('  // testing', '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n')
 
     # A doubly indented multi-line comment.
     def test_9(self):
-        ret = self.t('  // testing\n  // more testing')
-        assert ret == '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\nmore testing\n\n.. raw:: html\n\n </div>\n\n'
+        self.mt('  // testing\n  // more testing', '\n.. raw:: html\n' + 
+                '\n <div style="margin-left:1.0em;">\n\ntesting\n' + 
+                'more testing\n\n.. raw:: html\n\n </div>\n\n')
 
     # Code to comment transition.
     def test_9a(self):
-        ret = self.t('testing\n// test')
-        assert ret == bf + ' testing\n' + ef + 'test\n'
+        self.mt('testing\n// test', bf + ' testing\n' + ef + 'test\n')
 
     # A line with just the comment char, but no trailing space.
     def test_10(self):
-        ret = self.t('//')
-        assert ret == '\n'
+        self.mt('//', '\n')
 
     # Make sure an empty string works.
     def test_12(self):
-        ret = self.t('')
-        assert ret == bf + ' \n' + ef
+        self.mt('', bf + ' \n' + ef)
 
     # Make sure Unicode works.
     def test_13(self):
-        ret = self.t(u'ю')
-        assert ret == bf + u' ю\n' + ef
+        self.mt(u'ю', bf + u' ю\n' + ef)
 
     # Code to comment transition.
     def test_14(self):
-        ret = self.t('testing\n// Comparing')
-        assert ret ==  bf + ' testing\n' + ef + 'Comparing\n'
+        self.mt('testing\n// Comparing',  bf + ' testing\n' + ef + 
+                'Comparing\n')
 
     # Code to comment transition, with leading blank code lines.
     def test_15(self):
-        ret = self.t(' \ntesting\n// Comparing')
-        assert ret ==  bf + '  \n testing\n' + ef + 'Comparing\n'
+        self.mt(' \ntesting\n// Comparing',  bf + '  \n testing\n' + ef +
+                'Comparing\n')
 
     # Code to comment transition, with trailing blank code lines.
     def test_16(self):
-        ret = self.t('testing\n\n// Comparing')
-        assert ret ==  bf + ' testing\n \n' + ef + 'Comparing\n'
+        self.mt('testing\n\n// Comparing',  bf + ' testing\n \n' + ef +
+                'Comparing\n')
 
     # Comment to code transition.
     def test_17(self):
-        ret = self.t('// testing\nComparing')
-        assert ret ==  'testing\n' + bf + ' Comparing\n' + ef + ''
+        self.mt('// testing\nComparing',  'testing\n' + bf + ' Comparing\n' + 
+                ef)
 
     # Comment to code transition, with leading blank code lines.
     def test_18(self):
-        ret = self.t('// testing\n\nComparing')
-        assert ret ==  'testing\n' + bf + ' \n Comparing\n' + ef + ''
+        self.mt('// testing\n\nComparing',  'testing\n' + bf + 
+                ' \n Comparing\n' + ef)
 
     # Comment to code transition, with trailing blank code lines.
     def test_19(self):
-        ret = self.t('// testing\nComparing\n\n')
-        assert ret ==  'testing\n' + bf + ' Comparing\n' + ef + ''
+        self.mt('// testing\nComparing\n\n',  'testing\n' + bf + 
+                ' Comparing\n' + ef)
 
     # Block comments.
     def test_19_1(self):
-        ret = self.t('/* multi-\nline\ncomment */\n')
-        assert ret == 'multi-\nline\ncomment \n'
+        self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
 
     def test_19_2(self):
-        ret = self.t('/*multi-\nline\ncomment */\n')
-        assert ret == bf + ' /*multi-\n line\n comment */\n' + ef + ''
+        self.mt('/*multi-\nline\ncomment */\n', bf + 
+                ' /*multi-\n line\n comment */\n' + ef)
 
     def test_19_3(self):
-        ret = self.t('/* block */ //inline\n')
-        assert ret == 'block  inline\n'
+        self.mt('/* block */ //inline\n', 'block  inline\n')
 
     def test_19_4(self):
-        ret = self.t('/* block */ /**/\n')
-        assert ret == 'block  \n'
+        self.mt('/* block */ /**/\n', 'block  \n')
 
     def test_19_5(self):
-        ret = self.t('/* multi-\nline\ncomment */ //inline\n')
-        assert ret == 'multi-\nline\ncomment  inline\n'
+        self.mt('/* multi-\nline\ncomment */ //inline\n', 
+                'multi-\nline\ncomment  inline\n')
 
 # Other languages
 # ---------------
     # A bit of Python testing.
     def test_20(self):
-        ret = self.t('# testing\n#\n# Trying\n', '.py')
+        ret = self.t('# testing\n#\n# Trying\n', 'Python')
         assert ret ==  'testing\n\nTrying\n'
 
     def test_21(self):
-        ret = self.t('#\n', '.py')
+        ret = self.t('#\n', 'Python')
         assert ret ==  '\n'
 
     def test_22(self):
-        ret = self.t(' \nfoo()\n\n# bar\n', '.py')
+        ret = self.t(' \nfoo()\n\n# bar\n', 'Python')
         assert ( ret ==
                 bf + '  \n foo()\n \n' + ef + 'bar\n')
 

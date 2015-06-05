@@ -501,6 +501,7 @@ _COMMENT_DELIMITER_LENGTHS = {
   'C++':            ( 2,      2,            2),
   'Java':           ( 2,      2,            2),
   'ActionScript':   ( 2,      2,            2),
+  'ActionScript 3': ( 2,      2,            2),
   'C#':             ( 2,      2,            2),
   'D':              ( 2,      2,            2),
   'Go':             ( 2,      2,            2),
@@ -508,9 +509,10 @@ _COMMENT_DELIMITER_LENGTHS = {
   'Objective-C':    ( 2,      2,            2),
   'Rust':           ( 2,      2,            2),
   'Scala':          ( 2,      2,            2),
-  'Sass':           ( 2,      2,            2),
+  'Sass':           ( 2,      2,            2), # ??? Doesn't work in tests
   'Swift':          ( 2,      2,            2),
   'verilog':        ( 2,      2,            2),
+  'systemverilog':  ( 2,      2,            2),
   ##                  #,    N/A,          N/A
   'Python':         ( 1,   None,         None),
   'Python 3':       ( 1,   None,         None),
