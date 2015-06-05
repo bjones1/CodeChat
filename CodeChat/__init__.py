@@ -27,6 +27,3 @@
 # This is chosen following the `version convention
 # <http://packaging.python.org/en/latest/tutorial.html#version>`_.
 __version__ = '0.0.19a1'
-
-# Import all the non-test modules in this package.
-from . import CodeToRest, CodeToRestSphinx

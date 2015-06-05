@@ -48,7 +48,7 @@ from pygments.lexers import get_lexer_by_name
 from .CodeToRest import code_to_rest_string, code_to_html_file
 from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
-  _generate_rest, _GROUP
+  _generate_rest, _GROUP, _COMMENT_DELIMITER_INFO
 
 
 # This acutally tests using ``code_to_rest_string``, since that makes
@@ -192,7 +192,7 @@ class TestCodeToRest(object):
                 ('Python', 'Python3'))
 
     # Some CSS.
-    def xtest_23(self):
+    def test_23(self):
         self.mt(' \ndiv {}\n\n/* comment */\n', 
                 bf + '  \n div {}\n \n' + ef + 'comment \n', ['CSS'])
 
@@ -298,8 +298,8 @@ class TestCodeToHtmlFile(object):
 
 # Tests of lexer_to_code and subroutines
 # ======================================
-c_lexer = get_lexer_by_name('C')
-py_lexer = get_lexer_by_name('Python')
+c_lexer = _COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name]
+py_lexer = _COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
@@ -329,7 +329,7 @@ main(){
         lexer = get_lexer_by_name('c')
         token_iter = lex(self.test_c_code, lexer)
         # Capture both group and string for help in debugging.
-        token_group = list(_group_lexer_tokens(token_iter))
+        token_group = list(_group_lexer_tokens(token_iter, False, False))
         # But split the two into separate lists for unit tests.
         group_list, string_list = zip(*token_group)
         assert group_list == (
@@ -351,14 +351,14 @@ main(){
         lexer = get_lexer_by_name('python')
         token_iter = lex('', lexer)
         # Capture both group and string for help in debugging.
-        token_group = list(_group_lexer_tokens(token_iter))
+        token_group = list(_group_lexer_tokens(token_iter, True, False))
         assert token_group == [(_GROUP.whitespace, u'\n')]
 
     # Check gathering of groups by newlines.
     def test_4(self):
         lexer = get_lexer_by_name('c')
         token_iter = lex(self.test_c_code, lexer)
-        token_group = _group_lexer_tokens(token_iter)
+        token_group = _group_lexer_tokens(token_iter, False, False)
         gathered_group = list(_gather_groups_on_newlines(token_group))
         expected_group = [
           [(_GROUP.other, u'#include <stdio.h>\n')],
@@ -605,7 +605,7 @@ main(){
     def test_10(self):
         lexer = get_lexer_by_name('c')
         token_iter = lex(self.test_c_code, lexer)
-        token_group = _group_lexer_tokens(token_iter)
+        token_group = _group_lexer_tokens(token_iter, False, False)
         gathered_group = _gather_groups_on_newlines(token_group)
         classified_group = list( _classify_groups(gathered_group, c_lexer) )
         assert classified_group == [(-1, u'#include <stdio.h>\n'),

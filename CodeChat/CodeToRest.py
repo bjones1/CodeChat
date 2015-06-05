@@ -211,6 +211,13 @@ def get_lexer(
         return get_lexer_for_filename(filename, **options)
     if mimetype:
         return get_lexer_for_mimetype(mimetype, **options)
+
+
+# Provide the ability to print debug info if needed.
+def _debug_print(val):
+    # Uncomment for debug prints.
+    print(val),
+    pass
 #
 #
 # .. _lexer_to_rest:
@@ -232,15 +239,24 @@ def _lexer_to_rest(
   # See out_file_.
   out_file):
 
-    debug_print(u'Lexer: {}\n'.format(lexer.name))
-
+    _debug_print(u'Lexer: {}\n'.format(lexer.name))
+    # Gather some additional information, based on the lexer, which is needed
+    # to correctly process comments:
+    cdi = _COMMENT_DELIMITER_INFO[lexer.name]
+    # * If there's no multi-line start info, then classify generic comments as
+    #   inline. 
+    comment_is_inline = not cdi[1]
+    # * Likewise, no inline info indicates that generic comments are block 
+    #   comments.
+    comment_is_block = not cdi[0]
+    
     # \1. Invoke a Pygments lexer on the provided source code, obtaining an
     #     iterable of tokens.
     token_iter = lex(code_str, lexer)
 
     # \2. Combine tokens from the lexer into three groups: whitespace, comment,
     #     or other.
-    token_group = _group_lexer_tokens(token_iter)
+    token_group = _group_lexer_tokens(token_iter, comment_is_inline, comment_is_block)
 
     # \3. Make a per-line list of [group, string], so that the last string in
     #     each list ends with a newline. Change the group of block comments that
@@ -251,38 +267,42 @@ def _lexer_to_rest(
     #     whitespace and all comment characters (the // or #, for example).
     #
     # Then classify.
-    classified_group = _classify_groups(gathered_group, lexer)
+    classified_group = _classify_groups(gathered_group, cdi)
 
     # \5. Run a state machine to output the corresponding reST.
     _generate_rest(classified_group, out_file)
-
-
-# Provide the ability to print debug info if needed.
-def debug_print(val):
-    # Uncomment for debug prints.
-    print(val),
-    pass
 #
 #
 # Step 2 of lexer_to_rest_
 # ------------------------
 # Given tokens, group them.
 def _group_lexer_tokens(
-  # An interable of (tokentype, value) pairs provided by the lexer, per
+  # An interable of (tokentype, string) pairs provided by the lexer, per
   # `get_tokens
   # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
-  iter_token):
+  iter_token,
+  # .. _comment_is_inline:
+  # 
+  # When true, classify generic comments as inline. 
+  comment_is_inline,
+  # .. _comment_is_block:
+  #
+  # When true, classify generic comment as block comments.
+  comment_is_block):
+
 
     # Keep track of the current group and string.
     tokentype, current_string = iter_token.next()
-    current_group = _group_for_tokentype(tokentype)
-    debug_print(u'tokentype = {}, string = {}\n'.
+    current_group = _group_for_tokentype(tokentype, comment_is_inline, 
+                                         comment_is_block)
+    _debug_print(u'tokentype = {}, string = {}\n'.
                 format(tokentype, [current_string]))
 
     # Walk through tokens.
     for tokentype, string in iter_token:
-        group = _group_for_tokentype(tokentype)
-        debug_print(u'tokentype = {}, string = {}\n'.
+        group = _group_for_tokentype(tokentype, comment_is_inline, 
+          comment_is_block)
+        _debug_print(u'tokentype = {}, string = {}\n'.
                     format(tokentype, [string]))
 
         # If there's a change in group, yield what we've accumulated so far,
@@ -303,7 +323,8 @@ def _group_lexer_tokens(
 # Supporting routines and definitions
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # A simple enumerate I like, taken from one of the snippet on `stackoverflow
-# <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_. What I want: a set of unique identifiers that will be named nicely,
+# <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_. 
+# What I want: a set of unique identifiers that will be named nicely,
 # rather than printed as a number. Really, just a way to create a class whose
 # members contain a string representation of their name. Perhaps the best
 # solution is `enum34 <https://pypi.python.org/pypi/enum34>`_, based on `PEP
@@ -333,7 +354,11 @@ _GROUP = Enum(
 # Given a tokentype, group it.
 def _group_for_tokentype(
   # The tokentype to place into a group.
-  tokentype):
+  tokentype,
+  # See comment_is_inline_.
+  comment_is_inline,
+  # See comment_is_block_.
+  comment_is_block):
 
     # The list of Pygments `tokens <http://pygments.org/docs/tokens/>`_ lists
     # ``Token.Text`` (how a newline is classified) and ``Token.Whitespace``.
@@ -343,11 +368,12 @@ def _group_for_tokentype(
     # There is a Token.Comment, but this can refer to inline or block comments,
     # or even other things (preprocessors statements). Therefore, restrict
     # classification as follows.
-    if tokentype in Token.Comment and tokentype not in Token.Comment.Preproc:
-        if tokentype not in Token.Comment.Multiline:
-            return _GROUP.inline_comment
-        else:
-            return _GROUP.block_comment
+    if (tokentype == Token.Comment.Single or 
+      (tokentype == Token.Comment and comment_is_inline) ):
+        return _GROUP.inline_comment
+    if (tokentype == Token.Comment.Multiline or
+      (tokentype == Token.Comment and comment_is_block) ):
+        return _GROUP.block_comment
     return _GROUP.other
 #
 #
@@ -364,7 +390,7 @@ def _gather_groups_on_newlines(
 
     # Accumulate until we find a newline, then yield that.
     for group, string in iter_grouped:
-        debug_print(u'group = {}, string = {}\n'.format(group, [string]))
+        _debug_print(u'group = {}, string = {}\n'.format(group, [string]))
         # A given group (such as a block string) may extend across multiple
         # newlines. Split these groups apart first.
         splitlines = string.splitlines(True)
@@ -405,19 +431,19 @@ def _classify_groups(
   # ..., (groupN, stringN_ending_newline)], produced by
   # ``gather_groups_on_newlines``.
   iter_gathered_groups,
-  # .. _remove_comment_chars:
+  # .. _comment_delim_info:
   #
-  # See lexer_.
-  lexer):
+  # An element of _COMMENT_DELIMITER_INFO for the language being classified.
+  comment_delim_info):
 
     # Keep track of block comment state.
     is_block_rest_comment = False
 
     # Walk through groups.
     for l in iter_gathered_groups:
-        debug_print(u'list[(group, string), ... = {}\n'.format(l))
+        _debug_print(u'list[(group, string), ... = {}\n'.format(l))
 
-        if _is_rest_comment(l, is_block_rest_comment, lexer):
+        if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
 
             first_group, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
@@ -433,8 +459,8 @@ def _classify_groups(
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
-            string = ''.join([_remove_comment_delim(group, string, lexer)
-                              for group, string in l])
+            string = ''.join([_remove_comment_delim(group, string, 
+              comment_delim_info) for group, string in l])
             # Remove the inital space character from the first comment,
             # but not from body or end comments.
             if ( len(string) and string[0] == ' ' and
@@ -460,15 +486,15 @@ def _remove_comment_delim(
   group,
   # The string corresponding to this group.
   string,
-  # See lexer_.
-  lexer):
+  # See comment_delim_info_.
+  comment_delim_info):
 
     # Number of characters in a single-line comment delimiter.
     (len_inline_comment_delim,
     # Number of characters in an opening block comment.
     len_opening_block_comment_delim,
     # Number of characters in an closing block comment.
-    len_closing_block_comment_delim) = _COMMENT_DELIMITER_LENGTHS[lexer.name]
+    len_closing_block_comment_delim) = comment_delim_info
 
     if group == _GROUP.inline_comment:
         return string[len_inline_comment_delim:]
@@ -509,7 +535,7 @@ def _remove_beginning_comment_delim(
 # Based on the lexer class, define comment delimiter lengths. Based on the info
 # provided at the `Wikipedia page
 # <http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments>`_.
-_COMMENT_DELIMITER_LENGTHS = {
+_COMMENT_DELIMITER_INFO = {
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,           */
   'C':              ( 2,      2,            2),
@@ -833,7 +859,7 @@ def _generate_rest(
     current_type = -2
 
     for type_, string in classified_lines:
-        debug_print(u'type_ = {}, string = {}\n'.format(type_, [string]))
+        _debug_print(u'type_ = {}, string = {}\n'.format(type_, [string]))
 
         # See if there's a change in state.
         if current_type != type_:
