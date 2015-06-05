@@ -232,6 +232,8 @@ def _lexer_to_rest(
   # See out_file_.
   out_file):
 
+    debug_print(u'Lexer: {}\n'.format(lexer.name))
+
     # \1. Invoke a Pygments lexer on the provided source code, obtaining an
     #     iterable of tokens.
     token_iter = lex(code_str, lexer)
@@ -253,6 +255,13 @@ def _lexer_to_rest(
 
     # \5. Run a state machine to output the corresponding reST.
     _generate_rest(classified_group, out_file)
+
+
+# Provide the ability to print debug info if needed.
+def debug_print(val):
+    # Uncomment for debug prints.
+    print(val),
+    pass
 #
 #
 # Step 2 of lexer_to_rest_
@@ -267,10 +276,14 @@ def _group_lexer_tokens(
     # Keep track of the current group and string.
     tokentype, current_string = iter_token.next()
     current_group = _group_for_tokentype(tokentype)
+    debug_print(u'tokentype = {}, string = {}\n'.
+                format(tokentype, [current_string]))
 
     # Walk through tokens.
     for tokentype, string in iter_token:
         group = _group_for_tokentype(tokentype)
+        debug_print(u'tokentype = {}, string = {}\n'.
+                    format(tokentype, [string]))
 
         # If there's a change in group, yield what we've accumulated so far,
         # then initialize the state to the newly-found group and string.
@@ -327,7 +340,7 @@ def _group_for_tokentype(
     # Consider either as whitespace.
     if tokentype in Token.Text or tokentype in Token.Whitespace:
         return _GROUP.whitespace
-    # There is a Token.Comment, but this can refer to inline or block comments, 
+    # There is a Token.Comment, but this can refer to inline or block comments,
     # or even other things (preprocessors statements). Therefore, restrict
     # classification as follows.
     if tokentype in Token.Comment and tokentype not in Token.Comment.Preproc:
@@ -350,7 +363,8 @@ def _gather_groups_on_newlines(
     l = []
 
     # Accumulate until we find a newline, then yield that.
-    for (group, string) in iter_grouped:
+    for group, string in iter_grouped:
+        debug_print(u'group = {}, string = {}\n'.format(group, [string]))
         # A given group (such as a block string) may extend across multiple
         # newlines. Split these groups apart first.
         splitlines = string.splitlines(True)
@@ -401,6 +415,7 @@ def _classify_groups(
 
     # Walk through groups.
     for l in iter_gathered_groups:
+        debug_print(u'list[(group, string), ... = {}\n'.format(l))
 
         if _is_rest_comment(l, is_block_rest_comment, lexer):
 
@@ -818,6 +833,7 @@ def _generate_rest(
     current_type = -2
 
     for type_, string in classified_lines:
+        debug_print(u'type_ = {}, string = {}\n'.format(type_, [string]))
 
         # See if there's a change in state.
         if current_type != type_:
