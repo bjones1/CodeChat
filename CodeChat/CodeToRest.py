@@ -690,7 +690,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something ::         | .. code-block:: html              |
+# | .. code-block:: Python   | Do something ::         | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
@@ -710,7 +710,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | Do something            | .. code-block:: html              |
+# | .. code-block:: Python   | Do something            | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # Do something          | .. fenced-code::        |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
@@ -738,7 +738,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | One space indent ::     | .. code-block:: html              |
+# | .. code-block:: Python   | One space indent ::     | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # One space indent      |   foo = 1               |  <p>One space indent</p>          |
 # |   foo = 1                |                         |  <pre>foo = 1                     |
@@ -753,7 +753,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | One space indent        | .. code-block:: html              |
+# | .. code-block:: Python   | One space indent        | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # One space indent      | .. fenced-code::        |  <p>One space indent</p>          |
 # |   foo = 1                |                         |  <pre> foo = 1                    |
@@ -779,7 +779,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       | No indent               | .. code-block:: html              |
+# | .. code-block:: Python   | No indent               | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # No indent             |   Two space indent      |  <p>No indent</p>                 |
 # |    # Two space indent    |                         |  <blockquote>Two space indent     |
@@ -797,7 +797,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | ::                       |  No indent              | .. code-block:: html              |
+# | .. code-block:: Python   |  No indent              | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # No indent             |  .. raw:: html          |  <p>No indent</p>                 |
 # |    # Two space indent    |                         |  <div style="margin-left:1.0em">  |
@@ -816,8 +816,40 @@ def _is_rest_comment(
 # |                          |  .. raw:: html          |                                   |
 # |                          |                         |                                   |
 # |                          |   </div>                |                                   |
+# +--------------------------+-------------------------+-----------------------------------+
+
+# Following either a fenced code block or a raw block, care must be taken to 
+# separate these blocks' content from indented comments which follow them. For
+# example, the following code:
+#
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      | Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | .. code-block:: Python   |  .. fenced-code::       | .. code-block:: html              |
 # |                          |                         |                                   |
+# |  def foo():              |     Beginning fence     |  <pre>def foo():                  |
+# |  #      Indented comment |     def foo():          |  Ending fence                     |
+# |                          |     Ending fence        |                                   |
 # |                          |                         |                                   |
+# |                          |        Indented comment |                                   |
+# +--------------------------+-------------------------+-----------------------------------+
+#
+# Notice that the ``Ending fence`` ends up in the resulting HTML! To fix this,
+# simply add an unindented `reST comment 
+# <http://sphinx-doc.org/rest.html#comments>`_ after a block.
+#
+# +--------------------------+-------------------------+-----------------------------------+
+# + Python source            + Translated to reST      | Translated to (simplified) HTML   |
+# +==========================+=========================+===================================+
+# | .. code-block:: Python   |  .. fenced-code::       | .. code-block:: html              |
+# |                          |                         |                                   |
+# |  def foo():              |     Beginning fence     |  <pre>def foo():                  |
+# |  #      Indented comment |     def foo():          |  </pre>                           |
+# |                          |     Ending fence        |  <blockquote>                     |
+# |                          |                         |    Indented comment               |
+# |                          |  ..                     |  </blockquote>                    |
+# |                          |                         |                                   |
+# |                          |        Indented comment |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # Mixed code and comments
@@ -834,12 +866,14 @@ def _is_rest_comment(
 #
 # Summary and implementation
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^
-# This boils down to two basic rules:
+# This boils down to the following basic rules:
 #
 # #. Code blocks must be preceeded and followed by a removed marker (fences).
 #
 # #. Comments must be preeceded and followed by reST which sets the left
 #    margin based on the number of spaces before the comment.
+#
+# #. Both must be followed by an empty, unindented `reST comment`_.
 #
 # .. _generate_rest:
 #
@@ -900,10 +934,10 @@ def _exit_state(
 
     # Code state: emit an ending fence.
     if type_ == -1:
-        out_file.write(' Ending fence\n\n')
+        out_file.write(' Ending fence\n\n..\n\n')
     # Comment state: emit a closing indent.
     elif type_ > 0:
-        out_file.write('\n.. raw:: html\n\n </div>\n\n')
+        out_file.write('\n.. raw:: html\n\n </div>\n\n..\n\n')
     # Initial state. Nothing needed.
     else:
         pass

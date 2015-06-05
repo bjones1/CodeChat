@@ -54,20 +54,20 @@ from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
 bf = u'\n.. fenced-code::\n\n Beginning fence\n'
-ef = u' Ending fence\n\n'
+ef = u' Ending fence\n\n..\n\n'
 class TestCodeToRest(object):
 # C-like language tests
 # ---------------------
-    # multi-test: Check that the given code's output is correct over several 
+    # multi-test: Check that the given code's output is correct over several
     # C-like languages.
-    def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++', 
+    def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++',
       'Java', 'ActionScript', 'C#', 'D', 'Go', 'JavaScript', 'Objective-C',
       'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog')):
-        
+
         for alias in alias_seq:
             rest = code_to_rest_string(code_str, alias=alias)
             assert rest == expected_rest_str
-            
+
     def test_1(self):
         self.mt('testing', bf + ' testing\n' + ef)
 
@@ -99,19 +99,19 @@ class TestCodeToRest(object):
 
     # A singly indented single-line comment.
     def test_7(self):
-        self.mt(' // testing', '\n.. raw:: html\n' + 
-                '\n <div style="margin-left:0.5em;">\n\ntesting\n' + 
-                '\n.. raw:: html\n\n </div>\n\n')
+        self.mt(' // testing', '\n.. raw:: html\n' +
+                '\n <div style="margin-left:0.5em;">\n\ntesting\n' +
+                '\n.. raw:: html\n\n </div>\n\n..\n\n')
 
     # A doubly indented single-line comment.
     def test_8(self):
-        self.mt('  // testing', '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n')
+        self.mt('  // testing', '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n..\n\n')
 
     # A doubly indented multi-line comment.
     def test_9(self):
-        self.mt('  // testing\n  // more testing', '\n.. raw:: html\n' + 
-                '\n <div style="margin-left:1.0em;">\n\ntesting\n' + 
-                'more testing\n\n.. raw:: html\n\n </div>\n\n')
+        self.mt('  // testing\n  // more testing', '\n.. raw:: html\n' +
+                '\n <div style="margin-left:1.0em;">\n\ntesting\n' +
+                'more testing\n\n.. raw:: html\n\n </div>\n\n..\n\n')
 
     # Code to comment transition.
     def test_9a(self):
@@ -131,7 +131,7 @@ class TestCodeToRest(object):
 
     # Code to comment transition.
     def test_14(self):
-        self.mt('testing\n// Comparing',  bf + ' testing\n' + ef + 
+        self.mt('testing\n// Comparing',  bf + ' testing\n' + ef +
                 'Comparing\n')
 
     # Code to comment transition, with leading blank code lines.
@@ -146,17 +146,17 @@ class TestCodeToRest(object):
 
     # Comment to code transition.
     def test_17(self):
-        self.mt('// testing\nComparing',  'testing\n' + bf + ' Comparing\n' + 
+        self.mt('// testing\nComparing',  'testing\n' + bf + ' Comparing\n' +
                 ef)
 
     # Comment to code transition, with leading blank code lines.
     def test_18(self):
-        self.mt('// testing\n\nComparing',  'testing\n' + bf + 
+        self.mt('// testing\n\nComparing',  'testing\n' + bf +
                 ' \n Comparing\n' + ef)
 
     # Comment to code transition, with trailing blank code lines.
     def test_19(self):
-        self.mt('// testing\nComparing\n\n',  'testing\n' + bf + 
+        self.mt('// testing\nComparing\n\n',  'testing\n' + bf +
                 ' Comparing\n' + ef)
 
     # Block comments.
@@ -164,7 +164,7 @@ class TestCodeToRest(object):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
 
     def test_19_2(self):
-        self.mt('/*multi-\nline\ncomment */\n', bf + 
+        self.mt('/*multi-\nline\ncomment */\n', bf +
                 ' /*multi-\n line\n comment */\n' + ef)
 
     def test_19_3(self):
@@ -174,14 +174,14 @@ class TestCodeToRest(object):
         self.mt('/* block */ /**/\n', 'block  \n')
 
     def test_19_5(self):
-        self.mt('/* multi-\nline\ncomment */ //inline\n', 
+        self.mt('/* multi-\nline\ncomment */ //inline\n',
                 'multi-\nline\ncomment  inline\n')
 
 # Other languages
 # ---------------
     # A bit of Python testing.
     def test_20(self):
-        self.mt('# testing\n#\n# Trying\n', 'testing\n\nTrying\n', 
+        self.mt('# testing\n#\n# Trying\n', 'testing\n\nTrying\n',
                 ('Python', 'Python3'))
 
     def test_21(self):
@@ -193,27 +193,13 @@ class TestCodeToRest(object):
 
     # Some CSS.
     def test_23(self):
-        self.mt(' \ndiv {}\n\n/* comment */\n', 
+        self.mt(' \ndiv {}\n\n/* comment */\n',
                 bf + '  \n div {}\n \n' + ef + 'comment \n', ['CSS'])
 
-    def xtest_24(self):
+    def test_24(self):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n',
                 ['CSS'])
 
-    def xtest_25(self):
-        self.mt(
-"""/*
-*************************************************
-CodeChat.css - Style sheet for CodeChat docs
-*************************************************
-:Author: Bryan A. Jones
-:Contact: bjones AT ece DOT msstate DOT edu
-:Copyright: This stylesheet has been placed in the public domain.
-
-Stylesheet for use with CodeChat's extensions to Docutils.
-*/
-
-""", 'multi-\nline\ncomment \n', ['CSS'])
 
 
 # Fenced code block testing
@@ -637,6 +623,8 @@ main(){
 ' code\n' +
 ' \n' +
 ' Ending fence\n' +
+'\n' +
+'..\n' +
 '\n')
 
     def test_12(self):
@@ -669,6 +657,8 @@ comment
 .. raw:: html
 
  </div>
+
+..
 
 """)
 
