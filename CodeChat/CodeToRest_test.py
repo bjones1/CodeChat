@@ -53,6 +53,8 @@ from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
 
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
+bf = u'\n.. fenced-code::\n\n Beginning fence\n'
+ef = u' Ending fence\n\n'
 class TestCodeToRest(object):
     # Given a string and a language, run it through ``code_to_rest`` and return
     # the resulting string.
@@ -62,17 +64,17 @@ class TestCodeToRest(object):
     # A single line of code, without an ending ``\n``.
     def test_1(self):
         ret = self.t('testing')
-        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\n'
+        assert ret ==  bf + ' testing\n' + ef
 
     # A single line of code, with an ending ``\n``.
     def test_2(self):
         ret = self.t('testing\n')
-        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\n'
+        assert ret ==  bf + ' testing\n' + ef
 
     # Several lines of code, with arbitrary indents.
     def test_3(self):
         ret = self.t('testing\n  test 1\n test 2\n   test 3')
-        assert ret == '\n.. fenced-code::\n\n Beginning fence\n testing\n   test 1\n  test 2\n    test 3\n Ending fence\n\n'
+        assert ret == bf + ' testing\n   test 1\n  test 2\n    test 3\n' + ef
 
     # A single line comment, no trailing ``\n``.
     def test_4(self):
@@ -93,7 +95,7 @@ class TestCodeToRest(object):
     # like code.
     def test_6(self):
         ret = self.t('//testing')
-        assert ret == '\n.. fenced-code::\n\n Beginning fence\n //testing\n Ending fence\n\n'
+        assert ret == bf + ' //testing\n' + ef
 
     # A singly indented single-line comment.
     def test_7(self):
@@ -113,7 +115,7 @@ class TestCodeToRest(object):
     # Code to comment transition.
     def test_9a(self):
         ret = self.t('testing\n// test')
-        assert ret == '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\ntest\n'
+        assert ret == bf + ' testing\n' + ef + 'test\n'
 
     # A line with just the comment char, but no trailing space.
     def test_10(self):
@@ -123,42 +125,42 @@ class TestCodeToRest(object):
     # Make sure an empty string works.
     def test_12(self):
         ret = self.t('')
-        assert ret == u'\n.. fenced-code::\n\n Beginning fence\n \n Ending fence\n\n'
+        assert ret == bf + ' \n' + ef
 
     # Make sure Unicode works.
     def test_13(self):
         ret = self.t(u'ю')
-        assert ret == u'\n.. fenced-code::\n\n Beginning fence\n ю\n Ending fence\n\n'
+        assert ret == bf + u' ю\n' + ef
 
     # Code to comment transition.
     def test_14(self):
         ret = self.t('testing\n// Comparing')
-        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n Ending fence\n\nComparing\n'
+        assert ret ==  bf + ' testing\n' + ef + 'Comparing\n'
 
     # Code to comment transition, with leading blank code lines.
     def test_15(self):
         ret = self.t(' \ntesting\n// Comparing')
-        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n  \n testing\n Ending fence\n\nComparing\n'
+        assert ret ==  bf + '  \n testing\n' + ef + 'Comparing\n'
 
     # Code to comment transition, with trailing blank code lines.
     def test_16(self):
         ret = self.t('testing\n\n// Comparing')
-        assert ret ==  '\n.. fenced-code::\n\n Beginning fence\n testing\n \n Ending fence\n\nComparing\n'
+        assert ret ==  bf + ' testing\n \n' + ef + 'Comparing\n'
 
     # Comment to code transition.
     def test_17(self):
         ret = self.t('// testing\nComparing')
-        assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
+        assert ret ==  'testing\n' + bf + ' Comparing\n' + ef + ''
 
     # Comment to code transition, with leading blank code lines.
     def test_18(self):
         ret = self.t('// testing\n\nComparing')
-        assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n \n Comparing\n Ending fence\n\n'
+        assert ret ==  'testing\n' + bf + ' \n Comparing\n' + ef + ''
 
     # Comment to code transition, with trailing blank code lines.
     def test_19(self):
         ret = self.t('// testing\nComparing\n\n')
-        assert ret ==  'testing\n\n.. fenced-code::\n\n Beginning fence\n Comparing\n Ending fence\n\n'
+        assert ret ==  'testing\n' + bf + ' Comparing\n' + ef + ''
 
     # Block comments.
     def test_19_1(self):
@@ -167,7 +169,7 @@ class TestCodeToRest(object):
 
     def test_19_2(self):
         ret = self.t('/*multi-\nline\ncomment */\n')
-        assert ret == '\n.. fenced-code::\n\n Beginning fence\n /*multi-\n line\n comment */\n Ending fence\n\n'
+        assert ret == bf + ' /*multi-\n line\n comment */\n' + ef + ''
 
     def test_19_3(self):
         ret = self.t('/* block */ //inline\n')
@@ -195,19 +197,33 @@ class TestCodeToRest(object):
     def test_22(self):
         ret = self.t(' \nfoo()\n\n# bar\n', '.py')
         assert ( ret ==
-                '\n.. fenced-code::\n\n Beginning fence\n  \n foo()\n \n Ending fence\n\nbar\n')
+                bf + '  \n foo()\n \n' + ef + 'bar\n')
 
     # Some CSS.
-    def test_21(self):
-        ret = self.t(' \ndiv {}\n\n/* comment */\n')
+    def xtest_23(self):
+        ret = self.t(' \ndiv {}\n\n/* comment */\n', '.css')
         assert (ret ==
-          '\n.. fenced-code::\n\n Beginning fence\n  \n div {}\n \n Ending fence\n\ncomment \n' )
+          bf + '  \n div {}\n \n' + ef + 'comment \n' )
 
-    def test_22(self):
-        ret = self.t('/*multi-\nline\ncomment */\n', '.css')
-        ret = self.t('/* multi-\nline\ncomment */\n')
+    def xtest_24(self):
+        ret = self.t('/* multi-\nline\ncomment */\n', '.css')
         assert ret == 'multi-\nline\ncomment \n'
 
+    def xtest_25(self):
+        ret = self.t(
+"""/*
+*************************************************
+CodeChat.css - Style sheet for CodeChat docs
+*************************************************
+:Author: Bryan A. Jones
+:Contact: bjones AT ece DOT msstate DOT edu
+:Copyright: This stylesheet has been placed in the public domain.
+
+Stylesheet for use with CodeChat's extensions to Docutils.
+*/
+
+""", '.css')
+        assert ret == 'multi-\nline\ncomment \n'
 
 
 # Fenced code block testing
@@ -416,7 +432,7 @@ main(){
           u'*/', c_lexer) == u''
 
 # _is_rest_comment tests
-# ---------------------
+# ----------------------
     # newline only
     def test_4aa1(self):
         assert not _is_rest_comment([
