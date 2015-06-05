@@ -44,21 +44,21 @@ import pygments.util
 
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, code_to_rest_file, \
-    _COMMENT_DELIMITER_INFO
+from .CodeToRest import code_to_rest_string, code_to_rest_file
+from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 from . import __version__
 
 # Supported extensions
 # --------------------
 # Compute a list of supported filename extensions: supported by the lexer and
-# by CodeChat (inline / block comment info in COMMENT_DELIMITER_LENGTHS).
+# by CodeChat (inline / block comment info in COMMENT_DELIMITER_INFO).
 SUPPORTED_EXTENSIONS = set()
 # Per `get_all_lexers
 # <http://pygments.org/docs/api/#pygments.lexers.get_all_lexers>`_, we get a
 # tuple. Pick out only the filename and examine it.
 for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
     # Pick only filenames we have comment info for.
-    if longname in _COMMENT_DELIMITER_INFO:
+    if longname in COMMENT_DELIMITER_INFO:
         for fnp in filename_patterns:
             # Take just the extension, which is what Sphinx expects.
             ext = os.path.splitext(fnp)[1]
@@ -75,8 +75,6 @@ SUPPORTED_EXTENSIONS -= set(['.*', ''])
 # * Expand ``.php[345]``.
 SUPPORTED_EXTENSIONS -= set(['.php[345]'])
 SUPPORTED_EXTENSIONS |= set(['.php', '.php3', '.php4', '.php5'])
-# Convert this to a list.
-SUPPORTED_EXTENSIONS = list(SUPPORTED_EXTENSIONS)
 
 # CodeToRest extension
 # ====================

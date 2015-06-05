@@ -48,7 +48,8 @@ from pygments.lexers import get_lexer_by_name
 from .CodeToRest import code_to_rest_string, code_to_html_file
 from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
-  _generate_rest, _GROUP, _COMMENT_DELIMITER_INFO
+  _generate_rest, _GROUP
+from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
 # This acutally tests using ``code_to_rest_string``, since that makes
@@ -284,8 +285,8 @@ class TestCodeToHtmlFile(object):
 
 # Tests of lexer_to_code and subroutines
 # ======================================
-c_lexer = _COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name]
-py_lexer = _COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
+c_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name]
+py_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):

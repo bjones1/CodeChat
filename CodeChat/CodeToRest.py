@@ -58,7 +58,7 @@ from pygments.token import Token
 #
 # Local application imports
 # -------------------------
-# None.
+from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 #
 # API
 # ===
@@ -242,7 +242,7 @@ def _lexer_to_rest(
     _debug_print(u'Lexer: {}\n'.format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
-    cdi = _COMMENT_DELIMITER_INFO[lexer.name]
+    cdi = COMMENT_DELIMITER_INFO[lexer.name]
     # * If there's no multi-line start info, then classify generic comments as
     #   inline. 
     comment_is_inline = not cdi[1]
@@ -433,7 +433,7 @@ def _classify_groups(
   iter_gathered_groups,
   # .. _comment_delim_info:
   #
-  # An element of _COMMENT_DELIMITER_INFO for the language being classified.
+  # An element of COMMENT_DELIMITER_INFO for the language being classified.
   comment_delim_info):
 
     # Keep track of block comment state.
@@ -531,99 +531,6 @@ def _remove_beginning_comment_delim(
 
         # Not found -- panic.
         assert False
-
-# Based on the lexer class, define comment delimiter lengths. Based on the info
-# provided at the `Wikipedia page
-# <http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments>`_.
-_COMMENT_DELIMITER_INFO = {
-  ## Language name: inline, block opening, block closing
-  ##                 //,     /*,           */
-  'C':              ( 2,      2,            2),
-  'C++':            ( 2,      2,            2),
-  'Java':           ( 2,      2,            2),
-  'ActionScript':   ( 2,      2,            2),
-  'ActionScript 3': ( 2,      2,            2),
-  'C#':             ( 2,      2,            2),
-  'D':              ( 2,      2,            2),
-  'Go':             ( 2,      2,            2),
-  'JavaScript':     ( 2,      2,            2),
-  'Objective-C':    ( 2,      2,            2),
-  'Rust':           ( 2,      2,            2),
-  'Scala':          ( 2,      2,            2),
-  'Sass':           ( 2,      2,            2), # ??? Doesn't work in tests
-  'Swift':          ( 2,      2,            2),
-  'verilog':        ( 2,      2,            2),
-  'systemverilog':  ( 2,      2,            2),
-  ##                  #,    N/A,          N/A
-  'Python':         ( 1,   None,         None),
-  'Python 3':       ( 1,   None,         None),
-  ##                  #      /*            */
-  'GAS':            ( 1,      2,            2),
-  ##                  ;, %comment\n, %endcomment
-  'NASM':           ( 1,      9,           11),
-  ##                  ;      /*,           */
-  'autohotkey':     ( 1,      2,            2),
-  ##                 --      /*,           */
-  'SQL':            ( 2,      2,            2),
-  # Note: PHP allows # or // as an inline comment. We only support #.
-  ##                  #      /*,           */
-  'PHP':            ( 1,      2,            2),
-  ##                         /*,           */
-  'CSS':            (None,    2,            2),
-  ##                       <!--,          -->
-  'HTML':           (None,    4,            3),
-  ##                  %      /*,           */
-  'Prolog':         ( 1,      2,            2),
-
-  ## Note: still entering data from here on down. I've finished through the block
-  ## comments using /* ~ */.
-
-  ##                  C or !
-  'Fortran':        ( 1,   None,         None),
-  ##                  :
-  # Note: for simplicity, I don't support :: or REM as a valid comment type.
-  # Something for future work.
-  'Batchfile':      ( 1,   None,         None),
-  ##                  ⍝
-  'APL':            ( 1,   None,         None),
-  ##                  #
-  # This covers csh and sh as well.
-  'Bash':           ( 1,   None,         None),
-  'Tcsh':           ( 1,   None,         None),
-  'Perl':           ( 1,   None,         None),
-  'Perl6':          ( 1,   None,         None),
-  'Ruby':           ( 1,   None,         None),
-  'PowerShell':     ( 1,   None,         None),
-  'S':              ( 1,   None,         None),
-  'Makefile':       ( 1,   None,         None),
-  'Nimrod':         ( 1,   None,         None),
-  ##                  %
-  'TeX':            ( 1,   None,         None),
-  ##                  %
-  'Matlab':         ( 1,   None,         None),
-  'Erlang':         ( 1,   None,         None),
-  ##                  '
-  'QBasic':         ( 1,   None,         None),
-  'VB.net':         ( 1,   None,         None),
-  ##                 //
-  'Delphi':         ( 2,   None,         None),
-  ##                  ;
-  'AutoIt':         ( 1,   None,         None),
-  'Common Lisp':    ( 1,   None,         None),
-  'Clojure':        ( 1,   None,         None),
-  'REBOL':          ( 1,   None,         None),
-  'Scheme':         ( 1,   None,         None),
-  'LLVM':           ( 1,   None,         None),
-  ##                 --
-  'Haskell':        ( 2,   None,         None),
-  'Ada':            ( 2,   None,         None),
-  'AppleScript':    ( 2,   None,         None),
-  'Eiffel':         ( 2,   None,         None),
-  'Lua':            ( 2,   None,         None),
-  'Vhdl':           ( 2,   None,         None),
-  ## Note: COBOL supports * and *> and inline comment. We only support *.
-  'COBOL':          ( 2,   None,         None),
-  }
 
 
 # Determine if the given line is a comment to be interpreted by reST.
