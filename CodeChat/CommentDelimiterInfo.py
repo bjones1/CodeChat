@@ -27,6 +27,8 @@
 COMMENT_DELIMITER_INFO = {
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,           */
+
+  # Note: the following langauges have unit tests to verify that they work.
   'C':              ( 2,      2,            2),
   'C++':            ( 2,      2,            2),
   'Java':           ( 2,      2,            2),
@@ -46,6 +48,10 @@ COMMENT_DELIMITER_INFO = {
   ##                  #,    N/A,          N/A
   'Python':         ( 1,   None,         None),
   'Python 3':       ( 1,   None,         None),
+  ##                         /*,           */
+  'CSS':            (None,    2,            2),
+
+  # These langauges have **NOT** been tested.
   ##                  #      /*            */
   'GAS':            ( 1,      2,            2),
   ##                  ;, %comment\n, %endcomment
@@ -57,8 +63,6 @@ COMMENT_DELIMITER_INFO = {
   # Note: PHP allows # or // as an inline comment. We only support #.
   ##                  #      /*,           */
   'PHP':            ( 1,      2,            2),
-  ##                         /*,           */
-  'CSS':            (None,    2,            2),
   ##                       <!--,          -->
   'HTML':           (None,    4,            3),
   ##                  %      /*,           */

@@ -216,7 +216,7 @@ def get_lexer(
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
-    print(val),
+    #print(val),
     pass
 #
 #
@@ -510,27 +510,26 @@ def _remove_comment_delim(
 
 
 # Return a string with the given delimiter removed from its beginning.
+#
+# .. note::
+#
+#    This code isn't used yet -- it's for a rewrite which will support multiple
+#    delimiters.
 def _remove_beginning_comment_delim(
   # Either the number of characters in the beginning delimiter, or a tuple of
   # strings which give all valie beginning comment delimiters.
-  beginning_comment_delim,
+  beginning_comment_delim_seq,
   # The string which start with the delimiter to be removed.
   string):
 
-    # If we already know the number of characters in the delimiter, we're done!
-    # Just return the substring.
-    if isinstance(beginning_comment_delim, int):
-        return string[beginning_comment_delim:]
-    # Otherwise, we must search for one of the known delimiters in the  given
-    # string.
-    else:
-        for bcd in beginning_comment_delim:
-            # If we find it at the beginning of the string, strip it off.
-            if string.find(bcd) == 0:
-                return string[len(bcd):]
+    # Loop through all delimiters.
+    for bcd in beginning_comment_delim_seq:
+        # If we find one at the beginning of the string, strip it off.
+        if string.startswith(bcd):
+            return string[len(bcd):]
 
-        # Not found -- panic.
-        assert False
+    # Not found -- panic.
+    assert False
 
 
 # Determine if the given line is a comment to be interpreted by reST.
