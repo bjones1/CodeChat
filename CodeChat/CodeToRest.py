@@ -244,12 +244,12 @@ def _lexer_to_rest(
     # to correctly process comments:
     cdi = COMMENT_DELIMITER_INFO[lexer.name]
     # * If there's no multi-line start info, then classify generic comments as
-    #   inline. 
+    #   inline.
     comment_is_inline = not cdi[1]
-    # * Likewise, no inline info indicates that generic comments are block 
+    # * Likewise, no inline info indicates that generic comments are block
     #   comments.
     comment_is_block = not cdi[0]
-    
+
     # \1. Invoke a Pygments lexer on the provided source code, obtaining an
     #     iterable of tokens.
     token_iter = lex(code_str, lexer)
@@ -282,8 +282,8 @@ def _group_lexer_tokens(
   # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
   iter_token,
   # .. _comment_is_inline:
-  # 
-  # When true, classify generic comments as inline. 
+  #
+  # When true, classify generic comments as inline.
   comment_is_inline,
   # .. _comment_is_block:
   #
@@ -293,14 +293,14 @@ def _group_lexer_tokens(
 
     # Keep track of the current group and string.
     tokentype, current_string = iter_token.next()
-    current_group = _group_for_tokentype(tokentype, comment_is_inline, 
+    current_group = _group_for_tokentype(tokentype, comment_is_inline,
                                          comment_is_block)
     _debug_print(u'tokentype = {}, string = {}\n'.
                 format(tokentype, [current_string]))
 
     # Walk through tokens.
     for tokentype, string in iter_token:
-        group = _group_for_tokentype(tokentype, comment_is_inline, 
+        group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
         _debug_print(u'tokentype = {}, string = {}\n'.
                     format(tokentype, [string]))
@@ -323,7 +323,7 @@ def _group_lexer_tokens(
 # Supporting routines and definitions
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # A simple enumerate I like, taken from one of the snippet on `stackoverflow
-# <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_. 
+# <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_.
 # What I want: a set of unique identifiers that will be named nicely,
 # rather than printed as a number. Really, just a way to create a class whose
 # members contain a string representation of their name. Perhaps the best
@@ -368,7 +368,7 @@ def _group_for_tokentype(
     # There is a Token.Comment, but this can refer to inline or block comments,
     # or even other things (preprocessors statements). Therefore, restrict
     # classification as follows.
-    if (tokentype == Token.Comment.Single or 
+    if (tokentype == Token.Comment.Single or
       (tokentype == Token.Comment and comment_is_inline) ):
         return _GROUP.inline_comment
     if (tokentype == Token.Comment.Multiline or
@@ -459,7 +459,7 @@ def _classify_groups(
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
-            string = ''.join([_remove_comment_delim(group, string, 
+            string = ''.join([_remove_comment_delim(group, string,
               comment_delim_info) for group, string in l])
             # Remove the inital space character from the first comment,
             # but not from body or end comments.
@@ -724,7 +724,7 @@ def _is_rest_comment(
 # |                          |   </div>                |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 
-# Following either a fenced code block or a raw block, care must be taken to 
+# Following either a fenced code block or a raw block, care must be taken to
 # separate these blocks' content from indented comments which follow them. For
 # example, the following code:
 #
@@ -741,7 +741,7 @@ def _is_rest_comment(
 # +--------------------------+-------------------------+-----------------------------------+
 #
 # Notice that the ``Ending fence`` ends up in the resulting HTML! To fix this,
-# simply add an unindented `reST comment 
+# simply add an unindented `reST comment
 # <http://sphinx-doc.org/rest.html#comments>`_ after a block.
 #
 # +--------------------------+-------------------------+-----------------------------------+
