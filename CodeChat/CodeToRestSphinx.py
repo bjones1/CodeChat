@@ -33,6 +33,8 @@
 # ----------------
 # For code_to_rest_html_clean replacements.
 import os.path
+# For glob_to_lexer matching.
+import re, fnmatch
 
 # Third-party imports
 # -------------------
@@ -44,7 +46,7 @@ import pygments.util
 
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, code_to_rest_file
+from .CodeToRest import code_to_rest_string, code_to_rest_file, get_lexer
 from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 from . import __version__
 
@@ -122,9 +124,24 @@ def builder_inited(app):
             rest_file = os.path.join(app.env.srcdir, source_file + app.config.source_suffix)
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                code_to_rest_file(source_file, rest_file, app.config.html_output_encoding)
+                options = _lexer_for_filename(app, source_file)
+                code_to_rest_file(source_file, rest_file,
+                                  app.config.html_output_encoding, **options)
             else:
                 pass
+
+# Find a lexer for the given filename.
+def _lexer_for_filename(
+  # A Sphinx app instance.
+  app,
+  # The path of the file under consideration
+  source_file):
+
+    for glob, lexer_alias in app.config.CodeChat_lexer_for_glob.iteritems():
+        if re.match(fnmatch.translate(glob), os.path.normpath(
+          os.path.normcase(source_file))):
+            return {'alias': lexer_alias}
+    return {'filename': source_file}
 
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
@@ -135,7 +152,8 @@ def source_read(app, docname, source):
     full_path = app.env.doc2path(docname)
     # See if it's an extension we should process.
     try:
-        source[0] = code_to_rest_string(source[0], filename=full_path)
+        options = _lexer_for_filename(app, full_path)
+        source[0] = code_to_rest_string(source[0], **options)
     except KeyError, pygments.util.ClassNotFound:
         # We Don't support this language.
         pass
@@ -163,6 +181,9 @@ def setup(app):
     # Add the CodeChat.css style sheet using `add_stylesheet
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
     app.add_stylesheet('CodeChat.css')
+    # Add the CodeChat_lexer_for_glob config value. See `add_config_value
+    # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
+    app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
     # Return `extension metadata <http://sphinx-doc.org/extdev/index.html>`_.
     return {'version' : __version__,
             'parallel_read_safe' : True }
