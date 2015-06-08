@@ -50,12 +50,12 @@ COMMENT_DELIMITER_INFO = {
   'Python 3':       ( 1,   None,         None),
   ##                         /*,           */
   'CSS':            (None,    2,            2),
+  ##                  ;, %comment\n, %endcomment  -- block comments not tested.
+  'NASM':           ( 1,      9,           11),
 
   # These langauges have **NOT** been tested.
   ##                  #      /*            */
   'GAS':            ( 1,      2,            2),
-  ##                  ;, %comment\n, %endcomment
-  'NASM':           ( 1,      9,           11),
   ##                  ;      /*,           */
   'autohotkey':     ( 1,      2,            2),
   ##                 --      /*,           */

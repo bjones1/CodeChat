@@ -201,7 +201,10 @@ class TestCodeToRest(object):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n',
                 ['CSS'])
 
-
+    # Assembly (NASM).
+    def test_25(self):
+        self.mt('; Comment\n \nstart: bra start\n \n',
+                'Comment\n' + bf + '  \n start: bra start\n  \n' + ef, ['NASM'])
 
 # Fenced code block testing
 # =========================
