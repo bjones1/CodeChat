@@ -573,7 +573,7 @@ main(){
         assert cg == [(-1, u'  foo();\n')]
 
     # Test multi-line comments.
-    def xtest_8(self):
+    def test_8(self):
         cg = list( _classify_groups([
           [(_GROUP.block_comment_start, 0, u'/* multi-\n')],
           [(_GROUP.block_comment_body,  3, u'   line\n')],
@@ -584,7 +584,7 @@ main(){
 
     def test_9(self):
         cg = list( _classify_groups([
-          [(_GROUP.block_comment_start, 0, u'/*multi-\n')],
+          [(_GROUP.block_comment_start, 2, u'/*multi-\n')],
           [(_GROUP.block_comment_body,  2, u'  line\n')],
           [(_GROUP.block_comment_end,   2, u'  comment*/')]], c_lexer) )
         assert cg == [(-1, u'/*multi-\n'),
@@ -592,7 +592,7 @@ main(){
                       (-1, u'  comment*/')]
 
     # From code to classification.
-    def xtest_10(self):
+    def test_10(self):
         lexer = get_lexer_by_name('c')
         token_iter = lex(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False)

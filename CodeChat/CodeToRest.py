@@ -336,18 +336,19 @@ class Enum(frozenset):
             return name
         raise AttributeError
 
+
 # Define the groups into which tokens will be placed.
 _GROUP = Enum(
   # The basic classification used by group_for_tokentype_.
-  ('whitespace inline_comment other ' +
+  ('whitespace', 'inline_comment', 'other',
   # A ``/* comment */``-style comment contained in one string.
-  'block_comment ' +
+  'block_comment',
   # Grouping is::
   #
   #    /* BLOCK_COMMENT_START
   #       BLOCK_COMMENT_BODY, (repeats for all comment body)
   #       BLOCK_COMMENT_END */
-  'block_comment_start block_comment_body block_comment_end ').split())
+  'block_comment_start', 'block_comment_body', 'block_comment_end') )
 
 # .. _group_for_tokentype:
 #
@@ -379,8 +380,8 @@ def _group_for_tokentype(
 #
 # Step #3 of lexer_to_rest_
 # -------------------------
-# Given an iterable of groups, break them into lists bas    ed on newlines. The list
-# consists of (group, comment_leading_whitespace_chars, string) tuples.
+# Given an iterable of groups, break them into lists based on newlines. The list
+# consists of (group, comment_leading_whitespace_length, string) tuples.
 def _gather_groups_on_newlines(
   # An iterable of (group, string) pairs provided by
   # ``group_lexer_tokens``.
@@ -474,7 +475,7 @@ def _classify_groups(
 
     # Walk through groups.
     for l in iter_gathered_groups:
-        _debug_print(u'list[(group, string), ... = {}\n'.format(l))
+        _debug_print(u'list[(group, ws_len, string), ... = {}\n'.format(l))
 
         if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
 
@@ -484,21 +485,26 @@ def _classify_groups(
                 # Encode this whitespace in the type, then drop it.
                 type_ = len(first_string)
                 l.pop(0)
+                first_group, first_ws_len, first_string = l[0]
             else:
                 type_ = 0
 
             # Update the block reST state.
-            if l[0][0] == _GROUP.block_comment_start:
+            if first_group == _GROUP.block_comment_start:
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
             string = ''.join([_remove_comment_delim(group, string,
               comment_delim_info) for group, ws_len, string in l])
             # Remove the inital space character from the first comment,
-            # but not from body or end comments.
-            if ( len(string) and string[0] == ' ' and
-                first_group not in (_GROUP.block_comment_body,
-                                    _GROUP.block_comment_end) ):
+            # or ws_len chars from body or end comments.
+            if _is_block_body_or_end(first_group):
+                # Some of the body or end block lines may be just whitespace.
+                # Don't strip these: the line may be too short or we might
+                # remove a newline.
+                if not string.isspace():
+                    string = string[first_ws_len:]
+            elif len(string) and string[0] == ' ':
                 string = string[1:]
 
         # Everything else is considered code.
@@ -591,25 +597,35 @@ def _is_rest_comment(
     first_comment_index = 1 if group_tuple[0] == _GROUP.whitespace else 0
     first_group = group_tuple[first_comment_index]
     first_string = string_tuple[first_comment_index]
-    first_comment_text = _remove_comment_delim(first_group, first_string, lexer)
     # The cases are:
     #
     # #. ``// comment, //\n, #`` -> reST comment. Note that in some languages
     #    (Python is one example), the newline isn't included in the comment.
     # #. ``//comment`` -> not a reST comment.
-    # #. ``/* comment, /*\n``, or any block comment body or end for which its
-    #    block start was a reST comment.
+    # #. ``/* comment, /*\n`` -> reST comment
+    # #. Any block comment body or end for which its block start was a reST
+    #    comment -> reST comment.
     # #. ``/**/`` -> a reST comment. (I could see this either as reST or not;
     #    because it was simpler, I picked reST.)
+    #
+    # Begin by checking case #4 above.
+    if is_block_rest_comment and _is_block_body_or_end(first_group):
+        return True
+    # To check the other cases, first remove the comment delimiter so we can
+    # examine the next character following the delimiter.
+    first_comment_text = _remove_comment_delim(first_group, first_string, lexer)
     first_char_is_rest = ( (len(first_comment_text) > 0 and
                           first_comment_text[0] in (' ', '\n')) or
                           len(first_comment_text) == 0 )
-    is_block_body_or_end = first_group in (_GROUP.block_comment_body,
-                                               _GROUP.block_comment_end)
-    if ( (first_char_is_rest and not is_block_body_or_end) or
-         (is_block_rest_comment and is_block_body_or_end) ):
+    if first_char_is_rest and not _is_block_body_or_end(first_group):
         return True
     return False
+
+
+# Determine if this group is either a block comment body or a block comment end.
+def _is_block_body_or_end(group):
+    return group in (_GROUP.block_comment_body, _GROUP.block_comment_end)
+
 #
 #
 # .. _Step_5:
