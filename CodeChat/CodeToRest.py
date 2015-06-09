@@ -389,19 +389,47 @@ def _gather_groups_on_newlines(
     # Keep a list of (group, string) tuples we're accumulating.
     l = []
 
+    # Keep track of the length of whitespace at the beginning of the body and
+    # end portions of a block comment.
+    ws_len = 0
+
     # Accumulate until we find a newline, then yield that.
     for group, string in iter_grouped:
         _debug_print(u'group = {}, string = {}\n'.format(group, [string]))
         # A given group (such as a block string) may extend across multiple
         # newlines. Split these groups apart first.
         splitlines = string.splitlines(True)
+
         # Look for block comments spread across multiple lines and label
-        # them  correctly.
+        # them correctly.
         if len(splitlines) > 1 and group == _GROUP.block_comment:
             group = _GROUP.block_comment_start
+            # Look for similar leading whitespace throughout a multi-line 
+            # comment block.
+            if len(splitlines) > 0:
+                # Initally, a value of -1 indicates we haven't determined a
+                # leading whitespace length yet.
+                ws_len = -1
+                for string in splitlines[1:]:
+                    # Only consider lines with non-whitespace in them.
+                    if not string.isspace():
+                        # Determine how much leading whitespace this line
+                        # contains.
+                        this_ws_len = len(string) - len(string.lstrip())
+                        # If this is the first non-whitespace line, set the
+                        # ``ws_len`` we expect to see in all other lines.
+                        if ws_len == -1:
+                            ws_len = this_ws_len
+                        # Otherwise, check that this line's ws_len is consistent
+                        # with all the other lines.
+                        elif this_ws_len != ws_len:
+                            # We found inconsistent spacing. Give up.
+                            ws_len = 0
+                            break
+
         for index, split_str in enumerate(splitlines):
             # Accumulate results.
-            l.append( (group, 0, split_str) )
+            l.append( (group, ws_len, split_str) )
 
             # For block comments, move from a start to a body group.
             if group == _GROUP.block_comment_start:
@@ -417,6 +445,10 @@ def _gather_groups_on_newlines(
             if split_str.endswith('\n'):
                 yield l
                 l = []
+                
+        # We've output a group; reset the ws_len to 0 in case the group just
+        # output was a multi-line block comment with ws_len > 0.
+        ws_len = 0
 
     # Output final group, if one is still accumulating.
     if l:

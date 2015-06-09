@@ -353,7 +353,7 @@ main(){
         expected_group = [
           [(_GROUP.other, 0, u'#include <stdio.h>\n')],
           [(_GROUP.whitespace, 0, u'\n')],
-          [(_GROUP.block_comment_start, 0, u'/* A multi-\n')],
+          [(_GROUP.block_comment_start, 3, u'/* A multi-\n')],
           [(_GROUP.block_comment_body,  3, u'   line\n')],
           [(_GROUP.block_comment_end,   3, u'   comment */'),
            (_GROUP.whitespace, 0, u'\n')],
