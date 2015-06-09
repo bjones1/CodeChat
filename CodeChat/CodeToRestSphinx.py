@@ -130,17 +130,25 @@ def builder_inited(app):
             else:
                 pass
 
-# Find a lexer for the given filename.
+# Find a lexer for the given filename. Return a dict to be passed as arguments
+# to :ref:`get_lexer`.
 def _lexer_for_filename(
   # A Sphinx app instance.
   app,
   # The path of the file under consideration
   source_file):
 
+    # See if ``source_file`` matches any of the globs.
     for glob, lexer_alias in app.config.CodeChat_lexer_for_glob.iteritems():
+        # Sphinx likes to capitalize the extension of the file it's processing
+        # (observed using Sphinx 1.3.1 on Windows). So, normalize the path
+        # before doing the comparison.
         if re.match(fnmatch.translate(glob), os.path.normpath(
           os.path.normcase(source_file))):
+            # On a match, pass the specified lexer alias.
             return {'alias': lexer_alias}
+    # If none of the globs match, fall back to choosing a lexer based only on
+    # the filename.
     return {'filename': source_file}
 
 # The source-read_ event occurs when a source file is read. If it's code, this
