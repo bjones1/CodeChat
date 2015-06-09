@@ -379,7 +379,8 @@ def _group_for_tokentype(
 #
 # Step #3 of lexer_to_rest_
 # -------------------------
-# Given an iterable of groups, break them into lists based on newlines.
+# Given an iterable of groups, break them into lists bas    ed on newlines. The list
+# consists of (group, comment_leading_whitespace_chars, string) tuples.
 def _gather_groups_on_newlines(
   # An iterable of (group, string) pairs provided by
   # ``group_lexer_tokens``.
@@ -400,7 +401,7 @@ def _gather_groups_on_newlines(
             group = _GROUP.block_comment_start
         for index, split_str in enumerate(splitlines):
             # Accumulate results.
-            l.append( (group, split_str) )
+            l.append( (group, 0, split_str) )
 
             # For block comments, move from a start to a body group.
             if group == _GROUP.block_comment_start:
@@ -445,7 +446,7 @@ def _classify_groups(
 
         if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
 
-            first_group, first_string = l[0]
+            first_group, first_ws_len, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
             if first_group == _GROUP.whitespace:
                 # Encode this whitespace in the type, then drop it.
@@ -460,7 +461,7 @@ def _classify_groups(
 
             # Strip all comment characters off the strings and combine them.
             string = ''.join([_remove_comment_delim(group, string,
-              comment_delim_info) for group, string in l])
+              comment_delim_info) for group, ws_len, string in l])
             # Remove the inital space character from the first comment,
             # but not from body or end comments.
             if ( len(string) and string[0] == ' ' and
@@ -471,7 +472,7 @@ def _classify_groups(
         # Everything else is considered code.
         else:
             type_ = -1
-            string = ''.join([string for group, string in l])
+            string = ''.join([string for group, ws_len, string in l])
             is_block_rest_comment = False
 
         yield type_, string
@@ -545,7 +546,7 @@ def _is_rest_comment(
 
     # See if there is any _GROUP.other in this line. If so, it's not a reST
     # comment.
-    group_tuple, string_tuple = zip(*line_list)
+    group_tuple, ws_len_tuple, string_tuple = zip(*line_list)
     if _GROUP.other in group_tuple:
         return False
     # If there's no comments (meaning the entire line is whitespace), it's not a
