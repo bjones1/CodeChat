@@ -35,9 +35,12 @@
 import os.path
 # For glob_to_lexer matching.
 import re, fnmatch
+# For saving Enki info.
+import codecs
 
 # Third-party imports
 # -------------------
+import sphinx
 # Sphinx routines help to search for source files.
 from sphinx.util.matching import compile_matchers
 from sphinx.util import get_matching_docs
@@ -46,9 +49,35 @@ import pygments.util
 
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, code_to_rest_file, get_lexer
+from .CodeToRest import code_to_rest_string, code_to_rest_file
 from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 from . import __version__
+#
+# conf.py helpers
+# ===============
+# This section provide helper routines for use in ``conf.py``.
+#
+# This routine adds source suffixes supported by this extension (the extension
+# of all source files which this extension can translate into reST). It returns
+# the updated list. Typical use:
+#
+#    .. code-block:: python
+#       :linenos:
+#
+#       from CodeChat import CodeToRestSphinx
+#       source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix)
+def add_source_suffix(
+  # The ``source_suffix`` from conf.py.
+  source_suffix):
+    try:
+        assert sphinx.version_info[0] >= 1 and sphinx.version_info[1] >= 3
+        # Make source_suffix a list if it isn't already.
+        if not isinstance(source_suffix, list):
+            source_suffix = [source_suffix]
+        source_suffix += SUPPORTED_EXTENSIONS
+        return source_suffix
+    except:
+        return source_suffix
 
 # Supported extensions
 # --------------------
@@ -131,7 +160,7 @@ def builder_inited(app):
                 pass
 
 # Find a lexer for the given filename. Return a dict to be passed as arguments
-# to :ref:`get_lexer`.
+# to :ref:`get_lexer <get_lexer>`.
 def _lexer_for_filename(
   # A Sphinx app instance.
   app,
@@ -186,12 +215,25 @@ def setup(app):
         # <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
         # event is emitted.
         app.connect('builder-inited', builder_inited)
+
     # Add the CodeChat.css style sheet using `add_stylesheet
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
     app.add_stylesheet('CodeChat.css')
+
     # Add the CodeChat_lexer_for_glob config value. See `add_config_value
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
     app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
+
+    # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know 
+    # the HTML file extension. So, save it to a file for Enki_ to read.
+    try:
+        with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
+            f.write(app.config.html_file_suffix)
+    except TypeError:
+        # If ``html_file_suffix`` is None (TypeError), Enki will assume 
+        # ``.html``.
+        pass
+
     # Return `extension metadata <http://sphinx-doc.org/extdev/index.html>`_.
     return {'version' : __version__,
             'parallel_read_safe' : True }

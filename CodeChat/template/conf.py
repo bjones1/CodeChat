@@ -27,8 +27,7 @@
 #   to show the default.
 #
 import sys, os
-import sphinx
-from CodeChat.LanguageSpecificOptions import LanguageSpecificOptions
+from CodeChat import CodeToRestSphinx
 
 # If extensions (or modules to document with autodoc) are in another directory, add these directories to sys.path here. If the directory is relative to the documentation root, use os.path.abspath to make it absolute, as shown here.
 ##sys.path.insert(0, os.path.abspath('.'))
@@ -39,7 +38,7 @@ from CodeChat.LanguageSpecificOptions import LanguageSpecificOptions
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = u'Project Name'
-copyright = u'2014, Author'
+copyright = u'2015, Author'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
@@ -109,17 +108,13 @@ templates_path = ['_templates']
 # `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_:
 # The suffix of source filenames.
 source_suffix = '.rst'
-# **CodeChat note:** Sphinx v1.3 allows source_suffix to be a list. Take
-# advantage of this if possible by adding suffixes for all supported source
-# files.
-try:
-    assert sphinx.version_info[0] >= 1 and sphinx.version_info[1] >= 3
-    # Make source_suffix a list if it isn't already.
-    if not isinstance(source_suffix, list):
-        source_suffix = [source_suffix]
-    source_suffix += LanguageSpecificOptions.extension_to_options.keys()
-except:
-    pass
+# **CodeChat note:** Add the suffix of all CodeToRest-supported source files so
+# that Sphinx can process these as well.
+source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix)
+
+# **CodeChat note:** A dict of {glob, lexer_alias}, which uses lexer_alias to
+# analyze any file wihch matches the given glob.
+##CodeChat_lexer_for_glob = {'*.s' : 'NASM'}
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
@@ -161,9 +156,8 @@ html_theme = 'default'
 
 # `html_theme_options <http://sphinx-doc.org/config.html#confval-html_theme_options>`_:
 # Theme options are theme-specific and customize the look and feel of a theme
-# further. **CodeChat note:** Enki shows code next to HTML output; including the
-# sidebar wastes valuable space. Turn this off by default.
-html_theme_options = { "nosidebar" : "true" }
+# further.
+##html_theme_options = {}
 
 # `html_style <http://sphinx-doc.org/config.html#confval-html_style>`_: The
 # style sheet to use for HTML pages.
@@ -197,8 +191,7 @@ html_theme_options = { "nosidebar" : "true" }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files, so
 # a file named ``default.css`` will overwrite the builtin ``default.css``.
-# **CodeChat note:** This must always include ``CodeChat.css``.
-html_static_path = ['CodeChat.css']
+##html_static_path = []
 
 # `html_last_updated_fmt <http://sphinx-doc.org/config.html#confval-html_last_updated_fmt>`_:
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
@@ -252,13 +245,4 @@ html_show_sourcelink = True
 # `html_file_suffix <http://sphinx-doc.org/config.html#confval-html_file_suffix>`_:
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 ##html_file_suffix = None
-# **CodeChat note:** `Enki <http://enki-editor.org/>`_, which hosts CodeChat,
-# needs to know this value. So, save it to a file for Enki_ to read.
-import codecs
-try:
-    with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
-        f.write(html_file_suffix)
-except NameError, TypeError:
-    # If ``html_file_suffix`` isn't defined (NameError) or is None (TypeError),
-    # Enki will assume ``.html``.
-    pass
+
