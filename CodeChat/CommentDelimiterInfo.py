@@ -26,8 +26,7 @@
 # <http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments>`_.
 COMMENT_DELIMITER_INFO = {
   ## Language name: inline, block opening, block closing
-  ##                 //,     /*,           */
-
+  ##                 //,     /*,            */
   # Note: the following langauges have unit tests to verify that they work.
   'C':              ( 2,      2,            2),
   'C++':            ( 2,      2,            2),
@@ -35,7 +34,8 @@ COMMENT_DELIMITER_INFO = {
   'ActionScript':   ( 2,      2,            2),
   'ActionScript 3': ( 2,      2,            2),
   'C#':             ( 2,      2,            2),
-  'D':              ( 2,      2,            2),
+  'D':              ( 2,      2,            2), #  Note: also has /+ ~ +/ for
+                                                ## nested block comments.
   'Go':             ( 2,      2,            2),
   'JavaScript':     ( 2,      2,            2),
   'Objective-C':    ( 2,      2,            2),
@@ -48,28 +48,60 @@ COMMENT_DELIMITER_INFO = {
   ##                  #,    N/A,          N/A
   'Python':         ( 1,   None,         None),
   'Python 3':       ( 1,   None,         None),
-  ##                         /*,           */
+  ##                         /*,            */
   'CSS':            (None,    2,            2),
   ##                  ;, %comment\n, %endcomment  -- block comments not tested.
   'NASM':           ( 1,      9,           11),
 
   # These langauges have **NOT** been tested.
-  ##                  #      /*            */
+  ##                  #      /*             */
   'GAS':            ( 1,      2,            2),
-  ##                  ;      /*,           */
+  ##                  ;      /*,            */
   'autohotkey':     ( 1,      2,            2),
-  ##                 --      /*,           */
+  ##                 --      /*,            */
   'SQL':            ( 2,      2,            2),
-  # Note: PHP allows # or // as an inline comment. We only support #.
-  ##                  #      /*,           */
+  ##                  #      /*,            */
   'PHP':            ( 1,      2,            2),
-  ##                       <!--,          -->
-  'HTML':           (None,    4,            3),
-  ##                  %      /*,           */
-  'Prolog':         ( 1,      2,            2),
+  # Note: PHP allows # or // as an inline comment. We only support #.
 
-  ## Note: still entering data from here on down. I've finished through the block
-  ## comments using /* ~ */.
+  ##                       <!--,           -->
+  'HTML':           (None,    4,            3),
+  ##                  %      /*,            */
+  'Prolog':         ( 1,      2,            2),
+  ##                  ;,    #cs,           #ce
+  'AutoIt':         ( 1,      3,            3),
+  ##                  #,     <#,            #>
+  'PowerShell':     ( 1,      2,            2),
+  ##                  #, =begin,          =cut
+  'Perl':           ( 1,      6,            4),
+  ##                  #,    #'(,             )  # Or #`[ ~ ], or any other pairs.
+  'Perl6':          ( 1,      3,             1),
+  ##                  #, =begin,          =end
+  'Ruby':           ( 1,      6,            4),
+  ##                  #, #iffalse,      #endif
+  'S':              ( 1,      8,            6),
+  ##                 --,     {-,            -}
+  'Haskell':        ( 2,      2,            2), # Bird style not supported. See
+                     # https://wiki.haskell.org/Literate_programming#Bird_Style.
+  ##                 //,      {,             }
+  'Delphi':         ( 2,      1,            1),  # (* ~ *) not supported.
+  ##                 //,     (*,            *)
+  'AppleScript':    ( 2,      2,            2),
+  ##                  %      %{,            %}
+  'Matlab':         ( 1,      2,            2),
+  ##                  ;,     #|,            |#
+  'Common Lisp':    ( 1,      2,            2),
+  'Scheme':         ( 1,   None,         None),
+  ##                 --,   --[[,            ]]
+  'Lua':            ( 2,      4,            2),  # --[=[ ~ ]=] not supported.
+  ##                  ;, (comment,           )
+  'Clojure':        ( 1,      8,            1),
+  ##                  #,     <#,            #>
+  # This covers csh and sh as well.
+  'Bash':           ( 1,      2,            2),
+  'Tcsh':           ( 1,      2,            2),
+
+  ## Languages with no block comments.
 
   ##                  C or !
   'Fortran':        ( 1,   None,         None),
@@ -80,42 +112,25 @@ COMMENT_DELIMITER_INFO = {
   ##                  ⍝
   'APL':            ( 1,   None,         None),
   ##                  #
-  # This covers csh and sh as well.
-  'Bash':           ( 1,   None,         None),
-  'Tcsh':           ( 1,   None,         None),
-  'Perl':           ( 1,   None,         None),
-  'Perl6':          ( 1,   None,         None),
-  'Ruby':           ( 1,   None,         None),
-  'PowerShell':     ( 1,   None,         None),
-  'S':              ( 1,   None,         None),
   'Makefile':       ( 1,   None,         None),
   'Nimrod':         ( 1,   None,         None),
   ##                  %
   'TeX':            ( 1,   None,         None),
   ##                  %
-  'Matlab':         ( 1,   None,         None),
   'Erlang':         ( 1,   None,         None),
   ##                  '
   'QBasic':         ( 1,   None,         None),
   'VB.net':         ( 1,   None,         None),
-  ##                 //
-  'Delphi':         ( 2,   None,         None),
   ##                  ;
-  'AutoIt':         ( 1,   None,         None),
-  'Common Lisp':    ( 1,   None,         None),
-  'Clojure':        ( 1,   None,         None),
   'REBOL':          ( 1,   None,         None),
-  'Scheme':         ( 1,   None,         None),
   'LLVM':           ( 1,   None,         None),
   ##                 --
-  'Haskell':        ( 2,   None,         None),
   'Ada':            ( 2,   None,         None),
-  'AppleScript':    ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
-  'Lua':            ( 2,   None,         None),
   'Vhdl':           ( 2,   None,         None),
-  ## Note: COBOL supports * and *> and inline comment. We only support *.
-  'COBOL':          ( 2,   None,         None),
+  ##                  * or /
+  'COBOL':          ( 1,   None,         None),  #  *> as inline comment not
+                                                 ## supported.
   }
 
 
