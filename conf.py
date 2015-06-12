@@ -113,7 +113,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 # **CodeChat note:** Add the suffix of all CodeToRest-supported source files so
 # that Sphinx can process these as well.
-source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in'] 
+source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in']
 
 # **CodeChat note:** A dict of {glob, lexer_alias}, which uses lexer_alias to
 # analyze any file wihch matches the given glob. Here, allow MANIFEST.in to
@@ -210,7 +210,8 @@ html_theme = 'alabaster'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files, so
 # a file named ``default.css`` will overwrite the builtin ``default.css``.
-##html_static_path = []
+# **CodeChat note:** This must always include ``CodeChat.css``.
+html_static_path = ['CodeChat.css']
 
 # `html_last_updated_fmt <http://sphinx-doc.org/config.html#confval-html_last_updated_fmt>`_:
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,

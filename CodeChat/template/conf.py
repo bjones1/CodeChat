@@ -191,7 +191,8 @@ html_theme = 'default'
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files, so
 # a file named ``default.css`` will overwrite the builtin ``default.css``.
-##html_static_path = []
+# **CodeChat note:** This must always include ``CodeChat.css``.
+html_static_path = ['CodeChat.css']
 
 # `html_last_updated_fmt <http://sphinx-doc.org/config.html#confval-html_last_updated_fmt>`_:
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
