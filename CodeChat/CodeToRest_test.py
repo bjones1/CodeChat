@@ -48,7 +48,7 @@ from pygments.lexers import get_lexer_by_name
 from .CodeToRest import code_to_rest_string, code_to_html_file
 from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
-  _generate_rest, _GROUP
+  _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP
 from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
@@ -58,7 +58,7 @@ bf = u'\n.. fenced-code::\n\n Beginning fence\n'
 ef = u' Ending fence\n\n..\n\n'
 class TestCodeToRest(object):
 # C-like language tests
-# ---------------------
+# =====================
     # multi-test: Check that the given code's output is correct over several
     # C-like languages.
     def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++',
@@ -164,6 +164,54 @@ class TestCodeToRest(object):
     def test_19_1(self):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
 
+# Block comment indent removal: indents with spaces
+# -------------------------------------------------
+    # Removeal of leading whitespace in block comments.
+    def test_19_1_1(self):
+        self.mt('/* multi-\n   line\n   comment\n */\n', 'multi-\nline\n' +
+                'comment\n \n')
+
+    # Inconsistent whitespace -- no removal.
+    def test_19_1_2(self):
+        self.mt('/* multi-\n line\n   comment\n */\n', 'multi-\n line\n' +
+                '   comment\n \n')
+
+    # Too little whitespace to line up with initial comment.
+    def test_19_1_3(self):
+        self.mt('/* multi-\n line\n comment */\n', 'multi-\n line\n comment \n')
+
+    # Indented block comments with whitespace removal.
+    def test_19_1_4(self):
+        self.mt(' /* multi-\n    line\n    comment\n  */\n',
+                '\n.. raw:: html\n\n <div style="margin-left:0.5em;">\n\n' +
+                'multi-\nline\ncomment\n  \n\n.. raw:: html\n\n </div>\n\n' +
+                '..\n\n')
+
+# Block comment indent removal: indents with delimiters
+# -----------------------------------------------------
+    # Removal of leading whitespace in block comments.
+    def test_19_1_5(self):
+        self.mt('/* multi-\n * line\n * comment\n */\n', 'multi-\nline\n' +
+                'comment\n \n')
+
+    # Inconsistent whitespace -- no removal.
+    def test_19_1_6(self):
+        self.mt('/* multi-\n*line\n * comment\n */\n', 'multi-\n*line\n' +
+                ' * comment\n \n')
+
+    # Too little whitespace to line up with initial comment.
+    def test_19_1_7(self):
+        self.mt('/* multi-\n*line\n*comment */\n', 'multi-\n*line\n*comment \n')
+
+    # Indented block comments with whitespace removal.
+    def test_19_1_8(self):
+        self.mt(' /* multi-\n  * line\n  * comment\n  */\n',
+                '\n.. raw:: html\n\n <div style="margin-left:0.5em;">\n\n' +
+                'multi-\nline\ncomment\n  \n\n.. raw:: html\n\n </div>\n\n' +
+                '..\n\n')
+
+# Other block comment testing
+# ---------------------------
     def test_19_2(self):
         self.mt('/*multi-\nline\ncomment */\n', bf +
                 ' /*multi-\n line\n comment */\n' + ef)
@@ -349,7 +397,7 @@ main(){
         lexer = get_lexer_by_name('c')
         token_iter = lex(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False)
-        gathered_group = list(_gather_groups_on_newlines(token_group))
+        gathered_group = list(_gather_groups_on_newlines(token_group, (1, 2, 2)))
         expected_group = [
           [(_GROUP.other, 0, u'#include <stdio.h>\n')],
           [(_GROUP.whitespace, 0, u'\n')],
@@ -410,6 +458,42 @@ main(){
     def test_4k(self):
         assert _remove_comment_delim(_GROUP.block_comment_end,
           u'*/', c_lexer) == u''
+
+# _is_space_indented_line tests
+# -----------------------------
+    # Tests of block comment body indentation using spaces.
+    def test_4_1(self):
+        assert _is_space_indented_line('comment\n',
+                                       3, '*', False, (2, 2, 2)) == False
+        assert _is_space_indented_line('  comment\n',
+                                       3, '*', False, (2, 2, 2)) == False
+        assert _is_space_indented_line('   comment\n',
+                                       3, '*', False, (2, 2, 2)) == True
+
+    # Tests of block comment end indentation using spaces.
+    def test_4_2(self):
+        assert _is_space_indented_line('*/',
+                                       3, '*', True, (2, 2, 2)) == False
+        assert _is_space_indented_line(' */',
+                                       3, '*', True, (2, 2, 2)) == True
+
+    # Tests of block comment body indentation using spaces.
+    def test_4_3(self):
+        assert _is_delim_indented_line('comment\n',
+                                       3, '*', False, (2, 2, 2)) == False
+        assert _is_delim_indented_line(' *comment\n',
+                                       3, '*', False, (2, 2, 2)) == False
+        assert _is_delim_indented_line(' * comment\n',
+                                       3, '*', False, (2, 2, 2)) == True
+        assert _is_delim_indented_line(' *\n',
+                                       3, '*', False, (2, 2, 2)) == True
+
+    # Tests of block comment end indentation using spaces.
+    def test_4_4(self):
+        assert _is_delim_indented_line('*/',
+                                       3, '*', True, (2, 2, 2)) == False
+        assert _is_delim_indented_line(' */',
+                                       3, '*', True, (2, 2, 2)) == True
 
 # _is_rest_comment tests
 # ----------------------
@@ -596,7 +680,7 @@ main(){
         lexer = get_lexer_by_name('c')
         token_iter = lex(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False)
-        gathered_group = _gather_groups_on_newlines(token_group)
+        gathered_group = _gather_groups_on_newlines(token_group, (2, 2, 2))
         classified_group = list( _classify_groups(gathered_group, c_lexer) )
         assert classified_group == [(-1, u'#include <stdio.h>\n'),
                                     (-1, u'\n'),

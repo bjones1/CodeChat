@@ -256,12 +256,13 @@ def _lexer_to_rest(
 
     # \2. Combine tokens from the lexer into three groups: whitespace, comment,
     #     or other.
-    token_group = _group_lexer_tokens(token_iter, comment_is_inline, comment_is_block)
+    token_group = _group_lexer_tokens(token_iter, comment_is_inline,
+                                      comment_is_block)
 
-    # \3. Make a per-line list of [group, string], so that the last string in
-    #     each list ends with a newline. Change the group of block comments that
-    #     actually span multiple lines.
-    gathered_group = _gather_groups_on_newlines(token_group)
+    # \3. Make a per-line list of [group, ws_len, string], so that the last
+    #     string in each list ends with a newline. Change the group of block
+    #     comments that actually span multiple lines.
+    gathered_group = _gather_groups_on_newlines(token_group, cdi)
 
     # \4. Classify each line. For reST-formatted comments, remove the leading
     #     whitespace and all comment characters (the // or #, for example).
@@ -385,7 +386,11 @@ def _group_for_tokentype(
 def _gather_groups_on_newlines(
   # An iterable of (group, string) pairs provided by
   # ``group_lexer_tokens``.
-  iter_grouped):
+  iter_grouped,
+  # .. _comment_delim_info:
+  #
+  # An element of COMMENT_DELIMITER_INFO for the language being classified.
+  comment_delim_info):
 
     # Keep a list of (group, string) tuples we're accumulating.
     l = []
@@ -405,28 +410,33 @@ def _gather_groups_on_newlines(
         # them correctly.
         if len(splitlines) > 1 and group == _GROUP.block_comment:
             group = _GROUP.block_comment_start
-            # Look for similar leading whitespace throughout a multi-line 
-            # comment block.
-            if len(splitlines) > 0:
-                # Initally, a value of -1 indicates we haven't determined a
-                # leading whitespace length yet.
-                ws_len = -1
-                for string in splitlines[1:]:
-                    # Only consider lines with non-whitespace in them.
-                    if not string.isspace():
-                        # Determine how much leading whitespace this line
-                        # contains.
-                        this_ws_len = len(string) - len(string.lstrip())
-                        # If this is the first non-whitespace line, set the
-                        # ``ws_len`` we expect to see in all other lines.
-                        if ws_len == -1:
-                            ws_len = this_ws_len
-                        # Otherwise, check that this line's ws_len is consistent
-                        # with all the other lines.
-                        elif this_ws_len != ws_len:
-                            # We found inconsistent spacing. Give up.
-                            ws_len = 0
-                            break
+            # Look for an indented multi-line comment block. First, determine
+            # what the indent must be: (column in which comment starts) +
+            # (length of comment delimiter) + (1 space).
+            ws_len = comment_delim_info[1] + 1
+            for group_, ws_len_, string_ in l:
+                ws_len += len(string_)
+            # Determine the indent style (all spaces, or spaces followed by a
+            # character, typically ``*``). If it's not spaces only, it must
+            # be spaces followed by a delimiter.
+            #
+            # First, get the last character of the block comment delimiter.
+            last_delim_char = string[comment_delim_info[1] - 1]
+            if _is_space_indented_line(splitlines[1], ws_len, last_delim_char,
+              len(splitlines) == 1, comment_delim_info):
+                is_indented_line = _is_space_indented_line
+            else:
+                is_indented_line = _is_delim_indented_line
+
+            # Look at the second and following lines to see if their indent is
+            # consistent.
+            for i, line in enumerate(splitlines[1:]):
+                if not is_indented_line(line, ws_len, last_delim_char,
+                  len(splitlines) - 2 == i, comment_delim_info):
+                    # It's inconsistent. Set ws_len to 0 to signal that this
+                    # isn't an indented block comment.
+                    ws_len = 0
+                    break
 
         for index, split_str in enumerate(splitlines):
             # Accumulate results.
@@ -446,7 +456,7 @@ def _gather_groups_on_newlines(
             if split_str.endswith('\n'):
                 yield l
                 l = []
-                
+
         # We've output a group; reset the ws_len to 0 in case the group just
         # output was a multi-line block comment with ws_len > 0.
         ws_len = 0
@@ -454,6 +464,173 @@ def _gather_groups_on_newlines(
     # Output final group, if one is still accumulating.
     if l:
         yield l
+#
+#
+# Block comment indentation processing
+# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#
+# #. A single line: ``/* comment */``. No special handling needed.
+# #. Multiple lines, indented with spaces. For example:
+#
+#    .. code-block:: c
+#       :linenos:
+#
+#       Column:  1
+#       1234567890234567
+#
+#         /* A multi-
+#
+#            line
+#         WRONG INDENTATION
+#              string
+#          */
+#
+#    In the code above, the text of the comment begins at column 6 of line 5,
+#    with the letter A. Therefore, line 6 lacks the necessary 6-space indent,
+#    so that no indententation will be removed from this comment.
+#
+#    If line 6 was indented properly, the resulting reST would be:
+#
+#    .. code-block:: rest
+#
+#       ``...rest to indent the left margin of the following text 2 spaces...``
+#
+#       A multi-
+#
+#       line
+#       RIGHT INDENTATION
+#         string
+#
+#       ``...rest to end left margin indent...``
+#
+#    Note that the first 5 characters were stripped off each line, leaving only
+#    line 8 indented (preserving its indentation relative to the comment's
+#    indentation). Some special cases in doing this processing:
+#
+#    * Line 5 may contain less than the expected 5 space indent; it could be
+#      only a newline. This must be supported with a special case.
+#    * The comment closing (line 9) contains just 3 spaces; this is allowed.
+#      If there are non-space characters before the closing comment delimiter,
+#      they must not occur before column 6. For example,
+#
+#      .. code-block:: c
+#
+#         /* A multi-
+#            line comment */
+#
+#      has consistent indentation, but neither
+#
+#      .. code-block:: c
+#
+#         /* A multi-
+#           line comment */
+#
+#      nor
+#
+#         .. code-block:: c
+#
+#            /* A multi-line comment
+#            */
+#
+#      are sufficiently indented to qualify for indentation removal.
+#
+#      So, to recognize:
+#
+def _is_space_indented_line(
+  # A line from a multi-line comment to examine.
+  line,
+  # The expected indent to check for; a length, in characters.
+  indent_len,
+  # Placeholder for delimiter expected near the end of an indent (one
+  # character). Not used by this function, but this function must take the
+  # same parameters as is_delim_indented_line_.
+  delim,
+  # True if this is the last line of a multi-line comment.
+  is_last,
+  # See comment_delim_info_.
+  comment_delim_info):
+
+     # A line containing only whitespace is always considered valid.
+     if line.isspace():
+         return True
+     # A line beginning with ws_len spaces has the expected indent.
+     if ( (len(line) > indent_len and line[:indent_len].isspace()) or
+     # Last line possibility: indent_len - 2 spaces followed by the delimiter
+     # is a valid indent. For example, an indent of 3 begins with ``/* comment``
+     # and can end with ``_*/``, a total of (indent_len == 3) - (2 spaces
+     # that are usually a * followed by a space) + (closing delim ``*/`` length
+     # of 2 chars) == 3.
+         (is_last and len(line) == indent_len - 2 +
+          comment_delim_info[2] and line[:indent_len - 2].isspace()) ):
+         return True
+     # No other correctly indented cases.
+     return False
+#
+#
+# (continuing from the list above...)
+#
+# #. Multiple lines, indented with spaces followed by a delimiter. For example:
+#
+#    .. code-block:: c
+#       :linenos:
+#
+#       Column:  1
+#       1234567890123456789
+#         /* Multi-
+#          *   line
+#          *
+#          *WRONG INDENTATION
+#         *  WRONG INDENTATION
+#          */
+#
+#    The rules are similar to the previous case (indents with space alone).
+#    However, there is one special case: line 5 doesn't require a space after
+#    the asterisk; a newline is acceptable. If the indentation is corrected, the
+#    result is:
+#
+#    .. code-block:: rest
+#
+#       ``...rest to indent the left margin of the following text 2 spaces...``
+#
+#       Multi-
+#         line
+#
+#       RIGHT INDENTATION
+#       RIGHT INDENTATION
+#
+#       ``...rest to end left margin indent...``
+#
+#    So, to recognize:
+#
+# .. _is_delim_indented_line:
+#
+def _is_delim_indented_line(
+  # A line from a multi-line comment to examine.
+  line,
+  # The expected indent to check for; a length, in characters.
+  indent_len,
+  # Delimiter expected near the end of an indent (one character).
+  delim,
+  # True if this is the last line of a multi-line comment.
+  is_last,
+  # See comment_delim_info_.
+  comment_delim_info):
+
+     # A line the correct number of spaces, followed by a delimiter then either
+     # a space or a newlines is correctly indented.
+     if (len(line) >= indent_len and line[:indent_len - 2].isspace() and
+         line[indent_len - 2] == delim and line[indent_len - 1] in '\n '):
+         return True
+     # Last line possibility: indent_len - 2 spaces followed by the delimiter
+     # is a valid indent. For example, an indent of 3 begins with ``/* comment``
+     # and can end with ``_*/``, a total of (indent_len == 3) - (2 spaces
+     # that are usually a * followed by a space) + (closing delim ``*/`` length
+     # of 2 chars) == 3.
+     if ( is_last and len(line) == indent_len - 2 +
+          comment_delim_info[2] and line[:indent_len - 2].isspace() ):
+         return True
+     # No other correctly indented cases.
+     return False
 #
 #
 # Step #4 of lexer_to_rest_
@@ -465,9 +642,7 @@ def _classify_groups(
   # ..., (groupN, stringN_ending_newline)], produced by
   # ``gather_groups_on_newlines``.
   iter_gathered_groups,
-  # .. _comment_delim_info:
-  #
-  # An element of COMMENT_DELIMITER_INFO for the language being classified.
+  # See comment_delim_info_.
   comment_delim_info):
 
     # Keep track of block comment state.
@@ -486,7 +661,10 @@ def _classify_groups(
                 type_ = len(first_string)
                 l.pop(0)
                 first_group, first_ws_len, first_string = l[0]
-            else:
+            # For body or end block comments, use the indent set by at the
+            # beginning of the comment. Otherwise, there is no indent, so
+            # set it to 0.
+            elif not _is_block_body_or_end(first_group):
                 type_ = 0
 
             # Update the block reST state.
@@ -501,10 +679,21 @@ def _classify_groups(
             if _is_block_body_or_end(first_group):
                 # Some of the body or end block lines may be just whitespace.
                 # Don't strip these: the line may be too short or we might
-                # remove a newline.
-                if not string.isspace():
-                    string = string[first_ws_len:]
-            elif len(string) and string[0] == ' ':
+                # remove a newline. Or, this might be inconsistent indentation
+                # in which ws_len == 0, in which case we should also strip
+                # nothing.
+                if not string.isspace() and first_ws_len > 0:
+                    # The first ws_len - 1 characters should be stripped.
+                    string = string[first_ws_len - 1:]
+                    # The last character, if it's a space, should also be
+                    # stripped.
+                    if string[0] == ' ':
+                        string = string[1:]
+            # A comment of ``//\n`` qualifies as a reST comment, but should
+            # not have the ``\n`` stripped off. Avoid this case. Otherwise,
+            # handle the more typical ``// comment`` case, in which the space
+            # after the comment delimiter should be removed.
+            elif len(string) > 0 and string[0] == ' ':
                 string = string[1:]
 
         # Everything else is considered code.
