@@ -21,11 +21,15 @@ History of recent changes
    - Use of fenced code blocks to more cleanly include code in reST.
    - Support for Sphinx's conf.py ``highlight_language = 'python'``.
    - Improved CSS for better layout of paragraphs following code.
+   - Support for block comments with or without indents.
+   - Support for many more languages.
+   - Simpler integration of CodeChat into a Sphinx conf.py.
+   - Support for user-specified extensions.
 
 - 0.0.18, 11-Feb-2015:
 
    - Remove unused PyQt dependencies.
-   - Modernize documentation style in :doc:`CodeChat/LanguageSpecificOptions`.
+   - Modernize documentation style in ``CodeChat/LanguageSpecificOptions``.
 
 - 0.0.17, 17-Nov-2014:
 

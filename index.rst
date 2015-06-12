@@ -35,6 +35,7 @@ Developer documentation
    history
    CodeChat/CodeToRest.py
    CodeChat/CodeToRestSphinx.py
+   CodeChat/CommentDelimiterInfo.py
    CodeChat/__init__.py
 
 *******
@@ -61,6 +62,7 @@ Packaging
    :maxdepth: 2
 
    setup.py
+   MANIFEST.in
 
 ################
 Index and search

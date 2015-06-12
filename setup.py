@@ -188,7 +188,7 @@ setup(
     #
     # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
     # <CodeChat/CodeToRest>` can be executed from the command line and requires
-    # only ``docutils`` to run, :doc:`CodeToRestSphinx.py
+    # only ``docutils`` to run, :doc:`CodeToRestSphinx
     # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
     install_requires=['docutils>=0.12'
                       'pygments>=2.0'],
