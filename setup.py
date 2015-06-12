@@ -190,7 +190,8 @@ setup(
     # <CodeChat/CodeToRest>` can be executed from the command line and requires
     # only ``docutils`` to run, :doc:`CodeToRestSphinx.py
     # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
-    install_requires=['docutils>=0.12'],
+    install_requires=['docutils>=0.12'
+                      'pygments>=2.0'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
