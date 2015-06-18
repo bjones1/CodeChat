@@ -187,22 +187,22 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     #
     # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
-    # <CodeChat/CodeToRest>` can be executed from the command line and requires
-    # only ``docutils`` to run, :doc:`CodeToRestSphinx
-    # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
-    install_requires=['docutils>=0.12'
+    # <CodeChat/CodeToRest>` can be executed from the command line if the
+    # packages below are installed, :doc:`CodeToRestSphinx.py
+    # <CodeChat/CodeToRestSphinx>` can only be executed by Sphinx.
+    install_requires=['docutils>=0.12',
                       'pygments>=2.0'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
     #
-    #    ``$ pip install -e .[dev,test]``
+    #    ``$ pip install -e .test``
     extras_require={
         'test': ['py.test'],
     },
 
     # To package data files, I'm using ``include_package_data=True`` then
-    # putting the files in ``MANIFEST.in``. See `including data files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
+    # putting the files in :doc:`MANIFEST.in <MANIFEST>`. See `including data files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
     include_package_data=True,
 )
