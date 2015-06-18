@@ -112,8 +112,10 @@ source_suffix = '.rst'
 # that Sphinx can process these as well.
 source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix)
 
-# **CodeChat note:** A dict of {glob, lexer_alias}, which uses lexer_alias to
-# analyze any file wihch matches the given glob.
+# **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias 
+# (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze 
+# any file wihch matches the given `glob
+# <https://docs.python.org/2/library/glob.html>`_.
 ##CodeChat_lexer_for_glob = {'*.s' : 'NASM'}
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:

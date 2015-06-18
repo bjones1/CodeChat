@@ -112,15 +112,18 @@ templates_path = ['_templates']
 # The suffix of source filenames.
 source_suffix = '.rst'
 # **CodeChat note:** Add the suffix of all CodeToRest-supported source files so
-# that Sphinx can process these as well.
+# that Sphinx can process these as well. Also, add ``.in`` files so 
+# ``MANIFEST.in`` will be recognized (see below).
 source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in']
 
-# **CodeChat note:** A dict of {glob, lexer_alias}, which uses lexer_alias to
-# analyze any file wihch matches the given glob. Here, allow MANIFEST.in to
-# be interpreted (see next line).
+# **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias 
+# (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze 
+# any file wihch matches the given `glob
+# <https://docs.python.org/2/library/glob.html>`_. Here, allow MANIFEST.in to be
+# interpreted (see next line).
 #
-# The Manifest.in file uses # as a comment. So does Python. Ugly, no?
-CodeChat_lexer_for_glob = {'*.in' : 'python'}
+# The MANIFEST.in file uses # as a comment. So does Python. Ugly, no?
+CodeChat_lexer_for_glob = {'MANIFEST.in' : 'python'}
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
