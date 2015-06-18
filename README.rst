@@ -26,6 +26,7 @@ A programmer's word processor
 
    <iframe width="852" height="480" src="https://www.youtube.com/embed/ZEcWXR5maXE?list=PLOJAqFa3UI2EmpUOy7PhAJ7adRnBZkC6U" frameborder="0" allowfullscreen></iframe>
 
+
 Background
 ==========
 Put simply, literate programming (LP) is the realization that a program is a document written to and for fellow programmers, not simply a list of instructions for a computer. LP tools therefore produce a nicely-formatted document which contains the code intermixed with explanatory prose. `Donald Knuth <http://en.wikipedia.org/wiki/Donald_Knuth>`_ introducted literate programming using his WEB tool in his seminal `paper <http://www.literateprogramming.com/knuthweb.pdf>`_. Per Figure 1 of this paper_, the WEB system takes a ``.w`` document as input then produces either a "tangled" source file for compilation or a "woven" document as a ``.tex`` file. The document is beautiful; the WEB source is difficult to digest (see Figure 2a-c); the source code is completely unreadable (see Figure 3). While a plethora of `tools <http://en.wikipedia.org/wiki/Literate_programming#Tools>`_ developed over the years attempt to address these problems, only one `LP-inspired <http://rant.gulbrandsen.priv.no/udoc/history>`_ variant has gained widespread acceptance: documentation generators, such as `Doxygen <http://www.doxygen.org>`_ and `JavaDoc <http://www.oracle.com/technetwork/java/javase/documentation/index-jsp-135444.html>`_, which extract documentation directly from source code, rather than extracting source code from the documentation, as WEB and most LP tools do. CodeChat addresses these LP weaknesses by producing a doucment directly from the code; employing human-readable markup (reStructuredText); and by supporting a GUI to make editing an LP document-program faster and easier.
@@ -35,6 +36,7 @@ Tutorial
 ========
 The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
 
+
 .. _tutorial-examples:
 
 Examples
@@ -42,8 +44,8 @@ Examples
 Some examples of literate programming using CodeChat:
 
 * Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <https://pythonhosted.org/CodeChat/>`_
-* Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.html#preserving-empty-lines-of-code>`_.
-* Use of GraphViz to illustrate a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.html#summary-and-implementation>`_.
+* Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.html#step-5-of-lexer-to-rest>`_.
+* Use of a numbered list to explain a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.html#summary-and-implementation>`_.
 * Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.html>`_.
 * Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.html>`_
 * Use of a screenshot to demonstrate the operation of a `3-D simulation <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/homework_1_solution.html>`_.
@@ -51,9 +53,11 @@ Some examples of literate programming using CodeChat:
 * Use of equations to explain the resulting code for an `integrator <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/integrating_omega_3d.html>`_.
 * CodeChat is used for code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
 
+
 Contributing
 ============
-This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, or contribute to the code at the CodeChat_ homepage!
+This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, contribute to the code at the CodeChat_ homepage!
+
 
 License
 =======
