@@ -37,25 +37,24 @@ import os.path
 import re, fnmatch
 # For saving Enki info.
 import codecs
-
+#
 # Third-party imports
 # -------------------
 import sphinx
 # Sphinx routines help to search for source files.
 from sphinx.util.matching import compile_matchers
 from sphinx.util import get_matching_docs
-from pygments.lexers import get_all_lexers
 import pygments.util
-
+#
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, code_to_rest_file
-from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
+from .CommentDelimiterInfo import SUPPORTED_EXTENSIONS
 from . import __version__
 #
 # conf.py helpers
 # ===============
-# This section provide helper routines for use in ``conf.py``.
+# This section provide a helper routine for use in ``conf.py``.
 #
 # This routine adds source suffixes supported by this extension (the extension
 # of all source files which this extension can translate into reST). It returns
@@ -66,6 +65,10 @@ from . import __version__
 #
 #       from CodeChat import CodeToRestSphinx
 #       source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix)
+#
+# Although it would be convenient for this Sphinx extension to do this
+# automatically, without the need for calling it from ``conf.py``, modifying
+# ``app.config`` doesn't seems to work.
 def add_source_suffix(
   # The ``source_suffix`` from conf.py.
   source_suffix):
@@ -78,34 +81,6 @@ def add_source_suffix(
         return source_suffix
     except:
         return source_suffix
-
-# Supported extensions
-# --------------------
-# Compute a list of supported filename extensions: supported by the lexer and
-# by CodeChat (inline / block comment info in COMMENT_DELIMITER_INFO).
-SUPPORTED_EXTENSIONS = set()
-# Per `get_all_lexers
-# <http://pygments.org/docs/api/#pygments.lexers.get_all_lexers>`_, we get a
-# tuple. Pick out only the filename and examine it.
-for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
-    # Pick only filenames we have comment info for.
-    if longname in COMMENT_DELIMITER_INFO:
-        for fnp in filename_patterns:
-            # Take just the extension, which is what Sphinx expects.
-            ext = os.path.splitext(fnp)[1]
-            # Wrap ext in a list so set won't treat it each character in the
-            # string as a separate element.
-            SUPPORTED_EXTENSIONS = SUPPORTED_EXTENSIONS.union([ext])
-
-# Now, do some fixup on this list:
-#
-# * ``Makefile.*`` turns into ``.*`` as an extension. Remove this.
-#   Likewise, ``Sconscript`` turns into an empty string, which confuses
-#   Sphinx. Remove this also.
-SUPPORTED_EXTENSIONS -= set(['.*', ''])
-# * Expand ``.php[345]``.
-SUPPORTED_EXTENSIONS -= set(['.php[345]'])
-SUPPORTED_EXTENSIONS |= set(['.php', '.php3', '.php4', '.php5'])
 
 # CodeToRest extension
 # ====================
@@ -224,13 +199,13 @@ def setup(app):
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
     app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
 
-    # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know 
+    # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know
     # the HTML file extension. So, save it to a file for Enki_ to read.
     try:
         with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
             f.write(app.config.html_file_suffix)
     except TypeError:
-        # If ``html_file_suffix`` is None (TypeError), Enki will assume 
+        # If ``html_file_suffix`` is None (TypeError), Enki will assume
         # ``.html``.
         pass
 

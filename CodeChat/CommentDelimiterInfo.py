@@ -20,6 +20,23 @@
 # ************************************************************************
 # CommentDelimiterInfo.py - Info on comment delimiters for many languages.
 # ************************************************************************
+# Imports
+# =======
+# These are listed in the order prescribed by `PEP 8
+# <http://www.python.org/dev/peps/pep-0008/#imports>`_.
+#
+# Standard library
+# ----------------
+# For code_to_rest_html_clean replacements.
+import os.path
+#
+# Third-party imports
+# -------------------
+from pygments.lexers import get_all_lexers
+#
+#
+# Supported languages
+# ===================
 # Based on the unique name for each lexer, provide some additional information
 # on comment delimiters that Pygments doesn't explicitly define. This data was
 # mostly taken from the `Wikipedia page
@@ -132,5 +149,33 @@ COMMENT_DELIMITER_INFO = {
   'COBOL':          ( 1,   None,         None),  #  *> as inline comment not
                                                  ## supported.
   }
+
+# Supported extensions
+# ====================
+# Compute a list of supported filename extensions: supported by the lexer and
+# by CodeChat (inline / block comment info in COMMENT_DELIMITER_INFO).
+SUPPORTED_EXTENSIONS = set()
+# Per `get_all_lexers
+# <http://pygments.org/docs/api/#pygments.lexers.get_all_lexers>`_, we get a
+# tuple. Pick out only the filename and examine it.
+for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
+    # Pick only filenames we have comment info for.
+    if longname in COMMENT_DELIMITER_INFO:
+        for fnp in filename_patterns:
+            # Take just the extension, which is what Sphinx expects.
+            ext = os.path.splitext(fnp)[1]
+            # Wrap ext in a list so set won't treat it each character in the
+            # string as a separate element.
+            SUPPORTED_EXTENSIONS = SUPPORTED_EXTENSIONS.union([ext])
+
+# Now, do some fixup on this list:
+#
+# * ``Makefile.*`` turns into ``.*`` as an extension. Remove this.
+#   Likewise, ``Sconscript`` turns into an empty string, which confuses
+#   Sphinx. Remove this also.
+SUPPORTED_EXTENSIONS -= set(['.*', ''])
+# * Expand ``.php[345]``.
+SUPPORTED_EXTENSIONS -= set(['.php[345]'])
+SUPPORTED_EXTENSIONS |= set(['.php', '.php3', '.php4', '.php5'])
 
 
