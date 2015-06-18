@@ -142,13 +142,23 @@ def _lexer_for_filename(
   # The path of the file under consideration
   source_file):
 
+    # Sphinx likes to capitalize the extension of the file it's processing
+    # (observed using Sphinx 1.3.1 on Windows). So, normalize the path
+    # before doing the comparison.
+    source_file = os.path.normpath(os.path.normcase(source_file))
+    # All matching is done relative to the source directory. Strip all path
+    # components before that off.
+    assert ( source_file[:len(app.env.srcdir) + len(os.path.sep)] ==
+            os.path.normcase(app.env.srcdir) + os.path.sep )
+    source_file = source_file[len(app.env.srcdir) + len(os.path.sep):]
     # See if ``source_file`` matches any of the globs.
     for glob, lexer_alias in app.config.CodeChat_lexer_for_glob.iteritems():
-        # Sphinx likes to capitalize the extension of the file it's processing
-        # (observed using Sphinx 1.3.1 on Windows). So, normalize the path
-        # before doing the comparison.
-        if re.match(fnmatch.translate(glob), os.path.normpath(
-          os.path.normcase(source_file))):
+        # On Windows, a glob with captial letters won't match, since
+        # os.path.normcase has been applied to source_file, making it lowercase.
+        # (Note that fnmatch and glob both do Unix-style matching, which is case
+        # sensitive). To work around this, run the glob through os.path.normpath
+        # before matching with it.
+        if re.match(fnmatch.translate(os.path.normcase(glob)), source_file):
             # On a match, pass the specified lexer alias.
             return {'alias': lexer_alias}
     # If none of the globs match, fall back to choosing a lexer based only on
@@ -166,7 +176,7 @@ def source_read(app, docname, source):
     try:
         options = _lexer_for_filename(app, full_path)
         source[0] = code_to_rest_string(source[0], **options)
-    except KeyError, pygments.util.ClassNotFound:
+    except (KeyError, pygments.util.ClassNotFound):
         # We Don't support this language.
         pass
 
