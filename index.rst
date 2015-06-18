@@ -74,5 +74,5 @@ Index and search
 
 .. toctree::
    :hidden:
-   
+
    CodeChat/LICENSE.html

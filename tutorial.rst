@@ -15,7 +15,7 @@ This tutorial shows how the `Enki <http://enki-editor.org/>`_ text editor, integ
 
 .. contents:: Contents
    :local:
-   
+
 This tutorial employs the following typography:
 
 * :file:`This font` for the name of a file or directory;
@@ -87,7 +87,7 @@ For example, in *C* or *C++* [#]_:
 |                                                           |    b = 2; // separate line, not following code.           |
 +-----------------------------------------------------------+-----------------------------------------------------------+
 
-.. [#] Currently, only single-line comments in C/C++, Python, reST, assembly (``.s``), BASH scripts, PHP, MATLAB scripts, DOS batch (``.bat``) files, ``.ini``, and Inno setup (``.iss``) files are supported.
+.. [#] See :doc:`CodeChat/CommentDelimiterInfo` for a full list of supported languages.
 
 Now, open one of your source files. Modify your comments to add reST markup; add in titles, hyperlinks, and other useful markup.
 
