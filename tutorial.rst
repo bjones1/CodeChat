@@ -66,28 +66,12 @@ When you switch back to ``README.rst``, it will now be included in your project.
 
 Basic CodeChat
 ==============
-Based on your familiarity with reST, we'll now explore embedding reST in the comments of a program. First, enable CodeChat in Enki's :menuselection:`Settings --> Settings --> Literate Programming` dialog by checking the "Enable CodeChat" checkbox. In :menuselection:`Settings --> Settings --> Sphinx`, uncheck the :guilabel:`Enable Sphinx` checkbox. Now, open :file:`{location of unzipped CodeChat files}/setup.py`. Notice that reST markup, when correctly embedded in comments, render properly. Specifically, to be rendered using reST, a comment must:
+Based on your familiarity with reST, we'll now explore embedding reST in the comments of a program. First, enable CodeChat in Enki's :menuselection:`Settings --> Settings --> Literate Programming` dialog by checking the "Enable CodeChat" checkbox. In :menuselection:`Settings --> Settings --> Sphinx`, uncheck the :guilabel:`Enable Sphinx` checkbox. Now, open :file:`{location of unzipped CodeChat files}/setup.py`. Notice that reST markup, when correctly embedded in comments, render properly. Specifically, to be rendered using reST:
 
-#. Be a single-line comment; in C, multi-line capable ``/*`` and ``*/`` comments cannot be used.
-#. Be the only non-whitespace characters on the line -- code cannot preceed the comment.
-#. Have at least one space following the comment character(s) -- tabs don't work.
+#. A comment must be placed on a line containing only comments or whitespace, but no code, preprocessor directives, etc.
+#. One space must follow the opening comment delimier.
 
-For example, in *C* or *C++* [#]_:
-
-+-----------------------------------------------------------+-----------------------------------------------------------+
-+ Source code                                               + CodeChat results                                          +
-+===========================================================+===========================================================+
-| .. code:: c                                               | ReST_ works *here*.                                       |
-|                                                           |                                                           |
-|    // ReST_ works *here*.                                 | .. code:: c                                               |
-|    //But not here -- a space must follow the comment.     |                                                           |
-|    /* Not here either. Only single-line comments work. */ |    //But not here -- a space must follow the comment.     |
-|    a = 1; // Not here either. Comments must be on a       |    /* Not here either. Only single-line comments work. */ |
-|    b = 2; // separate line, not following code.           |    a = 1; // Not here either. Comments must be on a       |
-|                                                           |    b = 2; // separate line, not following code.           |
-+-----------------------------------------------------------+-----------------------------------------------------------+
-
-.. [#] See :doc:`CodeChat/CommentDelimiterInfo` for a full list of supported languages.
+The :doc:`style_guide` gives more details; also, see :doc:`CodeChat/CommentDelimiterInfo` for a full list of supported languages.
 
 Now, open one of your source files. Modify your comments to add reST markup; add in titles, hyperlinks, and other useful markup.
 

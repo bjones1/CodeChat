@@ -25,6 +25,7 @@ History of recent changes
    - Support for many more languages.
    - Simpler integration of CodeChat into a Sphinx conf.py.
    - Support for user-specified extensions.
+   - Support for indented headings; note that they won't be indented in the resulting HTML.
 
 - 0.0.18, 11-Feb-2015:
 

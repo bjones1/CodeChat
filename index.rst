@@ -21,7 +21,7 @@ User documentation
 
    README
    tutorial
-   style_guide.py
+   style_guide.cpp
    install
    CodeChat/template/conf.py
    CodeChat/template/CodeChat.css
