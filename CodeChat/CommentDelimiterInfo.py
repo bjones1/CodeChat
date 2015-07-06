@@ -70,7 +70,14 @@ COMMENT_DELIMITER_INFO = {
   ##                  ;, %comment\n, %endcomment  -- block comments not tested.
   'NASM':           ( 1,      9,           11),
 
+  ##                  #
+  'Bash':           ( 1,   None,         None),
+  'Tcsh':           ( 1,   None,         None),
+  # This covers csh and sh as well. Wikipedia claims that <# ~ #> are block
+  # comments, but I don't see this anywhere in man bash.
+
   # These langauges have **NOT** been tested.
+  # -----------------------------------------
   ##                  #      /*             */
   'GAS':            ( 1,      2,            2),
   ##                  ;      /*,            */
@@ -91,8 +98,8 @@ COMMENT_DELIMITER_INFO = {
   'PowerShell':     ( 1,      2,            2),
   ##                  #, =begin,          =cut
   'Perl':           ( 1,      6,            4),
-  ##                  #,    #'(,             )  # Or #`[ ~ ], or any other pairs.
-  'Perl6':          ( 1,      3,             1),
+  ##                  #,    #'(,             )  # Or #`[ ~ ], or any other pair.
+  'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
   ##                  #, #iffalse,      #endif
@@ -113,10 +120,6 @@ COMMENT_DELIMITER_INFO = {
   'Lua':            ( 2,      4,            2),  # --[=[ ~ ]=] not supported.
   ##                  ;, (comment,           )
   'Clojure':        ( 1,      8,            1),
-  ##                  #,     <#,            #>
-  # This covers csh and sh as well.
-  'Bash':           ( 1,      2,            2),
-  'Tcsh':           ( 1,      2,            2),
 
   ## Languages with no block comments.
 

@@ -254,6 +254,11 @@ class TestCodeToRest(object):
         self.mt('; Comment\n \nstart: bra start\n \n',
                 'Comment\n' + bf + '  \n start: bra start\n  \n' + ef, ['NASM'])
 
+    # Bash.
+    def test_26(self):
+        self.mt('# Comment\n \necho "hello world"\n \n',
+                'Comment\n' + bf + '  \n echo "hello world"\n  \n' + ef, ['Bash'])
+
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
