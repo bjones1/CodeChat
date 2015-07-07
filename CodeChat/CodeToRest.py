@@ -53,7 +53,7 @@ import docutils.writers.html4css1
 from docutils.writers.html4css1 import Writer
 from pygments import lex
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
-    get_lexer_for_mimetype
+    get_lexer_for_mimetype, guess_lexer_for_filename, guess_lexer
 from pygments.token import Token
 #
 # Local application imports
@@ -83,7 +83,7 @@ def code_to_rest_string(
 
     # Use a StringIO to capture writes into a string.
     output_rst = StringIO()
-    _lexer_to_rest(code_str, get_lexer(**options), output_rst)
+    _lexer_to_rest(code_str, get_lexer(code=code_str, **options), output_rst)
     return output_rst.getvalue()
 
 # .. _code_to_rest_file:
@@ -114,7 +114,7 @@ def code_to_rest_file(
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     code_str = fi.read()
-    lexer = get_lexer(filename=source_path)
+    lexer = get_lexer(filename=source_path, code=code_str)
     rst = code_to_rest_string(code_str, lexer=lexer)
     fo.write(rst)
 
@@ -177,7 +177,7 @@ def code_to_html_file(
     fo = io.FileOutput(destination_path=html_path, encoding=output_encoding)
 
     code_str = fi.read()
-    lexer = get_lexer(filename=source_path)
+    lexer = get_lexer(filename=source_path, code=code_str)
     html = code_to_html_string(code_str, lexer=lexer)
 
     fo.write(html)
@@ -198,8 +198,10 @@ def get_lexer(
   alias=None,
   # The filename of the source file to lex.
   filename=None,
-  # The MIME type of the source ile to lex.
+  # The MIME type of the source file to lex.
   mimetype=None,
+  # The code to be highlighted, used to guess a lexer.
+  code=None,
   # See options_.
   **options):
 
@@ -208,9 +210,14 @@ def get_lexer(
     if alias:
         return get_lexer_by_name(alias, **options)
     if filename:
-        return get_lexer_for_filename(filename, **options)
+        if code:
+            return guess_lexer_for_filename(filename, code, **options)
+        else:
+            return get_lexer_for_filename(filename, **options)
     if mimetype:
         return get_lexer_for_mimetype(mimetype, **options)
+    if code:
+        return guess_lexer(code, **options)
 
 
 # Provide the ability to print debug info if needed.
