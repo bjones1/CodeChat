@@ -93,7 +93,7 @@
 //
 // Title
 // -----
-//   Note that the comment character before the section title suppress a
+//   Note that the comment character before the section title suppresses a
 //   newline.
 //
 //   Incorrect:
@@ -107,7 +107,7 @@
 // * Headings may be indented, but that indentation won't appear in the
 //   resulting HTML. For example:
 void foo(int i_sum) {
-    if i_sum {
+    if (i_sum) {
         // Check pre-conditions
         // ---------------------
         assert(i_sum > 1);
