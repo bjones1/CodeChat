@@ -26,6 +26,9 @@ History of recent changes
    - Simpler integration of CodeChat into a Sphinx conf.py.
    - Support for user-specified extensions.
    - Support for indented headings; note that they won't be indented in the resulting HTML.
+   - Whitespace is removed in auto-save and build mode.
+   - Errors and warnings are now displayed in the Preview dock's status bar, which replaces the useless progress bar.
+   - Avoid double builds when in auto-save and build mode.
 
 - 0.0.18, 11-Feb-2015:
 
