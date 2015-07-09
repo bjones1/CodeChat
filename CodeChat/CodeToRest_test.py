@@ -52,10 +52,30 @@ from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
 from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
+# Define some commonly-used strings to make testing less verbose.
+bf = (u'\n' +
+      u'.. fenced-code::\n' +
+      u'\n' +
+      u' Beginning fence\n')
+ef = (u' Ending fence\n' +
+      u'\n' +
+      u'..\n' +
+      u'\n')
+def div(size):
+    return (u'\n' +
+            u'.. raw:: html\n' +
+            u'\n <div style="margin-left:{}em;">\n' +
+            u'\n').format(size)
+div_end = (u'\n' +
+           u'.. raw:: html\n' +
+           u'\n' +
+           u' </div>\n' +
+           u'\n' +
+           u'..\n' +
+           u'\n')
+
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
-bf = u'\n.. fenced-code::\n\n Beginning fence\n'
-ef = u' Ending fence\n\n..\n\n'
 class TestCodeToRest(object):
 # C-like language tests
 # =====================
@@ -100,19 +120,16 @@ class TestCodeToRest(object):
 
     # A singly indented single-line comment.
     def test_7(self):
-        self.mt(' // testing', '\n.. raw:: html\n' +
-                '\n <div style="margin-left:0.5em;">\n\ntesting\n' +
-                '\n.. raw:: html\n\n </div>\n\n..\n\n')
+        self.mt(' // testing', div(0.5) + 'testing\n' + div_end)
 
     # A doubly indented single-line comment.
     def test_8(self):
-        self.mt('  // testing', '\n.. raw:: html\n\n <div style="margin-left:1.0em;">\n\ntesting\n\n.. raw:: html\n\n </div>\n\n..\n\n')
+        self.mt('  // testing', div(1.0) + 'testing\n' + div_end)
 
     # A doubly indented multi-line comment.
     def test_9(self):
-        self.mt('  // testing\n  // more testing', '\n.. raw:: html\n' +
-                '\n <div style="margin-left:1.0em;">\n\ntesting\n' +
-                'more testing\n\n.. raw:: html\n\n </div>\n\n..\n\n')
+        self.mt('  // testing\n  // more testing',
+                div(1.0) + 'testing\nmore testing\n' + div_end)
 
     # Code to comment transition.
     def test_9a(self):
@@ -183,9 +200,7 @@ class TestCodeToRest(object):
     # Indented block comments with whitespace removal.
     def test_19_1_4(self):
         self.mt(' /* multi-\n    line\n    comment\n  */\n',
-                '\n.. raw:: html\n\n <div style="margin-left:0.5em;">\n\n' +
-                'multi-\nline\ncomment\n  \n\n.. raw:: html\n\n </div>\n\n' +
-                '..\n\n')
+                div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
 
 # Block comment indent removal: indents with delimiters
 # -----------------------------------------------------
@@ -206,9 +221,7 @@ class TestCodeToRest(object):
     # Indented block comments with whitespace removal.
     def test_19_1_8(self):
         self.mt(' /* multi-\n  * line\n  * comment\n  */\n',
-                '\n.. raw:: html\n\n <div style="margin-left:0.5em;">\n\n' +
-                'multi-\nline\ncomment\n  \n\n.. raw:: html\n\n </div>\n\n' +
-                '..\n\n')
+                div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
 
 # Other block comment testing
 # ---------------------------
@@ -708,17 +721,11 @@ main(){
         assert (out_stringio.getvalue() ==
 # Note: Not using a """ string, since the string trailing whitespace option in
 # Enki would remove some of the one-space lines.
-'\n' +
-'.. fenced-code::\n' +
-'\n' +
-' Beginning fence\n' +
+bf +
 ' \n'
 ' code\n' +
 ' \n' +
-' Ending fence\n' +
-'\n' +
-'..\n' +
-'\n')
+ef)
 
     def test_12(self):
         out_stringio = StringIO()
@@ -737,21 +744,5 @@ comment
           [(3, u'\n'),
            (3, u'comment\n'),
            (3, u'\n')], out_stringio)
-        assert (out_stringio.getvalue() ==
-"""
-.. raw:: html
-
- <div style="margin-left:1.5em;">
-
-
-comment
-
-
-.. raw:: html
-
- </div>
-
-..
-
-""")
+        assert (out_stringio.getvalue() == div(1.5) + '\ncomment\n\n' + div_end)
 
