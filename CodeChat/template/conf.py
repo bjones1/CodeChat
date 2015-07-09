@@ -116,7 +116,12 @@ source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix)
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze 
 # any file wihch matches the given `glob
 # <https://docs.python.org/2/library/glob.html>`_.
-##CodeChat_lexer_for_glob = {'*.s' : 'NASM'}
+CodeChat_lexer_for_glob = {
+    # ``CodeChat.css`` is auto-detected as a CSS + Lasso file by Pygments,
+    # causing it to display incorrectly. Define it as CSS only.
+    'CodeChat.css': 'CSS',
+    }
+
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
