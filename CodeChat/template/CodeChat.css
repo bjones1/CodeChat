@@ -3,8 +3,9 @@
    *************************************************
    Stylesheet for use with CodeChat's extensions to Docutils.
 
-   The overall goal is to allow comments (everything but <pre> tags) to appear
-   with normal (double) spacing, while comments and code are single spaced.
+   The overall goal is to allow comments (everything but ``<pre>`` tags) to
+   appear with normal (double) spacing, while comments and code are single
+   spaced.
 
    :Author: Bryan A. Jones
    :Contact: bjones AT ece DOT msstate DOT edu
@@ -14,13 +15,12 @@
    ==============
    This will cause an error if the html4css1 style sheet is embedded instead of
    linked, though the page still displays without problems. However, omitting
-   it will cause the linked stylesheet case to fail, so leave this in. 
+   it will cause the linked stylesheet case to fail, so leave this in.
  */
 @import url(html4css1.css);
 
-/* Remove all top and bottom space around <pre>, making it single-spaced.
-   Also, remove the border so that code and comments mix more
-   naturally. 
+/* Remove all top and bottom space around ``<pre>``, making it single-spaced.
+   Also, remove the border so that code and comments mix more naturally.
  */
 pre {
     padding: 0px;
@@ -40,7 +40,7 @@ pre.literal-block {
 
     This is actually a bad thing: the spacing between dissimilar elements may
     not be correct. However, I can't find a CSS rule to modify the
-    margins of elements which preceed code, so I just change them all. 
+    margins of elements which preceed code, so I just change them all.
  */
 p, blockquote, div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6, div.body ul   /* Sphinx */
                div h1,      div h2,      div h3,      div h4,      div h5,      div h6,      div ul.simple /* docutils */
@@ -49,7 +49,7 @@ p, blockquote, div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, 
 }
 
 /* Paragraphs have a non-zero margin-top, which adds a blank line when it
-   follows code. Remove this. 
+   follows code. Remove this.
  */
 div p:first-child {
   margin-top: 0px;
@@ -66,7 +66,7 @@ div p:first-child {
    Note: This isn't needed for the new alabaster theme. Why? Is there
    a workaround / better way to do this?
 
-   This line handles docutils output. 
+   This line handles docutils output.
 */
 pre.literal-block + *,
 /* The remaining lines handle Sphinx output. */

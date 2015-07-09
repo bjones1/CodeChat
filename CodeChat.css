@@ -3,8 +3,9 @@
    *************************************************
    Stylesheet for use with CodeChat's extensions to Docutils.
 
-   The overall goal is to allow comments (everything but <pre> tags) to appear
-   with normal (double) spacing, while comments and code are single spaced.
+   The overall goal is to allow comments (everything but ``<pre>`` tags) to
+   appear with normal (double) spacing, while comments and code are single
+   spaced.
 
    :Author: Bryan A. Jones
    :Contact: bjones AT ece DOT msstate DOT edu
@@ -18,9 +19,8 @@
  */
 @import url(html4css1.css);
 
-/* Remove all top and bottom space around <pre>, making it single-spaced.
-   Also, remove the border so that code and comments mix more
-   naturally.
+/* Remove all top and bottom space around ``<pre>``, making it single-spaced.
+   Also, remove the border so that code and comments mix more naturally.
  */
 pre {
     padding: 0px;
