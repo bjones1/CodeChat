@@ -29,6 +29,7 @@ History of recent changes
    - Whitespace is removed in auto-save and build mode.
    - Errors and warnings are now displayed in the Preview dock's status bar, which replaces the useless progress bar.
    - Avoid double builds when in auto-save and build mode.
+   - Template project now include ``conf.py`` and ``CodeChat.css``.
 
 - 0.0.18, 11-Feb-2015:
 
