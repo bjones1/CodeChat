@@ -154,9 +154,7 @@ master_doc = 'index'
 
 # `exclude_patterns <http://sphinx-doc.org/config.html#confval-exclude_patterns>`_:
 # List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files. **CodeChat note:** By
-# default, Enki will instruct Sphinx to place all Sphinx output in ``_build``;
-# this directory should therefore be excluded from the list of source files.
+# directories to ignore when looking for source files.
 exclude_patterns = [
                     # Ignore Mercurial repo.
                     '.hg',
@@ -166,6 +164,8 @@ exclude_patterns = [
                     'CodeChat.egg-info',
                     # Ignore Sphinx output.
                     '_build',
+                    # Ignore this file's output.
+                    'sphinx-enki-info.txt',
                     # Ignore file from external web site.
                     'ez_setup.py',
                     # Ignore test output.

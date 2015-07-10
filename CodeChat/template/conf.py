@@ -152,7 +152,10 @@ master_doc = 'index'
 # directories to ignore when looking for source files. **CodeChat note:** By
 # default, Enki will instruct Sphinx to place all Sphinx output in ``_build``;
 # this directory should therefore be excluded from the list of source files.
-exclude_patterns = ['_build']
+# In addition, this file createa a file named ``sphinx-enki-info.txt``, which
+# should be ignored by Sphinx.
+exclude_patterns = ['_build',
+                    'sphinx-enki-info.txt']
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
 # reST default role (used for this markup: `text`) to use for all documents.
