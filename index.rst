@@ -23,6 +23,7 @@ User documentation
    tutorial
    style_guide.cpp
    install
+   CodeChat/template/index.rst
    CodeChat/template/conf.py
    CodeChat/template/CodeChat.css
 
