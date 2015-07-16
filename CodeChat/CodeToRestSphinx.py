@@ -48,7 +48,7 @@ import pygments.util
 #
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, code_to_rest_file
+from .CodeToRest import code_to_rest_string, code_to_rest_file, get_lexer
 from .CommentDelimiterInfo import SUPPORTED_EXTENSIONS
 from . import __version__
 #
@@ -128,9 +128,13 @@ def builder_inited(app):
             rest_file = os.path.join(app.env.srcdir, source_file + app.config.source_suffix)
             if ( (not os.path.exists(rest_file)) or
                  (os.path.getmtime(source_file) > os.path.getmtime(rest_file)) ):
-                options = _lexer_for_filename(app, source_file)
+                with codecs.open(source_file, 'rb', 'utf-8') as f:
+                    code_str = f.read()
+                lexer = _lexer_for_filename(app, source_file, code_str)
+                app.info('Converting {} using the {} lexer.'.format(source_file,
+                                                                    lexer.name))
                 code_to_rest_file(source_file, rest_file,
-                                  app.config.html_output_encoding, **options)
+                                  app.config.html_output_encoding, lexer=lexer)
             else:
                 pass
 
@@ -140,7 +144,9 @@ def _lexer_for_filename(
   # A Sphinx app instance.
   app,
   # The path of the file under consideration
-  source_file):
+  source_file,
+  # The code in source_file,
+  code_str):
 
     # Sphinx likes to capitalize the extension of the file it's processing
     # (observed using Sphinx 1.3.1 on Windows). So, normalize the path
@@ -160,10 +166,10 @@ def _lexer_for_filename(
         # before matching with it.
         if re.match(fnmatch.translate(os.path.normcase(glob)), source_file):
             # On a match, pass the specified lexer alias.
-            return {'alias': lexer_alias}
+            return get_lexer(alias=lexer_alias)
     # If none of the globs match, fall back to choosing a lexer based only on
     # the filename.
-    return {'filename': source_file}
+    return get_lexer(filename=source_file, code=code_str)
 
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
@@ -174,8 +180,10 @@ def source_read(app, docname, source):
     full_path = app.env.doc2path(docname)
     # See if it's an extension we should process.
     try:
-        options = _lexer_for_filename(app, full_path)
-        source[0] = code_to_rest_string(source[0], **options)
+        lexer = _lexer_for_filename(app, full_path, source[0])
+        app.info('Converting {} using the {} lexer.'.format(docname,
+                                                            lexer.name))
+        source[0] = code_to_rest_string(source[0], lexer=lexer)
     except (KeyError, pygments.util.ClassNotFound):
         # We Don't support this language.
         pass
