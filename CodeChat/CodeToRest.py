@@ -105,7 +105,9 @@ def code_to_rest_file(
   # .. _output_encoding:
   #
   # Encoding to use for the output file.
-  output_encoding='utf-8'):
+  output_encoding='utf-8',
+  # See options_.
+  **options):
 
     # Use docutil's I/O classes to better handle and sniff encodings.
     #
@@ -114,7 +116,7 @@ def code_to_rest_file(
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     code_str = fi.read()
-    lexer = get_lexer(filename=source_path, code=code_str)
+    lexer = get_lexer(filename=source_path, code=code_str, **options)
     rst = code_to_rest_string(code_str, lexer=lexer)
     fo.write(rst)
 
