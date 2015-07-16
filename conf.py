@@ -133,10 +133,11 @@ source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in']
 # <https://docs.python.org/2/library/glob.html>`_.
 CodeChat_lexer_for_glob = {
     # ``CodeChat.css`` is auto-detected as a CSS + Lasso file by Pygments,
-    # causing it to display incorrectly. Define it as CSS only.
-    'CodeChat.css': 'CSS',
+    # causing it to display incorrectly. Define it as CSS only, both in the
+    # root path and in the template subdirectory.
+    '*CodeChat.css': 'CSS',
     # The MANIFEST.in file uses # as a comment. So does Python. Ugly, no?
-    'MANIFEST.in' : 'python',
+    'MANIFEST.in'  : 'python',
     }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
