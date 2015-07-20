@@ -42,55 +42,61 @@ from pygments.lexers import get_all_lexers
 # mostly taken from the `Wikipedia page
 # <http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments>`_.
 COMMENT_DELIMITER_INFO = {
+  # These languages have unit tests which pass
+  # ------------------------------------------
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,            */
-  # Note: the following langauges have unit tests to verify that they work.
   'C':              ( 2,      2,            2),
   'C++':            ( 2,      2,            2),
   'Java':           ( 2,      2,            2),
   'ActionScript':   ( 2,      2,            2),
   'ActionScript 3': ( 2,      2,            2),
   'C#':             ( 2,      2,            2),
-  'D':              ( 2,      2,            2), #  Note: also has /+ ~ +/ for
-                                                ## nested block comments.
+  #  Note: also has ``/+`` ~ ``+/`` for nested block comments.
+  'D':              ( 2,      2,            2),
   'Go':             ( 2,      2,            2),
   'JavaScript':     ( 2,      2,            2),
   'Objective-C':    ( 2,      2,            2),
   'Rust':           ( 2,      2,            2),
   'Scala':          ( 2,      2,            2),
-  'Sass':           ( 2,      2,            2), # ??? Doesn't work in tests
   'Swift':          ( 2,      2,            2),
   'verilog':        ( 2,      2,            2),
   'systemverilog':  ( 2,      2,            2),
+  # Note: PHP allows ``#`` or ``//`` as an inline comment. We only support
+  # ``#``.
+  ##                  #,     /*,            */
+  'PHP':            ( 1,      2,            2),
+  ##                  ;, %comment\n, %endcomment  -- block comments not tested.
+  'NASM':           ( 1,      9,           11),
   ##                  #,    N/A,          N/A
   'Python':         ( 1,   None,         None),
   'Python 3':       ( 1,   None,         None),
   ##                         /*,            */
   'CSS':            (None,    2,            2),
-  ##                  ;, %comment\n, %endcomment  -- block comments not tested.
-  'NASM':           ( 1,      9,           11),
-
+  # This covers csh and sh as well. Wikipedia claims that <# ~ #> are block
+  # comments, but I don't see this anywhere in man bash. There aren't supported.
   ##                  #
   'Bash':           ( 1,   None,         None),
   'Tcsh':           ( 1,   None,         None),
-  # This covers csh and sh as well. Wikipedia claims that <# ~ #> are block
-  # comments, but I don't see this anywhere in man bash.
+  # The only valid comment type is REM. Neither ``:`` or ``::`` are classified
+  # as a comment.
+  ##                REM
+  'Batchfile':      ( 3,   None,         None),
+
+  # These languages have failing unit tests
+  # ---------------------------------------
+  ##                 //,     /*,            */
+  'Sass':           ( 2,      2,            2),
 
   # These langauges have **NOT** been tested.
   # -----------------------------------------
-  ##                  #      /*             */
+  ##                  #,     /*,            */
   'GAS':            ( 1,      2,            2),
-  ##                  ;      /*,            */
+  ##                  ;,     /*,            */
   'autohotkey':     ( 1,      2,            2),
-  ##                 --      /*,            */
+  ##                 --,     /*,            */
   'SQL':            ( 2,      2,            2),
-  ##                  #      /*,            */
-  'PHP':            ( 1,      2,            2),
-  # Note: PHP allows # or // as an inline comment. We only support #.
-
-  ##                       <!--,           -->
-  'HTML':           (None,    4,            3),
-  ##                  %      /*,            */
+  ##                  %,     /*,            */
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
   'AutoIt':         ( 1,      3,            3),
@@ -98,37 +104,37 @@ COMMENT_DELIMITER_INFO = {
   'PowerShell':     ( 1,      2,            2),
   ##                  #, =begin,          =cut
   'Perl':           ( 1,      6,            4),
-  ##                  #,    #'(,             )  # Or #`[ ~ ], or any other pair.
+  # Or ``#`[`` ~ ``]``, or any other pair.
+  ##                  #,    #'(,             )
   'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
   ##                  #, #iffalse,      #endif
   'S':              ( 1,      8,            6),
+  # Bird style not supported. See
+  # https://wiki.haskell.org/Literate_programming#Bird_Style.
   ##                 --,     {-,            -}
-  'Haskell':        ( 2,      2,            2), # Bird style not supported. See
-                     # https://wiki.haskell.org/Literate_programming#Bird_Style.
+  'Haskell':        ( 2,      2,            2),
+  # ``(*`` ~ ``*)`` not supported.
   ##                 //,      {,             }
-  'Delphi':         ( 2,      1,            1),  # (* ~ *) not supported.
+  'Delphi':         ( 2,      1,            1),
   ##                 //,     (*,            *)
   'AppleScript':    ( 2,      2,            2),
-  ##                  %      %{,            %}
+  ##                  %,     %{,            %}
   'Matlab':         ( 1,      2,            2),
   ##                  ;,     #|,            |#
   'Common Lisp':    ( 1,      2,            2),
-  'Scheme':         ( 1,   None,         None),
+  # ``--[=[`` ~ ``]=]`` not supported.
   ##                 --,   --[[,            ]]
-  'Lua':            ( 2,      4,            2),  # --[=[ ~ ]=] not supported.
+  'Lua':            ( 2,      4,            2),
   ##                  ;, (comment,           )
   'Clojure':        ( 1,      8,            1),
-
-  ## Languages with no block comments.
-
+  ##                  ;,
+  'Scheme':         ( 1,   None,         None),
+  ##                       <!--,           -->
+  'HTML':           (None,    4,            3),
   ##                  C or !
   'Fortran':        ( 1,   None,         None),
-  ##                  :
-  # Note: for simplicity, I don't support :: or REM as a valid comment type.
-  # Something for future work.
-  'Batchfile':      ( 1,   None,         None),
   ##                  ⍝
   'APL':            ( 1,   None,         None),
   ##                  #
@@ -148,9 +154,9 @@ COMMENT_DELIMITER_INFO = {
   'Ada':            ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
   'Vhdl':           ( 2,   None,         None),
+  # ``*>`` as inline comment not supported.
   ##                  * or /
-  'COBOL':          ( 1,   None,         None),  #  *> as inline comment not
-                                                 ## supported.
+  'COBOL':          ( 1,   None,         None),
   }
 
 # Supported extensions
