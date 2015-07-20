@@ -274,6 +274,33 @@ class TestCodeToRest(object):
                 'Comment\n' + bf + '  \n echo "hello world"\n  \n' + ef,
                 ['Bash'])
 
+    # PHP. While the `PHP manual
+    # <http://php.net/manual/en/language.basic-syntax.comments.php>`_ confirms
+    # support for ``//`` inline comments, Pygments doesn't appear to support
+    # these; they are output as code.
+    def test_27(self):
+        self.mt("<?php\n"
+                "echo 'Hello world'\n"
+                "// Comment1\n"
+                "# Comment2\n"
+                "/* Comment3 */\n",
+                bf +
+                " <?php\n"
+                " echo 'Hello world'\n" +
+                " // Comment1\n" +
+                ef +
+                "Comment2\n"
+                "Comment3 \n", ['PHP'])
+
+    # Batch file.
+    def test_28(self):
+        self.mt('echo Hello\n'
+                'rem Comment\n',
+                bf +
+                ' echo Hello\n' +
+                ef +
+                'Comment\n', ['Batch'])
+
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
