@@ -797,13 +797,13 @@ def _is_rest_comment(
     first_string = string_tuple[first_comment_index]
     # The cases are:
     #
-    # #. ``// comment, //\n, #`` -> reST comment. Note that in some languages
+    # 1. ``// comment, //\n, #`` -> reST comment. Note that in some languages
     #    (Python is one example), the newline isn't included in the comment.
-    # #. ``//comment`` -> not a reST comment.
-    # #. ``/* comment, /*\n`` -> reST comment
-    # #. Any block comment body or end for which its block start was a reST
+    # 2. ``//comment`` -> not a reST comment.
+    # 3. ``/* comment, /*\n`` -> reST comment
+    # 4. Any block comment body or end for which its block start was a reST
     #    comment -> reST comment.
-    # #. ``/**/`` -> a reST comment. (I could see this either as reST or not;
+    # 5. ``/**/`` -> a reST comment. (I could see this either as reST or not;
     #    because it was simpler, I picked reST.)
     #
     # Begin by checking case #4 above.
