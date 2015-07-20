@@ -13,7 +13,11 @@ History of recent changes
 *************************
 - Development version:
 
-   - Update setup.py based on modern usage.
+   - None yet.
+
+- 1.0.0, 20-Jul-2015:
+
+   - Update ``setup.py`` based on modern usage.
    - Update docs.
    - Add support for Sphinx v1.3. Process source files in memory, instead of creating ``.rst`` files. This allows source links to refer to the source code, not the intermediate ``.rst`` files.
    - Creation of a tutorial.
@@ -23,7 +27,7 @@ History of recent changes
    - Improved CSS for better layout of paragraphs following code.
    - Support for block comments with or without indents.
    - Support for many more languages.
-   - Simpler integration of CodeChat into a Sphinx conf.py.
+   - Simpler integration of CodeChat into a Sphinx ``conf.py``.
    - Support for user-specified extensions.
    - Support for indented headings; note that they won't be indented in the resulting HTML.
    - Whitespace is removed in auto-save and build mode.
