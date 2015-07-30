@@ -24,9 +24,13 @@ This tutorial employs the following typography:
 
 Basic restructuredText
 ======================
+.. raw:: html
+
+   <iframe width="853" height="480" src="https://www.youtube.com/embed/2ZlJ9xWSiNs?rel=0" frameborder="0" allowfullscreen></iframe>
+
 CodeChat relies on `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ (`reST <http://docutils.sourceforge.net/rst.html>`_) in comments to provide human-readable markup. "ReStructuredText is an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax" [#]_. So, this tutorial begins by exploring reST_ using Enki.
 
-First, install Enki_, which hosts the CodeChat system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/get/tip.zip>`_ for use as an example of literate programming, then unzip this file in a directory of your choice. Now, open the source for this document, :file:`{location of unzipped CodeChat files}/README.rst`, in Enki. Move around the document, noticing that the text and web views are automatically synchronized [#]_. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try :file:`{location of unzipped CodeChat files}/CodeChat/LICENSE.html`, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
+First, install Enki_, which hosts the CodeChat system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/get/tip.zip>`_, which also contains files needed in this tutorial. Unzip this file in a directory of your choice. Now, open :file:`{location of unzipped CodeChat files}/tutorial/rest-primer.rst`, in Enki. Move around the document, noticing that the text and web views are automatically synchronized [#]_. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try :file:`{location of unzipped CodeChat files}/CodeChat/LICENSE.html`, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
 
 Now, explore creating your own reST_ file: create a new file, then save it with an extension of ``.rst``. Based on the very helpful `reST primer <http://sphinx-doc.org/rest.html>`_, try out some syntax: create headings, include a hyperlink, add an image, use inline markup. When errors occur, they are reported in the log window and typically in-line in the resulting web page. When a page is complete, the save icon in the preview window stores the resulting HTML to disk.
 

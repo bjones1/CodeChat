@@ -19,8 +19,9 @@ User documentation
 .. toctree::
    :maxdepth: 2
 
-   README
-   tutorial
+   README.rst
+   tutorial/tutorial.rst
+   tutorial/rest-primer.rst
    style_guide.cpp
    install
    CodeChat/template/index.rst
