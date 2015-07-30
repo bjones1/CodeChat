@@ -26,11 +26,11 @@ Basic restructuredText
 ======================
 .. raw:: html
 
-   <iframe width="853" height="480" src="https://www.youtube.com/embed/2ZlJ9xWSiNs?rel=0" frameborder="0" allowfullscreen></iframe>
+   <iframe width="853" height="480" src="https://www.youtube.com/embed/kpHFEDq24tE?rel=0" frameborder="0" allowfullscreen></iframe>
 
 CodeChat relies on `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ (`reST <http://docutils.sourceforge.net/rst.html>`_) in comments to provide human-readable markup. "ReStructuredText is an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax" [#]_. So, this tutorial begins by exploring reST_ using Enki.
 
-First, install Enki_, which hosts the CodeChat system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/get/tip.zip>`_, which also contains files needed in this tutorial. Unzip this file in a directory of your choice. Now, open :file:`{location of unzipped CodeChat files}/tutorial/rest-primer.rst`, in Enki. Move around the document, noticing that the text and web views are automatically synchronized [#]_. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try :file:`{location of unzipped CodeChat files}/CodeChat/LICENSE.html`, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
+First, install Enki_, which hosts the CodeChat system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/get/tip.zip>`_, which also contains a :doc:`rest-primer` needed in this tutorial. Unzip this file in a directory of your choice. Now, open :file:`{location of unzipped CodeChat files}/docs/rest-primer.rst` in Enki. Move around the document, noticing that the text and web views are automatically synchronized [#]_. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try :file:`{location of unzipped CodeChat files}/CodeChat/LICENSE.html`, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
 
 Now, explore creating your own reST_ file: create a new file, then save it with an extension of ``.rst``. Based on the very helpful `reST primer <http://sphinx-doc.org/rest.html>`_, try out some syntax: create headings, include a hyperlink, add an image, use inline markup. When errors occur, they are reported in the log window and typically in-line in the resulting web page. When a page is complete, the save icon in the preview window stores the resulting HTML to disk.
 
@@ -42,29 +42,29 @@ By design, reST_ operates on one file at a time. To create a web site consisting
 
 Basic Sphinx_
 =============
-"`Sphinx <http://sphinx-doc.org/index.html>`_ is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features lacking basic restructuredText, including the ability to link together many documents (such as all the files in a program's source code).
+"`Sphinx <http://sphinx-doc.org/index.html>`_ is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features lacking basic reStructuredText_, including the ability to link together many documents (such as all the files in a program's source code).
 
-To use Sphinx with Enki_, first go to :menuselection:`Settings --> Settings --> Sphinx`. Then enable Sphinx and select :file:`{location of unzipped CodeChat files}` as the project directory. Click OK. Then, open :file:`{location of unzipped CodeChat files}/README.rst`, or switch to it if it's still open. The resulting web page will be displayed in the Preview dock.
+To use Sphinx with Enki_, first go to :menuselection:`Settings --> Settings --> Sphinx`. Then enable Sphinx and select :file:`{location of unzipped CodeChat files}` as the project directory. Click OK. Then, open :file:`{location of unzipped CodeChat files}/README.rst`. The resulting web page will be displayed in the Preview dock.
 
 In addition to providing a number of beautiful themes for rendering reST_ files, Sphinx creates a set of linked documents. To see this in action, open :file:`{location of unzipped CodeChat files}/index.rst`. This file determines the hierarchical `document structure <http://sphinx-doc.org/markup/toctree.html>`_. For example, the following markup includes headings from ``README.rst`` into ``index.rst``::
 
    .. toctree::
       :maxdepth: 2
 
-      README
+      README.rst
 
 One important note: when refering to files in subdirectories, a forward slash **MUST** be used, even on Windows. That is, use ``CodeChat/filename``, not ``CodeChat\filename``. Sphinx supports many other `markup constructs <http://sphinx-doc.org/markup/index.html>`_ as well.
 
 Creating a new project
 ----------------------
-To create a new Sphinx project, first create an empty directory to hold your project's files. In :menuselection:`Settings --> Settings --> Sphinx`, select this directory as the project directory then click OK. In :menuselection:`Settings --> Settings --> Literate programming`, **uncheck** :guilabel:`Enable CodeChat`; otherwise, Enki will create not just a Sphinx project, but a CodeChat-enabled Sphinx project. Next, create a new file and save it with the ``.rst`` extension in the empty directory you created. A dialog box will pop up, asking if you'd like some default files copied. Click yes. Open the generated ``index.rst`` file. Generate some content in this file, including at least one heading, but notice that it generates a warning in the log window. To fix this, include it in your Sphinx project: in ``index.rst`` add it to your ``toctree`` directive. Assuming the name of the file you created was ``README.rst``, the syntax is::
+To create a new Sphinx project, first create an empty directory to hold your project's files. In :menuselection:`Settings --> Settings --> Sphinx`, select this directory as the project directory then click OK. In :menuselection:`Settings --> Settings --> Literate programming`, **uncheck** :guilabel:`Enable CodeChat`; otherwise, Enki will create not just a Sphinx project, but a CodeChat-enabled Sphinx project. Next, create a new file and save it with the ``.rst`` extension in the empty directory you created. A dialog box will pop up, asking if you'd like some default files copied. Click yes. Open the generated ``index.rst`` file. Add some content to this file, including at least one heading, but notice that it generates a warning in the log window. To fix this, include it in your Sphinx project: in ``index.rst`` add it to your ``toctree`` directive. Assuming the name of the file you created was ``demo.rst``, the syntax is::
 
    .. toctree::
       :maxdepth: 2
 
-      README
+      demo.rst
 
-When you switch back to ``README.rst``, it will now be included in your project.
+When you switch back to ``demo.rst``, it will now be included in your project.
 
 .. [#] http://sphinx-doc.org/index.html
 
