@@ -16,6 +16,12 @@ This tutorial shows how the `Enki <http://enki-editor.org/>`_ text editor, integ
 .. contents:: Contents
    :local:
 
+The following playlist covers all the topics in this tutorial.
+
+.. raw:: html
+
+   <iframe width="853" height="480" src="https://www.youtube.com/embed/videoseries?list=PLOJAqFa3UI2EmpUOy7PhAJ7adRnBZkC6U" frameborder="0" allowfullscreen></iframe>
+
 This tutorial employs the following typography:
 
 * :file:`This font` for the name of a file or directory;
@@ -24,10 +30,6 @@ This tutorial employs the following typography:
 
 Basic restructuredText
 ======================
-.. raw:: html
-
-   <iframe width="853" height="480" src="https://www.youtube.com/embed/kpHFEDq24tE?rel=0" frameborder="0" allowfullscreen></iframe>
-
 CodeChat relies on `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ (`reST <http://docutils.sourceforge.net/rst.html>`_) in comments to provide human-readable markup. "ReStructuredText is an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax" [#]_. So, this tutorial begins by exploring reST_ using Enki.
 
 First, install Enki_, which hosts the CodeChat system. Next, download the `source code for CodeChat <https://bitbucket.org/bjones/documentation/get/tip.zip>`_, which also contains a :doc:`rest-primer` needed in this tutorial. Unzip this file in a directory of your choice. Now, open :file:`{location of unzipped CodeChat files}/docs/rest-primer.rst` in Enki. Move around the document, noticing that the text and web views are automatically synchronized [#]_. Click on any element of the web view to show the corresponding text view. Edit -- your changes are visible immediately. Note that the syncronization ability applies to any file Enki can preview, such as HTML files (try :file:`{location of unzipped CodeChat files}/CodeChat/LICENSE.html`, for exampe, or Enki's `README.md <https://raw.githubusercontent.com/hlamer/enki/master/README.md>`_).
@@ -42,10 +44,6 @@ By design, reST_ operates on one file at a time. To create a web site consisting
 
 Basic Sphinx_
 =============
-.. raw:: html
-
-   <iframe width="853" height="480" src="https://www.youtube.com/embed/OSjUl0sfeZQ?rel=0" frameborder="0" allowfullscreen></iframe>
-   
 "`Sphinx <http://sphinx-doc.org/index.html>`_ is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features lacking basic reStructuredText_, including the ability to link together many documents (such as all the files in a program's source code).
 
 To use Sphinx with Enki_, first go to :menuselection:`Settings --> Settings --> Sphinx`. Then enable Sphinx and select :file:`{location of unzipped CodeChat files}` as the project directory. Click OK. Then, open :file:`{location of unzipped CodeChat files}/README.rst`. The resulting web page will be displayed in the Preview dock.
