@@ -24,7 +24,7 @@ A programmer's word processor
 
 .. raw:: html
 
-   <iframe width="852" height="480" src="https://www.youtube.com/embed/ZEcWXR5maXE?list=PLOJAqFa3UI2EmpUOy7PhAJ7adRnBZkC6U" frameborder="0" allowfullscreen></iframe>
+   <iframe width="853" height="480" src="https://www.youtube.com/embed/videoseries?list=PLOJAqFa3UI2EmpUOy7PhAJ7adRnBZkC6U" frameborder="0" allowfullscreen></iframe>
 
 
 Background
