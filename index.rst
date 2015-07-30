@@ -20,10 +20,10 @@ User documentation
    :maxdepth: 2
 
    README.rst
-   tutorial/tutorial.rst
-   tutorial/rest-primer.rst
-   style_guide.cpp
-   install
+   docs/tutorial.rst
+   docs/rest-primer.rst
+   docs/style_guide.cpp
+   docs/install.rst
    CodeChat/template/index.rst
    CodeChat/template/conf.py
    CodeChat/template/CodeChat.css
@@ -34,7 +34,7 @@ Developer documentation
 .. toctree::
    :maxdepth: 2
 
-   history
+   docs/history.rst
    CodeChat/CodeToRest.py
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
