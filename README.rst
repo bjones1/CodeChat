@@ -34,7 +34,7 @@ Put simply, literate programming (LP) is the realization that a program is a doc
 
 Tutorial
 ========
-The `tutorial <https://pythonhosted.org/CodeChat/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
+The `tutorial <https://pythonhosted.org/CodeChat/docs/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
 
 
 .. _tutorial-examples:
@@ -69,4 +69,4 @@ CodeChat is free software: you can redistribute it and/or modify it under the te
 
 CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with CodeChat.  If not, see http://www.gnu.org/licenses/.
