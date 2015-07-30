@@ -77,7 +77,7 @@ Based on your familiarity with reST_, we'll now explore embedding reST_ in the c
 #. A comment must be placed on a line containing only comments or whitespace, but no code, preprocessor directives, etc.
 #. One space must follow the opening comment delimiter.
 
-The :doc:`style_guide` gives more details; also, see :doc:`CodeChat/CommentDelimiterInfo` for a full list of supported languages.
+The :doc:`style_guide` gives more details; also, see :doc:`/CodeChat/CommentDelimiterInfo` for a full list of supported languages.
 
 Now, open one of your source files. Modify your comments to add reST_ markup; add in titles, hyperlinks, and other useful markup.
 
