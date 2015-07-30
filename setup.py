@@ -49,10 +49,6 @@
 # * `setuptools <https://pythonhosted.org/setuptools>`_ - A distutils
 #   replacement which can install dependencies, so I use it.
 #
-# Questions / to do
-# =================
-# * None at this time.
-#
 # To package
 # ==========
 # Create a source distribution, a built distribution, then upload both:
@@ -82,7 +78,7 @@
 # For users who install this from source but don't have setuptools installed,
 # `auto-install it
 # <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__.
-# When packing for Linux, downloads are blocked so we must specify a very old
+# When packaging for Linux, downloads are blocked so we must specify a very old
 # already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
 # Leave this as a `patch
 # <https://build.opensuse.org/package/view_file/home:yajo:enki/python-codechat/python-codechat.offline_setuptools.patch?expand=1>`_
