@@ -149,7 +149,9 @@ setup(
     # While I like something simple, such as ``import CodeChat`` then
     # ``version=CodeChat.__version__`` here, this means any dependeninces of
     # :doc:`__init__.py <CodeChat/__init__>` will be requred to run setup,
-    # a bad thing. So, instead I read the file in ``setup.py`` and parse the version with a regex (see `version parse code <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).
+    # a bad thing. So, instead I read the file in ``setup.py`` and parse the 
+    # version with a regex (see `version parse code
+    # <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).
     version=find_version("CodeChat", "__init__.py"),
 
     description="The CodeChat system for software documentation",
@@ -164,7 +166,8 @@ setup(
 
     license='GPLv3+',
 
-    # These are taken from the `full list <https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_.
+    # These are taken from the `full list 
+    # <https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_.
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
@@ -203,6 +206,7 @@ setup(
     },
 
     # To package data files, I'm using ``include_package_data=True`` then
-    # putting the files in :doc:`MANIFEST.in <MANIFEST>`. See `including data files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
+    # putting the files in :doc:`MANIFEST.in <MANIFEST>`. See `including data 
+    # files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
     include_package_data=True,
 )
