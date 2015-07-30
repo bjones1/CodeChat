@@ -42,6 +42,10 @@ By design, reST_ operates on one file at a time. To create a web site consisting
 
 Basic Sphinx_
 =============
+.. raw:: html
+
+   <iframe width="853" height="480" src="https://www.youtube.com/embed/OSjUl0sfeZQ?rel=0" frameborder="0" allowfullscreen></iframe>
+   
 "`Sphinx <http://sphinx-doc.org/index.html>`_ is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features lacking basic reStructuredText_, including the ability to link together many documents (such as all the files in a program's source code).
 
 To use Sphinx with Enki_, first go to :menuselection:`Settings --> Settings --> Sphinx`. Then enable Sphinx and select :file:`{location of unzipped CodeChat files}` as the project directory. Click OK. Then, open :file:`{location of unzipped CodeChat files}/README.rst`. The resulting web page will be displayed in the Preview dock.
@@ -70,16 +74,16 @@ When you switch back to ``demo.rst``, it will now be included in your project.
 
 Basic CodeChat
 ==============
-Based on your familiarity with reST_, we'll now explore embedding reST_ in the comments of a program. First, enable CodeChat in Enki's :menuselection:`Settings --> Settings --> Literate Programming` dialog by checking the "Enable CodeChat" checkbox. In :menuselection:`Settings --> Settings --> Sphinx`, uncheck the :guilabel:`Enable Sphinx` checkbox. Now, open :file:`{location of unzipped CodeChat files}/setup.py`. Notice that reST_ markup, when correctly embedded in comments, render properly. Specifically, to be rendered using reST_:
+Based on your familiarity with reST_, we'll now explore embedding reST_ in the comments of a program. First, enable CodeChat in Enki's :menuselection:`Settings --> Settings --> Literate Programming` dialog by checking the "Enable CodeChat" checkbox. In :menuselection:`Settings --> Settings --> Sphinx`, uncheck the :guilabel:`Enable Sphinx` checkbox. Now, open :file:`{location of unzipped CodeChat files}/setup.py`. Notice that reST_ markup, when correctly embedded in comments, renders properly. Specifically, to be rendered using reST_:
 
 #. A comment must be placed on a line containing only comments or whitespace, but no code, preprocessor directives, etc.
-#. One space must follow the opening comment delimier.
+#. One space must follow the opening comment delimiter.
 
 The :doc:`style_guide` gives more details; also, see :doc:`CodeChat/CommentDelimiterInfo` for a full list of supported languages.
 
 Now, open one of your source files. Modify your comments to add reST_ markup; add in titles, hyperlinks, and other useful markup.
 
-While basic CodeChat usage shown here provides a quick way to begin experimenting with literate programming, it's limited in several ways. First, because it uses basic reST_, CodeChat lacks the ability to create a web of documentation over multiple source files in a project. Second, the web page produced by CodeChat must be manually saved to disk for others to view, an inefficient process when providing documentation to others. Finally, the results are rather ugly. We therefore turn to Sphinx to remedy all these problems.
+While basic CodeChat usage shown here provides a quick way to begin experimenting with literate programming, it's limited in several ways. First, because it uses basic reST_, CodeChat lacks the ability to create a web of documentation over multiple source files in a project. Second, the web page produced by CodeChat must be manually saved to disk for others to view, an inefficient process when providing documentation to others. Finally, the results are rather plain. We therefore turn to Sphinx to remedy all these problems.
 
 Basic Sphinx with CodeChat
 ==========================
