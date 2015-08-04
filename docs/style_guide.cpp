@@ -66,21 +66,24 @@
 //
 //
 // In using CodeChat with Sphinx, I've developed a set of guidelines to make my
-// code more consistent and readable. These are my recommendations. Refer to the examples in :doc:`README` to see these principles applied to actual source code.
+// code more consistent and readable. These are my recommendations. Refer to the
+// examples in :doc:`../README` to see these principles applied to actual source 
+// code.
 //
-// * Carefully organize your code using sections. Based on Sphinx recommendations
-//   for `sections <http://sphinx-doc.org/rest.html#sections>`_, use:
+// * Carefully organize your code using sections. Based on Sphinx 
+//   recommendations for `sections <http://sphinx-doc.org/rest.html#sections>`_, 
+//   use:
 //
 //   * In a TOC-containing document, use ``@`` with overline for large parts.
-//     See, for example, :doc:`index`.
+//     See, for example, :doc:`../index`.
 //   * In a TOC-containing document use ``#`` with overline, for parts. Again,
-//     see :doc:`index`
+//     see :doc:`../index`
 //   * In each source file, use a single ``*`` with overline near the top of the
 //     file, giving the name of the file and a very brief description. See the
 //     title above as an example.
 //   * In a source file, use multiple ``=`` for sections. Then, repeat for
 //     finer-grained items, as shown below. The source files in this package,
-//     such as :doc:`setup`, demonstrate this.
+//     such as :doc:`../setup`, demonstrate this.
 //   * Use ``-`` for subsections.
 //   * Use ``^`` for subsubsections.
 //   * Use ``"`` for subsubsubsections.
@@ -131,7 +134,7 @@ void foo(int i_sum) {
             /// ...Code omitted...
 //
 // * Insert a per-source file table of contents (such as the one at the
-//   beginning of :doc:`README`) to provide a quick overview of the file's
+//   beginning of :doc:`../README`) to provide a quick overview of the file's
 //   structure.
 //
 // * Avoid long lines; wrap your lines at 80 characters. Many editors aren't
