@@ -1,4 +1,4 @@
-//    Copyright (C) 2012-2015 Bryan A. Jones.
+// .. Copyright (C) 2012-2015 Bryan A. Jones.
 //
 //    This file is part of CodeChat.
 //
@@ -15,7 +15,8 @@
 //    You should have received a copy of the GNU General Public License along
 //    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 //
-// .. Tell Sphinx to use the C syntax highligher for this file, instead of the
+//
+// .. Tell Sphinx to use the C++ syntax highligher for this file, instead of the
 //    default Python highligher.
 //
 // .. highlight:: c++
@@ -67,11 +68,11 @@
 //
 // In using CodeChat with Sphinx, I've developed a set of guidelines to make my
 // code more consistent and readable. These are my recommendations. Refer to the
-// examples in :doc:`../README` to see these principles applied to actual source 
+// examples in :doc:`../README` to see these principles applied to actual source
 // code.
 //
-// * Carefully organize your code using sections. Based on Sphinx 
-//   recommendations for `sections <http://sphinx-doc.org/rest.html#sections>`_, 
+// * Carefully organize your code using sections. Based on Sphinx
+//   recommendations for `sections <http://sphinx-doc.org/rest.html#sections>`_,
 //   use:
 //
 //   * In a TOC-containing document, use ``@`` with overline for large parts.
