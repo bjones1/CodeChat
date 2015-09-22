@@ -93,7 +93,7 @@ Reference
 =========
 With a basic knowledge of this literate programming system, the following pages provide helpful reference information.
 
-* The `style guide <style_guide.py.html>`_ for literate programming. Read this first.
+* The :doc:`style guide <style_guide>` for literate programming. Read this first.
 * For basic reST_ syntax, see the `reST primer`_.
 * For additional Sphinx-specific commands, refer to `markup constructs`_.
 
