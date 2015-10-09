@@ -376,15 +376,19 @@ def _group_for_tokentype(
     # Consider either as whitespace.
     if tokentype in Token.Text or tokentype in Token.Whitespace:
         return _GROUP.whitespace
-    # There is a Token.Comment, but this can refer to inline or block comments,
-    # or even other things (preprocessors statements). Therefore, restrict
-    # classification as follows.
+    # There is a Token.Comment, but this can refer to inline or block comments.
+    # Therefore, use info from CommentDelimiterInfo as a tiebreaker.
     if (tokentype == Token.Comment.Single or
       (tokentype == Token.Comment and comment_is_inline) ):
         return _GROUP.inline_comment
     if (tokentype == Token.Comment.Multiline or
       (tokentype == Token.Comment and comment_is_block) ):
         return _GROUP.block_comment
+    # If the tiebreaker above doesn't classify a Token.Comment, then assume it
+    # to be an inline comment. This occurs in the Matlab lexer using Pygments
+    # 2.0.2.
+    if tokentype == Token.Comment:
+        return _GROUP.inline_comment
     return _GROUP.other
 #
 #
@@ -494,15 +498,15 @@ def _gather_groups_on_newlines(
 #              string
 #          */
 #
-#    In the code above, the text of the comment begins at column 6 of line 5,
-#    with the letter A. Therefore, line 6 lacks the necessary 6-space indent,
+#    In the code above, the text of the comment begins at column 6 of line 4,
+#    with the letter A. Therefore, line 7 lacks the necessary 6-space indent,
 #    so that no indententation will be removed from this comment.
 #
 #    If line 6 was indented properly, the resulting reST would be:
 #
 #    .. code-block:: rest
 #
-#       ``...rest to indent the left margin of the following text 2 spaces...``
+#       ...rest to indent the left margin of the following text 2 spaces...
 #
 #       A multi-
 #
@@ -510,13 +514,13 @@ def _gather_groups_on_newlines(
 #       RIGHT INDENTATION
 #         string
 #
-#       ``...rest to end left margin indent...``
+#       ...rest to end the left margin indent...
 #
 #    Note that the first 5 characters were stripped off each line, leaving only
 #    line 8 indented (preserving its indentation relative to the comment's
 #    indentation). Some special cases in doing this processing:
 #
-#    * Line 5 may contain less than the expected 5 space indent; it could be
+#    * Line 5 may contain less than the expected 5 space indent: it could be
 #      only a newline. This must be supported with a special case.
 #    * The comment closing (line 9) contains just 3 spaces; this is allowed.
 #      If there are non-space characters before the closing comment delimiter,
@@ -527,21 +531,24 @@ def _gather_groups_on_newlines(
 #         /* A multi-
 #            line comment */
 #
-#      has consistent indentation, but neither
+#      and
+#
+#      .. code-block:: c
+#
+#         /* A multi-
+#            line comment
+#         */
+#
+#      have consistent indentation. In particular, the last line of a multi-line
+#      comment may contain zero or more whitespace chararacters followed by the
+#      closing block comment delimiter. However,
 #
 #      .. code-block:: c
 #
 #         /* A multi-
 #           line comment */
 #
-#      nor
-#
-#         .. code-block:: c
-#
-#            /* A multi-line comment
-#            */
-#
-#      are sufficiently indented to qualify for indentation removal.
+#      is not sufficiently indented to qualify for indentation removal.
 #
 #      So, to recognize:
 #
@@ -559,21 +566,24 @@ def _is_space_indented_line(
   # See comment_delim_info_.
   comment_delim_info):
 
-     # A line containing only whitespace is always considered valid.
-     if line.isspace():
-         return True
-     # A line beginning with ws_len spaces has the expected indent.
-     if ( (len(line) > indent_len and line[:indent_len].isspace()) or
-     # Last line possibility: indent_len - 2 spaces followed by the delimiter
-     # is a valid indent. For example, an indent of 3 begins with ``/* comment``
-     # and can end with ``_*/``, a total of (indent_len == 3) - (2 spaces
-     # that are usually a * followed by a space) + (closing delim ``*/`` length
-     # of 2 chars) == 3.
-         (is_last and len(line) == indent_len - 2 +
-          comment_delim_info[2] and line[:indent_len - 2].isspace()) ):
-         return True
-     # No other correctly indented cases.
-     return False
+    # A line containing only whitespace is always considered valid.
+    if line.isspace():
+        return True
+    # A line beginning with ws_len spaces has the expected indent.
+    if len(line) > indent_len and line[:indent_len].isspace():
+        return True
+
+    # The closing delimiter will always be followed by a newline, hence the - 1
+    # factor.
+    line_except_closing_delim = line[:-comment_delim_info[2] - 1]
+    # Last line: zero or more whitespaces followed by the closing block comment
+    # delimiter is valid. Since ``''.isspace() == False``, check for this case
+    # and consider it true.
+    if (is_last and (not line_except_closing_delim or
+                     line_except_closing_delim.isspace())):
+        return True
+    # No other correctly indented cases.
+    return False
 #
 #
 # (continuing from the list above...)
@@ -599,7 +609,7 @@ def _is_space_indented_line(
 #
 #    .. code-block:: rest
 #
-#       ``...rest to indent the left margin of the following text 2 spaces...``
+#       ...rest to indent the left margin of the following text 2 spaces...
 #
 #       Multi-
 #         line
@@ -607,7 +617,7 @@ def _is_space_indented_line(
 #       RIGHT INDENTATION
 #       RIGHT INDENTATION
 #
-#       ``...rest to end left margin indent...``
+#       ...rest to end left margin indent...
 #
 #    So, to recognize:
 #
@@ -626,7 +636,7 @@ def _is_delim_indented_line(
   comment_delim_info):
 
      # A line the correct number of spaces, followed by a delimiter then either
-     # a space or a newlines is correctly indented.
+     # a space or a newline is correctly indented.
      if (len(line) >= indent_len and line[:indent_len - 2].isspace() and
          line[indent_len - 2] == delim and line[indent_len - 1] in '\n '):
          return True
@@ -666,7 +676,7 @@ def _classify_groups(
 
     # Walk through groups.
     for l in iter_gathered_groups:
-        _debug_print(u'list[(group, ws_len, string), ... = {}\n'.format(l))
+        _debug_print(u'[(group, ws_len, string), ...] = {}\n'.format(l))
 
         if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
 

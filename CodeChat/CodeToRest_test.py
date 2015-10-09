@@ -186,8 +186,14 @@ class TestCodeToRest(object):
 # -------------------------------------------------
     # Removeal of leading whitespace in block comments.
     def test_19_1_1(self):
-        self.mt('/* multi-\n   line\n   comment\n */\n', 'multi-\nline\n' +
-                'comment\n \n')
+        self.mt('/* multi-\n'
+                '   line\n'
+                '   comment\n'
+                ' */\n',
+                'multi-\n'
+                'line\n'
+                'comment\n'
+                ' \n')
 
     # Inconsistent whitespace -- no removal.
     def test_19_1_2(self):
@@ -300,6 +306,25 @@ class TestCodeToRest(object):
                 ' echo Hello\n' +
                 ef +
                 'Comment\n', ['Batch'])
+
+    # MATLAB.
+    def test_29(self):
+        self.mt('a = [1 2 3 4];\n'
+                '% Hello\n'
+                '  %{\n'
+                '     to the\n'
+                '     world\n'
+                '  %}\n',
+                bf +
+                ' a = [1 2 3 4];\n' +
+                ef +
+                'Hello\n' +
+                div(1.0) +
+                '\n'
+                'to the\n'
+                'world\n'
+                '  \n' +
+                div_end, ['Matlab'])
 
 # Fenced code block testing
 # =========================
@@ -532,7 +557,7 @@ main(){
     # Tests of block comment end indentation using spaces.
     def test_4_2(self):
         assert _is_space_indented_line('*/',
-                                       3, '*', True, (2, 2, 2)) == False
+                                       3, '*', True, (2, 2, 2)) == True
         assert _is_space_indented_line(' */',
                                        3, '*', True, (2, 2, 2)) == True
 
