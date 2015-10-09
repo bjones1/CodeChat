@@ -646,6 +646,13 @@ def _is_delim_indented_line(
 # -------------------------
 # Classify the output of ``gather_groups_on_newlines`` into either a code or
 # comment with n leading whitespace types. Remove all comment characters.
+#
+# .. Note::
+#
+#    This is a destructive edit, instead of a classification. To make this invertible, it needs to be non-destructive. The idea:
+#
+#    * Output s, the entire line as a string, if it's not a reST comment. Currently, it outputs -1, s.
+#    * Output whitespace characters or '', opening comment delimiter and space, comment text, closing comment delimiter or '', newline). Currently, it outputs len(leading whitespace characters), comment text + newline.
 def _classify_groups(
   # An iterable of [(group1, string1_no_newline), (group2, string2_no_newline),
   # ..., (groupN, stringN_ending_newline)], produced by
