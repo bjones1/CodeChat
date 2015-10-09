@@ -181,6 +181,17 @@ class TestCodeToRest(object):
     # Block comments.
     def test_19_1(self):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
+
+    # Comments with headings.
+    def test_19_a(self):
+        self.mt('  // Heading\n'
+                '  // =======\n'
+                '  // Body.\n',
+                div(1.0) +
+                'Heading\n'
+                '=======\n'
+                'Body.\n' +
+                div_end)
     #
     # Block comment indent removal: indents with spaces
     # -------------------------------------------------
@@ -339,7 +350,7 @@ class TestRestToHtml(object):
         bodyMo = re.search('<body>\n(.*)</body>', html, re.DOTALL)
         body = bodyMo.group(1)
         # docutils wraps the resulting HTML in a <div>. Strip that out as well.
-        divMo = re.search('<div class="document">\n\n\n(.*)\n</div>', body,
+        divMo = re.search('<div class="document"[^>]*>\n+(.*)\n</div>', body,
                           re.DOTALL)
         div = divMo.group(1)
         return div
@@ -410,6 +421,20 @@ class TestRestToHtml(object):
                        ' Second fence\n') ==
                 '<pre class="code python literal-block">\n'
                 '<span class="name">testing</span>\n \n</pre>')
+
+    # Test translation of indented headings. Note that the enclosing <div>,
+    # which surrounds the heading in reST, is moved to only surround the body in
+    # the resulting HTML.
+    def test_12(self):
+        assert (self.t(div(1.0) +
+                       'Heading\n'
+                       '=======\n'
+                       'Body.\n' +
+                       div_end) ==
+                       '<h1 class="title">Heading</h1>\n'
+                       '\n'
+                       '<div style="margin-left:1.0em;"><p>Body.</p>\n'
+                       '</div><!--  -->')
 #
 # Poor coverage of code_to_html_file
 # ==================================
