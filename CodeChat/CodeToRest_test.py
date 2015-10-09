@@ -181,7 +181,7 @@ class TestCodeToRest(object):
     # Block comments.
     def test_19_1(self):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
-
+    #
     # Block comment indent removal: indents with spaces
     # -------------------------------------------------
     # Removeal of leading whitespace in block comments.
@@ -208,7 +208,7 @@ class TestCodeToRest(object):
     def test_19_1_4(self):
         self.mt(' /* multi-\n    line\n    comment\n  */\n',
                 div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
-
+    #
     # Block comment indent removal: indents with delimiters
     # -----------------------------------------------------
     # Removal of leading whitespace in block comments.
@@ -229,7 +229,7 @@ class TestCodeToRest(object):
     def test_19_1_8(self):
         self.mt(' /* multi-\n  * line\n  * comment\n  */\n',
                 div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
-
+    #
     # Other block comment testing
     # ---------------------------
     def test_19_2(self):
@@ -245,7 +245,7 @@ class TestCodeToRest(object):
     def test_19_5(self):
         self.mt('/* multi-\nline\ncomment */ //inline\n',
                 'multi-\nline\ncomment  inline\n')
-
+    #
     # Other languages
     # ---------------
     # A bit of Python testing.
@@ -325,7 +325,7 @@ class TestCodeToRest(object):
                 'world\n'
                 '  \n' +
                 div_end, ['Matlab'])
-
+#
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
@@ -366,7 +366,7 @@ class TestRestToHtml(object):
     def test_5(self):
         assert ('Content block expected for the '
         in self.t('.. fenced-code::\n\n First fence\n Second fence\n') )
-
+    #
     # Check newline preservation **without** syntax highlighting
     # ----------------------------------------------------------
     # Check output of a one-line code block surrounded by fences.
@@ -386,7 +386,7 @@ class TestRestToHtml(object):
         assert (self.t('.. fenced-code::\n\n First fence\n testing\n\n'
                        ' Second fence\n') ==
                 '<pre class="code literal-block">\ntesting\n \n</pre>')
-
+    #
     # Check newline preservation **with** syntax highlighting
     # -------------------------------------------------------
     # Check output of a one-line syntax-highlighted code block surrounded by
@@ -410,13 +410,13 @@ class TestRestToHtml(object):
                        ' Second fence\n') ==
                 '<pre class="code python literal-block">\n'
                 '<span class="name">testing</span>\n \n</pre>')
-
+#
 # Poor coverage of code_to_html_file
 # ==================================
 class TestCodeToHtmlFile(object):
     def test_1(self):
         code_to_html_file('CodeToRestSphinx.py')
-
+#
 # Tests of lexer_to_code and subroutines
 # ======================================
 c_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name]
@@ -495,7 +495,7 @@ main(){
            (_GROUP.inline_comment, 0, u'// Empty.\n')],
           [(_GROUP.other, 0, u'}'), (_GROUP.whitespace, 0, u'\n')] ]
         assert gathered_group == expected_group
-
+    #
     # remove_comment_chars tests
     # --------------------------
     def test_4a(self):
@@ -542,7 +542,7 @@ main(){
     def test_4k(self):
         assert _remove_comment_delim(_GROUP.block_comment_end,
           u'*/', c_lexer) == u''
-
+    #
     # _is_space_indented_line tests
     # -----------------------------
     # Tests of block comment body indentation using spaces.
@@ -578,9 +578,9 @@ main(){
                                        3, '*', True, (2, 2, 2)) == False
         assert _is_delim_indented_line(' */',
                                        3, '*', True, (2, 2, 2)) == True
-
-# _is_rest_comment tests
-# ----------------------
+    #
+    # _is_rest_comment tests
+    # ----------------------
     # newline only
     def test_4aa1(self):
         assert not _is_rest_comment([
@@ -716,7 +716,7 @@ main(){
         assert _is_rest_comment([
           (_GROUP.inline_comment, 0, u'#'),
           (_GROUP.whitespace, 0, u'\n')], True, py_lexer)
-
+    #
     # Classifier tests
     # ----------------
     # Test comment.
@@ -775,7 +775,7 @@ main(){
                                     (-1, u'main(){\n'),
                                     ( 2,   u'Empty.\n'),
                                     (-1, u'}\n')]
-
+    #
     # reST generation tests
     # ---------------------
     def test_11(self):
