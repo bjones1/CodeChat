@@ -78,8 +78,8 @@ div_end = (u'\n' +
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
 class TestCodeToRest(object):
-# C-like language tests
-# =====================
+    # C-like language tests
+    # =====================
     # multi-test: Check that the given code's output is correct over several
     # C-like languages.
     def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++',
@@ -182,8 +182,8 @@ class TestCodeToRest(object):
     def test_19_1(self):
         self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
 
-# Block comment indent removal: indents with spaces
-# -------------------------------------------------
+    # Block comment indent removal: indents with spaces
+    # -------------------------------------------------
     # Removeal of leading whitespace in block comments.
     def test_19_1_1(self):
         self.mt('/* multi-\n'
@@ -209,8 +209,8 @@ class TestCodeToRest(object):
         self.mt(' /* multi-\n    line\n    comment\n  */\n',
                 div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
 
-# Block comment indent removal: indents with delimiters
-# -----------------------------------------------------
+    # Block comment indent removal: indents with delimiters
+    # -----------------------------------------------------
     # Removal of leading whitespace in block comments.
     def test_19_1_5(self):
         self.mt('/* multi-\n * line\n * comment\n */\n', 'multi-\nline\n' +
@@ -230,8 +230,8 @@ class TestCodeToRest(object):
         self.mt(' /* multi-\n  * line\n  * comment\n  */\n',
                 div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
 
-# Other block comment testing
-# ---------------------------
+    # Other block comment testing
+    # ---------------------------
     def test_19_2(self):
         self.mt('/*multi-\nline\ncomment */\n', bf +
                 ' /*multi-\n line\n comment */\n' + ef)
@@ -246,8 +246,8 @@ class TestCodeToRest(object):
         self.mt('/* multi-\nline\ncomment */ //inline\n',
                 'multi-\nline\ncomment  inline\n')
 
-# Other languages
-# ---------------
+    # Other languages
+    # ---------------
     # A bit of Python testing.
     def test_20(self):
         self.mt('# testing\n#\n# Trying\n', 'testing\n\nTrying\n',
@@ -367,8 +367,8 @@ class TestRestToHtml(object):
         assert ('Content block expected for the '
         in self.t('.. fenced-code::\n\n First fence\n Second fence\n') )
 
-# Check newline preservation **without** syntax highlighting
-# ----------------------------------------------------------
+    # Check newline preservation **without** syntax highlighting
+    # ----------------------------------------------------------
     # Check output of a one-line code block surrounded by fences.
     def test_6(self):
         assert (self.t('.. fenced-code::\n\n First fence\n testing\n'
@@ -387,8 +387,8 @@ class TestRestToHtml(object):
                        ' Second fence\n') ==
                 '<pre class="code literal-block">\ntesting\n \n</pre>')
 
-# Check newline preservation **with** syntax highlighting
-# -------------------------------------------------------
+    # Check newline preservation **with** syntax highlighting
+    # -------------------------------------------------------
     # Check output of a one-line syntax-highlighted code block surrounded by
     # fences.
     def test_9(self):
@@ -496,8 +496,8 @@ main(){
           [(_GROUP.other, 0, u'}'), (_GROUP.whitespace, 0, u'\n')] ]
         assert gathered_group == expected_group
 
-# remove_comment_chars tests
-# --------------------------
+    # remove_comment_chars tests
+    # --------------------------
     def test_4a(self):
         assert _remove_comment_delim(_GROUP.whitespace,
           u'    ', c_lexer) == u'    '
@@ -543,8 +543,8 @@ main(){
         assert _remove_comment_delim(_GROUP.block_comment_end,
           u'*/', c_lexer) == u''
 
-# _is_space_indented_line tests
-# -----------------------------
+    # _is_space_indented_line tests
+    # -----------------------------
     # Tests of block comment body indentation using spaces.
     def test_4_1(self):
         assert _is_space_indented_line('comment\n',
@@ -717,8 +717,8 @@ main(){
           (_GROUP.inline_comment, 0, u'#'),
           (_GROUP.whitespace, 0, u'\n')], True, py_lexer)
 
-# Classifier tests
-# ----------------
+    # Classifier tests
+    # ----------------
     # Test comment.
     def test_5(self):
         cg = list( _classify_groups([[
@@ -776,8 +776,8 @@ main(){
                                     ( 2,   u'Empty.\n'),
                                     (-1, u'}\n')]
 
-# reST generation tests
-# ---------------------
+    # reST generation tests
+    # ---------------------
     def test_11(self):
         out_stringio = StringIO()
         generated_rest = _generate_rest(
