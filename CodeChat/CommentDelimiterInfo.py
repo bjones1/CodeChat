@@ -82,6 +82,8 @@ COMMENT_DELIMITER_INFO = {
   # as a comment.
   ##                REM
   'Batchfile':      ( 3,   None,         None),
+  ##                  %,     %{,            %}
+  'Matlab':         ( 1,      2,            2),
 
   # These languages have failing unit tests
   # ---------------------------------------
@@ -120,8 +122,6 @@ COMMENT_DELIMITER_INFO = {
   'Delphi':         ( 2,      1,            1),
   ##                 //,     (*,            *)
   'AppleScript':    ( 2,      2,            2),
-  ##                  %,     %{,            %}
-  'Matlab':         ( 1,      2,            2),
   ##                  ;,     #|,            |#
   'Common Lisp':    ( 1,      2,            2),
   # ``--[=[`` ~ ``]=]`` not supported.
