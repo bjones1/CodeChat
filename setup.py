@@ -27,7 +27,7 @@
 # Packaging on Python is a mess, IMHO. It takes an easy job and makes it hard.
 #
 # A quick summary: distutils_ can't
-# install dependencies from PyPi_, so use setuptools_. A source distribution is
+# install dependencies from PyPI_, so use setuptools_. A source distribution is
 # a good idea becaues it can run on a bare Python installation with no other
 # installs required, but there's no standard format (.zip?, .tar.gz?, etc.). An
 # .egg is nice, but requires setuptools/pip/ez_setup installed. The .whl
@@ -43,7 +43,7 @@
 #
 # * `distutils <http://docs.python.org/distutils/index.html>`_ - The built-in
 #   installer. Tells what to do, but not what actually happens. It doesn't have
-#   the ability to install dependencies from `PyPi <http://pypi.python.org>`_,
+#   the ability to install dependencies from `PyPI <http://pypi.python.org>`_,
 #   which I need.
 #
 # * `setuptools <https://pythonhosted.org/setuptools>`_ - A distutils
@@ -51,7 +51,8 @@
 #
 # To package
 # ==========
-# Create a source distribution, a built distribution, then upload both:
+# Create a source distribution, a built distribution, then upload both to
+# `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_:
 #
 #   ``python setup.py sdist bdist_wheel upload``
 #
@@ -145,7 +146,7 @@ setup(
     # While I like something simple, such as ``import CodeChat`` then
     # ``version=CodeChat.__version__`` here, this means any dependeninces of
     # :doc:`__init__.py <CodeChat/__init__>` will be requred to run setup,
-    # a bad thing. So, instead I read the file in ``setup.py`` and parse the 
+    # a bad thing. So, instead I read the file in ``setup.py`` and parse the
     # version with a regex (see `version parse code
     # <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).
     version=find_version("CodeChat", "__init__.py"),
@@ -162,7 +163,7 @@ setup(
 
     license='GPLv3+',
 
-    # These are taken from the `full list 
+    # These are taken from the `full list
     # <https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_.
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -202,7 +203,7 @@ setup(
     },
 
     # To package data files, I'm using ``include_package_data=True`` then
-    # putting the files in :doc:`MANIFEST.in <MANIFEST>`. See `including data 
+    # putting the files in :doc:`MANIFEST.in <MANIFEST>`. See `including data
     # files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
     include_package_data=True,
 )

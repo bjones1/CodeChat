@@ -26,4 +26,4 @@
 # Give the version number, which is read by :doc:`../setup` during packaging.
 # This is chosen following the `version convention
 # <http://packaging.python.org/en/latest/tutorial.html#version>`_.
-__version__ = '1.0.0'
+__version__ = '1.0.1'

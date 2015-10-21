@@ -15,6 +15,11 @@ History of recent changes
 
    - None yet.
 
+- 1.0.1, 21-Aug-2015:
+
+   - Support MATLAB (``.m``) files.
+   - Provide a tutorial in the docs.
+
 - 1.0.0, 20-Jul-2015:
 
    - Update ``setup.py`` based on modern usage.
