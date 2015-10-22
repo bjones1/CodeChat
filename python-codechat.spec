@@ -1,13 +1,29 @@
+# .. Copyright (C) 2012-2015 Bryan A. Jones.
+#
+#    This file is part of CodeChat.
+#
+#    CodeChat is free software: you can redistribute it and/or modify it under
+#    the terms of the GNU General Public License as published by the Free
+#    Software Foundation, either version 3 of the License, or (at your option)
+#    any later version.
+#
+#    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
+#    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#    details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ************************************************************
+# python-codechat.spec - openSUSE Build Service packaging file
+# ************************************************************
+# This was created by Yajo.
+#
 # Build instructions are in setup.py
-
-# Until https://bitbucket.org/bjones/documentation/issue/29/use-tags
-# gets fixed, we can get the version number from CodeChat/__init__.py
-
-%global checkout 79a4c43cb856
-
 Name:           python-codechat
-Version:        0.0.16
-Release:        0.1.20150206hg%{checkout}%{?dist}
+Version:        1.0.1
+Release:        %{version}%{?dist}
 Summary:        A programmer's word processor
 Group:          Development/Libraries
 BuildArch:      noarch
@@ -15,13 +31,18 @@ BuildArch:      noarch
 License:        GPLv3+
 URL:            https://bitbucket.org/bjones/documentation/
 
-Source0:        https://bitbucket.org/bjones/documentation/get/%{checkout}.zip#/bjones-documentation-%{checkout}.zip
+# Bitbucket insists on downloading an archive named only by the version number.
+# Even trying a URL like https://bitbucket.org/bjones/documentation/get/v1.0.1.zip#/bjones-documentation-v1.0.1.zip
+# actually downloads a file named ``bjones-documentation-fd000fac3273.zip``.
+# So, just deal with an archive name of ``%{version}.zip``.
+Source0:        https://bitbucket.org/bjones/documentation/get/v%{version}.zip
 Patch0:         %{name}.offline_setuptools.patch
 
 BuildRequires:  python2-devel >= 2.7
 BuildRequires:  python-docutils >= 0.12
 BuildRequires:  python-setuptools
 Requires:       python-docutils >= 0.12
+Requires:       python-pygments >= 2.0
 
 
 %description
@@ -35,7 +56,7 @@ diagrams, and much more.
 
 
 %prep
-%setup0 -n bjones-documentation-%{checkout}
+%setup0 -n v%{version}
 %patch0
 
 %build
