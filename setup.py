@@ -155,7 +155,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://bitbucket.org/bjones/documentation/overview',
+    url='https://pythonhosted.org/CodeChat/README.html',
 
     # Obscure my e-mail address to help defeat spam-bots.
     author="Bryan A. Jones",
@@ -166,7 +166,7 @@ setup(
     # These are taken from the `full list
     # <https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_.
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
