@@ -56,7 +56,7 @@ Some examples of literate programming using CodeChat:
 
 Contributing
 ============
-This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <http://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, contribute to the code at the CodeChat_ homepage!
+This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <https://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, contribute to the `code <https://bitbucket.org/bjones/documentation>`_!
 
 
 License
