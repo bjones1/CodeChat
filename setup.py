@@ -70,7 +70,7 @@
 #
 # Yajo has `packaged this for Linux
 # <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
-# Thanks so much.
+# Thanks so much. See also :doc:`python-codechat`.
 #
 # Packaging script
 # ================
