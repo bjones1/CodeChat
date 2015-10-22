@@ -65,6 +65,7 @@ Packaging
 
    setup.py
    MANIFEST.in
+   python-codechat.spec
 
 ################
 Index and search

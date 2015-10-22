@@ -125,7 +125,7 @@ source_suffix = '.rst'
 # **CodeChat note:** Add the suffix of all CodeToRest-supported source files so
 # that Sphinx can process these as well. Also, add ``.in`` files so
 # ``MANIFEST.in`` will be recognized (see below).
-source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in']
+source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in', '.spec']
 
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
@@ -136,8 +136,10 @@ CodeChat_lexer_for_glob = {
     # causing it to display incorrectly. Define it as CSS only, both in the
     # root path and in the template subdirectory.
     '*CodeChat.css': 'CSS',
-    # The MANIFEST.in file uses # as a comment. So does Python. Ugly, no?
+    # The ``MANIFEST.in`` and ``python-codechat.spec`` files use # as a comment.
+    # So does Python. Ugly, no?
     'MANIFEST.in'  : 'python',
+    'python-codechat.spec' : 'python',
     }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
