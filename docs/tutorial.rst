@@ -77,7 +77,7 @@ Based on your familiarity with reST_, we'll now explore embedding reST_ in the c
 #. A comment must be placed on a line containing only comments or whitespace, but no code, preprocessor directives, etc.
 #. One space must follow the opening comment delimiter.
 
-The :doc:`style_guide` gives more details; also, see :doc:`/CodeChat/CommentDelimiterInfo` for a full list of supported languages.
+The :doc:`style_guide.cpp` gives more details; also, see :doc:`/CodeChat/CommentDelimiterInfo.py` for a full list of supported languages.
 
 Now, open one of your source files. Modify your comments to add reST_ markup; add in titles, hyperlinks, and other useful markup.
 
@@ -93,7 +93,7 @@ Reference
 =========
 With a basic knowledge of this literate programming system, the following pages provide helpful reference information.
 
-* The :doc:`style guide <style_guide>` for literate programming. Read this first.
+* The :doc:`style guide <style_guide.cpp>` for literate programming. Read this first.
 * For basic reST_ syntax, see the `reST primer`_.
 * For additional Sphinx-specific commands, refer to `markup constructs`_.
 

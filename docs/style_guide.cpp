@@ -84,7 +84,7 @@
 //     title above as an example.
 //   * In a source file, use multiple ``=`` for sections. Then, repeat for
 //     finer-grained items, as shown below. The source files in this package,
-//     such as :doc:`../setup`, demonstrate this.
+//     such as :doc:`../setup.py`, demonstrate this.
 //   * Use ``-`` for subsections.
 //   * Use ``^`` for subsubsections.
 //   * Use ``"`` for subsubsubsections.

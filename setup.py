@@ -70,7 +70,7 @@
 #
 # Yajo has `packaged this for Linux
 # <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
-# Thanks so much. See also :doc:`python-codechat`.
+# Thanks so much. See also :doc:`python-codechat.spec`.
 #
 # Packaging script
 # ================
@@ -145,7 +145,7 @@ setup(
     # <https://packaging.python.org/en/latest/single_source_version.html>`_.
     # While I like something simple, such as ``import CodeChat`` then
     # ``version=CodeChat.__version__`` here, this means any dependeninces of
-    # :doc:`__init__.py <CodeChat/__init__>` will be requred to run setup,
+    # :doc:`__init__.py <CodeChat/__init__.py>` will be requred to run setup,
     # a bad thing. So, instead I read the file in ``setup.py`` and parse the
     # version with a regex (see `version parse code
     # <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).
@@ -187,9 +187,9 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     #
     # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
-    # <CodeChat/CodeToRest>` can be executed from the command line if the
+    # <CodeChat/CodeToRest.py>` can be executed from the command line if the
     # packages below are installed, :doc:`CodeToRestSphinx.py
-    # <CodeChat/CodeToRestSphinx>` can only be executed by Sphinx.
+    # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
     install_requires=['docutils>=0.12',
                       'pygments>=2.0'],
 
@@ -203,7 +203,7 @@ setup(
     },
 
     # To package data files, I'm using ``include_package_data=True`` then
-    # putting the files in :doc:`MANIFEST.in <MANIFEST>`. See `including data
+    # putting the files in :doc:`MANIFEST.in <MANIFEST.in>`. See `including data
     # files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
     include_package_data=True,
 )
