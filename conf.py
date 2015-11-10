@@ -134,8 +134,8 @@ CodeChat_lexer_for_glob = {
     '*CodeChat.css': 'CSS',
     # The ``MANIFEST.in`` and ``python-codechat.spec`` files use # as a comment.
     # So does Python. Ugly, no?
-    'MANIFEST.in'  : 'python',
-    'python-codechat.spec' : 'python',
+    'MANIFEST.in'  : 'Python',
+    'python-codechat.spec' : 'Python',
     }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
