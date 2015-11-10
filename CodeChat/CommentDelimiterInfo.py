@@ -172,5 +172,6 @@ SUPPORTED_GLOBS = set()
 for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
     # Pick only filenames we have comment info for.
     if longname in COMMENT_DELIMITER_INFO:
-        SUPPORTED_GLOBS = SUPPORTED_GLOBS.union(filename_patterns)
-
+        # Apply normcase to each glob, so it will match on this OS.
+        for fnp in filename_patterns:
+            SUPPORTED_GLOBS = SUPPORTED_GLOBS.union([os.path.normcase(fnp)])

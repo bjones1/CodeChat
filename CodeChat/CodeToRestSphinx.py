@@ -42,7 +42,7 @@
 import os.path
 from os import path
 # For glob_to_lexer matching.
-import re, fnmatch
+import fnmatch
 # For saving Enki info.
 import codecs
 #
@@ -74,8 +74,7 @@ def _source_read(app, docname, source):
         # See if it's an extension we should process.
         try:
             lexer = _lexer_for_filename(app, docname, source[0])
-            app.info('Converting {} using the {} lexer.'.format(docname,
-                                                                lexer.name))
+            app.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
         except (KeyError, pygments.util.ClassNotFound):
             # We Don't support this language.
@@ -97,12 +96,7 @@ def _lexer_for_filename(
     source_file = os.path.normpath(os.path.normcase(source_file))
     # See if ``source_file`` matches any of the globs.
     for glob, lexer_alias in app.config.CodeChat_lexer_for_glob.iteritems():
-        # On Windows, a glob with captial letters won't match, since
-        # os.path.normcase has been applied to source_file, making it lowercase.
-        # (Note that fnmatch and glob both do Unix-style matching, which is case
-        # sensitive). To work around this, run the glob through os.path.normpath
-        # before matching with it.
-        if re.match(fnmatch.translate(os.path.normcase(glob)), source_file):
+        if fnmatch.fnmatch(source_file, glob):
             # On a match, pass the specified lexer alias.
             return get_lexer(alias=lexer_alias)
     # If none of the globs match, fall back to choosing a lexer based only on
