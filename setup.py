@@ -169,7 +169,7 @@ setup(
     # These are taken from the `full list
     # <https://pypi.python.org/pypi?%3Aaction=list_classifiers>`_.
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
