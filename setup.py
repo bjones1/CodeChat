@@ -108,9 +108,12 @@ import io
 
 here = path.abspath(path.dirname(__file__))
 
-# Get the long description from the relevant file
+# Get the long description from the relevant file.
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
+    # The inclusion of a raw tag causes PyPI_ to not render the reST. Ouch.
+    # Remove it before uploading.
+    long_description = re.sub('\.\. raw.*<\/iframe>', '', long_description, flags=re.DOTALL)
 
 # This code was copied from `version parse code`_. See ``version`` in the call
 # to ``setup`` below.
