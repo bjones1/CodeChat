@@ -56,7 +56,7 @@ import pygments.util
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, get_lexer
-from .CommentDelimiterInfo import SUPPORTED_EXTENSIONS
+from .CommentDelimiterInfo import SUPPORTED_GLOBS
 from . import __version__
 #
 # source-read event
@@ -130,8 +130,8 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
     # The following line was added. While SUPPORTED_EXTENSIONS gives a list of
     # extensions, the CodeChat_lexer_for_glob is a glob, so it doesn't need a
     # prepended ``*``.
-    source_suffixpatterns = ( ['*' + s for s in SUPPORTED_EXTENSIONS] +
-                             _config.CodeChat_lexer_for_glob.keys() )
+    source_suffixpatterns = ( SUPPORTED_GLOBS |
+                             set(_config.CodeChat_lexer_for_glob.keys()) )
     for filename in get_matching_files(dirname, exclude_matchers):
         for suffixpattern in suffixpatterns:
             if fnmatch.fnmatch(filename, suffixpattern):

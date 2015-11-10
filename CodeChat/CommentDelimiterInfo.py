@@ -163,30 +163,14 @@ COMMENT_DELIMITER_INFO = {
 
 # Supported extensions
 # ====================
-# Compute a list of supported filename extensions: supported by the lexer and
+# Compute a list of supported filename globs: supported by the lexer and
 # by CodeChat (inline / block comment info in COMMENT_DELIMITER_INFO).
-SUPPORTED_EXTENSIONS = set()
+SUPPORTED_GLOBS = set()
 # Per `get_all_lexers
 # <http://pygments.org/docs/api/#pygments.lexers.get_all_lexers>`_, we get a
 # tuple. Pick out only the filename and examine it.
 for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
     # Pick only filenames we have comment info for.
     if longname in COMMENT_DELIMITER_INFO:
-        for fnp in filename_patterns:
-            # Take just the extension, which is what Sphinx expects.
-            ext = os.path.splitext(fnp)[1]
-            # Wrap ext in a list so set won't treat it each character in the
-            # string as a separate element.
-            SUPPORTED_EXTENSIONS = SUPPORTED_EXTENSIONS.union([ext])
-
-# Now, do some fixup on this list:
-#
-# * ``Makefile.*`` turns into ``.*`` as an extension. Remove this.
-#   Likewise, ``Sconscript`` turns into an empty string, which confuses
-#   Sphinx. Remove this also.
-SUPPORTED_EXTENSIONS -= set(['.*', ''])
-# * Expand ``.php[345]``.
-SUPPORTED_EXTENSIONS -= set(['.php[345]'])
-SUPPORTED_EXTENSIONS |= set(['.php', '.php3', '.php4', '.php5'])
-
+        SUPPORTED_GLOBS = SUPPORTED_GLOBS.union(filename_patterns)
 
