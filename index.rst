@@ -47,6 +47,7 @@ Testing
    :maxdepth: 2
 
    CodeChat/CodeToRest_test.py
+   CodeChat/pytest.ini
 
 ************************
 Documentation generation

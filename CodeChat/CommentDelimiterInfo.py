@@ -157,6 +157,8 @@ COMMENT_DELIMITER_INFO = {
   # ``*>`` as inline comment not supported.
   ##                  * or /
   'COBOL':          ( 1,   None,         None),
+  ##                  ;
+  'INI':            ( 1,   None,         None),
   }
 
 # Supported extensions
