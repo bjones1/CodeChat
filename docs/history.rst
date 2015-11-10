@@ -13,7 +13,10 @@ History of recent changes
 *************************
 - Development version:
 
-   - None yet.
+   - Dropped support for pre-v1.3 Sphinx.
+   - The extension of source files is now preserved, rather than being stripped. This makes for a simpler ``conf.py``, since ``source_suffix`` is no longer modified.
+   - The corret HTML extension is now written to ``sphinx-enki-info.txt``.
+   - A link to install instructions is now provided in :doc:`../README`.
 
 - 1.0.1, 21-Aug-2015:
 
