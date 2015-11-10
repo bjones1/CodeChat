@@ -102,9 +102,9 @@ pygments_style = 'sphinx'
 # -----------------------------------------------------------------------------------
 # `extensions <http://sphinx-doc.org/config.html#confval-extensions>`_: If your
 # documentation needs a minimal Sphinx version, state it here. **CodeChat
-# note:** CodeChat has been tested with Sphinx 1.1 and above. Older versions may
+# note:** CodeChat has been tested with Sphinx 1.3 and above. Older versions may
 # or may not work.
-needs_sphinx = '1.1'
+needs_sphinx = '1.3'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
@@ -119,9 +119,6 @@ templates_path = ['_templates']
 # `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_:
 # The suffix of source filenames.
 source_suffix = '.rst'
-# **CodeChat note:** Add the suffix of all CodeToRest-supported source files so
-# that Sphinx can process these as well.
-source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix)
 
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze

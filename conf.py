@@ -120,12 +120,8 @@ extensions = ['CodeChat.CodeToRestSphinx', 'sphinx.ext.graphviz']
 templates_path = ['_templates']
 
 # `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_:
-# The suffix of source filenames.
+# The suffix of source filenames. Add ``.in`` and ``.spec`` files (see below).
 source_suffix = '.rst'
-# **CodeChat note:** Add the suffix of all CodeToRest-supported source files so
-# that Sphinx can process these as well. Also, add ``.in`` files so
-# ``MANIFEST.in`` will be recognized (see below).
-source_suffix = CodeToRestSphinx.add_source_suffix(source_suffix) + ['.in', '.spec']
 
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
@@ -285,4 +281,3 @@ html_show_sourcelink = True
 # `html_file_suffix <http://sphinx-doc.org/config.html#confval-html_file_suffix>`_:
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 ##html_file_suffix = None
-
