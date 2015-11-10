@@ -27,7 +27,7 @@ A programmer's word processor
 
 Installation
 ============
-See the :doc:`docs/install`.
+See the `install intructions <https://pythonhosted.org/CodeChat/docs/install.html>`_.
 
 
 Background
@@ -37,7 +37,7 @@ Put simply, literate programming (LP) is the realization that a program is a doc
 
 Tutorial
 ========
-The `tutorial <https://pythonhosted.org/CodeChat/docs/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
+The `CodeChat tutorial <https://pythonhosted.org/CodeChat/docs/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
 
 
 .. _tutorial-examples:
