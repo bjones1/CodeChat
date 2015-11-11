@@ -34,11 +34,11 @@ Developer documentation
 .. toctree::
    :maxdepth: 2
 
-   docs/history.rst
+   CodeChat/__init__.py
    CodeChat/CodeToRest.py
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
-   CodeChat/__init__.py
+   docs/history.rst
 
 *******
 Testing
@@ -46,8 +46,8 @@ Testing
 .. toctree::
    :maxdepth: 2
 
-   CodeChat/CodeToRest_test.py
    CodeChat/pytest.ini
+   CodeChat/CodeToRest_test.py
 
 ************************
 Documentation generation
@@ -74,7 +74,7 @@ Index and search
 * :ref:`genindex`
 * :ref:`search`
 
-.. Ignore the following files. They're linked to elsewhere.
+.. Ignore the following files. They're linked in elsewhere.
 
 .. toctree::
    :hidden:

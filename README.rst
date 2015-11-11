@@ -27,7 +27,7 @@ A programmer's word processor
 
 Installation
 ============
-See the `install intructions <https://pythonhosted.org/CodeChat/docs/install.html>`_.
+See the `installation intructions <https://pythonhosted.org/CodeChat/docs/install.html>`_.
 
 
 Background

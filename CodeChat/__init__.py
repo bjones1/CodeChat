@@ -17,9 +17,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *********************************
-# __init__.py - Package placeholder
-# *********************************
+# ******************************
+# __init__.py - CodeChat Package
+# ******************************
 # This file defines this directory as a Python package, which contains the
 # CodeChat application.
 #
