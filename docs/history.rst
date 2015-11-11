@@ -15,6 +15,9 @@ History of recent changes
 
    - No changes yet.
 
+- 1.1.1, 11-Nov-2015:
+   - Fix to actually support ``SConscript`` and ``Makefiles``.
+
 - 1.1.0, 10-Nov-2015:
 
    - Dropped support for pre-v1.3 Sphinx.
