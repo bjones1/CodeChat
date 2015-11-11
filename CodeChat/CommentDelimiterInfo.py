@@ -20,20 +20,18 @@
 # ************************************************************************
 # CommentDelimiterInfo.py - Info on comment delimiters for many languages.
 # ************************************************************************
+# :doc:`CodeChat <__init__.py>` relies on knowledge of the comment
+# delimiters for each supported language. This file consists of a large table
+# which provides this information.
+#
 # Imports
 # =======
 # These are listed in the order prescribed by `PEP 8
 # <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
-# Standard library
-# ----------------
-# For code_to_rest_html_clean replacements.
-import os.path
-#
 # Third-party imports
 # -------------------
 from pygments.lexers import get_all_lexers
-#
 #
 # Supported languages
 # ===================
@@ -44,6 +42,7 @@ from pygments.lexers import get_all_lexers
 COMMENT_DELIMITER_INFO = {
   # These languages have unit tests which pass
   # ------------------------------------------
+  # See :doc:`CodeToRest_test.py` for the tests.
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,            */
   'C':              ( 2,      2,            2),
@@ -173,5 +172,4 @@ for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
     # Pick only filenames we have comment info for.
     if longname in COMMENT_DELIMITER_INFO:
         # Apply normcase to each glob, so it will match on this OS.
-        for fnp in filename_patterns:
-            SUPPORTED_GLOBS = SUPPORTED_GLOBS.union([os.path.normcase(fnp)])
+        SUPPORTED_GLOBS |= set(filename_patterns)
