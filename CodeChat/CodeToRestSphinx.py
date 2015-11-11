@@ -65,15 +65,21 @@ from . import __version__
 # routine changes it into reST.
 def _source_read(app, docname, source):
     # If the docname's extension doesn't change when asking for its full path,
-    # then it's source code. Normally, the docname of foo.rst is foo; only for
-    # source code is the docname of foo.c also foo.c. Look up the full name and
-    # extension using `doc2path
+    # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
+    # only for source code is the docname of ``foo.c`` also ``foo.c``. Look up
+    # the full name and extension using `doc2path
     # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
-    full_path = app.env.doc2path(docname)
-    if os.path.basename(full_path) == os.path.basename(docname):
+    # Then, use the basename for comparison. Use normcase to ensure a string
+    # comparison will be valid.
+    base_full_path = os.path.basename(os.path.normcase(app.env.doc2path(docname)))
+    # The docname can include a relative path, such as ``src/foo.c``. Remove the
+    # path, and again use basename for valid string comparison.
+    base_docname = os.path.basename(docname)
+    if base_full_path == os.path.normcase(base_docname):
         # See if it's an extension we should process.
         try:
-            lexer = _lexer_for_filename(app, docname, source[0])
+            # Pass the non-normcase version, per _source_file.
+            lexer = _lexer_for_filename(app, base_docname, source[0])
             app.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
         except (KeyError, pygments.util.ClassNotFound):
@@ -85,7 +91,11 @@ def _source_read(app, docname, source):
 def _lexer_for_filename(
   # A Sphinx app instance.
   app,
-  # The path of the file under consideration
+  # .. _source_file:
+  #
+  # The base name of the file under consideration. This must **NOT** be
+  # processed by normcase, since ``get_lexer`` doesn't use normcase in its
+  # comparsions.
   source_file,
   # The code in source_file,
   code_str):
@@ -93,10 +103,10 @@ def _lexer_for_filename(
     # Sphinx likes to capitalize the extension of the file it's processing
     # (observed using Sphinx 1.3.1 on Windows). So, normalize the path
     # before doing the comparison.
-    source_file = os.path.normpath(os.path.normcase(source_file))
+    norm_source_file = os.path.normcase(source_file)
     # See if ``source_file`` matches any of the globs.
     for glob, lexer_alias in app.config.CodeChat_lexer_for_glob.iteritems():
-        if fnmatch.fnmatch(source_file, glob):
+        if fnmatch.fnmatch(norm_source_file, glob):
             # On a match, pass the specified lexer alias.
             return get_lexer(alias=lexer_alias)
     # If none of the globs match, fall back to choosing a lexer based only on
