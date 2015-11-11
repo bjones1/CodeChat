@@ -63,7 +63,17 @@ from . import __version__
 # =================
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
-def _source_read(app, docname, source):
+def _source_read(
+  # .. _app:
+  #
+  # The `Sphinx application object <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx>`_.
+  app,
+  # The name of the document that was read. It contains a path relative to the
+  # project directory and (typically) no extension.
+  docname,
+  # A list whose single element is the contents of the source file.
+  source):
+
     # If the docname's extension doesn't change when asking for its full path,
     # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
     # only for source code is the docname of ``foo.c`` also ``foo.c``. Look up
@@ -89,7 +99,7 @@ def _source_read(app, docname, source):
 # Find a lexer for the given filename. Return a dict to be passed as arguments
 # to :ref:`get_lexer <get_lexer>`.
 def _lexer_for_filename(
-  # A Sphinx app instance.
+  # See app_.
   app,
   # .. _source_file:
   #
@@ -188,7 +198,10 @@ sphinx.environment.BuildEnvironment.doc2path = _doc2path
 #
 # Enki_ support
 # =============
-def _builder_inited(app):
+def _builder_inited(
+  # See app_.
+  app):
+
     # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know
     # the HTML file extension. So, save it to a file for Enki_ to read. Note
     # that this can't be done in setup_, since the values in ``conf.py`` aren't
@@ -208,18 +221,17 @@ def _builder_inited(app):
 # This routine defines the `entry point
 # <http://sphinx-doc.org/extdev/appapi.html>`_ called by Sphinx to initialize
 # this extension.
-def setup(app):
+def setup(
+  # See app_.
+  app):
+
     # Ensure we're using at least Sphinx v1.3 using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
     app.require_sphinx('1.3')
 
-    # Use the `source-read <http://sphinx-doc.org/extdev/appapi.html#sphinx.version_info>`_
+    # Use the `source-read <http://sphinx-doc.org/extdev/appapi.html#event-source-read>`_
     # event hook to transform source code to reST before Sphinx processes it.
     app.connect('source-read', _source_read)
-
-    # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
-    # event to write out settings specified in ``conf.py``.
-    app.connect('builder-inited', _builder_inited)
 
     # Add the CodeChat.css style sheet using `add_stylesheet
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
@@ -228,6 +240,10 @@ def setup(app):
     # Add the CodeChat_lexer_for_glob config value. See `add_config_value
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
     app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
+
+    # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
+    # event to write out settings specified in ``conf.py``.
+    app.connect('builder-inited', _builder_inited)
 
     # .. _global_config:
     #
