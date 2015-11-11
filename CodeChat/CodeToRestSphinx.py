@@ -77,51 +77,30 @@ def _source_read(
     # If the docname's extension doesn't change when asking for its full path,
     # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
     # only for source code is the docname of ``foo.c`` also ``foo.c``. Look up
-    # the full name and extension using `doc2path
+    # the name and extension using `doc2path
     # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
-    # Then, use the basename for comparison. Use normcase to ensure a string
-    # comparison will be valid.
-    base_full_path = os.path.basename(os.path.normcase(app.env.doc2path(docname)))
-    # The docname can include a relative path, such as ``src/foo.c``. Remove the
-    # path, and again use basename for valid string comparison.
-    base_docname = os.path.basename(docname)
-    if base_full_path == os.path.normcase(base_docname):
+    docname_ext = app.env.doc2path(docname, None)
+    if os.path.normpath(docname_ext) == os.path.normpath(docname):
         # See if it's an extension we should process.
         try:
-            # Pass the non-normcase version, per _source_file.
-            lexer = _lexer_for_filename(app, base_docname, source[0])
+            base_docname = os.path.basename(docname)
+            # See if ``source_file`` matches any of the globs.
+            lexer = None
+            lfg = app.config.CodeChat_lexer_for_glob
+            for glob, lexer_alias in lfg.iteritems():
+                if fnmatch.fnmatch(base_docname, glob):
+                    # On a match, pass the specified lexer alias.
+                    lexer = get_lexer(alias=lexer_alias)
+                    break
+            # Do this after checking the CodeChat_lexer_for_glob list, since
+            # this will raise an exception on failure.
+            lexer = lexer or get_lexer(filename=base_docname, code=source[0])
+
             app.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
         except (KeyError, pygments.util.ClassNotFound):
-            # We Don't support this language.
+            # We don't support this language.
             pass
-
-# Find a lexer for the given filename. Return a dict to be passed as arguments
-# to :ref:`get_lexer <get_lexer>`.
-def _lexer_for_filename(
-  # See app_.
-  app,
-  # .. _source_file:
-  #
-  # The base name of the file under consideration. This must **NOT** be
-  # processed by normcase, since ``get_lexer`` doesn't use normcase in its
-  # comparsions.
-  source_file,
-  # The code in source_file,
-  code_str):
-
-    # Sphinx likes to capitalize the extension of the file it's processing
-    # (observed using Sphinx 1.3.1 on Windows). So, normalize the path
-    # before doing the comparison.
-    norm_source_file = os.path.normcase(source_file)
-    # See if ``source_file`` matches any of the globs.
-    for glob, lexer_alias in app.config.CodeChat_lexer_for_glob.iteritems():
-        if fnmatch.fnmatch(norm_source_file, glob):
-            # On a match, pass the specified lexer alias.
-            return get_lexer(alias=lexer_alias)
-    # If none of the globs match, fall back to choosing a lexer based only on
-    # the filename.
-    return get_lexer(filename=source_file, code=code_str)
 #
 # Monkeypatch
 # ===========
@@ -130,6 +109,8 @@ def _lexer_for_filename(
 # doesn't work, since ``foo.c`` and ``foo.h`` will now both been seen as the
 # docname ``foo``, making then indistinguishable.
 #
+# get_matching_docs patch
+# -----------------------
 # So, do a bit of monkeypatching: for source files, make their docname the same
 # as the file name; for reST file, allow Sphinx to strip off the extension as
 # before. The first patch accomplishes this. It comes from ``sphinx.util``, line
@@ -141,9 +122,7 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
     Exclude files and dirs matching a pattern in *exclude_patterns*.
     """
     suffixpatterns = ['*' + s for s in suffixes]
-    # The following line was added. While SUPPORTED_EXTENSIONS gives a list of
-    # extensions, the CodeChat_lexer_for_glob is a glob, so it doesn't need a
-    # prepended ``*``.
+    # The following line was added.
     source_suffixpatterns = ( SUPPORTED_GLOBS |
                              set(_config.CodeChat_lexer_for_glob.keys()) )
     for filename in get_matching_files(dirname, exclude_matchers):
@@ -162,9 +141,13 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
 # is in ``sphinx.environment`` instead of ``sphinx.util``.
 sphinx.environment.get_matching_docs = _get_matching_docs
 
+# doc2path patch
+# --------------
 # Next, the way docnames get transformed back to a full path needs to be fixed
 # for source files. Specifically, a docname might be the source file, without
-# adding an extension.
+# adding an extension. This code comes from ``sphinx.environment`` of Sphinx
+# 1.3.1. See also the official `doc2path <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_
+# Sphinx docs.
 def _doc2path(self, docname, base=True, suffix=None):
     """Return the filename for the document name.
 
@@ -198,14 +181,15 @@ sphinx.environment.BuildEnvironment.doc2path = _doc2path
 #
 # Enki_ support
 # =============
+# `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know the
+# HTML file extension. So, save it to a file for Enki_ to read. Note that this
+# can't be done in `Extension setup`_, since the values in ``conf.py`` aren't
+# loaded yet. See also global_config_. Instead, wait for the builder-inited_
+# event, when the config_ settings are available.
 def _builder_inited(
   # See app_.
   app):
 
-    # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know
-    # the HTML file extension. So, save it to a file for Enki_ to read. Note
-    # that this can't be done in setup_, since the values in ``conf.py`` aren't
-    # loaded yet. See also global_config_.
     try:
         with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
             f.write(app.config.html_file_suffix)
@@ -213,8 +197,6 @@ def _builder_inited(
         # If ``html_file_suffix`` is None (TypeError), Enki will assume
         # ``.html``.
         pass
-#
-# .. _setup:
 #
 # Extension setup
 # ===============
