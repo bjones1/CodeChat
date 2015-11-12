@@ -94,6 +94,7 @@ class TestCodeToRest(object):
             rest = code_to_rest_string(code_str, alias=alias)
             assert rest == expected_rest_str
 
+    # A single line of code.
     def test_1(self):
         self.mt('testing',
                 bf +
@@ -558,10 +559,13 @@ class TestRestToHtml(object):
         # Snip out just the body. Note that ``.`` needs the `re.DOTALL flag
         # <https://docs.python.org/2/library/re.html#re.DOTALL>`_ so that it
         # can match newlines.
-        bodyMo = re.search('<body>\n(.*)</body>', html, re.DOTALL)
+        bodyMo = re.search('<body>\n'
+                           '(.*)</body>', html, re.DOTALL)
         body = bodyMo.group(1)
         # docutils wraps the resulting HTML in a <div>. Strip that out as well.
-        divMo = re.search('<div class="document"[^>]*>\n+(.*)\n</div>', body,
+        divMo = re.search('<div class="document"[^>]*>\n'
+                          '+(.*)\n'
+                          '</div>', body,
                           re.DOTALL)
         div = divMo.group(1)
         return div
@@ -572,8 +576,11 @@ class TestRestToHtml(object):
 
     # Test the harness -- can we pass some code through properly?
     def test_2(self):
-        assert (self.t('.. code::\n\n testing') ==
-                '<pre class="code literal-block">\ntesting\n</pre>')
+        assert (self.t('.. code::\n'
+                       '\n testing') ==
+                       '<pre class="code literal-block">\n'
+                       'testing\n'
+                       '</pre>')
 
     # See if a fenced code block that's too short produces an error.
     def test_3(self):
@@ -581,57 +588,97 @@ class TestRestToHtml(object):
                 self.t('.. fenced-code::') )
     def test_4(self):
         assert ('Fenced code block must contain at least two lines.' in
-                self.t('.. fenced-code::\n\n First fence') )
+                self.t('.. fenced-code::\n'
+                       '\n'
+                       ' First fence') )
 
     # Verify that a fenced code block with just fences complains about empty
     # output.
     def test_5(self):
         assert ('Content block expected for the '
-        in self.t('.. fenced-code::\n\n First fence\n Second fence\n') )
+        in self.t('.. fenced-code::\n'
+                  '\n'
+                  ' First fence\n'
+                  ' Second fence\n') )
 #
 # Check newline preservation **without** syntax highlighting
 # ----------------------------------------------------------
     # Check output of a one-line code block surrounded by fences.
     def test_6(self):
-        assert (self.t('.. fenced-code::\n\n First fence\n testing\n'
+        assert (self.t('.. fenced-code::\n'
+                       '\n First fence'
+                       '\n testing'
+                       '\n'
                        ' Second fence\n') ==
-                '<pre class="code literal-block">\ntesting\n</pre>')
+                       '<pre class="code literal-block">\n'
+                       'testing\n'
+                       '</pre>')
 
     # Check that leading newlines are preserved.
     def test_7(self):
-        assert (self.t('.. fenced-code::\n\n First fence\n\n testing\n'
+        assert (self.t('.. fenced-code::\n'
+                       '\n'
+                       ' First fence\n'
+                       '\n testing'
+                       '\n'
                        ' Second fence\n') ==
-                '<pre class="code literal-block">\n \ntesting\n</pre>')
+                       '<pre class="code literal-block">\n'
+                       ' \n'
+                       'testing\n'
+                       '</pre>')
 
     # Check that trailing newlines are preserved.
     def test_8(self):
-        assert (self.t('.. fenced-code::\n\n First fence\n testing\n\n'
+        assert (self.t('.. fenced-code::\n'
+                       '\n'
+                       ' First fence\n'
+                       ' testing\n'
+                       '\n'
                        ' Second fence\n') ==
-                '<pre class="code literal-block">\ntesting\n \n</pre>')
+                       '<pre class="code literal-block">\n'
+                       'testing\n'
+                       ' \n'
+                       '</pre>')
 #
 # Check newline preservation **with** syntax highlighting
 # -------------------------------------------------------
     # Check output of a one-line syntax-highlighted code block surrounded by
     # fences.
     def test_9(self):
-        assert (self.t('.. fenced-code:: python\n\n First fence\n testing\n'
+        assert (self.t('.. fenced-code:: python\n'
+                       '\n'
+                       ' First fence\n'
+                       ' testing\n'
                        ' Second fence\n') ==
-                '<pre class="code python literal-block">\n'
-                '<span class="name">testing</span>\n</pre>')
+                       '<pre class="code python literal-block">\n'
+                       '<span class="name">testing</span>\n'
+                       '</pre>')
 
     # Check that leading newlines are preserved with syntax highlighting.
     def test_10(self):
-        assert (self.t('.. fenced-code:: python\n\n First fence\n\n testing\n'
+        assert (self.t('.. fenced-code:: python\n'
+                       '\n'
+                       ' First fence\n'
+                       '\n'
+                       ' testing\n'
                        ' Second fence\n') ==
-                '<pre class="code python literal-block">\n \n'
-                '<span class="name">testing</span>\n</pre>')
+                       '<pre class="code python literal-block">\n'
+                       ' \n'
+                       '<span class="name">testing</span>\n'
+                       '</pre>')
 
     # Check that trailing newlines are preserved with syntax highlighting.
     def test_11(self):
-        assert (self.t('.. fenced-code:: python\n\n First fence\n testing\n\n'
+        assert (self.t('.. fenced-code:: python\n'
+                       '\n'
+                       ' First fence\n'
+                       ' testing\n'
+                       '\n'
                        ' Second fence\n') ==
-                '<pre class="code python literal-block">\n'
-                '<span class="name">testing</span>\n \n</pre>')
+                       '<pre class="code python literal-block">\n'
+                       '<span class="name">testing</span>\n'
+                       ' \n'
+                       '</pre>')
 
     # Test translation of indented headings. Note that the enclosing <div>,
     # which surrounds the heading in reST, is moved to only surround the body in
