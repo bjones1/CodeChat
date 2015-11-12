@@ -22,7 +22,7 @@
 #
 # Build instructions are in setup.py
 Name:           python-codechat
-Version:        1.0.1
+Version:        1.2.1
 Release:        %{version}%{?dist}
 Summary:        A programmer's word processor
 Group:          Development/Libraries
