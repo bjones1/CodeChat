@@ -287,6 +287,16 @@ class TestCodeToRest(object):
                 '=======\n'
                 'Body.\n' +
                 div_end)
+
+    # Indented comments following code.
+    def test_19_b(self):
+        self.mt('Code\n'
+                '//  Comment\n',
+                bf +
+                ' Code\n' +
+                ef +
+                sl(-2) +
+                ' Comment\n')
 #
 # Block comment indent removal: indents with spaces
 # -------------------------------------------------
@@ -694,6 +704,22 @@ class TestRestToHtml(object):
                        '<div style="margin-left:1.0em;"><!--  -->\n'
                        '<p>Body.</p>\n'
                        '</div><!--  -->')
+
+    # Test translation of an indented comment following code.
+    def test_13(self):
+        assert (self.t(bf +
+                       ' Code\n' +
+                       ef +
+                       sl(-2) +
+                       ' Comment\n') ==
+                       '<pre class="code literal-block">\n'
+                       'Code\n'
+                       '</pre>\n'
+                       '<!--  -->\n'
+                       '<!--  -->\n'
+                       '<blockquote>\n'
+                       'Comment</blockquote>')
+
 #
 # Poor coverage of code_to_html_file
 # ==================================
