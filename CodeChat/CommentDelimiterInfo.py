@@ -51,7 +51,7 @@ COMMENT_DELIMITER_INFO = {
   'ActionScript':   ( 2,      2,            2),
   'ActionScript 3': ( 2,      2,            2),
   'C#':             ( 2,      2,            2),
-  #  Note: also has ``/+`` ~ ``+/`` for nested block comments.
+  # Note: also has ``/+`` ~ ``+/`` for nested block comments.
   'D':              ( 2,      2,            2),
   'Go':             ( 2,      2,            2),
   'JavaScript':     ( 2,      2,            2),

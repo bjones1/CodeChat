@@ -83,7 +83,7 @@
 # already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
 # Leave this as a `patch
 # <https://build.opensuse.org/package/view_file/home:yajo:enki/python-codechat/python-codechat.offline_setuptools.patch?expand=1>`_
-# so that we normally uses a more modern version.
+# so that we normally use a more modern version.
 import ez_setup
 ez_setup.use_setuptools()
 
