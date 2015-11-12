@@ -108,13 +108,27 @@
 // -----
 //   Note the unnecesary newline before the section title above.
 //
-// * Headings may be indented, but that indentation won't appear in the
-//   resulting HTML. For example:
-void foo(int i_sum) {
-    if (i_sum) {
-        // Check pre-conditions
-        // ---------------------
-        assert(i_sum > 1);
+// * Headings may be indented, but this causes problems in the resulting HTML by
+//   indenting too much. **Avoid this.**
+    void foo(int i_sum) {
+        if (i_sum) {
+            // Indented heading -- **bad**
+            // ---------------------------
+            // This comment isn't indented as it should be, one bad result of
+            // indenting a heading.
+            assert(i_sum > 1);
+            // Another indented heading -- **bad**
+            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            // The indentation on this heading is wrong, too, another bad
+            // result. In fact, *everything* will be indented until the next
+            // heading. For example, the following code and comments will be
+            // extremely overindented.
+            bar(i_sum);
+            // Overindented text.
+//
+// An unindented heading -- correct
+// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        // Now, text and code will be indented correctly.
 //
 // * Document functions, classes, parameters, etc. on the preeceding line. For
 //   example:
@@ -164,7 +178,7 @@ void foo(int i_sum) {
 //
 //   Use a similar structure to get a monospaced font when necessary. For example:
     ///       Max  Prefix   Hit ratio
-    dump_objs(23,  'test_', 3.05)
+    dump_objs(23,  "test_", 3.05);
 //
 // * Use directives, such as `note
 //   <http://docutils.sourceforge.net/docs/ref/rst/directives.html#note>`_,
@@ -172,7 +186,7 @@ void foo(int i_sum) {
 //
 //  .. note::
 //
-//     Need to work on this..
+//     Need to work on this.
 //
 // * Use `reST comments <http://sphinx-doc.org/rest.html#comments>`_ to hide
 //   text in the output. At the top of the this file, the file's license is
