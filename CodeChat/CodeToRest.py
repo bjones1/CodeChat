@@ -46,8 +46,8 @@ import os.path
 from docutils import io, core
 # Import CodeBlock as a base class for FencedCodeBlock.
 from docutils.parsers.rst.directives.body import CodeBlock
-# Import directives to register the new FencedCodeBlock directive.
-from docutils.parsers.rst import directives
+# Import directives to register the new FencedCodeBlock and SetLine directives.
+from docutils.parsers.rst import directives, Directive
 # For the docutils default stylesheet and template
 import docutils.writers.html4css1
 from docutils.writers.html4css1 import Writer
@@ -158,7 +158,6 @@ def code_to_html_string(
         # Capture errors to a string and return it.
         'warning_stream' : warning_stream})
     return html
-
 
 # .. _code_to_html_file:
 #
@@ -1062,8 +1061,11 @@ def _generate_rest(
     # Keep track of the current type. Begin with a 0-indent comment.
     current_type = -2
 
+    # Keep track of the current line number.
+    line = 1
+
     for type_, string in classified_lines:
-        _debug_print(u'type_ = {}, string = {}\n'.format(type_, [string]))
+        _debug_print(u'type_ = {}, line = {}, string = {}\n'.format(type_, line, [string]))
 
         # See if there's a change in state.
         if current_type != type_:
@@ -1076,9 +1078,15 @@ def _generate_rest(
             if type_ == -1:
                 out_file.write('\n.. fenced-code::\n\n Beginning fence\n')
             # Comment state: emit an opening indent for non-zero indents.
-            elif type_ > 0:
-                out_file.write('\n.. raw:: html\n\n <div style="margin-left:' +
-                               str(0.5*type_) + 'em;">\n\n')
+            else:
+                # Add an indent if needed.
+                if type_ > 0:
+                    out_file.write('\n.. raw:: html\n\n'
+                      ' <div style="margin-left:{}em;">\n\n'.format(0.5*type_))
+                # Specify the line number in the source, so that errors will be
+                # accurately reported. This isn't necessary in code blocks,
+                # since errors can't occur.
+                out_file.write('\n.. set-line:: {}\n\n'.format(line - 2))
 
         # Output string based on state. All code needs an inital space to
         # place it inside the fenced-code block.
@@ -1088,13 +1096,14 @@ def _generate_rest(
 
         # Update the state.
         current_type = type_
+        line += 1
 
     # When done, exit the last state.
     _exit_state(current_type, out_file)
 #
 #
 # Supporting routines
-# ^^^^^^^^^^^^^^^^^^^
+# """""""""""""""""""
 # Output text produce when exiting a state. Supports generate_rest_ above.
 def _exit_state(
   # The type (classification) of the last line.
@@ -1111,8 +1120,10 @@ def _exit_state(
     # Initial state. Nothing needed.
     else:
         pass
-
-
+#
+#
+# Supporting reST directives
+# """"""""""""""""""""""""""
 # Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
@@ -1179,6 +1190,48 @@ class _FencedCodeBlock(CodeBlock):
 
         return nodeList
 
+# This directive allows changing the line number at which errors will be
+# reported. ``.. set-line:: 10`` makes the current line report as line 10,
+# regardless of its actual location in the file.
+class _SetLine(Directive):
+
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = False
+    option_spec = {}
+    has_content = False
+
+    def run(self):
+        line = int(self.arguments[0])
+
+        # The ``input_lines`` class (see docutils.statemachine.ViewList)
+        # maintains two lists, ``data`` and ``items``. ``data`` is a list of
+        # strings, one per line, of reST to process. ``items`` is a list of
+        # ``(source, offset)`` giving the source of each line and the offset of
+        # each line from the beginning of its source. Modifying the offset will
+        # change the reported error location.
+        il = self.state_machine.input_lines
+
+        # However, directly modifying ``input_lines`` produces no effect: the
+        # root ``input_lines`` must be modified. Find it.
+        while il.parent:
+            il = il.parent
+        # Now, determine the index of this directive's line in the parent
+        # ``input_offset`` class.
+        current_line = (self.state_machine.line_offset +
+                        self.state_machine.input_offset)
+
+        # Walk from this line to the end of the file, rewriting the offset (that
+        # is, the effective line number).
+        items = il.items
+        for i in range(current_line, len(items)):
+            (source, offset) = items[i]
+            items[i] = (source, line)
+            line += 1
+
+        # This directive create no nodes.
+        return []
+
 # Register the new fenced code block directive with docutils.
 directives.register_directive('fenced-code', _FencedCodeBlock)
-
+directives.register_directive('set-line', _SetLine)
