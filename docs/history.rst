@@ -15,6 +15,15 @@ History of recent changes
 
    - No changes yet.
 
+- 1.2.1, 12-Nov-2015:
+   - Fix broken hyperlinks in the :ref:`tutorial-examples`.
+   - Provide correct Linux installation instructions.
+
+- 1.2.0, 12-Nov-2015:
+   - Prevent errors when an indented comment follows code.
+   - Display the correct line number of errors/warnings.
+   - Document brokenness when headings are indented.
+
 - 1.1.1, 11-Nov-2015:
    - Fix to actually support ``SConscript`` and ``Makefiles``.
 
