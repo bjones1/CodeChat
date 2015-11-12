@@ -54,25 +54,31 @@ from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
 # Define some commonly-used strings to make testing less verbose.
-bf = (u'\n' +
-      u'.. fenced-code::\n' +
-      u'\n' +
+bf = (u'\n'
+      u'.. fenced-code::\n'
+      u'\n'
       u' Beginning fence\n')
-ef = (u' Ending fence\n' +
-      u'\n' +
-      u'..\n' +
+ef = (u' Ending fence\n'
+      u'\n'
+      u'..\n'
       u'\n')
-def div(size):
-    return (u'\n' +
-            u'.. raw:: html\n' +
-            u'\n <div style="margin-left:{}em;">\n' +
-            u'\n').format(size)
-div_end = (u'\n' +
-           u'.. raw:: html\n' +
-           u'\n' +
-           u' </div>\n' +
-           u'\n' +
-           u'..\n' +
+def div(size, line):
+    return (u'\n'
+            u'.. raw:: html\n'
+            u'\n <div style="margin-left:{}em;">\n'
+            u'\n').format(size) + sl(line)
+def sl(line):
+    return (u'\n'
+            '.. set-line:: {}\n'
+            '\n'
+            '..\n'
+            '\n').format(line)
+div_end = (u'\n'
+           u'.. raw:: html\n'
+           u'\n'
+           u' </div>\n'
+           u'\n'
+           u'..\n'
            u'\n')
 
 # This acutally tests using ``code_to_rest_string``, since that makes
@@ -99,20 +105,36 @@ class TestCodeToRest(object):
 
     # Several lines of code, with arbitrary indents.
     def test_3(self):
-        self.mt('testing\n  test 1\n test 2\n   test 3',
-          bf + ' testing\n   test 1\n  test 2\n    test 3\n' + ef)
+        self.mt('testing\n'
+                '  test 1\n'
+                ' test 2\n'
+                '   test 3',
+                bf +
+                ' testing\n'
+                '   test 1\n'
+                '  test 2\n'
+                '    test 3\n' +
+                ef)
 
     # A single line comment, no trailing ``\n``.
     def test_4(self):
-        self.mt('// testing', 'testing\n')
+        self.mt('// testing',
+                sl(-3) +
+                'testing\n')
 
     # A single line comment, trailing ``\n``.
     def test_5(self):
-        self.mt('// testing\n', 'testing\n')
+        self.mt('// testing\n',
+                sl(-3) +
+                'testing\n')
 
     # A multi-line comment.
     def test_5a(self):
-        self.mt('// testing\n// more testing', 'testing\nmore testing\n')
+        self.mt('// testing\n'
+                '// more testing',
+                sl(-3) +
+                'testing\n'
+                'more testing\n')
 
     # A single line comment with no space after the comment should be treated
     # like code.
@@ -121,24 +143,36 @@ class TestCodeToRest(object):
 
     # A singly indented single-line comment.
     def test_7(self):
-        self.mt(' // testing', div(0.5) + 'testing\n' + div_end)
+        self.mt(' // testing', div(0.5, -3) + 'testing\n' + div_end)
 
     # A doubly indented single-line comment.
     def test_8(self):
-        self.mt('  // testing', div(1.0) + 'testing\n' + div_end)
+        self.mt('  // testing', div(1.0, -3) + 'testing\n' + div_end)
 
     # A doubly indented multi-line comment.
     def test_9(self):
-        self.mt('  // testing\n  // more testing',
-                div(1.0) + 'testing\nmore testing\n' + div_end)
+        self.mt('  // testing\n'
+                '  // more testing',
+                div(1.0, -3) +
+                'testing\n'
+                'more testing\n' +
+                div_end)
 
     # Code to comment transition.
     def test_9a(self):
-        self.mt('testing\n// test', bf + ' testing\n' + ef + 'test\n')
+        self.mt('testing\n'
+                '// test',
+                bf +
+                ' testing\n' +
+                ef +
+                sl(-2) +
+                'test\n')
 
     # A line with just the comment char, but no trailing space.
     def test_10(self):
-        self.mt('//', '\n')
+        self.mt('//',
+                sl(-3) +
+                '\n')
 
     # Make sure an empty string works.
     def test_12(self):
@@ -150,44 +184,85 @@ class TestCodeToRest(object):
 
     # Code to comment transition.
     def test_14(self):
-        self.mt('testing\n// Comparing',  bf + ' testing\n' + ef +
+        self.mt('testing\n'
+                '// Comparing',
+                bf +
+                ' testing\n' +
+                ef +
+                sl(-2) +
                 'Comparing\n')
 
     # Code to comment transition, with leading blank code lines.
     def test_15(self):
-        self.mt(' \ntesting\n// Comparing',  bf + '  \n testing\n' + ef +
+        self.mt(' \n'
+                'testing\n'
+                '// Comparing',
+                bf + '  \n'
+                ' testing\n' +
+                ef +
+                sl(-1) +
                 'Comparing\n')
 
     # Code to comment transition, with trailing blank code lines.
     def test_16(self):
-        self.mt('testing\n\n// Comparing',  bf + ' testing\n \n' + ef +
+        self.mt('testing\n'
+                '\n'
+                '// Comparing',
+                bf + ' testing\n'
+                ' \n' +
+                ef +
+                sl(-1) +
                 'Comparing\n')
 
     # Comment to code transition.
     def test_17(self):
-        self.mt('// testing\nComparing',  'testing\n' + bf + ' Comparing\n' +
+        self.mt('// testing\n'
+                'Comparing',
+                sl(-3) +
+                'testing\n' +
+                bf +
+                ' Comparing\n' +
                 ef)
 
     # Comment to code transition, with leading blank code lines.
     def test_18(self):
-        self.mt('// testing\n\nComparing',  'testing\n' + bf +
-                ' \n Comparing\n' + ef)
+        self.mt('// testing\n'
+                '\n'
+                'Comparing',
+                sl(-3) +
+                'testing\n' +
+                bf +
+                ' \n'
+                ' Comparing\n' +
+                ef)
 
     # Comment to code transition, with trailing blank code lines.
     def test_19(self):
-        self.mt('// testing\nComparing\n\n',  'testing\n' + bf +
-                ' Comparing\n' + ef)
+        self.mt('// testing\n'
+                'Comparing\n'
+                '\n',
+                sl(-3) +
+                'testing\n' +
+                bf +
+                ' Comparing\n' +
+                ef)
 
     # Block comments.
     def test_19_1(self):
-        self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n')
+        self.mt('/* multi-\n'
+                'line\n'
+                'comment */\n',
+                sl(-3) +
+                'multi-\n'
+                'line\n'
+                'comment \n')
 
     # Comments with headings.
     def test_19_a(self):
         self.mt('  // Heading\n'
                 '  // =======\n'
                 '  // Body.\n',
-                div(1.0) +
+                div(1.0, -3) +
                 'Heading\n'
                 '=======\n'
                 'Body.\n' +
@@ -201,6 +276,7 @@ class TestCodeToRest(object):
                 '   line\n'
                 '   comment\n'
                 ' */\n',
+                sl(-3) +
                 'multi-\n'
                 'line\n'
                 'comment\n'
@@ -208,38 +284,87 @@ class TestCodeToRest(object):
 
     # Inconsistent whitespace -- no removal.
     def test_19_1_2(self):
-        self.mt('/* multi-\n line\n   comment\n */\n', 'multi-\n line\n' +
-                '   comment\n \n')
+        self.mt('/* multi-\n'
+                ' line\n'
+                '   comment\n'
+                ' */\n',
+                sl(-3) +
+                'multi-\n'
+                ' line\n'
+                '   comment\n'
+                ' \n')
 
     # Too little whitespace to line up with initial comment.
     def test_19_1_3(self):
-        self.mt('/* multi-\n line\n comment */\n', 'multi-\n line\n comment \n')
+        self.mt('/* multi-\n'
+                ' line\n'
+                ' comment */\n',
+                sl(-3) +
+                'multi-\n'
+                ' line\n'
+                ' comment \n')
 
     # Indented block comments with whitespace removal.
     def test_19_1_4(self):
-        self.mt(' /* multi-\n    line\n    comment\n  */\n',
-                div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
+        self.mt(' /* multi-\n'
+                '    line\n'
+                '    comment\n'
+                '  */\n',
+                div(0.5, -3) +
+                'multi-\n'
+                'line\n'
+                'comment\n'
+                '  \n' +
+                div_end)
     #
     # Block comment indent removal: indents with delimiters
     # -----------------------------------------------------
     # Removal of leading whitespace in block comments.
     def test_19_1_5(self):
-        self.mt('/* multi-\n * line\n * comment\n */\n', 'multi-\nline\n' +
-                'comment\n \n')
+        self.mt('/* multi-\n'
+                ' * line\n'
+                ' * comment\n'
+                ' */\n',
+                sl(-3) +
+                'multi-\n'
+                'line\n'
+                'comment\n'
+                ' \n')
 
     # Inconsistent whitespace -- no removal.
     def test_19_1_6(self):
-        self.mt('/* multi-\n*line\n * comment\n */\n', 'multi-\n*line\n' +
-                ' * comment\n \n')
+        self.mt('/* multi-\n'
+                '*line\n'
+                ' * comment\n'
+                ' */\n',
+                sl(-3) +
+                'multi-\n'
+                '*line\n'
+                ' * comment\n'
+                ' \n')
 
     # Too little whitespace to line up with initial comment.
     def test_19_1_7(self):
-        self.mt('/* multi-\n*line\n*comment */\n', 'multi-\n*line\n*comment \n')
+        self.mt('/* multi-\n'
+                '*line\n'
+                '*comment */\n',
+                sl(-3) +
+                'multi-\n'
+                '*line\n'
+                '*comment \n')
 
     # Indented block comments with whitespace removal.
     def test_19_1_8(self):
-        self.mt(' /* multi-\n  * line\n  * comment\n  */\n',
-                div(0.5) + 'multi-\nline\ncomment\n  \n' + div_end)
+        self.mt(' /* multi-\n'
+                '  * line\n'
+                '  * comment\n'
+                '  */\n',
+                div(0.5, -3) +
+                'multi-\n'
+                'line\n'
+                'comment\n'
+                '  \n' +
+                div_end)
     #
     # Other block comment testing
     # ---------------------------
@@ -248,48 +373,106 @@ class TestCodeToRest(object):
                 ' /*multi-\n line\n comment */\n' + ef)
 
     def test_19_3(self):
-        self.mt('/* block */ //inline\n', 'block  inline\n')
+        self.mt('/* block */ //inline\n',
+                sl(-3) +
+                'block  inline\n')
 
     def test_19_4(self):
-        self.mt('/* block */ /**/\n', 'block  \n')
+        self.mt('/* block */ /**/\n',
+                sl(-3) +
+                'block  \n')
 
     def test_19_5(self):
-        self.mt('/* multi-\nline\ncomment */ //inline\n',
-                'multi-\nline\ncomment  inline\n')
+        self.mt('/* multi-\n'
+                'line\n'
+                'comment */ //inline\n',
+                sl(-3) +
+                'multi-\n'
+                'line\n'
+                'comment  inline\n')
     #
     # Other languages
     # ---------------
     # A bit of Python testing.
     def test_20(self):
-        self.mt('# testing\n#\n# Trying\n', 'testing\n\nTrying\n',
+        self.mt('# testing\n'
+                '#\n'
+                '# Trying\n',
+                sl(-3) +
+                'testing\n'
+                '\n'
+                'Trying\n',
                 ('Python', 'Python3'))
 
     def test_21(self):
-        self.mt('#\n', '\n', ('Python', 'Python3'))
+        self.mt('#\n',
+                sl(-3) +
+                '\n', ('Python', 'Python3'))
 
     def test_22(self):
-        self.mt(' \nfoo()\n\n# bar\n', bf + '  \n foo()\n \n' + ef + 'bar\n',
+        self.mt(' \n'
+                'foo()\n'
+                '\n'
+                '# bar\n',
+                bf +
+                '  \n'
+                ' foo()\n'
+                ' \n' +
+                ef +
+                sl(0) +
+                'bar\n',
                 ('Python', 'Python3'))
 
     # Some CSS.
     def test_23(self):
-        self.mt(' \ndiv {}\n\n/* comment */\n',
-                bf + '  \n div {}\n \n' + ef + 'comment \n', ['CSS'])
+        self.mt(' \n'
+                'div {}\n'
+                '\n'
+                '/* comment */\n',
+                bf +
+                '  \n'
+                ' div {}\n'
+                ' \n' +
+                ef +
+                sl(0) +
+                'comment \n', ['CSS'])
 
     def test_24(self):
-        self.mt('/* multi-\nline\ncomment */\n', 'multi-\nline\ncomment \n',
-                ['CSS'])
+        self.mt('/* multi-\n'
+                'line\n'
+                'comment */\n',
+                sl(-3) +
+                'multi-\n'
+                'line\n'
+                'comment \n', ['CSS'])
 
     # Assembly (NASM).
     def test_25(self):
-        self.mt('; Comment\n \nstart: bra start\n \n',
-                'Comment\n' + bf + '  \n start: bra start\n  \n' + ef, ['NASM'])
+        self.mt('; Comment\n'
+                ' \n'
+                'start: bra start\n'
+                ' \n',
+                sl(-3) +
+                'Comment\n' +
+                bf +
+                '  \n'
+                ' start: bra start\n'
+                '  \n' +
+                ef, ['NASM'])
 
     # Bash.
     def test_26(self):
-        self.mt('# Comment\n \necho "hello world"\n \n',
-                'Comment\n' + bf + '  \n echo "hello world"\n  \n' + ef,
-                ['Bash'])
+        self.mt('# Comment\n'
+                ' \n'
+                'echo "hello world"\n'
+                ' \n',
+                sl(-3) +
+                'Comment\n' +
+                bf +
+                '  \n'
+                ' echo "hello world"\n'
+                '  \n' +
+                ef, ['Bash'])
 
     # PHP. While the `PHP manual
     # <http://php.net/manual/en/language.basic-syntax.comments.php>`_ confirms
@@ -306,6 +489,7 @@ class TestCodeToRest(object):
                 " echo 'Hello world'\n" +
                 " // Comment1\n" +
                 ef +
+                sl(0) +
                 "Comment2\n"
                 "Comment3 \n", ['PHP'])
 
@@ -316,6 +500,7 @@ class TestCodeToRest(object):
                 bf +
                 ' echo Hello\n' +
                 ef +
+                sl(-2) +
                 'Comment\n', ['Batch'])
 
     # MATLAB.
@@ -329,8 +514,9 @@ class TestCodeToRest(object):
                 bf +
                 ' a = [1 2 3 4];\n' +
                 ef +
+                sl(-2) +
                 'Hello\n' +
-                div(1.0) +
+                div(1.0, -1) +
                 '\n'
                 'to the\n'
                 'world\n'
@@ -426,14 +612,15 @@ class TestRestToHtml(object):
     # which surrounds the heading in reST, is moved to only surround the body in
     # the resulting HTML.
     def test_12(self):
-        assert (self.t(div(1.0) +
+        assert (self.t(div(1.0, -3) +
                        'Heading\n'
                        '=======\n'
                        'Body.\n' +
                        div_end) ==
                        '<h1 class="title">Heading</h1>\n'
                        '\n'
-                       '<div style="margin-left:1.0em;"><p>Body.</p>\n'
+                       '<div style="margin-left:1.0em;"><!--  -->\n'
+                       '<p>Body.</p>\n'
                        '</div><!--  -->')
 #
 # Poor coverage of code_to_html_file
@@ -824,7 +1011,7 @@ ef)
           [(0, u'\n'),
            (0, u'comment\n'),
            (0, u'\n')], out_stringio)
-        assert (out_stringio.getvalue() ==
+        assert (out_stringio.getvalue() == sl(-3) +
 """
 comment
 
@@ -835,5 +1022,5 @@ comment
           [(3, u'\n'),
            (3, u'comment\n'),
            (3, u'\n')], out_stringio)
-        assert (out_stringio.getvalue() == div(1.5) + '\ncomment\n\n' + div_end)
+        assert (out_stringio.getvalue() == div(1.5, -3) + '\ncomment\n\n' + div_end)
 
