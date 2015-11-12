@@ -1086,7 +1086,14 @@ def _generate_rest(
                 # Specify the line number in the source, so that errors will be
                 # accurately reported. This isn't necessary in code blocks,
                 # since errors can't occur.
-                out_file.write('\n.. set-line:: {}\n\n'.format(line - 2))
+                #
+                # After this directive, the following text may be indented,
+                # which would make it a part of the ``set-line`` directive! So,
+                # include an empty comment to terminate the ``set-line``, making
+                # any following indents a separate syntatical element. See the
+                # end of `reST comment syntax <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#comments>`_
+                # for more discussion.
+                out_file.write('\n.. set-line:: {}\n\n..\n\n'.format(line - 4))
 
         # Output string based on state. All code needs an inital space to
         # place it inside the fenced-code block.
