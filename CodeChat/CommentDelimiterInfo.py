@@ -161,7 +161,7 @@ COMMENT_DELIMITER_INFO = {
   ##                  ;
   'INI':            ( 1,   None,         None),
   }
-
+#
 # Supported extensions
 # ====================
 # Compute a list of supported filename globs: supported by the lexer and

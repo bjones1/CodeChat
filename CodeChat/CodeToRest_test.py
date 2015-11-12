@@ -24,8 +24,6 @@
 # from the command line. Note the period in this command -- ``pytest`` does
 # **NOT** work (it is a completely different program).
 #
-# .. highlight:: none
-#
 # Imports
 # =======
 # These are listed in the order prescribed by `PEP 8
@@ -84,8 +82,8 @@ div_end = (u'\n'
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
 class TestCodeToRest(object):
-    # C-like language tests
-    # =====================
+# C-like language tests
+# =====================
     # multi-test: Check that the given code's output is correct over several
     # C-like languages.
     def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++',
@@ -97,11 +95,17 @@ class TestCodeToRest(object):
             assert rest == expected_rest_str
 
     def test_1(self):
-        self.mt('testing', bf + ' testing\n' + ef)
+        self.mt('testing',
+                bf +
+                ' testing\n' +
+                ef)
 
     # A single line of code, with an ending ``\n``.
     def test_2(self):
-        self.mt('testing\n', bf + ' testing\n' + ef)
+        self.mt('testing\n',
+                bf +
+                ' testing\n' +
+                ef)
 
     # Several lines of code, with arbitrary indents.
     def test_3(self):
@@ -139,15 +143,24 @@ class TestCodeToRest(object):
     # A single line comment with no space after the comment should be treated
     # like code.
     def test_6(self):
-        self.mt('//testing', bf + ' //testing\n' + ef)
+        self.mt('//testing',
+                bf +
+                ' //testing\n' +
+                ef)
 
     # A singly indented single-line comment.
     def test_7(self):
-        self.mt(' // testing', div(0.5, -3) + 'testing\n' + div_end)
+        self.mt(' // testing',
+                div(0.5, -3) +
+                'testing\n' +
+                div_end)
 
     # A doubly indented single-line comment.
     def test_8(self):
-        self.mt('  // testing', div(1.0, -3) + 'testing\n' + div_end)
+        self.mt('  // testing',
+                div(1.0, -3) +
+                'testing\n' +
+                div_end)
 
     # A doubly indented multi-line comment.
     def test_9(self):
@@ -176,11 +189,17 @@ class TestCodeToRest(object):
 
     # Make sure an empty string works.
     def test_12(self):
-        self.mt('', bf + ' \n' + ef)
+        self.mt('',
+                bf +
+                ' \n' +
+                ef)
 
     # Make sure Unicode works.
     def test_13(self):
-        self.mt(u'ю', bf + u' ю\n' + ef)
+        self.mt(u'ю',
+                bf +
+                u' ю\n' +
+                ef)
 
     # Code to comment transition.
     def test_14(self):
@@ -267,10 +286,10 @@ class TestCodeToRest(object):
                 '=======\n'
                 'Body.\n' +
                 div_end)
-    #
-    # Block comment indent removal: indents with spaces
-    # -------------------------------------------------
-    # Removeal of leading whitespace in block comments.
+#
+# Block comment indent removal: indents with spaces
+# -------------------------------------------------
+    # Removal of leading whitespace in block comments.
     def test_19_1_1(self):
         self.mt('/* multi-\n'
                 '   line\n'
@@ -316,9 +335,9 @@ class TestCodeToRest(object):
                 'comment\n'
                 '  \n' +
                 div_end)
-    #
-    # Block comment indent removal: indents with delimiters
-    # -----------------------------------------------------
+#
+# Block comment indent removal: indents with delimiters
+# -----------------------------------------------------
     # Removal of leading whitespace in block comments.
     def test_19_1_5(self):
         self.mt('/* multi-\n'
@@ -365,12 +384,18 @@ class TestCodeToRest(object):
                 'comment\n'
                 '  \n' +
                 div_end)
-    #
-    # Other block comment testing
-    # ---------------------------
+#
+# Other block comment testing
+# ---------------------------
     def test_19_2(self):
-        self.mt('/*multi-\nline\ncomment */\n', bf +
-                ' /*multi-\n line\n comment */\n' + ef)
+        self.mt('/*multi-\n'
+                'line\n'
+                'comment */\n',
+                bf +
+                ' /*multi-\n'
+                ' line\n'
+                ' comment */\n' +
+                ef)
 
     def test_19_3(self):
         self.mt('/* block */ //inline\n',
@@ -390,9 +415,9 @@ class TestCodeToRest(object):
                 'multi-\n'
                 'line\n'
                 'comment  inline\n')
-    #
-    # Other languages
-    # ---------------
+#
+# Other languages
+# ---------------
     # A bit of Python testing.
     def test_20(self):
         self.mt('# testing\n'
@@ -563,9 +588,9 @@ class TestRestToHtml(object):
     def test_5(self):
         assert ('Content block expected for the '
         in self.t('.. fenced-code::\n\n First fence\n Second fence\n') )
-    #
-    # Check newline preservation **without** syntax highlighting
-    # ----------------------------------------------------------
+#
+# Check newline preservation **without** syntax highlighting
+# ----------------------------------------------------------
     # Check output of a one-line code block surrounded by fences.
     def test_6(self):
         assert (self.t('.. fenced-code::\n\n First fence\n testing\n'
@@ -583,9 +608,9 @@ class TestRestToHtml(object):
         assert (self.t('.. fenced-code::\n\n First fence\n testing\n\n'
                        ' Second fence\n') ==
                 '<pre class="code literal-block">\ntesting\n \n</pre>')
-    #
-    # Check newline preservation **with** syntax highlighting
-    # -------------------------------------------------------
+#
+# Check newline preservation **with** syntax highlighting
+# -------------------------------------------------------
     # Check output of a one-line syntax-highlighted code block surrounded by
     # fences.
     def test_9(self):
@@ -707,9 +732,9 @@ main(){
            (_GROUP.inline_comment, 0, u'// Empty.\n')],
           [(_GROUP.other, 0, u'}'), (_GROUP.whitespace, 0, u'\n')] ]
         assert gathered_group == expected_group
-    #
-    # remove_comment_chars tests
-    # --------------------------
+#
+# remove_comment_chars tests
+# --------------------------
     def test_4a(self):
         assert _remove_comment_delim(_GROUP.whitespace,
           u'    ', c_lexer) == u'    '
@@ -754,9 +779,9 @@ main(){
     def test_4k(self):
         assert _remove_comment_delim(_GROUP.block_comment_end,
           u'*/', c_lexer) == u''
-    #
-    # _is_space_indented_line tests
-    # -----------------------------
+#
+# _is_space_indented_line tests
+# -----------------------------
     # Tests of block comment body indentation using spaces.
     def test_4_1(self):
         assert _is_space_indented_line('comment\n',
@@ -790,9 +815,9 @@ main(){
                                        3, '*', True, (2, 2, 2)) == False
         assert _is_delim_indented_line(' */',
                                        3, '*', True, (2, 2, 2)) == True
-    #
-    # _is_rest_comment tests
-    # ----------------------
+#
+# _is_rest_comment tests
+# ----------------------
     # newline only
     def test_4aa1(self):
         assert not _is_rest_comment([
@@ -928,9 +953,9 @@ main(){
         assert _is_rest_comment([
           (_GROUP.inline_comment, 0, u'#'),
           (_GROUP.whitespace, 0, u'\n')], True, py_lexer)
-    #
-    # Classifier tests
-    # ----------------
+#
+# Classifier tests
+# ----------------
     # Test comment.
     def test_5(self):
         cg = list( _classify_groups([[
@@ -987,9 +1012,9 @@ main(){
                                     (-1, u'main(){\n'),
                                     ( 2,   u'Empty.\n'),
                                     (-1, u'}\n')]
-    #
-    # reST generation tests
-    # ---------------------
+#
+# reST generation tests
+# ---------------------
     def test_11(self):
         out_stringio = StringIO()
         generated_rest = _generate_rest(
@@ -997,13 +1022,13 @@ main(){
            (-1, u'code\n'),
            (-1, u'\n')], out_stringio)
         assert (out_stringio.getvalue() ==
-# Note: Not using a """ string, since the string trailing whitespace option in
-# Enki would remove some of the one-space lines.
-bf +
-' \n'
-' code\n' +
-' \n' +
-ef)
+          # Note: Not using a """ string, since the string trailing whitespace option in
+          # Enki would remove some of the one-space lines.
+          bf +
+          ' \n'
+          ' code\n' +
+          ' \n' +
+          ef)
 
     def test_12(self):
         out_stringio = StringIO()
