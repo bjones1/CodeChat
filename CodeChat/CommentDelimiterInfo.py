@@ -72,8 +72,9 @@ COMMENT_DELIMITER_INFO = {
   'Python 3':       ( 1,   None,         None),
   ##                         /*,            */
   'CSS':            (None,    2,            2),
-  # This covers csh and sh as well. Wikipedia claims that <# ~ #> are block
-  # comments, but I don't see this anywhere in man bash. There aren't supported.
+  # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
+  # block comments, but I don't see this anywhere in man bash. These aren't
+  # supported.
   ##                  #
   'Bash':           ( 1,   None,         None),
   'Tcsh':           ( 1,   None,         None),
@@ -112,8 +113,9 @@ COMMENT_DELIMITER_INFO = {
   'Ruby':           ( 1,      6,            4),
   ##                  #, #iffalse,      #endif
   'S':              ( 1,      8,            6),
-  # Bird style not supported. See
-  # https://wiki.haskell.org/Literate_programming#Bird_Style.
+  # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
+  # is not supported.
+  #
   ##                 --,     {-,            -}
   'Haskell':        ( 2,      2,            2),
   # ``(*`` ~ ``*)`` not supported.
@@ -153,7 +155,7 @@ COMMENT_DELIMITER_INFO = {
   'Ada':            ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
   'Vhdl':           ( 2,   None,         None),
-  # ``*>`` as inline comment not supported.
+  # ``*>`` as an inline comment is not supported.
   ##                  * or /
   'COBOL':          ( 1,   None,         None),
   ##                  ;
