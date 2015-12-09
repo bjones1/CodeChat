@@ -16,5 +16,5 @@ CodeChat is typically bundled with the `Enki <http://enki-editor.org/>`_; for mo
 
 * From the command line, execute :command:`pip install --upgrade CodeChat`.
 * For Linux users, see these `installation instructions <https://software.opensuse.org/download.html?project=home%3Ayajo%3Aenki&package=python-codechat>`_. This version is usually older than the pip package (see above).
-* `Download <https://bitbucket.org/bjones/documentation/get/tip.zip>`_ the source, unzip, then execute :command:`python setup.py install` from the command line.
-* Clone the `CodeChat <https://bitbucket.org/bjones/documentation>`_ `Mercurial <http://mercurial.selenic.com/>`_ repository, then execute :command:`python setup.py install` from the command line.
+* `Download <https://github.com/bjones1/CodeChat/archive/master.zip>`_ the source, unzip, then execute :command:`python setup.py install` from the command line.
+* Clone the `CodeChat <https://github.com/bjones1/CodeChat>`_ repository, then execute :command:`python setup.py install` from the command line.

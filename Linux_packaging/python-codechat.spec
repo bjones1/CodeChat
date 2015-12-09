@@ -29,13 +29,9 @@ Group:          Development/Libraries
 BuildArch:      noarch
 
 License:        GPLv3+
-URL:            https://bitbucket.org/bjones/documentation/
+URL:            https://github.com/bjones1/CodeChat
 
-# Bitbucket insists on downloading an archive named only by the version number.
-# Even trying a URL like https://bitbucket.org/bjones/documentation/get/v1.0.1.zip#/bjones-documentation-v1.0.1.zip
-# actually downloads a file named ``bjones-documentation-fd000fac3273.zip``.
-# So, just deal with an archive name of ``%{version}.zip``.
-Source0:        https://bitbucket.org/bjones/documentation/get/v%{version}.zip
+Source0:        https://github.com/bjones1/CodeChat/archive/v%{version}.zip
 Patch0:         %{name}.offline_setuptools.patch
 
 BuildRequires:  python2-devel >= 2.7

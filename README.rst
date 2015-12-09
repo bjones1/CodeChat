@@ -15,9 +15,9 @@ A programmer's word processor
 
 .. Note that hyperlinks don't use the typical :doc: syntax here, because:
 
-   1. This same file will be processed by reST-only tools on the Bitbucket and PyPI pages, so :doc: will produce errors.
+   1. This same file will be processed by reST-only tools on the GitHub and PyPI pages, so :doc: will produce errors.
 
-   2. Pointing to the doc homepage causes Bitbucket and PyPI links to automatically refer users to the full documentation set, rather than the single file (this one) hosted automatically there.
+   2. Pointing to the doc homepage causes GitHub and PyPI links to automatically refer users to the full documentation set, rather than the single file (this one) hosted automatically there.
 
 .. The following includes a YouTube CodeChat playlist.
 
@@ -59,7 +59,7 @@ Some examples of literate programming using CodeChat:
 
 Contributing
 ============
-This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <https://bitbucket.org/bjones/documentation/issues?status=new&status=open>`_ to report bugs or request features; even better, contribute to the `code <https://bitbucket.org/bjones/documentation>`_!
+This is a fairly basic implementation; much improvement is needed! Please use the `issue tracker <https://github.com/bjones1/CodeChat/issues>`_ to report bugs or request features; even better, contribute to the `code <https://github.com/bjones1/CodeChat>`_!
 
 
 License
