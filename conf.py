@@ -152,8 +152,8 @@ master_doc = 'index'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-                    # Ignore Mercurial repo.
-                    '.hg',
+                    # Ignore Git repo.
+                    '.git',
                     # Ignore setup.py output.
                     'build',
                     'dist',
