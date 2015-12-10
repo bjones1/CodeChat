@@ -35,11 +35,8 @@
 # * All configuration values have a default; values that are commented out serve
 #   to show the default.
 #
-import sys, os
-import sphinx
 # Use the CodeChat version date in its generated documentation.
 import CodeChat
-from CodeChat import CodeToRestSphinx
 #
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -47,7 +44,7 @@ from CodeChat import CodeToRestSphinx
 ##sys.path.insert(0, os.path.abspath('.'))
 #
 # `Project information <http://sphinx-doc.org/config.html#project-information>`_
-# -------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # `project <http://sphinx-doc.org/config.html#confval-project>`_  and
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
@@ -102,7 +99,7 @@ pygments_style = 'sphinx'
 
 #
 # `General configuration <http://sphinx-doc.org/config.html#general-configuration>`_
-# -----------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
 # `extensions <http://sphinx-doc.org/config.html#confval-extensions>`_: If your
 # documentation needs a minimal Sphinx version, state it here. **CodeChat
 # note:** CodeChat has been tested with Sphinx 1.1 and above. Older versions may
@@ -113,7 +110,7 @@ needs_sphinx = '1.3'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
 # note:** The ``CodeChat.CodeToRestSphinx`` extension is mandatory; without it,
 # CodeChat will not translate source code to reST and then (via Sphinx) to html.
-extensions = ['CodeChat.CodeToRestSphinx', 'sphinx.ext.graphviz']
+extensions = ['CodeChat.CodeToRestSphinx']
 
 # `templates_path <http://sphinx-doc.org/config.html#confval-templates_path>`_:
 # Add any paths that contain templates here, relative to this directory.
@@ -131,11 +128,11 @@ CodeChat_lexer_for_glob = {
     # ``CodeChat.css`` is auto-detected as a CSS + Lasso file by Pygments,
     # causing it to display incorrectly. Define it as CSS only, both in the
     # root path and in the template subdirectory.
-    '*CodeChat.css': 'CSS',
+    '*/CodeChat.css': 'CSS',
     # The ``MANIFEST.in`` and ``python-codechat.spec`` files use # as a comment.
     # So does Python. Ugly, no?
     'MANIFEST.in'  : 'Python',
-    'python-codechat.spec' : 'Python',
+    '*/python-codechat.spec' : 'Python',
     }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:

@@ -68,9 +68,9 @@
 #
 #  ``python setup.py develop``
 #
-# Yajo has `packaged this for Linux
+# Yajo helped `package this for Linux
 # <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
-# Thanks so much. See also :doc:`python-codechat.spec`.
+# Thanks so much. See also :doc:`Linux_packaging/python-codechat.spec`.
 #
 # Packaging script
 # ================
