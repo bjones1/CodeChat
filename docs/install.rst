@@ -12,9 +12,9 @@
 Installation instructions
 *************************
 
-CodeChat is typically bundled with the `Enki <http://enki-editor.org/>`_; for most users, installing Enki_ will install CodeChat. See :doc:`../README` for more information on CodeChat itself. For manual installation, choose any of the following options:
+On Windows, CodeChat is bundled with the `Enki <http://enki-editor.org/>`_; for these users, installing Enki_ will install CodeChat. See :doc:`../README` for more information on CodeChat itself. For other OSes or for manual installation:
 
 * From the command line, execute :command:`pip install --upgrade CodeChat`.
-* For Linux users, see these `installation instructions <https://software.opensuse.org/download.html?project=home%3Ayajo%3Aenki&package=python-codechat>`_. This version is usually older than the pip package (see above).
 * `Download <https://github.com/bjones1/CodeChat/archive/master.zip>`_ the source, unzip, then execute :command:`python setup.py install` from the command line.
 * Clone the `CodeChat <https://github.com/bjones1/CodeChat>`_ repository, then execute :command:`python setup.py install` from the command line.
+* For Linux users, see these `installation instructions <https://software.opensuse.org/download.html?project=home%3Ayajo%3Aenki&package=python-codechat>`_. This version is usually older than the pip package (see above).
