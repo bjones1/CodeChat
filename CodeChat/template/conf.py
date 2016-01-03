@@ -48,8 +48,8 @@ from CodeChat import CodeToRestSphinx
 # `project <http://sphinx-doc.org/config.html#confval-project>`_  and
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
-project = u'Project Name'
-copyright = u'2015, Author'
+project = 'Project Name'
+copyright = '2015, Author'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout

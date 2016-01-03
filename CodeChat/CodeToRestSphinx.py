@@ -87,7 +87,7 @@ def _source_read(
             # See if ``source_file`` matches any of the globs.
             lexer = None
             lfg = app.config.CodeChat_lexer_for_glob
-            for glob, lexer_alias in lfg.iteritems():
+            for glob, lexer_alias in lfg.items():
                 if fnmatch.fnmatch(base_docname, glob):
                     # On a match, pass the specified lexer alias.
                     lexer = get_lexer(alias=lexer_alias)

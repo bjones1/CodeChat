@@ -48,8 +48,8 @@ import CodeChat
 # `project <http://sphinx-doc.org/config.html#confval-project>`_  and
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
-project = u'CodeChat'
-copyright = u'2015, Bryan A. Jones'
+project = 'CodeChat'
+copyright = '2015, Bryan A. Jones'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
@@ -152,8 +152,8 @@ master_doc = 'index'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-                    # Ignore Git repo.
-                    '.git',
+                    # Ignore Mercurial repo.
+                    '.hg',
                     # Ignore setup.py output.
                     'build',
                     'dist',

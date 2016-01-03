@@ -36,7 +36,7 @@
 # ----------------
 # For calling code_to_rest with a string. While using cStringIO would be
 # great, it doesn't support Unicode, so we can't.
-from StringIO import StringIO
+from io import StringIO
 # To find a file's extension and locate data files.
 import os.path
 #
@@ -247,7 +247,7 @@ def _lexer_to_rest(
   # See out_file_.
   out_file):
 
-    _debug_print(u'Lexer: {}\n'.format(lexer.name))
+    _debug_print('Lexer: {}\n'.format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
     cdi = COMMENT_DELIMITER_INFO[lexer.name]
@@ -301,17 +301,17 @@ def _group_lexer_tokens(
 
 
     # Keep track of the current group and string.
-    tokentype, current_string = iter_token.next()
+    tokentype, current_string = next(iter_token)
     current_group = _group_for_tokentype(tokentype, comment_is_inline,
                                          comment_is_block)
-    _debug_print(u'tokentype = {}, string = {}\n'.
+    _debug_print('tokentype = {}, string = {}\n'.
                 format(tokentype, [current_string]))
 
     # Walk through tokens.
     for tokentype, string in iter_token:
         group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
-        _debug_print(u'tokentype = {}, string = {}\n'.
+        _debug_print('tokentype = {}, string = {}\n'.
                     format(tokentype, [string]))
 
         # If there's a change in group, yield what we've accumulated so far,
@@ -413,7 +413,7 @@ def _gather_groups_on_newlines(
 
     # Accumulate until we find a newline, then yield that.
     for group, string in iter_grouped:
-        _debug_print(u'group = {}, string = {}\n'.format(group, [string]))
+        _debug_print('group = {}, string = {}\n'.format(group, [string]))
         # A given group (such as a block string) may extend across multiple
         # newlines. Split these groups apart first.
         splitlines = string.splitlines(True)
@@ -675,7 +675,7 @@ def _classify_groups(
 
     # Walk through groups.
     for l in iter_gathered_groups:
-        _debug_print(u'[(group, ws_len, string), ...] = {}\n'.format(l))
+        _debug_print('[(group, ws_len, string), ...] = {}\n'.format(l))
 
         if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
 
@@ -798,7 +798,7 @@ def _is_rest_comment(
 
     # See if there is any _GROUP.other in this line. If so, it's not a reST
     # comment.
-    group_tuple, ws_len_tuple, string_tuple = zip(*line_list)
+    group_tuple, ws_len_tuple, string_tuple = list(zip(*line_list))
     if _GROUP.other in group_tuple:
         return False
     # If there's no comments (meaning the entire line is whitespace), it's not a
@@ -1065,7 +1065,7 @@ def _generate_rest(
     line = 1
 
     for type_, string in classified_lines:
-        _debug_print(u'type_ = {}, line = {}, string = {}\n'.format(type_, line, [string]))
+        _debug_print('type_ = {}, line = {}, string = {}\n'.format(type_, line, [string]))
 
         # See if there's a change in state.
         if current_type != type_:
