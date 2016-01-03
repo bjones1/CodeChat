@@ -140,7 +140,10 @@ COMMENT_DELIMITER_INFO = {
   'APL':            ( 1,   None,         None),
   ##                  #
   'Makefile':       ( 1,   None,         None),
+  'RPMSpec':        ( 1,   None,         None),
   'Nimrod':         ( 1,   None,         None),
+  ##                  ; or #
+  'NSIS':           ( 1,   None,         None),
   ##                  %
   'TeX':            ( 1,   None,         None),
   ##                  %

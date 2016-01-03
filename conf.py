@@ -129,10 +129,9 @@ CodeChat_lexer_for_glob = {
     # causing it to display incorrectly. Define it as CSS only, both in the
     # root path and in the template subdirectory.
     '*/CodeChat.css': 'CSS',
-    # The ``MANIFEST.in`` and ``python-codechat.spec`` files use # as a comment.
+    # The ``MANIFEST.in`` files uses # as a comment.
     # So does Python. Ugly, no?
     'MANIFEST.in'  : 'Python',
-    '*/python-codechat.spec' : 'Python',
     }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
