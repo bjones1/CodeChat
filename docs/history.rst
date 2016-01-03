@@ -18,7 +18,7 @@ History of recent changes
    - Tests now reside in a separate ``test/`` subdirectory.
 
 - 1.2.1, 12-Nov-2015:
-   - Fix broken hyperlinks in the :ref:`tutorial-examples`.
+   - Fixed broken hyperlinks in the :ref:`tutorial-examples`.
    - Provide correct Linux installation instructions.
 
 - 1.2.0, 12-Nov-2015:
