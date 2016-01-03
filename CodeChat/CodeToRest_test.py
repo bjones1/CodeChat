@@ -565,7 +565,7 @@ class TestCodeToRest(object):
 class TestRestToHtml(object):
     # Use docutils to convert reST to HTML, then look at the resulting string.
     def t(self, rest):
-        html = core.publish_string(rest, writer_name='html')
+        html = core.publish_string(rest, writer_name='html').decode('utf-8')
         # Snip out just the body. Note that ``.`` needs the `re.DOTALL flag
         # <https://docs.python.org/2/library/re.html#re.DOTALL>`_ so that it
         # can match newlines.
