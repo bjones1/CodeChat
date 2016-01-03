@@ -13,7 +13,9 @@ History of recent changes
 *************************
 - Development version:
 
-   - No changes yet.
+   - Ported to Python 3.
+   - Added NSIS, Spec file support.
+   - Tests now reside in a separate ``test/`` subdirectory.
 
 - 1.2.1, 12-Nov-2015:
    - Fix broken hyperlinks in the :ref:`tutorial-examples`.

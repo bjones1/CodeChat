@@ -46,8 +46,8 @@ Testing
 .. toctree::
    :maxdepth: 2
 
-   CodeChat/pytest.ini
-   CodeChat/CodeToRest_test.py
+   test/pytest.ini
+   test/CodeToRest_test.py
 
 ************************
 Documentation generation
