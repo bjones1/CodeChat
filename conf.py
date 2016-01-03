@@ -128,7 +128,7 @@ CodeChat_lexer_for_glob = {
     # ``CodeChat.css`` is auto-detected as a CSS + Lasso file by Pygments,
     # causing it to display incorrectly. Define it as CSS only, both in the
     # root path and in the template subdirectory.
-    '*/CodeChat.css': 'CSS',
+    'CodeChat.css': 'CSS',
     # The ``MANIFEST.in`` files uses # as a comment.
     # So does Python. Ugly, no?
     'MANIFEST.in'  : 'Python',
