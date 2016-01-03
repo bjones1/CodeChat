@@ -42,7 +42,7 @@ from pygments.lexers import get_all_lexers
 COMMENT_DELIMITER_INFO = {
   # These languages have unit tests which pass
   # ------------------------------------------
-  # See :doc:`CodeToRest_test.py` for the tests.
+  # See :doc:`../test/CodeToRest_test.py` for the tests.
   ## Language name: inline, block opening, block closing
   ##                 //,     /*,            */
   'C':              ( 2,      2,            2),
