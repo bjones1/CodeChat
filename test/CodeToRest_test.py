@@ -44,11 +44,11 @@ from pygments.lexers import get_lexer_by_name
 #
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, code_to_html_file
-from .CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
+from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
+from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
   _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP
-from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
+from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
 # Define some commonly-used strings to make testing less verbose.
@@ -725,7 +725,7 @@ class TestRestToHtml(object):
 # ==================================
 class TestCodeToHtmlFile(object):
     def test_1(self):
-        code_to_html_file('CodeToRestSphinx.py')
+        code_to_html_file('CodeChat/CodeToRestSphinx.py')
 #
 # Tests of lexer_to_code and subroutines
 # ======================================
