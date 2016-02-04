@@ -74,9 +74,3 @@ Index and search
 * :ref:`genindex`
 * :ref:`search`
 
-.. Ignore the following files. They're linked in elsewhere.
-
-.. toctree::
-   :hidden:
-
-   CodeChat/LICENSE.html

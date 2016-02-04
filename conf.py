@@ -51,7 +51,7 @@ import alabaster
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = 'CodeChat'
-copyright = '2015, Bryan A. Jones'
+copyright = '2016, Bryan A. Jones'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
@@ -165,8 +165,8 @@ exclude_patterns = [
                     'sphinx-enki-info.txt',
                     # Ignore file from external web site.
                     'ez_setup.py',
-                    # Ignore test output.
-                    'CodeChat/CodeToRestSphinx.py.html',
+                    # Ignore HTML -- the license and test output.
+                    '**.html',
                     ]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
