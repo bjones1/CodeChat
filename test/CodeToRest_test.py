@@ -51,7 +51,10 @@ from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
-# Define some commonly-used strings to make testing less verbose.
+# Define some commonly-used strings to make testing less verbose. Per the
+# :ref:`summary_and_implementation`, "Code blocks must be preceeded and followed
+# by a removed marker (fences)." These two functions (begin fence == ``bf``, end
+# fence == ``ef``) contain the fence strings ``_generate_rest`` produces.
 bf = ('\n'
       '.. fenced-code::\n'
       '\n'
@@ -60,17 +63,35 @@ ef = (' Ending fence\n'
       '\n'
       '..\n'
       '\n')
-def div(size, line):
+
+# ``_generate_rest`` inserts a ``<div>`` to format indented comments followed by
+# a ``set-line`` directive to show line numbers of the comments correctly. This
+# function generates the same string.
+def div(
+   # The size of the indent, in em. Each space = 0.5 em, so a 3-space indent would be ``size=1.5``.
+   size,
+   # The line number  passed to ``sl`` below.
+   line):
+
     return ('\n'
             '.. raw:: html\n'
             '\n <div style="margin-left:{}em;">\n'
             '\n').format(size) + sl(line)
-def sl(line):
+
+# After a ``<div>``, ``_generate_rest`` inserts a ``set-line`` directive. This
+# function provides that directive as a string.
+def sl(
+  # The line number for the set-line directive, which is comment_line - 4. For
+  # example, for a comment in the first line of the file, implying
+  # comment_line == 1, use ``sl(-3)``.
+  line):
     return ('\n'
             '.. set-line:: {}\n'
             '\n'
             '..\n'
             '\n').format(line)
+
+# The standard string which marks the end of a ``<div>``.
 div_end = ('\n'
            '.. raw:: html\n'
            '\n'
@@ -735,7 +756,7 @@ class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
         test_py_code = '# A comment\nan_identifier\n'
-        test_token_list = [(Token.Comment.Single, '# A comment'),
+        test_token_list = [(Token.Comment, '# A comment'),
                            (Token.Text, '\n'),
                            (Token.Name, 'an_identifier'),
                            (Token.Text, '\n')]
@@ -764,11 +785,9 @@ main(){
         # But split the two into separate lists for unit tests.
         group_list, string_list = list(zip(*token_group))
         assert group_list == (
-          _GROUP.other,               # #include.
-          _GROUP.whitespace,          # The space after #include.
-          _GROUP.other,               # <stdio.h>\n
-          _GROUP.whitespace,          # \n
-          _GROUP.block_comment,       # The /* comment */.
+          _GROUP.other,               # The #include.
+          _GROUP.whitespace,          # Up to the /* comment */.
+          _GROUP.block_comment,  # The /* comment */.
           _GROUP.whitespace,          # Up to the code.
           _GROUP.other,               # main(){.
           _GROUP.whitespace,          # Up to the // comment.
@@ -795,9 +814,7 @@ main(){
         gathered_group = list(_gather_groups_on_newlines(token_group,
                                                          (1, 2, 2)))
         expected_group = [
-          [(_GROUP.other, 0, '#include'),
-            (_GROUP.whitespace, 0, ' '),
-            (_GROUP.other, 0, '<stdio.h>\n')],
+          [(_GROUP.other, 0, '#include <stdio.h>\n')],
           [(_GROUP.whitespace, 0, '\n')],
           [(_GROUP.block_comment_start, 3, '/* A multi-\n')],
           [(_GROUP.block_comment_body,  3, '   line\n')],

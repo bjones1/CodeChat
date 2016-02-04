@@ -1033,6 +1033,8 @@ def _is_block_body_or_end(group):
 # renders incorrectly. So, mixed lines are simply translated as code, meaning
 # reST markup can't be applied to the comments.
 #
+# .. _summary_and_implementation:
+#
 # Summary and implementation
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^
 # This boils down to the following basic rules:
