@@ -579,7 +579,22 @@ class TestCodeToRest(object):
                 'world\n'
                 '  \n' +
                 div_end, ['Matlab'])
-#
+
+    # Ruby.
+    def test_30(self):
+        self.mt('puts "Hello World!"\n'
+                '# Comment here\n',
+                bf +
+                ' puts "Hello World!"\n' +
+                ef +
+                sl(-2) +
+                'Comment here\n', ['Ruby'])
+
+    def test_31(self):
+        self.mt('puts "Hello World!"\n',
+                bf +
+                ' puts "Hello World!"\n' +
+                ef, ['Ruby'])
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
@@ -756,7 +771,7 @@ class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
         test_py_code = '# A comment\nan_identifier\n'
-        test_token_list = [(Token.Comment, '# A comment'),
+        test_token_list = [(Token.Comment.Single, '# A comment'),
                            (Token.Text, '\n'),
                            (Token.Name, 'an_identifier'),
                            (Token.Text, '\n')]
@@ -786,8 +801,10 @@ main(){
         group_list, string_list = list(zip(*token_group))
         assert group_list == (
           _GROUP.other,               # The #include.
-          _GROUP.whitespace,          # Up to the /* comment */.
-          _GROUP.block_comment,  # The /* comment */.
+          _GROUP.whitespace,          # The space after #include.
+          _GROUP.other,               # <stdio.h>\n
+          _GROUP.whitespace,          # \n
+          _GROUP.block_comment,       # The /* comment */.
           _GROUP.whitespace,          # Up to the code.
           _GROUP.other,               # main(){.
           _GROUP.whitespace,          # Up to the // comment.
@@ -814,7 +831,9 @@ main(){
         gathered_group = list(_gather_groups_on_newlines(token_group,
                                                          (1, 2, 2)))
         expected_group = [
-          [(_GROUP.other, 0, '#include <stdio.h>\n')],
+          [(_GROUP.other, 0, '#include'),
+            (_GROUP.whitespace, 0, ' '),
+            (_GROUP.other, 0, '<stdio.h>\n')],
           [(_GROUP.whitespace, 0, '\n')],
           [(_GROUP.block_comment_start, 3, '/* A multi-\n')],
           [(_GROUP.block_comment_body,  3, '   line\n')],
