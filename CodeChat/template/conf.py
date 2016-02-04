@@ -36,7 +36,6 @@
 #   to show the default.
 #
 import sys, os
-from CodeChat import CodeToRestSphinx
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -49,7 +48,7 @@ from CodeChat import CodeToRestSphinx
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = 'Project Name'
-copyright = '2015, Author'
+copyright = '2016, Author'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
