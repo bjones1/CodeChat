@@ -15,6 +15,8 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
+# .. highlight:: spec
+#
 # ************************************************************
 # python-codechat.spec - openSUSE Build Service packaging file
 # ************************************************************
