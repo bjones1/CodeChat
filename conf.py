@@ -37,6 +37,8 @@
 #
 # Use the CodeChat version date in its generated documentation.
 import CodeChat
+# Import the `Alabaster theme customizations <https://github.com/bitprophet/alabaster#installation>`_.
+import alabaster
 #
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -110,7 +112,7 @@ needs_sphinx = '1.3'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
 # note:** The ``CodeChat.CodeToRestSphinx`` extension is mandatory; without it,
 # CodeChat will not translate source code to reST and then (via Sphinx) to html.
-extensions = ['CodeChat.CodeToRestSphinx']
+extensions = ['CodeChat.CodeToRestSphinx', 'alabaster']
 
 # `templates_path <http://sphinx-doc.org/config.html#confval-templates_path>`_:
 # Add any paths that contain templates here, relative to this directory.
@@ -196,7 +198,8 @@ html_theme = 'alabaster'
 
 # `html_theme_path <http://sphinx-doc.org/config.html#confval-html_theme_path>`_:
 # Add any paths that contain custom themes here, relative to this directory.
-##html_theme_path = []
+# Set this per the `Alabaster theme customizations`_.
+html_theme_path = [alabaster.get_path()]
 
 # `html_title <http://sphinx-doc.org/config.html#confval-html_title>`_: The
 # name for this set of Sphinx documents.  If None, it defaults to ``<project>
@@ -237,7 +240,16 @@ html_use_smartypants = True
 
 # `html_sidebars <http://sphinx-doc.org/config.html#confval-html_sidebars>`_:
 # Custom sidebar templates, maps document names to template names.
-##html_sidebars = {}
+# Set this per the `Alabaster theme customizations`_.
+html_sidebars = {
+    '**': [
+        'about.html',
+        'navigation.html',
+        'relations.html',
+        'searchbox.html',
+        'donate.html',
+    ]
+}
 
 # `html_additional_pages <http://sphinx-doc.org/config.html#confval-html_additional_pages>`_:
 # Additional templates that should be rendered to pages, maps page names to
