@@ -595,6 +595,50 @@ class TestCodeToRest(object):
                 bf +
                 ' puts "Hello World!"\n' +
                 ef, ['Ruby'])
+    
+    # SQL
+    def test_32(self):
+        self.mt('SELECT column0,column1\n'
+                'FROM table\n',
+                bf +
+                ' SELECT column0,column1\n' +
+                ' FROM table\n' +
+                ef, ['SQL'])
+                
+    def test_33(self):
+        self.mt('SELECT aBetter, example\n'
+                '-- with interlaced comments\n'
+                'FROM ourTestUnit\n',
+                bf +
+                ' SELECT aBetter, example\n' +
+                ef +
+                sl(-2) +
+                'with interlaced comments\n' +
+                bf +
+                ' FROM ourTestUnit\n' +
+                ef, ['SQL'])
+                
+     # Powershell
+    def test_34(self):
+        self.mt('Write-Host "Hello World!"\n'
+                '# comment here\n',
+                bf +
+                ' Write-Host "Hello World!"\n' +
+                ef +
+                sl(-2) +
+                'comment here\n', ['Powershell'])     
+    
+    def test_35(self):
+        self.mt('<# testing block comment beginning here\n'
+                ' continuing on this line\n'
+                'and ending on this line #>\n',
+                sl(-3) +
+                'testing block comment beginning here\n'
+                ' continuing on this line\n'
+                'and ending on this line \n', ['Powershell'])
+                
+     
+    
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
