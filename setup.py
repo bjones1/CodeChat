@@ -173,8 +173,10 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
         'Operating System :: OS Independent',
         'Natural Language :: English',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Documentation',
         'Topic :: Text Processing :: Markup',
     ],
@@ -193,7 +195,7 @@ setup(
     # packages below are installed, :doc:`CodeToRestSphinx.py
     # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
     install_requires=['docutils>=0.12',
-                      'pygments>=2.0'],
+                      'pygments>=2.1'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
