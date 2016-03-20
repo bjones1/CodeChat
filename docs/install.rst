@@ -1,4 +1,4 @@
-.. Copyright (C) 2012-2015 Bryan A. Jones.
+.. Copyright (C) 2012-2016 Bryan A. Jones.
 
    This file is part of CodeChat.
 

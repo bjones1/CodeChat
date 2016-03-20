@@ -1,6 +1,4 @@
-# .. -*- coding: utf-8 -*-
-#
-#    Copyright (C) 2012-2015 Bryan A. Jones.
+#    Copyright (C) 2012-2016 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -71,6 +69,7 @@
 # Yajo helped `package this for Linux
 # <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
 # Thanks so much. See also :doc:`Linux_packaging/python-codechat.spec`.
+# Unfortunately, the Linux packaging is untested.
 #
 # Packaging script
 # ================
