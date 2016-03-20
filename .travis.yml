@@ -3,13 +3,13 @@
 # ######################################
 # See https://docs.travis-ci.com/user/languages/python.
 language: python
+# We only support Python 3.
 python:
   - "3.3"
   - "3.4"
   - "3.5"
-# command to install dependencies
-install: "pip install docutils>=0.12 pygments>=2.1"
-# command to run tests
-script:
-  - python3 setup.py develop
-  - py.test
+# In order to test, use :doc:`setup.py` to both install dependences and to put
+# CodeChat in the Python path.
+install: python setup.py develop
+# Run the tests.
+script: py.test
