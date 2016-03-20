@@ -1,0 +1,15 @@
+# ######################################
+# .travis.yml - Travis CI configuration
+# ######################################
+# See https://docs.travis-ci.com/user/languages/python.
+language: python
+python:
+  - "3.3"
+  - "3.4"
+  - "3.5"
+# command to install dependencies
+install: "pip install docutils>=0.12 pygments>=2.1"
+# command to run tests
+script:
+  - python3 setup.py develop
+  - py.test
