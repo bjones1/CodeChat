@@ -161,6 +161,8 @@ COMMENT_DELIMITER_INFO = {
   'COBOL':          ( 1,   None,         None),
   ##                  ;
   'INI':            ( 1,   None,         None),
+  ##                  #
+  'YAML':           ( 1,   None,         None),
   }
 #
 # Supported extensions
