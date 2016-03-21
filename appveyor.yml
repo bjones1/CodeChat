@@ -31,6 +31,9 @@ install:
   # Use setup.py to install dependencies and add CodeChat to the Python path.
   - python setup.py develop
 
+  # py.test isn't installed by default. Do so.
+  - pip install pytest
+
 build: none
 
 test_script:
