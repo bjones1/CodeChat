@@ -1,6 +1,6 @@
-# ######################################
+# *************************************
 # .travis.yml - Travis CI configuration
-# ######################################
+# *************************************
 # See https://docs.travis-ci.com/user/languages/python.
 language: python
 # We only support Python 3.
