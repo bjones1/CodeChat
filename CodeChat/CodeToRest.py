@@ -37,6 +37,8 @@
 from io import StringIO
 # To find a file's extension and locate data files.
 import os.path
+# For enumerations.
+from enum import Enum
 #
 # Third-party imports
 # -------------------
@@ -329,34 +331,23 @@ def _group_lexer_tokens(
 #
 # Supporting routines and definitions
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-# A simple enumerate I like, taken from one of the snippet on `stackoverflow
-# <http://stackoverflow.com/questions/36932/how-can-i-represent-an-enum-in-python>`_.
-# What I want: a set of unique identifiers that will be named nicely,
-# rather than printed as a number. Really, just a way to create a class whose
-# members contain a string representation of their name. Perhaps the best
-# solution is `enum34 <https://pypi.python.org/pypi/enum34>`_, based on `PEP
-# 0435 <https://www.python.org/dev/peps/pep-0435/>`_, but I don't want an extra
-# dependency just for this.
-class Enum(frozenset):
-    def __getattr__(self, name):
-        if name in self:
-            return name
-        raise AttributeError
-
-
 # Define the groups into which tokens will be placed.
-_GROUP = Enum(
+class _GROUP(Enum):
   # The basic classification used by group_for_tokentype_.
-  ('whitespace', 'inline_comment', 'other',
+  whitespace = 1
+  inline_comment = 2
+  other = 3
   # A ``/* comment */``-style comment contained in one string.
-  'block_comment',
+  block_comment = 4
   # Grouping is::
   #
   #    /* BLOCK_COMMENT_START
   #       BLOCK_COMMENT_BODY, (repeats for all comment body)
   #       BLOCK_COMMENT_END */
-  'block_comment_start', 'block_comment_body', 'block_comment_end') )
-
+  block_comment_start = 5
+  block_comment_body = 6
+  block_comment_end = 7
+#
 # .. _group_for_tokentype:
 #
 # Given a tokentype, group it.
