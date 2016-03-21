@@ -1,4 +1,4 @@
-#    Copyright (C) 2012-2016 Bryan A. Jones.
+# .. Copyright (C) 2012-2016 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -47,6 +47,8 @@
 # * `setuptools <https://pythonhosted.org/setuptools>`_ - A distutils
 #   replacement which can install dependencies, so I use it.
 #
+# .. _to-package:
+#
 # To package
 # ==========
 # Create a source distribution, a built distribution, then upload both to
@@ -85,7 +87,7 @@
 # so that we normally use a more modern version.
 import ez_setup
 ez_setup.use_setuptools()
-
+#
 # PyPA copied code
 # ----------------
 # From `PyPA's sample setup.py

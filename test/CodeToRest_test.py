@@ -1,4 +1,4 @@
-#    Copyright (C) 2012-2016 Bryan A. Jones.
+# .. Copyright (C) 2012-2016 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -18,9 +18,10 @@
 # *********************************
 # CodeToRest_test.py - Unit testing
 # *********************************
-# This test bench exercises the CodeToRest module. To run, execute ``py.test``
-# from the command line. Note the period in this command -- ``pytest`` does
-# **NOT** work (it is a completely different program).
+# This test bench exercises the CodeToRest module. First, set up for
+# development (see :ref:`To-package`). To run, execute ``py.test`` from the
+# command line. Note the period in this command -- ``pytest`` does **NOT** work
+# (it is a completely different program).
 #
 # Imports
 # =======
