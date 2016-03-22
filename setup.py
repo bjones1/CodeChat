@@ -135,6 +135,9 @@ def find_version(*file_paths):
 
 # My code
 # -------
+# We support Python 3.3 and higher.
+assert sys.version_info >= (3, 3)
+
 setup(
     # This must comply with `PEP 0426
     # <http://legacy.python.org/dev/peps/pep-0426/#name>`_'s
@@ -192,12 +195,16 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     #
-    # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
-    # <CodeChat/CodeToRest.py>` can be executed from the command line if the
-    # packages below are installed, :doc:`CodeToRestSphinx.py
-    # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
-    install_requires=['docutils>=0.12',
-                      'pygments>=2.1'],
+    install_requires=(
+      # `Enum <https://docs.python.org/3/library/enum.html>`_ was introduced in
+      # Python 3.4. Use a backport of it if needed.
+      ['enum34'] if sys.version_info.minor == 3 else []
+      # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
+      # <CodeChat/CodeToRest.py>` can be executed from the command line if the
+      # packages below are installed, :doc:`CodeToRestSphinx.py
+      # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
+      + ['docutils>=0.12',
+         'pygments>=2.1']),
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
