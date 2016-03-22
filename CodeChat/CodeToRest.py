@@ -377,6 +377,80 @@ def _group_for_tokentype(
     # 2.0.2.
     if tokentype == Token.Comment:
         return _GROUP.inline_comment
+    # Note: though Pygments does support a `String.Doc token type <http://pygments.org/docs/tokens/#literals>`_,
+    # it doesn't truly identify docstring; from Pygments 2.1.3,
+    # ``pygments.lexers.python.PythonLexer``:
+    #
+    # .. code-block:: Python3
+    #    :linenos:
+    #    :lineno-start: 55
+    #
+    #    (r'^(\s*)([rRuU]{,2}"""(?:.|\n)*?""")', bygroups(Text, String.Doc)),
+    #    (r"^(\s*)([rRuU]{,2}'''(?:.|\n)*?''')", bygroups(Text, String.Doc)),
+    #
+    # which means that ``String.Doc`` is simply *ANY* triple-quoted string.
+    # Looking at other lexers, ``String.Doc`` often refers to a
+    # specially-formatted comment, not a docstring. From
+    # ``pygments.lexers.javascript``:
+    #
+    # .. code-block:: Javascript
+    #    :linenos:
+    #    :lineno-start: 591
+    #
+    #    (r'//.*?\n', Comment.Single),
+    #    (r'/\*\*!.*?\*/', String.Doc),
+    #    (r'/\*.*?\*/', Comment.Multiline),
+    #
+    # So, the ``String.Doc`` token can't be used in any meaningful way by
+    # CodeToRest to identify docstrings. Per Wikipedia's `docstrings article
+    # <https://en.wikipedia.org/wiki/Docstring>`_, only three languages support
+    # this feature. So, we'll need a language-specific approach. For Python,
+    # `PEP 0257 <https://www.python.org/dev/peps/pep-0257>`_ provides the
+    # syntax and even some code to correctly remove docstring indentation. The
+    # `ast <https://docs.python.org/3.4/library/ast.html>`_ module provides
+    # routines which parse a given Python string without executing it, which
+    # looks like a better way to go that evaluating arbitrary Python then
+    # looking at its ``__doc__`` attributes. On approach would be to find
+    # docstrings, then convert them into comments before the lexer was run.
+    # However, playing around with the following, it looks like lineno gives
+    # the last line of the string, which might make fixing it harder. See also
+    # http://bugs.python.org/issue16806. Some test code:
+    #
+    # .. code-block:: Python3
+    #    :linenos:
+    #
+    #    for _ in ast.walk(ast.parse(open('tst.py').read())):
+    #        try:
+    #            d = ast.get_docstring(_)
+    #            if d:
+    #                print('Patch docstring ending at line {}:\n{}\n'
+    #                  '====================\n'.format(_.body[0].lineno, d))
+    #        except (AttributeError, TypeError):
+    #            pass
+    #
+    # Perhaps the approach would be to scan with ast, then see if the line
+    # number matches the ending line number of a string, and if so convert the
+    # string into a comment. Trickiness: Python will merge strings; consider
+    # the following:
+    #
+    # .. code-block:: pycon
+    #    :linenos:
+    #
+    #    >>> def foo():
+    #    ...     ("""A comment.""" \
+    #    ...      ' More.'
+    #    ...      " And more.")
+    #    ...     pass
+    #    ...
+    #    >>> print(foo.__doc__)
+    #    A comment. More. And more.
+    #
+    # It's probabaly best not to support this case. Unfortunately, AST reports
+    # this as a single string, rather than as a list of several elements.
+    # The approach: make sure the docstring found by ast is in the text of a
+    # Pygments string token. If so, replace the string token by a block
+    # comment, whose contents come from ``inspect.cleandoc`` of the docstring.
+
     return _GROUP.other
 #
 #
@@ -848,7 +922,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   | Do something ::         | .. code-block:: html              |
+# | .. code-block:: Python3  | Do something ::         | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # Do something          |  foo = 1                |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
@@ -868,7 +942,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   | Do something            | .. code-block:: html              |
+# | .. code-block:: Python3  | Do something            | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # Do something          | .. fenced-code::        |  <p>Do something:</p>             |
 # |  foo = 1                 |                         |  <pre>foo = 1                     |
@@ -896,7 +970,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   | One space indent ::     | .. code-block:: html              |
+# | .. code-block:: Python3  | One space indent ::     | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # One space indent      |   foo = 1               |  <p>One space indent</p>          |
 # |   foo = 1                |                         |  <pre>foo = 1                     |
@@ -911,7 +985,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   | One space indent        | .. code-block:: html              |
+# | .. code-block:: Python3  | One space indent        | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # One space indent      | .. fenced-code::        |  <p>One space indent</p>          |
 # |   foo = 1                |                         |  <pre> foo = 1                    |
@@ -937,7 +1011,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   | No indent               | .. code-block:: html              |
+# | .. code-block:: Python3  | No indent               | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # No indent             |   Two space indent      |  <p>No indent</p>                 |
 # |    # Two space indent    |                         |  <blockquote>Two space indent     |
@@ -955,7 +1029,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   |  No indent              | .. code-block:: html              |
+# | .. code-block:: Python3  |  No indent              | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  # No indent             |  .. raw:: html          |  <p>No indent</p>                 |
 # |    # Two space indent    |                         |  <div style="margin-left:1.0em">  |
@@ -983,7 +1057,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   |  .. fenced-code::       | .. code-block:: html              |
+# | .. code-block:: Python3  |  .. fenced-code::       | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  def foo():              |     Beginning fence     |  <pre>def foo():                  |
 # |  #      Indented comment |     def foo():          |  Ending fence                     |
@@ -999,7 +1073,7 @@ def _is_block_body_or_end(group):
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      | Translated to (simplified) HTML   |
 # +==========================+=========================+===================================+
-# | .. code-block:: Python   |  .. fenced-code::       | .. code-block:: html              |
+# | .. code-block:: Python3  |  .. fenced-code::       | .. code-block:: html              |
 # |                          |                         |                                   |
 # |  def foo():              |     Beginning fence     |  <pre>def foo():                  |
 # |  #      Indented comment |     def foo():          |  </pre>                           |
