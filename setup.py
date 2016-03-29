@@ -198,7 +198,7 @@ setup(
     install_requires=(
       # `Enum <https://docs.python.org/3/library/enum.html>`_ was introduced in
       # Python 3.4. Use a backport of it if needed.
-      ['enum34'] if sys.version_info.minor == 3 else []
+      (['enum34'] if sys.version_info.minor == 3 else [])
       # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
       # <CodeChat/CodeToRest.py>` can be executed from the command line if the
       # packages below are installed, :doc:`CodeToRestSphinx.py
@@ -210,9 +210,9 @@ setup(
     # dependencies). You can install these using the following syntax,
     # for example:
     #
-    #    ``$ pip install -e .test``
+    #    ``$ pip install -e .[test]``
     extras_require={
-        'test': ['py.test'],
+        'test': ['pytest'],
     },
 
     # To package data files, I'm using ``include_package_data=True`` then
