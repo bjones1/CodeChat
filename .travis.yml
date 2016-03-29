@@ -1,15 +1,93 @@
 # *************************************
 # .travis.yml - Travis CI configuration
 # *************************************
+#
+# See https://docs.travis-ci.com/user/multi-os/.
+os: linux
 # See https://docs.travis-ci.com/user/languages/python.
 language: python
-# We only support Python 3.
 python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
-# In order to test, use :doc:`setup.py` to both install dependences and to put
-# CodeChat in the Python path.
-install: python setup.py develop
+  - 3.3
+  - 3.4
+  - 3.5
+
+# See https://docs.travis-ci.com/user/customizing-the-build/#Build-Matrix. This
+# manually includes additional OS X tests to the matrix of Linux tests defined
+# above.
+matrix:
+  include:
+  - os: osx
+    # Since OS X doesn't natively support Python, use some workarounds (see
+    # before_install_ for details).
+    language: generic
+    # See https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-.travis.yml.
+    # Note that pyenv requres a full version specifier; selecting only 3.3
+    # produces an error: ``python-build: definition not found: 3.3``.
+    env: PYTHON=3.3.6
+  - os: osx
+    language: generic
+    env: PYTHON=3.4.4
+  - os: osx
+    language: generic
+    env: PYTHON=3.5.1
+
+# _`before_install`: Perform the manual steps on OS X to install python3 and
+# activate venv, since Python support is not available, per the list of
+# `unsupported languages on OS X <https://github.com/travis-ci/travis-ci/issues/2320>`_.
+# The following approach is based on a `workaround <https://github.com/travis-ci/travis-ci/issues/2312#issuecomment-195620855>`_.
+# This was modified based on `instructions to install multiple Python versions on OS X <https://gist.github.com/Bouke/11261620>`_.
+# See also the `pyenv docs <https://github.com/yyuu/pyenv/blob/master/README.md>`_.
+before_install: |
+  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+    brew update
+    # Per the `pyenv homebrew recommendations <https://github.com/yyuu/pyenv/wiki#suggested-build-environment>`_.
+    brew install openssl readline
+    # See https://docs.travis-ci.com/user/osx-ci-environment/#A-note-on-upgrading-packages.
+    # I didn't do this above because it works and I'm lazy.
+    brew outdated pyenv || brew upgrade pyenv
+    # virtualenv doesn't work without pyenv knowledge. venv in Python 3.3
+    # doesn't provide Pip by default. So, use `pyenv-virtualenv <https://github.com/yyuu/pyenv-virtualenv/blob/master/README.md>`_.
+    brew install pyenv-virtualenv
+    pyenv install $PYTHON
+    # I would expect something like ``pyenv init; pyenv local $PYTHON`` or
+    # ``pyenv shell $PYTHON`` would work, but ``pyenv init`` doesn't seem to
+    # modify the Bash environment. ??? So, I hand-set the variables instead.
+    export PYENV_VERSION=$PYTHON
+    export PATH="/Users/travis/.pyenv/shims:${PATH}"
+    pyenv-virtualenv venv
+    source venv/bin/activate
+    # A manual check that the correct version of Python is running.
+    python --version
+  fi
+
+install:
+  # Make sure we're using the latest version of pip. Use the approach which
+  # `Appveyor requires <Appveyor pip install>`_ to keep the CI files as close
+  # as possible.
+  - python -m pip install -U pip
+
+  # The default version of setuptools is old:
+  #
+  # .. code-block:: console
+  #    :linenos:
+  #
+  #    $ pip install -e .[test]
+  #    Obtaining file:///home/travis/build/bjones1/CodeChat
+  #        The required version of setuptools (>=20.3.1) is not available,
+  #        and can't be installed while this script is running. Please
+  #        install a more recent version first, using
+  #        'easy_install -U setuptools'.
+  #
+  # Use the `Appveyor approach <Appveyor easy_install install>`_ (see above).
+  - python -m easy_install -U setuptools
+
+  # See :ref:`here <Appveyor pip install command>`.
+  - pip install -e .[test]
+
 # Run the tests.
-script: py.test
+script:
+  # On OS X, ``py.test`` with no parameters runs all CodeChat tests, then
+  # discovers others that fail. Try to avoid this. Also, invoking ``py.test``
+  # refers to the system Python. So, run it as a module to use the selected
+  # Python 3 version.
+  - python -m pytest ./test
