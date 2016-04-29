@@ -24,9 +24,16 @@ User documentation
    docs/rest-primer.rst
    docs/style_guide.cpp
    docs/install.rst
+
+**********************
+Template documentation
+**********************
+The following shows the documentation produced by a template CodeChat project.
+
+.. toctree::
+   :maxdepth: 2
+
    CodeChat/template/index.rst
-   CodeChat/template/conf.py
-   CodeChat/template/CodeChat.css
 
 #######################
 Developer documentation
