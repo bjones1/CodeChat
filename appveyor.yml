@@ -1,6 +1,8 @@
 # ****************************************
 # appveyor.yml - Appveyor CI configuration
 # ****************************************
+# .. highlight:: yaml
+#
 # This was based on https://github.com/pyinstaller/pyinstaller/blob/develop/appveyor.yml
 environment:
   matrix:

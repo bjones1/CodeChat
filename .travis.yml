@@ -1,6 +1,7 @@
 # *************************************
 # .travis.yml - Travis CI configuration
 # *************************************
+# .. highlight:: yaml
 #
 # See https://docs.travis-ci.com/user/multi-os/.
 os: linux
