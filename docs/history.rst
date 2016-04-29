@@ -12,14 +12,23 @@
 History of recent changes
 *************************
 - Development version:
+   - Nothing yet.
 
+- 1.3.1, 29-Apr-2016:
+   - Installer fixes.
+   - CI testing added.
+   - Test more languages.
+
+- 1.3.0, 19-Mar-2016:
    - Ported to Python 3.
    - Added NSIS, Spec file support.
    - Tests now reside in a separate ``test/`` subdirectory.
+   - Documentation fixes.
 
 - 1.2.1, 12-Nov-2015:
    - Fixed broken hyperlinks in the :ref:`tutorial-examples`.
    - Provide correct Linux installation instructions.
+   - Correctly report the line number of errors.
 
 - 1.2.0, 12-Nov-2015:
    - Prevent errors when an indented comment follows code.
