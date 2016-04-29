@@ -82,6 +82,10 @@ COMMENT_DELIMITER_INFO = {
   'Batchfile':      ( 3,   None,         None),
   ##                  %,     %{,            %}
   'Matlab':         ( 1,      2,            2),
+  ##                 --,     /*,            */
+  'SQL':            ( 2,      2,            2),
+  ##                  #,     <#,            #>
+  'PowerShell':     ( 1,      2,            2),
 
   # These languages have failing unit tests
   # ---------------------------------------
@@ -94,14 +98,10 @@ COMMENT_DELIMITER_INFO = {
   'GAS':            ( 1,      2,            2),
   ##                  ;,     /*,            */
   'autohotkey':     ( 1,      2,            2),
-  ##                 --,     /*,            */
-  'SQL':            ( 2,      2,            2),
   ##                  %,     /*,            */
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
   'AutoIt':         ( 1,      3,            3),
-  ##                  #,     <#,            #>
-  'PowerShell':     ( 1,      2,            2),
   ##                  #, =begin,          =cut
   'Perl':           ( 1,      6,            4),
   # Or ``#`[`` ~ ``]``, or any other pair.
