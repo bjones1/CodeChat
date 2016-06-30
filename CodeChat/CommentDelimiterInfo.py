@@ -86,16 +86,10 @@ COMMENT_DELIMITER_INFO = {
   'SQL':            ( 2,      2,            2),
   ##                  #,     <#,            #>
   'PowerShell':     ( 1,      2,            2),
-
-  # These languages have failing unit tests
-  # ---------------------------------------
-  ##                 //,     /*,            */
-  'Sass':           ( 2,      2,            2),
-
-  # These langauges have **NOT** been tested.
-  # -----------------------------------------
+  # ``/*`` ~ ``*/`` tests fail.
   ##                  #,     /*,            */
   'GAS':            ( 1,      2,            2),
+  # ``;`` tests fail.
   ##                  ;,     /*,            */
   'autohotkey':     ( 1,      2,            2),
   ##                  %,     /*,            */
@@ -104,11 +98,9 @@ COMMENT_DELIMITER_INFO = {
   'AutoIt':         ( 1,      3,            3),
   ##                  #, =begin,          =cut
   'Perl':           ( 1,      6,            4),
-  # Or ``#`[`` ~ ``]``, or any other pair.
-  ##                  #,    #'(,             )
-  'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
+  # ``#iffalse`` ~ ``#endif`` tests fail.
   ##                  #, #iffalse,      #endif
   'S':              ( 1,      8,            6),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
@@ -126,13 +118,14 @@ COMMENT_DELIMITER_INFO = {
   # ``--[=[`` ~ ``]=]`` not supported.
   ##                 --,   --[[,            ]]
   'Lua':            ( 2,      4,            2),
+  # ``(comment`` ~ ``)`` tests fail.
   ##                  ;, (comment,           )
   'Clojure':        ( 1,      8,            1),
   ##                  ;,
   'Scheme':         ( 1,   None,         None),
   ##                       <!--,           -->
   'HTML':           (None,    4,            3),
-  ##                  C or !
+  ##                  !
   'Fortran':        ( 1,   None,         None),
   ##                  ⍝
   'APL':            ( 1,   None,         None),
@@ -155,14 +148,39 @@ COMMENT_DELIMITER_INFO = {
   ##                 --
   'Ada':            ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
-  'Vhdl':           ( 2,   None,         None),
-  # ``*>`` as an inline comment is not supported.
-  ##                  * or /
-  'COBOL':          ( 1,   None,         None),
   ##                  ;
   'INI':            ( 1,   None,         None),
   ##                  #
   'YAML':           ( 1,   None,         None),
+
+  # These languages have failing unit tests
+  # ---------------------------------------
+  ##                 //,     /*,            */
+  'Sass':           ( 2,      2,            2),
+  # Or ``#`[`` ~ ``]``, or any other pair.
+  ##                  #,    #'(,             )
+  'Perl6':          ( 1,      3,            1),
+  # ``*>`` as an inline comment is not supported.
+  ##                  * or /
+  'COBOL':          ( 1,   None,         None),
+
+  # ``/*`` ~ ``*/`` tests fail.
+  ##                  #,     /*,            */
+  'GAS':            ( 1,      2,            2),
+  # ``;`` tests fail.
+  ##                  ;,     /*,            */
+  'autohotkey':     ( 1,      2,            2),
+  # ``#iffalse`` ~ ``#endif`` tests fail.
+  ##                  #, #iffalse,      #endif
+  'S':              ( 1,      8,            6),
+  # ``(comment`` ~ ``)`` tests fail.
+  ##                  ;, (comment,           )
+  'Clojure':        ( 1,      8,            1),
+
+  # These languages have missing lexers
+  # ---------------------------------------
+  ##                 --
+  'Vhdl':           ( 2,   None,         None),
   }
 #
 # Supported extensions
