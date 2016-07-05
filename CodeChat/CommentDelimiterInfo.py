@@ -86,12 +86,6 @@ COMMENT_DELIMITER_INFO = {
   'SQL':            ( 2,      2,            2),
   ##                  #,     <#,            #>
   'PowerShell':     ( 1,      2,            2),
-  # ``/*`` ~ ``*/`` tests fail.
-  ##                  #,     /*,            */
-  'GAS':            ( 1,      2,            2),
-  # ``;`` tests fail.
-  ##                  ;,     /*,            */
-  'autohotkey':     ( 1,      2,            2),
   ##                  %,     /*,            */
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
@@ -100,9 +94,6 @@ COMMENT_DELIMITER_INFO = {
   'Perl':           ( 1,      6,            4),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
-  # ``#iffalse`` ~ ``#endif`` tests fail.
-  ##                  #, #iffalse,      #endif
-  'S':              ( 1,      8,            6),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
   # is not supported.
   #
@@ -118,9 +109,6 @@ COMMENT_DELIMITER_INFO = {
   # ``--[=[`` ~ ``]=]`` not supported.
   ##                 --,   --[[,            ]]
   'Lua':            ( 2,      4,            2),
-  # ``(comment`` ~ ``)`` tests fail.
-  ##                  ;, (comment,           )
-  'Clojure':        ( 1,      8,            1),
   ##                  ;,
   'Scheme':         ( 1,   None,         None),
   ##                       <!--,           -->
