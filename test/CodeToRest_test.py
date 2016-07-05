@@ -608,7 +608,7 @@ class TestCodeToRest(object):
                 'comment\n'
                 '\n', ['Ruby'])
 
-    # SQL
+    # SQL.
     def test_33(self):
         self.mt('SELECT column0,column1\n'
                 'FROM table\n',
@@ -630,7 +630,7 @@ class TestCodeToRest(object):
                 ' FROM ourTestUnit\n' +
                 ef, ['SQL'])
 
-    # Powershell
+    # Powershell.
     def test_35(self):
         self.mt('Write-Host "Hello World!"\n'
                 '# comment here\n',
@@ -649,7 +649,8 @@ class TestCodeToRest(object):
                 ' continuing on this line\n'
                 'and ending on this line \n', ['Powershell'])
 
-    # GAS
+    # GAS. Pygments does not lex multi-line comments, therefore CodeChat 
+    # does not support them.
     def test_37_a(self):
         self.mt('# comment\n',
                 sl(-3) +
@@ -663,20 +664,8 @@ class TestCodeToRest(object):
                 ef +
                 sl(-2) +
                 'comment\n', ['GAS'])
-    """
-    def test_38(self):
-        self.mt('/*\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '*/\n',
-                sl(-3) +
-                '\nmulti-\n'
-                'line\n'
-                'comment\n\n', ['GAS'])
-    """
 
-    # autohotkey
+    # autohotkey.
     """
     def test_39_a(self):
         self.mt('; Comment here\n',
@@ -703,7 +692,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['autohotkey'])
 
-    # Prolog
+    # Prolog.
     def test_41(self):
         self.mt('?- write("Hello world!").\n'
                 '% Comment here\n',
@@ -724,7 +713,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['Prolog'])
 
-    # AutoIt
+    # AutoIt.
     def test_43(self):
         self.mt('ConsoleWrite(\'Hello World!\')\n'
                 '; Comment here\n',
@@ -746,7 +735,7 @@ class TestCodeToRest(object):
                 'comment\n\n', ['AutoIt'])
 
 
-    # Perl
+    # Perl.
     def test_45(self):
         self.mt('print "Hello World!"\n'
                 '# Comment here\n',
@@ -799,7 +788,7 @@ class TestCodeToRest(object):
                 'comment\n'
                 '\n', ['Perl'])
 
-    # Perl6
+    # Perl6.
     """
     def test_48_a(self):
         self.mt('# Comment here\n',
@@ -836,7 +825,7 @@ class TestCodeToRest(object):
                 'comment\n', ['Perl6'])
     """
 
-    # S
+    # S.
     def test_50(self):
         self.mt('# Comment here\n',
                 sl(-3) +
@@ -855,7 +844,7 @@ class TestCodeToRest(object):
                 'comment\n', ['S'])
     """
 
-    # Haskell
+    # Haskell.
     def test_52(self):
         self.mt('putStrLn "Hello World!"\n'
                 '-- Comment here\n',
@@ -876,7 +865,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['Haskell'])
 
-    # Delphi
+    # Delphi.
     def test_54(self):
         self.mt('writeln(\'Hello World!\');\n'
                 '// Comment here\n',
@@ -897,7 +886,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['Delphi'])
 
-    # AppleScript
+    # AppleScript.
     def test_56_a(self):
         self.mt('-- Comment here\n',
                 sl(-3) +
@@ -923,7 +912,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['AppleScript'])
 
-    # Common Lisp
+    # Common Lisp.
     def test_58(self):
         self.mt('(princ (code-char 69))\n'
                 '; Comment here\n',
@@ -944,7 +933,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['common-lisp'])
 
-    # Lua
+    # Lua.
     def test_60(self):
         self.mt('print(\'Hello World!\')\n'
                 '-- Comment here\n',
@@ -965,14 +954,13 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['Lua'])
 
-    # Clojure
+    # Clojure.
     def test_62(self):
         self.mt('; Comment here\n',
                 sl(-3) +
                 'Comment here\n', ['Clojure'])
 
-    # Scheme
-
+    # Scheme.
     def test_63(self):
         self.mt('Hello World!\n'
                 '; Comment here\n',
@@ -982,7 +970,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Scheme'])
 
-    # HTML
+    # HTML.
     """
     def test_64_a(self):
         self.mt('; Comment here\n',
@@ -1009,7 +997,7 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['HTML'])
 
-    # Fortran
+    # Fortran.
     def test_66(self):
         self.mt('write(*,*) "Hello World!"\n'
                 '! Comment here\n',
@@ -1019,7 +1007,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Fortran'])
 
-    # APL
+    # APL.
     def test_67(self):
         self.mt('Hello World!\n'
                 '⍝ Comment here\n',
@@ -1029,7 +1017,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['APL'])
 
-    # Makefile
+    # Makefile.
     def test_68(self):
         self.mt('@echo \'Hello World!\'\n'
                 '# Comment here\n',
@@ -1039,7 +1027,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Makefile'])
 
-    # RPMSpec
+    # RPMSpec.
     def test_69(self):
         self.mt('echo \'Hello World!\'\n'
                 '# Comment here\n',
@@ -1049,7 +1037,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['spec'])
 
-    # Nimrod
+    # Nimrod.
     def test_70_a(self):
         self.mt('# Comment here\n',
                 sl(-3) +
@@ -1064,7 +1052,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Nimrod'])
 
-    # NSIS
+    # NSIS.
     def test_71_a(self):
         self.mt('; Comment here\n',
                 sl(-3) +
@@ -1093,7 +1081,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['NSIS'])
 
-    # TeX
+    # TeX.
     def test_72(self):
         self.mt('Hello World!\n'
                 '% Comment here\n',
@@ -1103,7 +1091,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['TeX'])
 
-    # Erlang
+    # Erlang.
     def test_73(self):
         self.mt('Hello World!.\n'
                 '% Comment here\n',
@@ -1113,7 +1101,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Erlang'])
 
-    # QBasic
+    # QBasic.
     def test_74(self):
         self.mt('PRINT "Hello World!";\n'
                 '\' Comment here\n',
@@ -1123,7 +1111,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['QBasic'])
 
-    # VB.net
+    # VB.net.
     def test_75(self):
         self.mt('Console.WriteLine("Hello World!")\n'
                 '\' Comment here\n',
@@ -1133,7 +1121,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['VB.net'])
 
-    # REBOL
+    # REBOL.
     def test_76(self):
         self.mt('view [text "Hello World!"]\n'
                 '; Comment here\n',
@@ -1143,7 +1131,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['REBOL'])
 
-    # LLVM
+    # LLVM.
     def test_77_a(self):
         self.mt('; Comment here\n',
                 sl(-3) +
@@ -1158,7 +1146,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['LLVM'])
 
-    # Ada
+    # Ada.
     def test_78(self):
         self.mt('Put_Line("Hello World!");\n'
                 '-- Comment here\n',
@@ -1168,7 +1156,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Ada'])
 
-    # Eiffel
+    # Eiffel.
     def test_79(self):
         self.mt('print ("Hello World!%N")\n'
                 '-- Comment here\n',
@@ -1178,7 +1166,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Eiffel'])
 
-    # Vhdl
+    # Vhdl.
     """
     def test_80(self):
         self.mt('assert false report "Hello World!"\n'
@@ -1190,7 +1178,7 @@ class TestCodeToRest(object):
                 'Comment here\n', ['Vhdl'])
     """
 
-    # COBOL
+    # COBOL.
     """
     def test_81_a(self):
         self.mt('*> Comment here\n',
@@ -1226,7 +1214,7 @@ class TestCodeToRest(object):
                 'Comment here\n', ['COBOL'])
     """
 
-    # INI
+    # INI.
     def test_82_a(self):
         self.mt('; Comment here\n',
                 sl(-3) +
@@ -1241,7 +1229,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['INI'])
 
-    # YAML
+    # YAML.
     def test_83_a(self):
         self.mt('# Comment here\n',
                 sl(-3) +
