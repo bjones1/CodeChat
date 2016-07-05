@@ -367,6 +367,8 @@ def _group_for_tokentype(
     # There is a Token.Comment, but this can refer to inline or block comments.
     # Therefore, use info from CommentDelimiterInfo as a tiebreaker.
     if (tokentype == Token.Comment.Single or
+      # A few goofy lexers use this as of Pygments 2.1.3. See https://bitbucket.org/birkenfeld/pygments-main/issues/1251/use-of-commentsingleline-instead-of.
+      tokentype == Token.Comment.Singleline or
       (tokentype == Token.Comment and comment_is_inline) ):
         return _GROUP.inline_comment
     if (tokentype == Token.Comment.Multiline or
