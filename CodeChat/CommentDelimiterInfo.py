@@ -86,6 +86,11 @@ COMMENT_DELIMITER_INFO = {
   'SQL':            ( 2,      2,            2),
   ##                  #,     <#,            #>
   'PowerShell':     ( 1,      2,            2),
+  # ``/*`` ~ ``*/`` not supported.
+  ##                  #,     /*,            */
+  'GAS':            ( 1,      2,            2),
+  ##                  ;,     /*,            */
+  'autohotkey':     ( 1,      2,            2),
   ##                  %,     /*,            */
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
@@ -136,6 +141,7 @@ COMMENT_DELIMITER_INFO = {
   ##                 --
   'Ada':            ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
+  'vhdl':           ( 2,   None,         None),
   ##                  ;
   'INI':            ( 1,   None,         None),
   ##                  #
@@ -151,24 +157,12 @@ COMMENT_DELIMITER_INFO = {
   # ``*>`` as an inline comment is not supported.
   ##                  * or /
   'COBOL':          ( 1,   None,         None),
-
-  # ``/*`` ~ ``*/`` tests fail.
-  ##                  #,     /*,            */
-  'GAS':            ( 1,      2,            2),
-  # ``;`` tests fail.
-  ##                  ;,     /*,            */
-  'autohotkey':     ( 1,      2,            2),
   # ``#iffalse`` ~ ``#endif`` tests fail.
   ##                  #, #iffalse,      #endif
   'S':              ( 1,      8,            6),
   # ``(comment`` ~ ``)`` tests fail.
   ##                  ;, (comment,           )
   'Clojure':        ( 1,      8,            1),
-
-  # These languages have missing lexers
-  # ---------------------------------------
-  ##                 --
-  'Vhdl':           ( 2,   None,         None),
   }
 #
 # Supported extensions
