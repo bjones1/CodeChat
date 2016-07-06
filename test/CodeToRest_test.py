@@ -666,7 +666,6 @@ class TestCodeToRest(object):
                 'comment\n', ['GAS'])
 
     # autohotkey.
-    """
     def test_39_a(self):
         self.mt('; Comment here\n',
                 sl(-3) +
@@ -680,7 +679,7 @@ class TestCodeToRest(object):
                 ef +
                 sl(-2) +
                 'Comment here\n', ['autohotkey'])
-    """
+
     def test_40(self):
         self.mt('/*\n'
                 'multi-\n'
@@ -789,7 +788,6 @@ class TestCodeToRest(object):
                 '\n', ['Perl'])
 
     # Perl6.
-    """
     def test_48_a(self):
         self.mt('# Comment here\n',
                 sl(-3) +
@@ -803,23 +801,17 @@ class TestCodeToRest(object):
                 ef +
                 sl(-2) +
                 'Comment here\n', ['Perl6'])
-
+    """
     def test_49_a(self):
-        self.mt('#\'(\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                ')\n',
-                'multi-\n'
-                'line\n'
-                'comment\n', ['Perl6'])
+        self.mt('#\'(embedded comment)\n',
+                'embedded comment\n', ['Perl6'])
 
     def test_49_b(self):
-        self.mt('=begin\n'
+        self.mt('=begin comment\n'
                 'multi-\n'
                 'line\n'
                 'comment\n'
-                '=end\n',
+                '=end comment\n',
                 'multi-\n'
                 'line\n'
                 'comment\n', ['Perl6'])
@@ -971,21 +963,6 @@ class TestCodeToRest(object):
                 'Comment here\n', ['Scheme'])
 
     # HTML.
-    """
-    def test_64_a(self):
-        self.mt('; Comment here\n',
-                sl(-3) +
-                'Comment here\n', ['HTML'])
-
-    def test_64_b(self):
-        self.mt('Hello World!\n'
-                '; Comment here\n',
-                bf +
-                ' Hello World!\n' +
-                ef +
-                sl(-2) +
-                'Comment here\n', ['HTML'])
-    """
     def test_65(self):
         self.mt('<!--\n'
                 'multi-\n'
@@ -1166,8 +1143,7 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['Eiffel'])
 
-    # Vhdl.
-    """
+    # vhdl.
     def test_80(self):
         self.mt('assert false report "Hello World!"\n'
                 '-- Comment here\n',
@@ -1175,8 +1151,7 @@ class TestCodeToRest(object):
                 ' assert false report "Hello World!"\n' +
                 ef +
                 sl(-2) +
-                'Comment here\n', ['Vhdl'])
-    """
+                'Comment here\n', ['vhdl'])
 
     # COBOL.
     """
