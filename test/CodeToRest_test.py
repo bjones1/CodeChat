@@ -801,40 +801,19 @@ class TestCodeToRest(object):
                 ef +
                 sl(-2) +
                 'Comment here\n', ['Perl6'])
-    """
-    def test_49_a(self):
-        self.mt('#\'(embedded comment)\n',
-                'embedded comment\n', ['Perl6'])
 
-    def test_49_b(self):
-        self.mt('=begin comment\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '=end comment\n',
-                'multi-\n'
-                'line\n'
-                'comment\n', ['Perl6'])
-    """
+    def test_49(self):
+        print(code_to_rest_string(
+                '#`( embedded comment)\n', alias = 'Perl6'))
+        self.mt('#`( embedded comment)\n',
+                sl(-3) +
+                'embedded comment\n', ['Perl6'])
 
     # S.
     def test_50(self):
         self.mt('# Comment here\n',
                 sl(-3) +
                 'Comment here\n', ['S'])
-
-    """
-    def test_51(self):
-        self.mt('#iffalse\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '#endif\n',
-                sl(-3) +
-                'multi\n'
-                'line\n'
-                'comment\n', ['S'])
-    """
 
     # Haskell.
     def test_52(self):
@@ -1154,40 +1133,34 @@ class TestCodeToRest(object):
                 'Comment here\n', ['vhdl'])
 
     # COBOL.
-    """
+
     def test_81_a(self):
-        self.mt('*> Comment here\n',
-                sl(-3) +
+        self.mt('       DISPLAY "Hello World!".\n'
+                '      * Comment here\n',
+                bf +
+                '        DISPLAY "Hello World!".\n' +
+                ef +
+                sl(-2) +
                 'Comment here\n', ['COBOL'])
 
     def test_81_b(self):
-        self.mt('DISPLAY "Hello World!".\n'
-                '* Comment here\n',
-                bf +
-                ' DISPLAY "Hello World!".\n' +
-                ef +
-                sl(-2) +
+        self.mt('      / Comment here\n',
+                sl(-3) +
                 'Comment here\n', ['COBOL'])
 
     def test_81_c(self):
-        self.mt('/ Comment here\n',
-                sl(-3) +
-                'Comment here\n', ['COBOL'])
-
-    def test_81_d(self):
-        self.mt('DISPLAY "Hello World!"\n'
-                '/ Comment here\n',
+        self.mt('       DISPLAY "Hello World!"\n'
+                '      / Comment here\n',
                 bf +
-                ' DISPLAY "Hello World!"\n' +
+                '        DISPLAY "Hello World!"\n' +
                 ef +
                 sl(-2) +
                 'Comment here\n', ['COBOL'])
 
-    def test_81_e(self):
-        self.mt('-- Comment here\n',
+    def test_81_d(self):
+        self.mt('      -- Comment here\n',
                 sl(-3) +
                 'Comment here\n', ['COBOL'])
-    """
 
     # INI.
     def test_82_a(self):

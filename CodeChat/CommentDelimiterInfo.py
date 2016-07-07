@@ -95,8 +95,12 @@ COMMENT_DELIMITER_INFO = {
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
   'AutoIt':         ( 1,      3,            3),
+  # PODs not supported in Perl or Perl6.
   ##                  #, =begin,          =cut
   'Perl':           ( 1,      6,            4),
+  # Or ``#`[`` ~ ``]``, or any other pair.
+  ##                  #,    #'(,             )
+  'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
@@ -151,9 +155,6 @@ COMMENT_DELIMITER_INFO = {
   # ---------------------------------------
   ##                 //,     /*,            */
   'Sass':           ( 2,      2,            2),
-  # Or ``#`[`` ~ ``]``, or any other pair.
-  ##                  #,    #'(,             )
-  'Perl6':          ( 1,      3,            1),
   # ``*>`` as an inline comment is not supported.
   ##                  * or /
   'COBOL':          ( 1,   None,         None),
