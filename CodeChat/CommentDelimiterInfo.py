@@ -86,14 +86,7 @@ COMMENT_DELIMITER_INFO = {
   'SQL':            ( 2,      2,            2),
   ##                  #,     <#,            #>
   'PowerShell':     ( 1,      2,            2),
-
-  # These languages have failing unit tests
-  # ---------------------------------------
-  ##                 //,     /*,            */
-  'Sass':           ( 2,      2,            2),
-
-  # These langauges have **NOT** been tested.
-  # -----------------------------------------
+  # ``/*`` ~ ``*/`` not supported.
   ##                  #,     /*,            */
   'GAS':            ( 1,      2,            2),
   ##                  ;,     /*,            */
@@ -102,6 +95,7 @@ COMMENT_DELIMITER_INFO = {
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
   'AutoIt':         ( 1,      3,            3),
+  # PODs not supported in Perl or Perl6.
   ##                  #, =begin,          =cut
   'Perl':           ( 1,      6,            4),
   # Or ``#`[`` ~ ``]``, or any other pair.
@@ -109,6 +103,7 @@ COMMENT_DELIMITER_INFO = {
   'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
+  # ``#iffalse`` ~ ``#endif`` not supported.
   ##                  #, #iffalse,      #endif
   'S':              ( 1,      8,            6),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
@@ -126,13 +121,14 @@ COMMENT_DELIMITER_INFO = {
   # ``--[=[`` ~ ``]=]`` not supported.
   ##                 --,   --[[,            ]]
   'Lua':            ( 2,      4,            2),
+  # ``(comment`` ~ ``)`` not supported.
   ##                  ;, (comment,           )
   'Clojure':        ( 1,      8,            1),
   ##                  ;,
   'Scheme':         ( 1,   None,         None),
   ##                       <!--,           -->
   'HTML':           (None,    4,            3),
-  ##                  C or !
+  ##                  !
   'Fortran':        ( 1,   None,         None),
   ##                  ⍝
   'APL':            ( 1,   None,         None),
@@ -155,7 +151,7 @@ COMMENT_DELIMITER_INFO = {
   ##                 --
   'Ada':            ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
-  'Vhdl':           ( 2,   None,         None),
+  'vhdl':           ( 2,   None,         None),
   # ``*>`` as an inline comment is not supported.
   ##                  * or /
   'COBOL':          ( 1,   None,         None),
@@ -163,6 +159,11 @@ COMMENT_DELIMITER_INFO = {
   'INI':            ( 1,   None,         None),
   ##                  #
   'YAML':           ( 1,   None,         None),
+
+  # These languages have failing unit tests
+  # ---------------------------------------
+  ##                 //,     /*,            */
+  'Sass':           ( 2,      2,            2),
   }
 #
 # Supported extensions
