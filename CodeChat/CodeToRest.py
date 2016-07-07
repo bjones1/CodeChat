@@ -498,7 +498,14 @@ def _gather_groups_on_newlines(
             # be spaces followed by a delimiter.
             #
             # First, get the last character of the block comment delimiter.
-            last_delim_char = string[comment_delim_info[1] - 1]
+            # This is expressed as a 1-character range, so that '' will be
+            # returned if the index is past the end of the string. Perl's PODs
+            # consist of ``=whatever text you want\n``, meaning the entire line
+            # should be discarded. To make this "easy", I define
+            # comment_delim_info[1] as a very large number, so that the entire
+            # line will be discarded. Hence, the need for the hack below.
+            last_delim_char = string[comment_delim_info[1] - 1:
+                                     comment_delim_info[1]]
             if _is_space_indented_line(splitlines[1], ws_len, last_delim_char,
               len(splitlines) == 1, comment_delim_info):
                 is_indented_line = _is_space_indented_line

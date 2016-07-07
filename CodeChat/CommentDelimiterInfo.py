@@ -76,8 +76,8 @@ COMMENT_DELIMITER_INFO = {
   ##                  #
   'Bash':           ( 1,   None,         None),
   'Tcsh':           ( 1,   None,         None),
-  # The only valid comment type is REM. Neither ``:`` or ``::`` are classified
-  # as a comment.
+  # The only valid comment type is ``REM``. Neither ``:`` or ``::`` are
+  # classified as a comment.
   ##                REM
   'Batchfile':      ( 3,   None,         None),
   ##                  %,     %{,            %}
@@ -86,7 +86,7 @@ COMMENT_DELIMITER_INFO = {
   'SQL':            ( 2,      2,            2),
   ##                  #,     <#,            #>
   'PowerShell':     ( 1,      2,            2),
-  # ``/*`` ~ ``*/`` not supported.
+  # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
   ##                  #,     /*,            */
   'GAS':            ( 1,      2,            2),
   ##                  ;,     /*,            */
@@ -95,17 +95,19 @@ COMMENT_DELIMITER_INFO = {
   'Prolog':         ( 1,      2,            2),
   ##                  ;,    #cs,           #ce
   'AutoIt':         ( 1,      3,            3),
-  # PODs not supported in Perl or Perl6.
-  ##                  #, =begin,          =cut
-  'Perl':           ( 1,      6,            4),
-  # Or ``#`[`` ~ ``]``, or any other pair.
+  # PODs begin and end on a line starting with =string. Toss the entire line by
+  # making the delimiter length large. This allows it to work with ``=head1``,
+  # ``=begin``, ``=begin comment``, and a host of others.
+  ##                  #, =a string, =another string
+  'Perl':           ( 1,   1000,         1000),
+  # PODs not supported in Perl6, since they conflict with the new block-style
+  # comments: ``#`[`` ~ ``]``, or any other pair.
   ##                  #,    #'(,             )
   'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
   # is not supported.
-  #
   ##                 --,     {-,            -}
   'Haskell':        ( 2,      2,            2),
   # ``(*`` ~ ``*)`` not supported.
@@ -150,26 +152,19 @@ COMMENT_DELIMITER_INFO = {
   'INI':            ( 1,   None,         None),
   ##                  #
   'YAML':           ( 1,   None,         None),
-
-  # These languages have failing unit tests
-  # ---------------------------------------
-  ##                 //,     /*,            */
-  'Sass':           ( 2,      2,            2),
   # ``*>`` as an inline comment is not supported.
-  ##                  * or /
-  'COBOL':          ( 1,   None,         None),
-  # ``#iffalse`` ~ ``#endif`` tests fail.
-  ##                  #, #iffalse,      #endif
-  'S':              ( 1,      8,            6),
-  # ``(comment`` ~ ``)`` tests fail.
-  ##                  ;, (comment,           )
-  'Clojure':        ( 1,      8,            1),
+  ##                  Six ignored characters followed by * or /.
+  'COBOL':          ( 7,   None,         None),
+  ##                  #
+  'S':              ( 1,   None,         None),
+  ##                  ;
+  'Clojure':        ( 1,   None,         None),
   }
 #
 # Supported extensions
 # ====================
 # Compute a list of supported filename globs: supported by the lexer and
-# by CodeChat (inline / block comment info in COMMENT_DELIMITER_INFO).
+# by CodeChat (inline / block comment info in ``COMMENT_DELIMITER_INFO``).
 SUPPORTED_GLOBS = set()
 # Per `get_all_lexers
 # <http://pygments.org/docs/api/#pygments.lexers.get_all_lexers>`_, we get a
@@ -177,5 +172,4 @@ SUPPORTED_GLOBS = set()
 for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
     # Pick only filenames we have comment info for.
     if longname in COMMENT_DELIMITER_INFO:
-        # Apply normcase to each glob, so it will match on this OS.
         SUPPORTED_GLOBS |= set(filename_patterns)
