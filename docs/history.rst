@@ -12,7 +12,7 @@
 History of recent changes
 *************************
 - Development version:
-   - Nothing yet.
+   - More languages tested, along with some fixes.
 
 - 1.3.1, 29-Apr-2016:
    - Installer fixes.
