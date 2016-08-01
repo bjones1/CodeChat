@@ -56,6 +56,7 @@ from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
 from pygments.util import text_type, guess_decode
 from pygments.lexer import _encoding_map
 from pygments.token import Token
+import ast
 #
 # Local application imports
 # -------------------------
@@ -294,10 +295,23 @@ def _pygments_lexer(
 
     # Pygments does some cleanup on the code given to it before lexing it. If this is Python code, we want to run AST on that cleaned-up version, so that AST results can be correlated with Pygments results. However, Pygments doesn't offer a way to do this; so, add that ability in to the detected lexer.
     preprocessed_code_str = _pygments_get_tokens_preprocess(lexer, code_str)
-    # Process this with AST if this is Python code, to find docstrings.
-    #
-    # Alden, your code here.
-    #
+    # Process this with AST if this is Python code, to find docstrings
+
+    # Determine if file is Python
+    if lexer.name == 'Python' or lexer.name == 'Python3':
+        # Run AST analysis and store it in ast_result
+        global ast_lineno
+        global ast_docstring
+        for _ in ast.walk(ast.parse(preprocessed_code_str)):
+            try:
+                d = ast.get_docstring(_)
+                if d:
+                    ast_lineno = _.body[0].lineno
+                    ast_docstring = d
+            except (AttributeError, TypeError):
+                pass
+        pass
+
     # Now, run the lexer.
     return lexer.get_tokens_unprocessed(preprocessed_code_str)
 #
@@ -393,12 +407,28 @@ def _group_lexer_tokens(
                 format(tokentype, [current_string]))
 
     # Walk through tokens.
+    compare = False
+    token_lineno = 1
     for index, tokentype, string in iter_token:
-        # Alden, modify this call to use index, the index into code_str, which should help you correlate with AST's output.
+        if current_string == '\n':
+            # keep track of every newline
+            token_lineno += 1
+        if compare:
+            # compare token containing docstring with ast results
+            global ast_lineno
+            global ast_docstring
+            token_docstring = current_string[3:-3]
+            if (ast_lineno == token_lineno and ast_docstring == token_docstring):
+                # replace token with docstring in _group_for_tokentype
+                current_string = current_string[3:-3]
+                pass
+            compare = False
+            pass
+        if tokentype == Token.Literal.String.Doc:
+            # compare next token
+            compare = True
         group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
-        _debug_print('tokentype = {}, string = {}\n'.
-                    format(tokentype, [string]))
 
         # If there's a change in group, yield what we've accumulated so far,
         # then initialize the state to the newly-found group and string.

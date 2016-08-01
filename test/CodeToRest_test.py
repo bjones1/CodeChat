@@ -1168,6 +1168,20 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['YAML'])
 
+    # DocString Testing
+    # =================
+
+    # Single Line.
+    def test_84_a(self):
+        print(code_to_rest_string(
+                'def foo():\n'
+                '    \"""single line docstring.\"""\n'
+                '    pass\n', alias = 'Python'))
+        self.mt('def foo():\n'
+                '    (\"""single line docstring.\""")\n'
+                '    pass\n',
+                'single line docstring.', ['Python'])
+
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
