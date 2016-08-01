@@ -106,6 +106,8 @@ COMMENT_DELIMITER_INFO = {
   'Perl6':          ( 1,      3,            1),
   ##                  #, =begin,          =end
   'Ruby':           ( 1,      6,            4),
+  ##                  #
+  'S':              ( 1,   None,         None),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
   # is not supported.
   ##                 --,     {-,            -}
@@ -120,6 +122,8 @@ COMMENT_DELIMITER_INFO = {
   # ``--[=[`` ~ ``]=]`` not supported.
   ##                 --,   --[[,            ]]
   'Lua':            ( 2,      4,            2),
+  ##                  ;
+  'Clojure':        ( 1,   None,         None),
   ##                  ;,
   'Scheme':         ( 1,   None,         None),
   ##                       <!--,           -->
@@ -148,17 +152,17 @@ COMMENT_DELIMITER_INFO = {
   'Ada':            ( 2,   None,         None),
   'Eiffel':         ( 2,   None,         None),
   'vhdl':           ( 2,   None,         None),
+  # ``*>`` as an inline comment is not supported.
+  ##                  Six ignored characters followed by * or /.
+  'COBOL':          ( 7,   None,         None),
   ##                  ;
   'INI':            ( 1,   None,         None),
   ##                  #
   'YAML':           ( 1,   None,         None),
-  # ``*>`` as an inline comment is not supported.
-  ##                  Six ignored characters followed by * or /.
-  'COBOL':          ( 7,   None,         None),
-  ##                  #
-  'S':              ( 1,   None,         None),
-  ##                  ;
-  'Clojure':        ( 1,   None,         None),
+
+  # These languages have failing unit tests
+  # ---------------------------------------
+  # None at this time.
   }
 #
 # Supported extensions
