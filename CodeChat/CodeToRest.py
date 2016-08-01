@@ -227,7 +227,7 @@ def get_lexer(
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
-    #print(val),
+    print(val),
     pass
 #
 #
@@ -404,36 +404,31 @@ def _group_lexer_tokens(
   ast_docstring):
 
     # Keep track of the current group and string.
-    tokentype, current_string = next(iter_token)
-    current_group = _group_for_tokentype(tokentype, comment_is_inline,
-                                         comment_is_block)
-    _debug_print('tokentype = {}, string = {}\n'.
-                format(tokentype, [current_string]))
-
+    current_string = ''
+    current_group = None
     # Walk through tokens.
-    compare = False
     token_lineno = 1
     for tokentype, string in iter_token:
+        _debug_print('tokentype = {}, string = {}\n'.
+                    format(tokentype, [string]))
+        # TODO: Might not work; what if a token contains multiple newlines? Probably something like current_string.count('\n') (assuming such a function exists).
         if current_string == '\n':
             # keep track of every newline
             token_lineno += 1
-        if compare:
+        if tokentype == Token.Literal.String.Doc:
             # compare token containing docstring with ast results
             token_docstring = current_string[3:-3]
             if (ast_lineno == token_lineno and ast_docstring == token_docstring):
                 # replace token with docstring in _group_for_tokentype
                 current_string = current_string[3:-3]
-                pass
-            compare = False
-            pass
-        if tokentype == Token.Literal.String.Doc:
-            # compare next token
-            compare = True
+                tokentype = Token.Comment.Multiline
         group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
 
         # If there's a change in group, yield what we've accumulated so far,
         # then initialize the state to the newly-found group and string.
+        if current_group is None:
+            current_group = group
         if current_group != group:
             yield current_group, current_string
             current_group = group
