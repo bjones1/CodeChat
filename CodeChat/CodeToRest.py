@@ -263,12 +263,12 @@ def _lexer_to_rest(
     # \1. Invoke a Pygments lexer on the provided source code, obtaining an
     #     iterable of tokens. Also analyze Python code for docstrings.
     #
-    token_iter = _pygments_lexer(code_str, lexer)
+    token_iter, ast_lineno, ast_docstring = _pygments_lexer(code_str, lexer)
 
     # \2. Combine tokens from the lexer into three groups: whitespace, comment,
     #     or other.
     token_group = _group_lexer_tokens(token_iter, comment_is_inline,
-                                      comment_is_block)
+                                      comment_is_block, ast_lineno, ast_docstring)
 
     # \3. Make a per-line list of [group, ws_len, string], so that the last
     #     string in each list ends with a newline. Change the group of block
@@ -298,10 +298,10 @@ def _pygments_lexer(
     # Process this with AST if this is Python code, to find docstrings
 
     # Determine if file is Python
+    ast_lineno = None
+    ast_docstring = None
     if lexer.name == 'Python' or lexer.name == 'Python3':
-        # Run AST analysis and store it in ast_result
-        global ast_lineno
-        global ast_docstring
+        # Run AST analysis and store it in ast_result. TODO: explain this in more detail.
         for _ in ast.walk(ast.parse(preprocessed_code_str)):
             try:
                 d = ast.get_docstring(_)
@@ -310,10 +310,9 @@ def _pygments_lexer(
                     ast_docstring = d
             except (AttributeError, TypeError):
                 pass
-        pass
 
     # Now, run the lexer.
-    return lexer.get_tokens_unprocessed(preprocessed_code_str)
+    return lexer.get_tokens_unprocessed(preprocessed_code_str), ast_lineno, ast_docstring
 #
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
@@ -396,8 +395,10 @@ def _group_lexer_tokens(
   # .. _comment_is_block:
   #
   # When true, classify generic comment as block comments.
-  comment_is_block):
-
+  comment_is_block,
+  # TODO: comments on these.
+  ast_lineno,
+  ast_docstring):
 
     # Keep track of the current group and string.
     index, tokentype, current_string = next(iter_token)
@@ -415,8 +416,6 @@ def _group_lexer_tokens(
             token_lineno += 1
         if compare:
             # compare token containing docstring with ast results
-            global ast_lineno
-            global ast_docstring
             token_docstring = current_string[3:-3]
             if (ast_lineno == token_lineno and ast_docstring == token_docstring):
                 # replace token with docstring in _group_for_tokentype
