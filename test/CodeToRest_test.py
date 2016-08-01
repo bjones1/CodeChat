@@ -1168,9 +1168,8 @@ class TestCodeToRest(object):
                 sl(-2) +
                 'Comment here\n', ['YAML'])
 
-    # DocString Testing
-    # =================
-
+# DocString Testing
+# =================
     # Single Line.
     def test_84_a(self):
         print(code_to_rest_string(
@@ -1183,9 +1182,12 @@ class TestCodeToRest(object):
                 bf +
                 ' def foo():\n' +
                 ef +
-                sl(-3) +
-                div(4) +
-                ' single line docstring.', ['Python3'])
+                div(2.0, -2) +
+                'single line docstring.\n' +
+                div_end +
+                bf + 
+                '     pass\n' +
+                ef, ['Python3'])
 
 # Fenced code block testing
 # =========================

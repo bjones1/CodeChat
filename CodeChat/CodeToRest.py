@@ -227,7 +227,7 @@ def get_lexer(
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
-    print(val),
+    #print(val),
     pass
 #
 #
@@ -302,7 +302,7 @@ def _pygments_lexer(
     ast_lineno = None
     ast_docstring = None
     # TODO: Is it OK to run Python code through the Python3 AST? All we want is the docstrings...
-    if lexer.name == 'Python' or lexer.name == 'Python3':
+    if lexer.name == 'Python' or lexer.name == 'Python 3':
         # Run AST analysis and store it in ast_result. TODO: explain this in more detail.
         for _ in ast.walk(ast.parse(preprocessed_code_str)):
             try:
@@ -412,16 +412,15 @@ def _group_lexer_tokens(
         _debug_print('tokentype = {}, string = {}\n'.
                     format(tokentype, [string]))
         # TODO: Might not work; what if a token contains multiple newlines? Probably something like current_string.count('\n') (assuming such a function exists).
-        if current_string == '\n':
+        if string == '\n':
             # keep track of every newline
             token_lineno += 1
         if tokentype == Token.Literal.String.Doc:
             # compare token containing docstring with ast results
-            token_docstring = current_string[3:-3]
-            if (ast_lineno == token_lineno and ast_docstring == token_docstring):
-                # replace token with docstring in _group_for_tokentype
-                current_string = current_string[3:-3]
+            if ast_lineno == token_lineno and ast_docstring == string[3:-3]:
                 tokentype = Token.Comment.Multiline
+                # Insert an extra space after the docstring delimiter, making this look like a reST commment.
+                string = string[0:3] + ' ' + string[3:]
         group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
 

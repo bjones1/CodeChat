@@ -65,9 +65,10 @@ COMMENT_DELIMITER_INFO = {
   'PHP':            ( 1,      2,            2),
   ##                  ;, %comment\n, %endcomment  -- block comments not tested.
   'NASM':           ( 1,      9,           11),
-  ##                  #,    N/A,          N/A
-  'Python':         ( 1,   None,         None),
-  'Python 3':       ( 1,   None,         None),
+  # In Python, docstrings are treated as multi-line comments.
+  ##                  #,    """,          """
+  'Python':         ( 1,      3,            3),
+  'Python 3':       ( 1,      3,            3),
   ##                         /*,            */
   'CSS':            (None,    2,            2),
   # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
