@@ -56,6 +56,7 @@ from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
 from pygments.util import text_type, guess_decode
 from pygments.lexer import _encoding_map
 from pygments.token import Token
+from pygments.filter import apply_filters
 import ast
 #
 # Local application imports
@@ -300,6 +301,7 @@ def _pygments_lexer(
     # Determine if file is Python
     ast_lineno = None
     ast_docstring = None
+    # TODO: Is it OK to run Python code through the Python3 AST? All we want is the docstrings...
     if lexer.name == 'Python' or lexer.name == 'Python3':
         # Run AST analysis and store it in ast_result. TODO: explain this in more detail.
         for _ in ast.walk(ast.parse(preprocessed_code_str)):
@@ -312,7 +314,7 @@ def _pygments_lexer(
                 pass
 
     # Now, run the lexer.
-    return lexer.get_tokens_unprocessed(preprocessed_code_str), ast_lineno, ast_docstring
+    return _pygments_get_tokens_postprocess(lexer, preprocessed_code_str), ast_lineno, ast_docstring
 #
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
@@ -370,14 +372,15 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     # EDIT: This is not from the original Pygments code. It was added to return the preprocessed text.
     return text
 
-    # EDIT: This was removed, since we want the index of each token.
-    ##def streamer():
-    ##    for _, t, v in self.get_tokens_unprocessed(text):
-    ##        yield t, v
-    ##stream = streamer()
-    ##if not unfiltered:
-    ##    stream = apply_filters(stream, self.filters, self)
-    ##return stream
+# This code was copied from pygments.lexer.Lexer.get_token, v. 2.1.3 (the last few lines).
+def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
+    def streamer():
+        for _, t, v in self.get_tokens_unprocessed(text):
+            yield t, v
+    stream = streamer()
+    if not unfiltered:
+        stream = apply_filters(stream, self.filters, self)
+    return stream
 #
 #
 # Step 2 of lexer_to_rest_
@@ -401,7 +404,7 @@ def _group_lexer_tokens(
   ast_docstring):
 
     # Keep track of the current group and string.
-    index, tokentype, current_string = next(iter_token)
+    tokentype, current_string = next(iter_token)
     current_group = _group_for_tokentype(tokentype, comment_is_inline,
                                          comment_is_block)
     _debug_print('tokentype = {}, string = {}\n'.
@@ -410,7 +413,7 @@ def _group_lexer_tokens(
     # Walk through tokens.
     compare = False
     token_lineno = 1
-    for index, tokentype, string in iter_token:
+    for tokentype, string in iter_token:
         if current_string == '\n':
             # keep track of every newline
             token_lineno += 1

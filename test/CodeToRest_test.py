@@ -1363,13 +1363,11 @@ py_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
-        ## Character              1          2
-        ##  index       01234567890 12345678901234 56789
         test_py_code = '# A comment\nan_identifier\n'
-        test_token_list = [(0, Token.Comment.Single, '# A comment'),
-                           (11, Token.Text, '\n'),
-                           (12, Token.Name, 'an_identifier'),
-                           (25, Token.Text, '\n')]
+        test_token_list = [(Token.Comment.Single, '# A comment'),
+                           (Token.Text, '\n'),
+                           (Token.Name, 'an_identifier'),
+                           (Token.Text, '\n')]
 
         lexer = get_lexer_by_name('python')
         token_iter, ast_lineno, ast_docstring = _pygments_lexer(test_py_code, lexer)
