@@ -38,7 +38,6 @@ import re
 # Used to run docutils.
 from docutils import core
 from pygments.token import Token
-from pygments import lex
 from pygments.lexers import get_lexer_by_name
 #
 # Local application imports
@@ -46,7 +45,8 @@ from pygments.lexers import get_lexer_by_name
 from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
 from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
-  _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP
+  _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP, \
+  _pygments_lexer
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
@@ -1344,14 +1344,16 @@ py_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
+        ## Character              1          2
+        ##  index       01234567890 12345678901234 56789
         test_py_code = '# A comment\nan_identifier\n'
-        test_token_list = [(Token.Comment.Single, '# A comment'),
-                           (Token.Text, '\n'),
-                           (Token.Name, 'an_identifier'),
-                           (Token.Text, '\n')]
+        test_token_list = [(0, Token.Comment.Single, '# A comment'),
+                           (11, Token.Text, '\n'),
+                           (12, Token.Name, 'an_identifier'),
+                           (25, Token.Text, '\n')]
 
         lexer = get_lexer_by_name('python')
-        token_list = list( lex(test_py_code, lexer) )
+        token_list = list( _pygments_lexer(test_py_code, lexer) )
         assert token_list == test_token_list
 
     test_c_code = \
@@ -1368,7 +1370,7 @@ main(){
     # Check grouping of a list of tokens.
     def test_2(self):
         lexer = get_lexer_by_name('c')
-        token_iter = lex(self.test_c_code, lexer)
+        token_iter = _pygments_lexer(self.test_c_code, lexer)
         # Capture both group and string for help in debugging.
         token_group = list(_group_lexer_tokens(token_iter, False, False))
         # But split the two into separate lists for unit tests.
@@ -1392,7 +1394,7 @@ main(){
         # `ensurenl <http://pygments.org/docs/lexers/>`_ option is True by
         # default.
         lexer = get_lexer_by_name('python')
-        token_iter = lex('', lexer)
+        token_iter = _pygments_lexer('', lexer)
         # Capture both group and string for help in debugging.
         token_group = list(_group_lexer_tokens(token_iter, True, False))
         assert token_group == [(_GROUP.whitespace, '\n')]
@@ -1400,7 +1402,7 @@ main(){
     # Check gathering of groups by newlines.
     def test_4(self):
         lexer = get_lexer_by_name('c')
-        token_iter = lex(self.test_c_code, lexer)
+        token_iter = _pygments_lexer(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False)
         gathered_group = list(_gather_groups_on_newlines(token_group,
                                                          (1, 2, 2)))
@@ -1686,7 +1688,7 @@ main(){
     # From code to classification.
     def test_10(self):
         lexer = get_lexer_by_name('c')
-        token_iter = lex(self.test_c_code, lexer)
+        token_iter = _pygments_lexer(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False)
         gathered_group = _gather_groups_on_newlines(token_group, (2, 2, 2))
         classified_group = list( _classify_groups(gathered_group, c_lexer) )
