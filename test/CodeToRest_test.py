@@ -1189,6 +1189,30 @@ class TestCodeToRest(object):
                 '     pass\n' +
                 ef, ['Python3'])
 
+    def test_84_b(self):
+        print(code_to_rest_string(
+                'def foo():\n'
+                '    \"""single line docstring.\"""\n'
+                '    if (1 <> 2):\n'
+                '        pass\n'
+                '    pass\n', alias='Python'))
+        self.mt('def foo():\n'
+                '    \"""single line docstring.\"""\n'
+                '    if (1 <> 2):\n'
+                '        pass\n'
+                '    pass\n',
+                bf +
+                ' def foo():\n' +
+                ef +
+                div(2.0, -2) +
+                'single line docstring.\n' +
+                div_end +
+                bf + 
+                '     if (1 <> 2):\n'
+                '         pass\n'
+                '     pass\n' +
+                ef, ['Python'])
+
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.

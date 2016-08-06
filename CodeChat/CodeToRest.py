@@ -305,16 +305,20 @@ def _pygments_lexer(
     # Determine if code is Python or Python3.
     if lexer.name == 'Python' or lexer.name == 'Python 3':
         # If so, walk through the preprocessed code to analyze each token.
-        for _ in ast.walk(ast.parse(preprocessed_code_str)):
-            try:
-                # Check if current token is a docstring.
-                d = ast.get_docstring(_)
-                if d:
-                    # If so, store current line number and token value.
-                    ast_lineno = _.body[0].lineno
-                    ast_docstring = d
-            except (AttributeError, TypeError):
-                pass
+        try:
+            for _ in ast.walk(ast.parse(preprocessed_code_str)):
+                try:
+                    # Check if current token is a docstring.
+                    d = ast.get_docstring(_)
+                    if d:
+                        # If so, store current line number and token value.
+                        ast_lineno = _.body[0].lineno
+                        ast_docstring = d
+                except (AttributeError, TypeError):
+                    pass
+        except (SyntaxError):
+            _debug_print('SyntaxError, could not compile.\n')
+            pass
 
     # Now, run the lexer.
     return _pygments_get_tokens_postprocess(lexer, preprocessed_code_str), ast_lineno, ast_docstring
