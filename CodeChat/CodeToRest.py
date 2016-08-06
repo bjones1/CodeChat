@@ -297,12 +297,11 @@ def _pygments_lexer(
     # Pygments does some cleanup on the code given to it before lexing it. If this is Python code, we want to run AST on that cleaned-up version, so that AST results can be correlated with Pygments results. However, Pygments doesn't offer a way to do this; so, add that ability in to the detected lexer.
     preprocessed_code_str = _pygments_get_tokens_preprocess(lexer, code_str)
     # Process this with AST if this is Python or Python3 code, to find docstrings.
-
     # If found, store line number and docstring into ``ast_lineno`` and ``ast_docstring`` respectively.
     ast_lineno = None
     ast_docstring = None
-
     # Determine if code is Python or Python3.
+    # Note that AST processing cannot support Python 2 specific syntax (e.g. the ``<>`` operator).
     if lexer.name == 'Python' or lexer.name == 'Python 3':
         # If so, walk through the preprocessed code to analyze each token.
         try:
