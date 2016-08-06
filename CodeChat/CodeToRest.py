@@ -296,18 +296,21 @@ def _pygments_lexer(
 
     # Pygments does some cleanup on the code given to it before lexing it. If this is Python code, we want to run AST on that cleaned-up version, so that AST results can be correlated with Pygments results. However, Pygments doesn't offer a way to do this; so, add that ability in to the detected lexer.
     preprocessed_code_str = _pygments_get_tokens_preprocess(lexer, code_str)
-    # Process this with AST if this is Python code, to find docstrings
+    # Process this with AST if this is Python or Python3 code, to find docstrings.
 
-    # Determine if file is Python
+    # If found, store line number and docstring into ``ast_lineno`` and ``ast_docstring`` respectively.
     ast_lineno = None
     ast_docstring = None
-    # TODO: Is it OK to run Python code through the Python3 AST? All we want is the docstrings...
+
+    # Determine if code is Python or Python3.
     if lexer.name == 'Python' or lexer.name == 'Python 3':
-        # Run AST analysis and store it in ast_result. TODO: explain this in more detail.
+        # If so, walk through the preprocessed code to analyze each token.
         for _ in ast.walk(ast.parse(preprocessed_code_str)):
             try:
+                # Check if current token is a docstring.
                 d = ast.get_docstring(_)
                 if d:
+                    # If so, store current line number and token value.
                     ast_lineno = _.body[0].lineno
                     ast_docstring = d
             except (AttributeError, TypeError):
@@ -399,8 +402,9 @@ def _group_lexer_tokens(
   #
   # When true, classify generic comment as block comments.
   comment_is_block,
-  # TODO: comments on these.
+  # Docstring line number found from AST scanning.
   ast_lineno,
+  # Docstring token found from AST scanning.
   ast_docstring):
 
     # Keep track of the current group and string.
@@ -411,12 +415,14 @@ def _group_lexer_tokens(
     for tokentype, string in iter_token:
         _debug_print('tokentype = {}, string = {}\n'.
                     format(tokentype, [string]))
-        # TODO: Might not work; what if a token contains multiple newlines? Probably something like current_string.count('\n') (assuming such a function exists).
-        if string == '\n':
-            # keep track of every newline
-            token_lineno += 1
+        # Increase token line no. for every newline found.
+        token_lineno = current_string.count('\n') + 1
         if tokentype == Token.Literal.String.Doc:
-            # compare token containing docstring with ast results
+            # Compare token containing docstring with AST results.
+            _debug_print('ast_lineno = {}, ast_docstring = {}\n'.
+                  format(ast_lineno, ast_docstring))
+            _debug_print('token_lineno = {}, token_docstring = {}\n'.
+                  format(token_lineno, string[3:-3]))
             if ast_lineno == token_lineno and ast_docstring == string[3:-3]:
                 tokentype = Token.Comment.Multiline
                 # Insert an extra space after the docstring delimiter, making this look like a reST commment.
