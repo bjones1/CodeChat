@@ -227,7 +227,7 @@ def get_lexer(
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
-    #print(val),
+    # print(val),
     pass
 #
 #
@@ -410,24 +410,32 @@ def _group_lexer_tokens(
   # Docstring token found from AST scanning.
   ast_docstring):
 
-    # Keep track of the current group and string.
+    # Keep track of the current group, string, and line no.
     current_string = ''
     current_group = None
-    # Walk through tokens.
+    formatted_string = ''
     token_lineno = 1
+    # Walk through tokens.
     for tokentype, string in iter_token:
         _debug_print('tokentype = {}, string = {}\n'.
                     format(tokentype, [string]))
         # Increase token line no. for every newline found.
-        token_lineno = current_string.count('\n') + 1
+        token_lineno += string.count('\n')
         if tokentype == Token.Literal.String.Doc:
-            # Compare token containing docstring with AST results.
+            # Format token containing docstring to compare.
+            formatted_string = string
+            # Remove tabs.
+            formatted_string = formatted_string.replace('    ','')
+            # Remove extra newline on multi-line docstrings.
+            formatted_string = formatted_string.replace('\n\"""','\"""')
+            # Compare formatted token containing docstring with AST result.
             _debug_print('ast_lineno = {}, ast_docstring = {}\n'.
                   format(ast_lineno, ast_docstring))
             _debug_print('token_lineno = {}, token_docstring = {}\n'.
-                  format(token_lineno, string[3:-3]))
-            if ast_lineno == token_lineno and ast_docstring == string[3:-3]:
+                  format(token_lineno, formatted_string))
+            if ast_lineno == token_lineno and ast_docstring == formatted_string[3:-3]:
                 tokentype = Token.Comment.Multiline
+                string = formatted_string
                 # Insert an extra space after the docstring delimiter, making this look like a reST commment.
                 string = string[0:3] + ' ' + string[3:]
         group = _group_for_tokentype(tokentype, comment_is_inline,

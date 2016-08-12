@@ -1174,44 +1174,72 @@ class TestCodeToRest(object):
     def test_84_a(self):
         print(code_to_rest_string(
                 'def foo():\n'
-                '    \"""single line docstring.\"""\n'
-                '    pass\n', alias='Python3'))
+                '    \"""single-line docstring.\"""\n'
+                '    pass\n', alias = 'Python3'))
         self.mt('def foo():\n'
-                '    \"""single line docstring.\"""\n'
+                '    \"""single-line docstring.\"""\n'
                 '    pass\n',
                 bf +
                 ' def foo():\n' +
                 ef +
                 div(2.0, -2) +
-                'single line docstring.\n' +
+                'single-line docstring.\n' +
                 div_end +
                 bf + 
                 '     pass\n' +
                 ef, ['Python3'])
 
+    # Single Line, with Incorrect Syntax (uncomment to test).
     def test_84_b(self):
         print(code_to_rest_string(
                 'def foo():\n'
-                '    \"""single line docstring.\"""\n'
-                '    if (1 <> 2):\n'
-                '        pass\n'
-                '    pass\n', alias='Python'))
+                '    \"""single-line docstring.\"""\n'
+                # '    if (1 <> 2):\n'
+                # '        pass\n'
+                '    pass\n', alias = 'Python'))
         self.mt('def foo():\n'
-                '    \"""single line docstring.\"""\n'
-                '    if (1 <> 2):\n'
-                '        pass\n'
+                '    \"""single-line docstring.\"""\n'
+                # '    if (1 <> 2):\n'
+                # '        pass\n'
                 '    pass\n',
                 bf +
                 ' def foo():\n' +
                 ef +
                 div(2.0, -2) +
-                'single line docstring.\n' +
+                'single-line docstring.\n' +
                 div_end +
                 bf + 
-                '     if (1 <> 2):\n'
-                '         pass\n'
+                # '     if (1 <> 2):\n'
+                # '         pass\n'
                 '     pass\n' +
                 ef, ['Python'])
+
+    # Multi Line.
+    def test_85(self):
+        print(code_to_rest_string(
+                'def foo():\n'
+                '    \"""multi-\n'
+                '    line\n'
+                '    docstring.\n'
+                '    \"""\n'
+                '    pass\n', alias = 'Python3'))
+        self.mt('def foo():\n'
+                '    \"""multi-\n'
+                '    line\n'
+                '    docstring.\n'
+                '    \"""\n'
+                '    pass\n',
+                bf +
+                ' def foo():\n' +
+                ef +
+                div(2.0, -2) +
+                'multi-\n'
+                'line\n'
+                'docstring.\n' +
+                div_end +
+                bf +
+                '     pass\n' +
+                ef, ['Python3'])
 
 # Fenced code block testing
 # =========================
