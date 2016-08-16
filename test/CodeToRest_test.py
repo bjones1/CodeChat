@@ -1185,7 +1185,7 @@ class TestCodeToRest(object):
                 div(2.0, -2) +
                 'single-line docstring.\n' +
                 div_end +
-                bf + 
+                bf +
                 '     pass\n' +
                 ef, ['Python3'])
 
@@ -1208,7 +1208,7 @@ class TestCodeToRest(object):
                 div(2.0, -2) +
                 'single-line docstring.\n' +
                 div_end +
-                bf + 
+                bf +
                 # '     if (1 <> 2):\n'
                 # '         pass\n'
                 '     pass\n' +
@@ -1216,13 +1216,6 @@ class TestCodeToRest(object):
 
     # Multi Line.
     def test_85(self):
-        print(code_to_rest_string(
-                'def foo():\n'
-                '    \"""multi-\n'
-                '    line\n'
-                '    docstring.\n'
-                '    \"""\n'
-                '    pass\n', alias = 'Python3'))
         self.mt('def foo():\n'
                 '    \"""multi-\n'
                 '    line\n'
@@ -1235,16 +1228,16 @@ class TestCodeToRest(object):
                 div(2.0, -2) +
                 'multi-\n'
                 'line\n'
-                'docstring.\n' +
+                'docstring.\n'
+                '\n' +
                 div_end +
                 bf +
                 '     pass\n' +
                 ef, ['Python3'])
-
+#
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
-
 class TestRestToHtml(object):
     # Use docutils to convert reST to HTML, then look at the resulting string.
     def t(self, rest):

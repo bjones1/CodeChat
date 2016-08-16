@@ -39,6 +39,8 @@ from io import StringIO
 import os.path
 # For enumerations.
 from enum import Enum
+# To clean up docstrings.
+import inspect
 #
 # Third-party imports
 # -------------------
@@ -227,7 +229,7 @@ def get_lexer(
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
-    # print(val),
+    #print(val),
     pass
 #
 #
@@ -308,16 +310,15 @@ def _pygments_lexer(
             for _ in ast.walk(ast.parse(preprocessed_code_str)):
                 try:
                     # Check if current token is a docstring.
-                    d = ast.get_docstring(_)
+                    d = ast.get_docstring(_, False)
                     if d:
                         # If so, store current line number and token value.
                         ast_lineno = _.body[0].lineno
                         ast_docstring = d
                 except (AttributeError, TypeError):
                     pass
-        except (SyntaxError):
-            _debug_print('SyntaxError, could not compile.\n')
-            pass
+        except SyntaxError as err:
+            _debug_print('SyntaxError, could not compile: {}\n'.format(err))
 
     # Now, run the lexer.
     return _pygments_get_tokens_postprocess(lexer, preprocessed_code_str), ast_lineno, ast_docstring
@@ -413,7 +414,6 @@ def _group_lexer_tokens(
     # Keep track of the current group, string, and line no.
     current_string = ''
     current_group = None
-    formatted_string = ''
     token_lineno = 1
     # Walk through tokens.
     for tokentype, string in iter_token:
@@ -422,20 +422,14 @@ def _group_lexer_tokens(
         # Increase token line no. for every newline found.
         token_lineno += string.count('\n')
         if tokentype == Token.Literal.String.Doc:
-            # Format token containing docstring to compare.
-            formatted_string = string
-            # Remove tabs.
-            formatted_string = formatted_string.replace('    ','')
-            # Remove extra newline on multi-line docstrings.
-            formatted_string = formatted_string.replace('\n\"""','\"""')
-            # Compare formatted token containing docstring with AST result.
             _debug_print('ast_lineno = {}, ast_docstring = {}\n'.
                   format(ast_lineno, ast_docstring))
             _debug_print('token_lineno = {}, token_docstring = {}\n'.
-                  format(token_lineno, formatted_string))
-            if ast_lineno == token_lineno and ast_docstring == formatted_string[3:-3]:
+                  format(token_lineno, string))
+            # Compare formatted token containing docstring with AST result.
+            if ast_lineno == token_lineno and ast_docstring == string[3:-3]:
                 tokentype = Token.Comment.Multiline
-                string = formatted_string
+                string = inspect.cleandoc(string)
                 # Insert an extra space after the docstring delimiter, making this look like a reST commment.
                 string = string[0:3] + ' ' + string[3:]
         group = _group_for_tokentype(tokentype, comment_is_inline,
