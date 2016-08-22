@@ -32,6 +32,8 @@
 #
 # Standard library
 # ----------------
+# For stderr.
+import sys
 # For calling code_to_rest with a string. While using cStringIO would be
 # great, it doesn't support Unicode, so we can't.
 from io import StringIO
@@ -151,10 +153,12 @@ def code_to_html_string(
         # because (I think) it relies on a relative path wihch the frozen
         # environment doesn't have. So, rebuild that path manually.
         'stylesheet_path': Writer.default_stylesheet + ',CodeChat.css',
-        'stylesheet_dirs': ['.', os.path.dirname(docutils.writers.html4css1.__file__),
-                           os.path.join(os.path.dirname(__file__), 'template')],
+        'stylesheet_dirs': ['.',
+                            os.path.dirname(docutils.writers.html4css1.__file__),
+                            os.path.join(os.path.dirname(__file__), 'template')],
         # The default template uses a relative path, which doesn't work when frozen ???.
-        'template': os.path.join(os.path.dirname(docutils.writers.html4css1.__file__), Writer.default_template),
+        'template': os.path.join(os.path.dirname(docutils.writers.html4css1.__file__),
+                                 Writer.default_template),
         # Make sure to use Unicode everywhere.
         'output_encoding': 'unicode',
         'input_encoding' : 'unicode',
@@ -296,14 +300,19 @@ def _pygments_lexer(
   # See lexer_.
   lexer):
 
-    # Pygments does some cleanup on the code given to it before lexing it. If this is Python code, we want to run AST on that cleaned-up version, so that AST results can be correlated with Pygments results. However, Pygments doesn't offer a way to do this; so, add that ability in to the detected lexer.
+    # Pygments does some cleanup on the code given to it before lexing it. If
+    # this is Python code, we want to run AST on that cleaned-up version, so
+    # that AST results can be correlated with Pygments results. However,
+    # Pygments doesn't offer a way to do this; so, add that ability in to the
+    # detected lexer.
     preprocessed_code_str = _pygments_get_tokens_preprocess(lexer, code_str)
     # Process this with AST if this is Python or Python3 code, to find docstrings.
-    # If found, store line number and docstring into ``ast_lineno`` and ``ast_docstring`` respectively.
+    # If found, store line number and docstring into ``ast_lineno`` and
+    # ``ast_docstring`` respectively.
     ast_lineno = None
     ast_docstring = None
-    # Determine if code is Python or Python3.
-    # Note that AST processing cannot support Python 2 specific syntax (e.g. the ``<>`` operator).
+    # Determine if code is Python or Python3. Note that AST processing cannot
+    # support Python 2 specific syntax (e.g. the ``<>`` operator).
     if lexer.name == 'Python' or lexer.name == 'Python 3':
         # If so, walk through the preprocessed code to analyze each token.
         try:
@@ -318,14 +327,16 @@ def _pygments_lexer(
                 except (AttributeError, TypeError):
                     pass
         except SyntaxError as err:
-            _debug_print('SyntaxError, could not compile: {}\n'.format(err))
+            print('SyntaxError: {}\n'.format(err), file=sys.stdout)
 
     # Now, run the lexer.
-    return _pygments_get_tokens_postprocess(lexer, preprocessed_code_str), ast_lineno, ast_docstring
+    return (_pygments_get_tokens_postprocess(lexer, preprocessed_code_str),
+            ast_lineno, ast_docstring)
 #
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
-# Provide a way to perform preprocessing on text before lexing it. This code was copied from pygments.lexer.Lexer.get_token, v. 2.1.3.
+# Provide a way to perform preprocessing on text before lexing it. This code was
+# copied from pygments.lexer.Lexer.get_token, v. 2.1.3.
 def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     """
     Return an iterable of (tokentype, value) pairs generated from
@@ -376,10 +387,12 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
         text = text.expandtabs(self.tabsize)
     if self.ensurenl and not text.endswith('\n'):
         text += '\n'
-    # EDIT: This is not from the original Pygments code. It was added to return the preprocessed text.
+    # EDIT: This is not from the original Pygments code. It was added to return
+    # the preprocessed text.
     return text
 
-# This code was copied from pygments.lexer.Lexer.get_token, v. 2.1.3 (the last few lines).
+# This code was copied from pygments.lexer.Lexer.get_token, v. 2.1.3 (the last
+# few lines).
 def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
     def streamer():
         for _, t, v in self.get_tokens_unprocessed(text):
@@ -430,7 +443,8 @@ def _group_lexer_tokens(
             if ast_lineno == token_lineno and ast_docstring == string[3:-3]:
                 tokentype = Token.Comment.Multiline
                 string = inspect.cleandoc(string)
-                # Insert an extra space after the docstring delimiter, making this look like a reST commment.
+                # Insert an extra space after the docstring delimiter, making
+                # this look like a reST commment.
                 string = string[0:3] + ' ' + string[3:]
         group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
@@ -853,10 +867,15 @@ def _is_delim_indented_line(
 #
 # .. Note::
 #
-#    This is a destructive edit, instead of a classification. To make this invertible, it needs to be non-destructive. The idea:
+#    This is a destructive edit, instead of a classification. To make this
+#    invertible, it needs to be non-destructive. The idea:
 #
-#    * Output s, the entire line as a string, if it's not a reST comment. Currently, it outputs -1, s.
-#    * Output whitespace characters or '', opening comment delimiter and space, comment text, closing comment delimiter or '', newline). Currently, it outputs len(leading whitespace characters), comment text + newline.
+#    * Output s, the entire line as a string, if it's not a reST comment.
+#      Currently, it outputs -1, s.
+#    * Output whitespace characters or '', opening comment delimiter and
+#      space, comment text, closing comment delimiter or '', newline).
+#      Currently, it outputs len(leading whitespace characters), comment text +
+#      newline.
 def _classify_groups(
   # An iterable of [(group1, string1_no_newline), (group2, string2_no_newline),
   # ..., (groupN, stringN_ending_newline)], produced by
