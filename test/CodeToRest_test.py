@@ -1172,10 +1172,6 @@ class TestCodeToRest(object):
 # =================
     # Single Line.
     def test_84_a(self):
-        print(code_to_rest_string(
-                'def foo():\n'
-                '    \"""single-line docstring.\"""\n'
-                '    pass\n', alias = 'Python3'))
         self.mt('def foo():\n'
                 '    \"""single-line docstring.\"""\n'
                 '    pass\n',
@@ -1189,29 +1185,17 @@ class TestCodeToRest(object):
                 '     pass\n' +
                 ef, ['Python3'])
 
-    # Single Line, with Incorrect Syntax (uncomment to test).
+    # Single Line, with incorrect syntax.
     def test_84_b(self):
-        print(code_to_rest_string(
-                'def foo():\n'
-                '    \"""single-line docstring.\"""\n'
-                # '    if (1 <> 2):\n'
-                # '        pass\n'
-                '    pass\n', alias = 'Python'))
         self.mt('def foo():\n'
                 '    \"""single-line docstring.\"""\n'
-                # '    if (1 <> 2):\n'
-                # '        pass\n'
-                '    pass\n',
+                '    if (1 <> 2):\n'
+                '        pass\n',
                 bf +
                 ' def foo():\n' +
-                ef +
-                div(2.0, -2) +
-                'single-line docstring.\n' +
-                div_end +
-                bf +
-                # '     if (1 <> 2):\n'
-                # '         pass\n'
-                '     pass\n' +
+                '     \"""single-line docstring.\"""\n'
+                '     if (1 <> 2):\n'
+                '         pass\n' +
                 ef, ['Python'])
 
     # Multi Line.
@@ -1233,6 +1217,49 @@ class TestCodeToRest(object):
                 div_end +
                 bf +
                 '     pass\n' +
+                ef, ['Python3'])
+
+    # Multiple comments.
+    def test_86(self):
+        self.mt('\"""Module docstring.\"""\n'
+                '\n'
+                'def foo():\n'
+                '    \"""Function docstring.\"""\n'
+                '    pass\n'
+                '\n'
+                'class bar():\n'
+                '    \"""Class docstring.\"""\n'
+                '\n'
+                '    def one(self):\n'
+                '        \"""Method (actually function) docstring.\"""\n'
+                '        pass\n',
+                div(0.0, -3) +
+                'Module docstring.\n'
+                '\n' +
+                div_end +
+                bf +
+                ' def foo():\n' +
+                ef +
+                div(2.0, -2) +
+                'Function docstring.\n'
+                '\n' +
+                bf +
+                '     pass\n'
+                '\n'
+                'class bar():\n' +
+                ef +
+                div(2.0, -2) +
+                'Class docstring.\n'
+                '\n' +
+                div_end +
+                bf +
+                '     def one(self):\n' +
+                div(4.0, -2) +
+                'Method (actually function) docstring.\n' +
+                div_end +
+                bf +
+                '         pass\n'
+                '\n' +
                 ef, ['Python3'])
 #
 # Fenced code block testing
