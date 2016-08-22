@@ -306,21 +306,81 @@ def _pygments_lexer(
     # Pygments doesn't offer a way to do this; so, add that ability in to the
     # detected lexer.
     preprocessed_code_str = _pygments_get_tokens_preprocess(lexer, code_str)
-    # Process this with AST if this is Python or Python3 code, to find docstrings.
-    # If found, store line number and docstring into ``ast_lineno`` and
-    # ``ast_docstring`` respectively.
+    # Note: though Pygments does support a `String.Doc token type <http://pygments.org/docs/tokens/#literals>`_,
+    # it doesn't truly identify docstring; from Pygments 2.1.3,
+    # ``pygments.lexers.python.PythonLexer``:
+    #
+    # .. code-block:: Python3
+    #    :linenos:
+    #    :lineno-start: 55
+    #
+    #    (r'^(\s*)([rRuU]{,2}"""(?:.|\n)*?""")', bygroups(Text, String.Doc)),
+    #    (r"^(\s*)([rRuU]{,2}'''(?:.|\n)*?''')", bygroups(Text, String.Doc)),
+    #
+    # which means that ``String.Doc`` is simply *ANY* triple-quoted string.
+    # Looking at other lexers, ``String.Doc`` often refers to a
+    # specially-formatted comment, not a docstring. From
+    # ``pygments.lexers.javascript``:
+    #
+    # .. code-block:: Javascript
+    #    :linenos:
+    #    :lineno-start: 591
+    #
+    #    (r'//.*?\n', Comment.Single),
+    #    (r'/\*\*!.*?\*/', String.Doc),
+    #    (r'/\*.*?\*/', Comment.Multiline),
+    #
+    # So, the ``String.Doc`` token can't be used in any meaningful way by
+    # CodeToRest to identify docstrings. Per Wikipedia's `docstrings article
+    # <https://en.wikipedia.org/wiki/Docstring>`_, only three languages support
+    # this feature. So, we'll need a language-specific approach. For Python,
+    # `PEP 0257 <https://www.python.org/dev/peps/pep-0257>`_ provides the
+    # syntax and even some code to correctly remove docstring indentation. The
+    # `ast <https://docs.python.org/3.4/library/ast.html>`_ module provides
+    # routines which parse a given Python string without executing it, which
+    # is better than evaluating arbitrary Python then looking at its
+    # ``__doc__`` attributes.
+    #
+    # Perhaps the approach would be to scan with ast, then see if the line
+    # number matches the ending line number of a string, and if so convert the
+    # string into a comment. Trickiness: Python will merge strings; consider
+    # the following:
+    #
+    # .. code-block:: pycon
+    #    :linenos:
+    #
+    #    >>> def foo():
+    #    ...     ("""A comment.""" \
+    #    ...      ' More.'
+    #    ...      " And more.")
+    #    ...     pass
+    #    ...
+    #    >>> print(foo.__doc__)
+    #    A comment. More. And more.
+    #
+    # It's probabaly best not to support this case. Unfortunately, AST reports
+    # this as a single string, rather than as a list of several elements.
+    # The approach: make sure the docstring found by ast is in the text of a
+    # Pygments string token. If so, replace the string token by a block
+    # comment, whose contents come from ``inspect.cleandoc`` of the docstring.
+    #
+    # So, process this with AST if this is Python or Python3 code to find docstrings.
+    # If found, store line number and docstring into ``ast_docstring``.
     ast_docstring = {}
     # Determine if code is Python or Python3. Note that AST processing cannot
     # support Python 2 specific syntax (e.g. the ``<>`` operator).
     if lexer.name == 'Python' or lexer.name == 'Python 3':
-        # If so, walk through the preprocessed code to analyze each token.
+        # Syntax errors cause ``ast.parse`` to fail. Catch and report them.
         try:
+            # If so, walk through the preprocessed code to analyze each token.
             for _ in ast.walk(ast.parse(preprocessed_code_str)):
                 try:
                     # Check if current token is a docstring.
                     d = ast.get_docstring(_, False)
                     if d is not None:
-                        # If so, store current line number and token value.
+                        # If so, store current line number and token value. Note
+                        # that ``lineno`` gives the last line of the string,
+                        # per http://bugs.python.org/issue16806.
                         ast_docstring[_.body[0].lineno] = d
                 except (AttributeError, TypeError):
                     pass
@@ -510,79 +570,6 @@ def _group_for_tokentype(
     # 2.0.2.
     if tokentype == Token.Comment:
         return _GROUP.inline_comment
-    # Note: though Pygments does support a `String.Doc token type <http://pygments.org/docs/tokens/#literals>`_,
-    # it doesn't truly identify docstring; from Pygments 2.1.3,
-    # ``pygments.lexers.python.PythonLexer``:
-    #
-    # .. code-block:: Python3
-    #    :linenos:
-    #    :lineno-start: 55
-    #
-    #    (r'^(\s*)([rRuU]{,2}"""(?:.|\n)*?""")', bygroups(Text, String.Doc)),
-    #    (r"^(\s*)([rRuU]{,2}'''(?:.|\n)*?''')", bygroups(Text, String.Doc)),
-    #
-    # which means that ``String.Doc`` is simply *ANY* triple-quoted string.
-    # Looking at other lexers, ``String.Doc`` often refers to a
-    # specially-formatted comment, not a docstring. From
-    # ``pygments.lexers.javascript``:
-    #
-    # .. code-block:: Javascript
-    #    :linenos:
-    #    :lineno-start: 591
-    #
-    #    (r'//.*?\n', Comment.Single),
-    #    (r'/\*\*!.*?\*/', String.Doc),
-    #    (r'/\*.*?\*/', Comment.Multiline),
-    #
-    # So, the ``String.Doc`` token can't be used in any meaningful way by
-    # CodeToRest to identify docstrings. Per Wikipedia's `docstrings article
-    # <https://en.wikipedia.org/wiki/Docstring>`_, only three languages support
-    # this feature. So, we'll need a language-specific approach. For Python,
-    # `PEP 0257 <https://www.python.org/dev/peps/pep-0257>`_ provides the
-    # syntax and even some code to correctly remove docstring indentation. The
-    # `ast <https://docs.python.org/3.4/library/ast.html>`_ module provides
-    # routines which parse a given Python string without executing it, which
-    # looks like a better way to go that evaluating arbitrary Python then
-    # looking at its ``__doc__`` attributes. On approach would be to find
-    # docstrings, then convert them into comments before the lexer was run.
-    # However, playing around with the following, it looks like lineno gives
-    # the last line of the string, which might make fixing it harder. See also
-    # http://bugs.python.org/issue16806. Some test code:
-    #
-    # .. code-block:: Python3
-    #    :linenos:
-    #
-    #    for _ in ast.walk(ast.parse(open('tst.py').read())):
-    #        try:
-    #            d = ast.get_docstring(_)
-    #            if d:
-    #                print('Patch docstring ending at line {}:\n{}\n'
-    #                  '====================\n'.format(_.body[0].lineno, d))
-    #        except (AttributeError, TypeError):
-    #            pass
-    #
-    # Perhaps the approach would be to scan with ast, then see if the line
-    # number matches the ending line number of a string, and if so convert the
-    # string into a comment. Trickiness: Python will merge strings; consider
-    # the following:
-    #
-    # .. code-block:: pycon
-    #    :linenos:
-    #
-    #    >>> def foo():
-    #    ...     ("""A comment.""" \
-    #    ...      ' More.'
-    #    ...      " And more.")
-    #    ...     pass
-    #    ...
-    #    >>> print(foo.__doc__)
-    #    A comment. More. And more.
-    #
-    # It's probabaly best not to support this case. Unfortunately, AST reports
-    # this as a single string, rather than as a list of several elements.
-    # The approach: make sure the docstring found by ast is in the text of a
-    # Pygments string token. If so, replace the string token by a block
-    # comment, whose contents come from ``inspect.cleandoc`` of the docstring.
 
     return _GROUP.other
 #
