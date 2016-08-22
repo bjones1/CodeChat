@@ -270,12 +270,12 @@ def _lexer_to_rest(
     # \1. Invoke a Pygments lexer on the provided source code, obtaining an
     #     iterable of tokens. Also analyze Python code for docstrings.
     #
-    token_iter, ast_lineno, ast_docstring = _pygments_lexer(code_str, lexer)
+    token_iter, ast_docstring = _pygments_lexer(code_str, lexer)
 
     # \2. Combine tokens from the lexer into three groups: whitespace, comment,
     #     or other.
     token_group = _group_lexer_tokens(token_iter, comment_is_inline,
-                                      comment_is_block, ast_lineno, ast_docstring)
+                                      comment_is_block, ast_docstring)
 
     # \3. Make a per-line list of [group, ws_len, string], so that the last
     #     string in each list ends with a newline. Change the group of block
@@ -309,8 +309,7 @@ def _pygments_lexer(
     # Process this with AST if this is Python or Python3 code, to find docstrings.
     # If found, store line number and docstring into ``ast_lineno`` and
     # ``ast_docstring`` respectively.
-    ast_lineno = None
-    ast_docstring = None
+    ast_docstring = {}
     # Determine if code is Python or Python3. Note that AST processing cannot
     # support Python 2 specific syntax (e.g. the ``<>`` operator).
     if lexer.name == 'Python' or lexer.name == 'Python 3':
@@ -320,10 +319,9 @@ def _pygments_lexer(
                 try:
                     # Check if current token is a docstring.
                     d = ast.get_docstring(_, False)
-                    if d:
+                    if d is not None:
                         # If so, store current line number and token value.
-                        ast_lineno = _.body[0].lineno
-                        ast_docstring = d
+                        ast_docstring[_.body[0].lineno] = d
                 except (AttributeError, TypeError):
                     pass
         except SyntaxError as err:
@@ -331,7 +329,7 @@ def _pygments_lexer(
 
     # Now, run the lexer.
     return (_pygments_get_tokens_postprocess(lexer, preprocessed_code_str),
-            ast_lineno, ast_docstring)
+            ast_docstring)
 #
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
@@ -419,9 +417,7 @@ def _group_lexer_tokens(
   #
   # When true, classify generic comment as block comments.
   comment_is_block,
-  # Docstring line number found from AST scanning.
-  ast_lineno,
-  # Docstring token found from AST scanning.
+  # Docstring dict found from AST scanning.
   ast_docstring):
 
     # Keep track of the current group, string, and line no.
@@ -435,12 +431,10 @@ def _group_lexer_tokens(
         # Increase token line no. for every newline found.
         token_lineno += string.count('\n')
         if tokentype == Token.Literal.String.Doc:
-            _debug_print('ast_lineno = {}, ast_docstring = {}\n'.
-                  format(ast_lineno, ast_docstring))
             _debug_print('token_lineno = {}, token_docstring = {}\n'.
                   format(token_lineno, string))
             # Compare formatted token containing docstring with AST result.
-            if ast_lineno == token_lineno and ast_docstring == string[3:-3]:
+            if ast_docstring.get(token_lineno) == string[3:-3]:
                 tokentype = Token.Comment.Multiline
                 string = inspect.cleandoc(string)
                 # Insert an extra space after the docstring delimiter, making
