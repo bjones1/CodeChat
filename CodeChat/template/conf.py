@@ -127,6 +127,11 @@ CodeChat_lexer_for_glob = {
     'CodeChat.css': 'CSS',
     }
 
+# **CodeChat note:** _`CodeChat_excludes` is a list of exclude_patterns_ which
+# applies only to source documents; exclude_patterns_ will exclude the given
+# files from all of Sphinx (for example, files here won't be included even if
+# they're mentioned in html_static_path_.
+CodeChat_excludes = []
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
@@ -155,19 +160,12 @@ exclude_patterns = [
     'sphinx-enki-info.txt']
     # **Important:** Do **NOT** add ``CodeChat.css`` to this list; this will
     # instruct Sphinx not to copy it to the ``_static`` directory, where it
-    # is needed to properly lay out CodeChat output. Instead, use the following
-    # syntax:
-    #
-    # .. code-block:: rest
-    #
-    #    .. toctree::
-    #       :hidden:
-    #
-    #       CodeChat.css
+    # is needed to properly lay out CodeChat output. Instead, to exclude it
+    # from the documents produced by Sphinx, add it to CodeChat_excludes_.
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
-# reST default role (used for this markup: `text`) to use for all documents.
-##default_role = None
+# reST default role (used for this markup: ```text```) to use for all documents.
+default_role = 'any'
 
 # `keep_warnings <http://sphinx-doc.org/config.html#confval-keep_warnings>`_: If
 # true, keep warnings as "system message" paragraphs in the built documents.

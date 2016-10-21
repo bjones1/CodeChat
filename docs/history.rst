@@ -14,6 +14,7 @@ History of recent changes
 - Development version:
    - More languages tested, along with some fixes.
    - Python docstrings are now processed as reST.
+   - Added the `CodeChat_excludes` configuration variable.
 
 - 1.3.1, 29-Apr-2016:
    - Installer fixes.

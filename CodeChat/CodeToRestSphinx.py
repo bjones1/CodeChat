@@ -39,14 +39,13 @@
 # ----------------
 import os.path
 from os import path
-# For glob_to_lexer matching.
 import fnmatch
-# For saving Enki info.
 import codecs
 #
 # Third-party imports
 # -------------------
 from sphinx.util import get_matching_files
+from sphinx.util.matching import compile_matchers
 import sphinx.environment
 from sphinx.util.osutil import SEP
 import pygments.util
@@ -120,9 +119,10 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
     Exclude files and dirs matching a pattern in *exclude_patterns*.
     """
     suffixpatterns = ['*' + s for s in suffixes]
-    # The following line was added.
+    # The following two lines were added.
     source_suffixpatterns = ( SUPPORTED_GLOBS |
                              set(_config.CodeChat_lexer_for_glob.keys()) )
+    exclude_matchers += compile_matchers(_config.CodeChat_excludes)
     for filename in get_matching_files(dirname, exclude_matchers):
         for suffixpattern in suffixpatterns:
             if fnmatch.fnmatch(filename, suffixpattern):
@@ -217,9 +217,11 @@ def setup(
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_stylesheet>`_.
     app.add_stylesheet('CodeChat.css')
 
-    # Add the CodeChat_lexer_for_glob config value. See `add_config_value
+    # Add the `CodeChat_lexer_for_glob <CodeChat_lexer_for_glob>` config value. See `add_config_value
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
     app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
+    # Add the `CodeChat_excludes <CodeChat_excludes>` config value.
+    app.add_config_value('CodeChat_excludes', [], 'html')
 
     # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
     # event to write out settings specified in ``conf.py``.

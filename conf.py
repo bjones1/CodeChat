@@ -120,6 +120,8 @@ templates_path = ['_templates']
 # The suffix of source filenames. Add ``.in`` and ``.spec`` files (see below).
 source_suffix = '.rst'
 
+# .. _CodeChat_lexer_for_glob:
+#
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
 # any file wihch matches the given `glob
@@ -133,6 +135,14 @@ CodeChat_lexer_for_glob = {
     # So does Python. Ugly, no?
     'MANIFEST.in'  : 'Python',
     }
+
+# .. _CodeChat_excludes:
+#
+# **CodeChat note::** This is a list of exclude_patterns_ which applies only to
+# source documents; exclude_patterns_ will exclude the given files from all of
+# Sphinx (for example, files here won't be included even if they're mentioned in
+# html_static_path_.
+CodeChat_excludes = []
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
@@ -168,8 +178,8 @@ exclude_patterns = [
                     ]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
-# reST default role (used for this markup: `text`) to use for all documents.
-##default_role = None
+# reST default role (used for this markup: ```text```) to use for all documents.
+default_role = 'any'
 
 # `keep_warnings <http://sphinx-doc.org/config.html#confval-keep_warnings>`_: If
 # true, keep warnings as "system message" paragraphs in the built documents.
