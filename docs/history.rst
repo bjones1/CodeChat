@@ -12,9 +12,12 @@
 History of recent changes
 *************************
 - Development version:
+   - No changes
+
+- 1.4.0, 22-Nov-2016:
    - More languages tested, along with some fixes.
    - Python docstrings are now processed as reST.
-   - Added the `CodeChat_excludes` configuration variable.
+   - Added the `CodeChat_excludes <CodeChat_excludes>` configuration variable.
 
 - 1.3.1, 29-Apr-2016:
    - Installer fixes.
@@ -28,7 +31,7 @@ History of recent changes
    - Documentation fixes.
 
 - 1.2.1, 12-Nov-2015:
-   - Fixed broken hyperlinks in the :ref:`tutorial-examples`.
+   - Fixed broken hyperlinks in the `tutorial-examples`.
    - Provide correct Linux installation instructions.
    - Correctly report the line number of errors.
 
@@ -44,8 +47,8 @@ History of recent changes
 
    - Dropped support for pre-v1.3 Sphinx.
    - The extension of source files is now preserved, rather than being stripped. This makes for a simpler ``conf.py``, since ``source_suffix`` is no longer modified.
-   - The corret HTML extension is now written to ``sphinx-enki-info.txt``.
-   - A link to install instructions is now provided in :doc:`../README`.
+   - The correct HTML extension is now written to ``sphinx-enki-info.txt``.
+   - A link to install instructions is now provided in `../README`.
    - The ``.ini`` file format is now supported.
    - ``SConscript`` and ``Makefiles`` are now supported.
 
