@@ -398,7 +398,7 @@ def _pygments_lexer(
 def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     """
     Return an iterable of (tokentype, value) pairs generated from
-    `text`. If `unfiltered` is set to `True`, the filtering mechanism
+    ``text``. If ``unfiltered`` is set to ``True``, the filtering mechanism
     is bypassed even if filters are defined.
 
     Also preprocess the text, i.e. expand tabs and strip it if
