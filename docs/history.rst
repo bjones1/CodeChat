@@ -12,7 +12,7 @@
 History of recent changes
 *************************
 - Development version:
-   - No changes
+   - Updated code to work with docutils 0.13.1. This breaks older docutils.
 
 - 1.4.0, 22-Nov-2016:
    - More languages tested, along with some fixes.
