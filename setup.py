@@ -52,9 +52,12 @@
 # To package
 # ==========
 # Create a source distribution, a built distribution, then upload both to
-# `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_:
+# `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_::
 #
-#   ``python setup.py sdist bdist_wheel upload``
+#   python setup.py sdist bdist_wheel
+#   python -m twine upload dist\CodeChat-1.4.0*
+#
+# I can't get ``python setup.py upload`` to work. Of course, replace the version number in the command above.
 #
 # To `upload docs
 # <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
