@@ -1408,23 +1408,31 @@ class _SetLine(Directive):
         # each line from the beginning of its source. Modifying the offset will
         # change the reported error location.
         il = self.state_machine.input_lines
+        # Line renumbering should begin at this offset in ``il.items``, which is
+        # the line currently being processed.
+        line_offset = self.state_machine.line_offset
+        current_source = il.items[line_offset][0]
 
-        # However, directly modifying ``input_lines`` produces no effect: the
-        # root ``input_lines`` must be modified. Find it.
-        while il.parent:
+        # Walk through the current ``input_lines`` up through all its parents.
+        while il:
+            # Walk from the current line to the end of the current file, rewriting the
+            # offset (that is, the effective line number).
+            line_ = line
+            for index in range(line_offset, len(il.items)):
+                source, old_offset = il.items[index]
+                # If the source file changes, stop renumbering. The
+                # ``current_source`` must have been included; only renumber
+                # this, not lines from another source which included
+                # ``current_source``.
+                if source != current_source:
+                    break
+                il.items[index] = (source, line_)
+                line_ += 1
+
+            # Adjust the offset when moving up to the parent.
+            if il.parent:
+                line_offset += il.parent_offset
             il = il.parent
-        # Now, determine the index of this directive's line in the parent
-        # ``input_offset`` class.
-        current_line = (self.state_machine.line_offset +
-                        self.state_machine.input_offset)
-
-        # Walk from this line to the end of the file, rewriting the offset (that
-        # is, the effective line number).
-        items = il.items
-        for i in range(current_line, len(items)):
-            (source, offset) = items[i]
-            items[i] = (source, line)
-            line += 1
 
         # This directive create no nodes.
         return []
