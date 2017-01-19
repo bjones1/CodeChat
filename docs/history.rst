@@ -14,7 +14,11 @@ History of recent changes
 
 - Development version:
 
+- 1.4.1, 19-Jan-2017
+
     - Updated code to work with docutils 0.13.1. This breaks older docutils.
+    - Provided a ``is_source_code`` function in ``CodeToRestSphinx``.
+    - Corrected the ``set-line`` directive to properly renumber all lines.
 
 - 1.4.0, 22-Nov-2016:
 

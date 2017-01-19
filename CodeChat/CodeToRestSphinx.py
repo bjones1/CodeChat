@@ -61,23 +61,15 @@ from . import __version__
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
 def _source_read(
-  # .. _app:
-  #
-  # The `Sphinx application object <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx>`_.
+  # _`app`: The `Sphinx application object <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx>`_.
   app,
-  # The name of the document that was read. It contains a path relative to the
+  # _`docname`: The name of the document that was read. It contains a path relative to the
   # project directory and (typically) no extension.
   docname,
   # A list whose single element is the contents of the source file.
   source):
 
-    # If the docname's extension doesn't change when asking for its full path,
-    # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
-    # only for source code is the docname of ``foo.c`` also ``foo.c``. Look up
-    # the name and extension using `doc2path
-    # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
-    docname_ext = app.env.doc2path(docname, None)
-    if os.path.normpath(docname_ext) == os.path.normpath(docname):
+    if is_source_code(app.env, docname):
         # See if it's an extension we should process.
         try:
             base_docname = os.path.basename(docname)
@@ -98,6 +90,21 @@ def _source_read(
         except (KeyError, pygments.util.ClassNotFound):
             # We don't support this language.
             pass
+#
+# Return True if the supplied docname is source code.
+def is_source_code(
+  # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
+  env,
+  # See docname_.
+  docname):
+
+    # If the docname's extension doesn't change when asking for its full path,
+    # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
+    # only for source code is the docname of ``foo.c`` also ``foo.c``. Look up
+    # the name and extension using `doc2path
+    # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
+    docname_ext = env.doc2path(docname, None)
+    return os.path.normpath(docname_ext) == os.path.normpath(docname)
 #
 # Monkeypatch
 # ===========
@@ -138,7 +145,7 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
 # import get_matching_docs``. So, `where to patch <https://docs.python.org/dev/library/unittest.mock.html#where-to-patch>`_
 # is in ``sphinx.environment`` instead of ``sphinx.util``.
 sphinx.environment.get_matching_docs = _get_matching_docs
-
+#
 # doc2path patch
 # --------------
 # Next, the way docnames get transformed back to a full path needs to be fixed
