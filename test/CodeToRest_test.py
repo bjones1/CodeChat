@@ -108,7 +108,9 @@ class TestCodeToRest(object):
     # C-like languages.
     def mt(self, code_str, expected_rest_str, alias_seq=('C', 'C', 'C++',
       'Java', 'ActionScript', 'C#', 'D', 'Go', 'JavaScript', 'Objective-C',
-      'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog')):
+      'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog', 'Dart', 'Juttle',
+      'Objective-J', 'TypeScript', 'Arduino', 'Clay', 'CUDA', 'eC', 'MQL',
+      'nesC', 'Pike', 'SWIG', 'Vala', 'Zephir', 'Haxe')):
 
         for alias in alias_seq:
             rest = code_to_rest_string(code_str, alias=alias)
@@ -934,6 +936,22 @@ class TestCodeToRest(object):
                 '\nmulti-\n'
                 'line\n'
                 'comment\n\n', ['HTML'])
+
+    # MXML.
+    def test_101(self):
+        self.mt('Hello World!\n'
+                '<!---\n'
+                'multi-\n'
+                'line\n'
+                'comment\n'
+                '-->\n',
+                bf +
+                ' Hello World!\n' +
+                ef +
+                sl(-2) +
+                '\nmulti-\n'
+                'line\n'
+                'comment\n\n', ['MXML'])
 
     # Fortran.
     def test_66(self):
