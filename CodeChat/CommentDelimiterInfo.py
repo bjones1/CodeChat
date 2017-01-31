@@ -59,6 +59,22 @@ COMMENT_DELIMITER_INFO = {
   'Swift':          ( 2,      2,            2),
   'verilog':        ( 2,      2,            2),
   'systemverilog':  ( 2,      2,            2),
+  'Dart':           ( 2,      2,            2),
+  'Juttle':         ( 2,      2,            2),
+  'Objective-J':    ( 2,      2,            2),
+  'TypeScript':     ( 2,      2,            2),
+  'Arduino':        ( 2,      2,            2),
+  'Clay':           ( 2,      2,            2),
+  'CUDA':           ( 2,      2,            2),
+  'eC':             ( 2,      2,            2),
+  'MQL':            ( 2,      2,            2),
+  'nesC':           ( 2,      2,            2),
+  'Pike':           ( 2,      2,            2),
+  'SWIG':           ( 2,      2,            2),
+  'Vala':           ( 2,      2,            2),
+  'Zephir':         ( 2,      2,            2),
+  'Haxe':           ( 2,      2,            2),
+
   # Note: PHP allows ``#`` or ``//`` as an inline comment. We only support
   # ``#``.
   ##                  #,     /*,            */
@@ -129,6 +145,8 @@ COMMENT_DELIMITER_INFO = {
   'Scheme':         ( 1,   None,         None),
   ##                       <!--,           -->
   'HTML':           (None,    4,            3),
+  ##                      <!---,           -->
+  'MXML':           (None,    5,            3),
   ##                  !
   'Fortran':        ( 1,   None,         None),
   ##                  ⍝
