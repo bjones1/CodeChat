@@ -114,6 +114,7 @@ class TestCodeToRest(object):
 
         for alias in alias_seq:
             rest = code_to_rest_string(code_str, alias=alias)
+            print (rest)
             assert rest == expected_rest_str
 
     # A single line of code.
@@ -469,7 +470,7 @@ class TestCodeToRest(object):
 
     def test_22(self):
         self.mt(' \n'
-                'foo()\n'
+                'foo(1)\n'
                 '\n'
                 '# bar\n',
                 bf +
@@ -478,7 +479,7 @@ class TestCodeToRest(object):
                 ' \n' +
                 ef +
                 sl(0) +
-                'bar\n',
+                'bar1\n',
                 ('Python', 'Python3'))
 
     # Some CSS.

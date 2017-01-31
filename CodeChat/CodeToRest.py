@@ -252,7 +252,15 @@ def _lexer_to_rest(
     _debug_print('Lexer: {}\n'.format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
-    cdi = COMMENT_DELIMITER_INFO[lexer.name]
+    cdi_start = COMMENT_DELIMITER_INFO[lexer.name]
+    cdi = []
+    for i in cdi_start:
+        if i != None:
+            a = len(i)
+        else:
+            a = None
+        cdi.append(a)
+    tuple(cdi)
     # * If there's no multi-line start info, then classify generic comments as
     #   inline.
     comment_is_inline = not cdi[1]
