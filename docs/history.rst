@@ -14,6 +14,11 @@ History of recent changes
 
 - Development version:
 
+    - Added MXML and 15 C-like languages.
+    - Consistent treatment of path in globs stored in ``CodeChat_lexer_for_glob``.
+    - Better error messages for incorrect lexers specified in ``CodeChat_lexer_for_glob``.
+    - CI fixes.
+
 - 1.4.1, 19-Jan-2017
 
     - Updated code to work with docutils 0.13.1. This breaks older docutils.
