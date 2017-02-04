@@ -8,9 +8,10 @@ os: linux
 # See https://docs.travis-ci.com/user/languages/python.
 language: python
 python:
-  - 3.3
-  - 3.4
+  - 3.6
   - 3.5
+  - 3.4
+  - 3.3
 
 # See https://docs.travis-ci.com/user/customizing-the-build/#Build-Matrix. This
 # manually includes additional OS X tests to the matrix of Linux tests defined
@@ -24,13 +25,16 @@ matrix:
     # See https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-.travis.yml.
     # Note that pyenv requres a full version specifier; selecting only 3.3
     # produces an error: ``python-build: definition not found: 3.3``.
+    env: PYTHON=3.6.0
+  - os: osx
+    language: generic
+    env: PYTHON=3.5.3
+  - os: osx
+    language: generic
+    env: PYTHON=3.4.6
+  - os: osx
+    language: generic
     env: PYTHON=3.3.6
-  - os: osx
-    language: generic
-    env: PYTHON=3.4.4
-  - os: osx
-    language: generic
-    env: PYTHON=3.5.1
 
 # _`before_install`: Perform the manual steps on OS X to install python3 and
 # activate venv, since Python support is not available, per the list of
@@ -66,21 +70,6 @@ install:
   # `Appveyor requires <Appveyor pip install>`_ to keep the CI files as close
   # as possible.
   - python -m pip install -U pip
-
-  # The default version of setuptools is old:
-  #
-  # .. code-block:: console
-  #    :linenos:
-  #
-  #    $ pip install -e .[test]
-  #    Obtaining file:///home/travis/build/bjones1/CodeChat
-  #        The required version of setuptools (>=20.3.1) is not available,
-  #        and can't be installed while this script is running. Please
-  #        install a more recent version first, using
-  #        'easy_install -U setuptools'.
-  #
-  # Use the `Appveyor approach <Appveyor easy_install install>`_ (see above).
-  - python -m easy_install -U setuptools
 
   # See :ref:`here <Appveyor pip install command>`.
   - pip install -e .[test]
