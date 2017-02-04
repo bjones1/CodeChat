@@ -80,17 +80,6 @@
 # ================
 # Otherwise known as the evils of ``setup.py``.
 #
-# For users who install this from source but don't have setuptools installed,
-# `auto-install it
-# <https://pythonhosted.org/setuptools/setuptools.html#using-setuptools-without-bundling-it>`__.
-# When packaging for Linux, downloads are blocked so we must specify a very old
-# already-installed `version <http://pythonhosted.org/setuptools/history.html>`_.
-# Leave this as a `patch
-# <https://build.opensuse.org/package/view_file/home:yajo:enki/python-codechat/python-codechat.offline_setuptools.patch?expand=1>`_
-# so that we normally use a more modern version.
-import ez_setup
-ez_setup.use_setuptools()
-#
 # PyPA copied code
 # ----------------
 # From `PyPA's sample setup.py
