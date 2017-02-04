@@ -46,7 +46,7 @@ from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
 from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
   _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP, \
-  _pygments_lexer
+  _pygments_lexer, len_cdi
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
@@ -114,7 +114,6 @@ class TestCodeToRest(object):
 
         for alias in alias_seq:
             rest = code_to_rest_string(code_str, alias=alias)
-            print (rest)
             assert rest == expected_rest_str
 
     # A single line of code.
@@ -470,7 +469,7 @@ class TestCodeToRest(object):
 
     def test_22(self):
         self.mt(' \n'
-                'foo(1)\n'
+                'foo()\n'
                 '\n'
                 '# bar\n',
                 bf +
@@ -479,7 +478,7 @@ class TestCodeToRest(object):
                 ' \n' +
                 ef +
                 sl(0) +
-                'bar1\n',
+                'bar\n',
                 ('Python', 'Python3'))
 
     # Some CSS.
@@ -736,21 +735,21 @@ class TestCodeToRest(object):
                 'line\n'
                 'comment\n\n', ['AutoIt'])
 
-    # Perl.
-    def test_45(self):
+    # Perl. (currently not available)
+    """def test_45(self):
         self.mt('print "Hello World!"\n'
                 '# Comment here\n',
                 bf +
                 ' print "Hello World!"\n' +
                 ef +
                 sl(-2) +
-                'Comment here\n', ['Perl', 'Perl6'])
+                'Comment here\n', ['Perl6', 'Perl'])
 
     def test_46(self):
         self.mt('print "Hello World!"\n',
                 bf +
                 ' print "Hello World!"\n' +
-                ef, ['Perl', 'Perl6'])
+                ef, ['Perl6', 'Perl'])
 
     def test_47_a(self):
         self.mt('=pod\n'
@@ -792,7 +791,7 @@ class TestCodeToRest(object):
     def test_49(self):
         self.mt('#`( embedded comment)\n',
                 sl(-3) +
-                'embedded comment\n', ['Perl6'])
+                'embedded comment\n', ['Perl6'])"""
 
     # S.
     def test_50(self):
@@ -1450,8 +1449,9 @@ class TestCodeToHtmlFile(object):
 #
 # Tests of lexer_to_code and subroutines
 # ======================================
-c_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name]
-py_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
+c_lexer= len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name])
+py_lexer= len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name])
+
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):

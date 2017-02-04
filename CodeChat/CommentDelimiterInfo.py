@@ -42,142 +42,139 @@ COMMENT_DELIMITER_INFO = {
   # ------------------------------------------
   # See :doc:`../test/CodeToRest_test.py` for the tests.
   ## Language name: inline, block opening, block closing
-  ##                   //,     /*,            */
-  'C':              ( '//',   '/*',          '/*'),
-  'C++':            ( '//',   '/*',          '/*'),
-  'Java':           ( '//',   '/*',          '/*'),
-  'ActionScript':   ( '//',   '/*',          '/*'),
-  'ActionScript 3': ( '//',   '/*',          '/*'),
-  'C#':             ( '//',   '/*',          '/*'),
-  # Note: also has   ``/+`` ~ ``+/`` for nested block comments.
-  'D':              ( '//',   '/*',          '/*'),
-  'Go':             ( '//',   '/*',          '/*'),
-  'JavaScript':     ( '//',   '/*',          '/*'),
-  'Objective-C':    ( '//',   '/*',          '/*'),
-  'Rust':           ( '//',   '/*',          '/*'),
-  'Scala':          ( '//',   '/*',          '/*'),
-  'Swift':          ( '//',   '/*',          '/*'),
-  'verilog':        ( '//',   '/*',          '/*'),
-  'systemverilog':  ( '//',   '/*',          '/*'),
-  'Dart':           ( '//',   '/*',          '/*'),
-  'Juttle':         ( '//',   '/*',          '/*'),
-  'Objective-J':    ( '//',   '/*',          '/*'),
-  'TypeScript':     ( '//',   '/*',          '/*'),
-  'Arduino':        ( '//',   '/*',          '/*'),
-  'Clay':           ( '//',   '/*',          '/*'),
-  'CUDA':           ( '//',   '/*',          '/*'),
-  'eC':             ( '//',   '/*',          '/*'),
-  'MQL':            ( '//',   '/*',          '/*'),
-  'nesC':           ( '//',   '/*',          '/*'),
-  'Pike':           ( '//',   '/*',          '/*'),
-  'SWIG':           ( '//',   '/*',          '/*'),
-  'Vala':           ( '//',   '/*',          '/*'),
-  'Zephir':         ( '//',   '/*',          '/*'),
-  'Haxe':           ( '//',   '/*',          '/*'),
+  ##                   //,       /*,              */
+  'C':              ( '//',     '/*',            '*/'),
+  'C++':            ( '//',     '/*',            '*/'),
+  'Java':           ( '//',     '/*',            '*/'),
+  'ActionScript':   ( '//',     '/*',            '*/'),
+  'ActionScript 3': ( '//',     '/*',            '*/'),
+  'C#':             ( '//',     '/*',            '*/'),
+  # Note: also has   ``/+``  ~  ``+/`` for nested block comments.
+  'D':              ( '//',     '/*',            '*/'),
+  'Go':             ( '//',     '/*',            '*/'),
+  'JavaScript':     ( '//',     '/*',            '*/'),
+  'Objective-C':    ( '//',     '/*',            '*/'),
+  'Rust':           ( '//',     '/*',            '*/'),
+  'Scala':          ( '//',     '/*',            '*/'),
+  'Swift':          ( '//',     '/*',            '*/'),
+  'verilog':        ( '//',     '/*',            '*/'),
+  'systemverilog':  ( '//',     '/*',            '*/'),
+  'Dart':           ( '//',     '/*',            '*/'),
+  'Juttle':         ( '//',     '/*',            '*/'),
+  'Objective-J':    ( '//',     '/*',            '*/'),
+  'TypeScript':     ( '//',     '/*',            '*/'),
+  'Arduino':        ( '//',     '/*',            '*/'),
+  'Clay':           ( '//',     '/*',            '*/'),
+  'CUDA':           ( '//',     '/*',            '*/'),
+  'eC':             ( '//',     '/*',            '*/'),
+  'MQL':            ( '//',     '/*',            '*/'),
+  'nesC':           ( '//',     '/*',            '*/'),
+  'Pike':           ( '//',     '/*',            '*/'),
+  'SWIG':           ( '//',     '/*',            '*/'),
+  'Vala':           ( '//',     '/*',            '*/'),
+  'Zephir':         ( '//',     '/*',            '*/'),
+  'Haxe':           ( '//',     '/*',            '*/'),
 
   # Note: PHP allows ``#`` or ``//`` as an inline comment. We only support
   # ``#``.
-  ##                  #,     /*,            */
-  'PHP':            ( '#',      '/*',            '/*'),
-  ##                  ;, %comment\n, %endcomment  -- block comments not tested.
-  'NASM':           ( 1,      9,           11),
+  ##                   #,        /*,              */
+  'PHP':            ( '#',      '/*',            '*/'),
+  ##                  ;,   %comment\n,   %endcomment  -- block comments not tested.
+  'NASM':           (';', '%comment\n', '%endcomment'),
   # In Python, docstrings are treated as multi-line comments.
-  ##                  #,    """,          """
-  'Python':         ( 1,      3,            3),
-  'Python 3':       ( 1,      3,            3),
-  ##                         /*,            */
-  'CSS':            (None,    2,            2),
+  ##                   #,        """,            """
+  'Python':         ( '#',      '"""',          '"""'),
+  'Python 3':       ( '#',      '"""',          '"""'),
+  ##                             /*,              */
+  'CSS':            (None,      '/*',            '*/'),
   # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
   # block comments, but I don't see this anywhere in man bash. These aren't
   # supported.
-  ##                  #
-  'Bash':           ( 1,   None,         None),
-  'Tcsh':           ( 1,   None,         None),
+  ##                   #
+  'Bash':           ( '#',      None,            None),
+  'Tcsh':           ( '#',      None,            None),
   # The only valid comment type is ``REM``. Neither ``:`` or ``::`` are
   # classified as a comment.
-  ##                REM
-  'Batchfile':      ( 3,   None,         None),
-  ##                  %,     %{,            %}
-  'Matlab':         ( 1,      2,            2),
-  ##                 --,     /*,            */
-  'SQL':            ( 2,      2,            2),
-  ##                  #,     <#,            #>
-  'PowerShell':     ( 1,      2,            2),
+  ##                   REM
+  'Batchfile':      ( 'REM',    None,            None),
+  ##                   %,        %{,              %}
+  'Matlab':         ( '%',      '%{',            '%}'),
+  ##                   --,       /*,              */
+  'SQL':            ( '--',     '/*',            '*/'),
+  ##                   #,        <#,              #>
+  'PowerShell':     ( '#',      '<#',            '#>'),
   # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
-  ##                  #,     /*,            */
-  'GAS':            ( 1,      2,            2),
-  ##                  ;,     /*,            */
-  'autohotkey':     ( 1,      2,            2),
-  ##                  %,     /*,            */
-  'Prolog':         ( 1,      2,            2),
-  ##                  ;,    #cs,           #ce
-  'AutoIt':         ( 1,      3,            3),
+  ##                   #,        /*,              */
+  'GAS':            ( '#',      '/*',            '*/'),
+  ##                   ;,        /*,              */
+  'autohotkey':     ( ';',      '/*',            '*/'),
+  ##                   %,        /*,              */
+  'Prolog':         ( '%',      '/*',            '*/'),
+  ##                   ;,       #cs,             #ce
+  'AutoIt':         ( ';',     '#cs',           '#ce'),
   # PODs begin and end on a line starting with =string. Toss the entire line by
   # making the delimiter length large. This allows it to work with ``=head1``,
   # ``=begin``, ``=begin comment``, and a host of others.
   ##                  #, =a string, =another string
-  'Perl':           ( 1,   1000,         1000),
+  """'Perl':           ( 1,   1000,         1000),"""
   # PODs not supported in Perl6, since they conflict with the new block-style
   # comments: ``#`[`` ~ ``]``, or any other pair.
-  ##                  #,    #'(,             )
-  'Perl6':          ( 1,      3,            1),
-  ##                  #, =begin,          =end
-  'Ruby':           ( 1,      6,            4),
-  ##                  #
-  'S':              ( 1,   None,         None),
+  ##                   #,       #'(,               )
+  """'Perl6':          ( '#',     "#'(",             ')'),"""
+  ##                   #,    =begin,            =end
+  'Ruby':           ( '#',  '=begin',          '=end'),
+  ##                   #
+  'S':              ( '#',      None,            None),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
   # is not supported.
-  ##                 --,     {-,            -}
-  'Haskell':        ( 2,      2,            2),
+  ##                   --        {-,              -}
+  'Haskell':        ( '--',     '{-',            '-}'),
   # ``(*`` ~ ``*)`` not supported.
-  ##                 //,      {,             }
-  'Delphi':         ( 2,      1,            1),
-  ##                 //,     (*,            *)
-  'AppleScript':    ( 2,      2,            2),
-  ##                  ;,     #|,            |#
-  'Common Lisp':    ( 1,      2,            2),
+  ##                   //,        {,               }
+  'Delphi':         ( '//',      '{',             '}'),
+  ##                   //,       (*,              *)
+  'AppleScript':    ( '//',     '(*',            '*)'),
+  ##                   ;,        #|,              |#
+  'Common Lisp':    ( ';',      '#|',            '|#'),
   # ``--[=[`` ~ ``]=]`` not supported.
-  ##                 --,   --[[,            ]]
-  'Lua':            ( 2,      4,            2),
-  ##                  ;
-  'Clojure':        ( 1,   None,         None),
-  ##                  ;,
-  'Scheme':         ( 1,   None,         None),
-  ##                       <!--,           -->
-  'HTML':           (None,    4,            3),
-  ##                      <!---,           -->
-  'MXML':           (None,    5,            3),
-  ##                  !
-  'Fortran':        ( 1,   None,         None),
+  ##                   --,     --[[,              ]]
+  'Lua':            ( '--',   '--[[',            ']]'),
+  ##                   ;
+  'Clojure':        ( ';',      None,            None),
+  'Scheme':         ( ';',      None,            None),
+  ##                           <!--,             -->
+  'HTML':           (None,    '<!--',           '-->'),
+  ##                          <!---,             -->
+  'MXML':           (None,   '<!---',           '-->'),
+  ##                   !
+  'Fortran':        ( '!',      None,            None),
   ##                  ⍝
-  'APL':            ( 1,   None,         None),
-  ##                  #
-  'Makefile':       ( 1,   None,         None),
-  'RPMSpec':        ( 1,   None,         None),
-  'Nimrod':         ( 1,   None,         None),
+  'APL':            ( '⍝',      None,            None),
+  ##                   #
+  'Makefile':       ( '#',      None,            None),
+  'RPMSpec':        ( '#',      None,            None),
+  'Nimrod':         ( '#',      None,            None),
   ##                  ; or #
-  'NSIS':           ( 1,   None,         None),
-  ##                  %
-  'TeX':            ( 1,   None,         None),
-  ##                  %
-  'Erlang':         ( 1,   None,         None),
+  'NSIS':           ( '#',      None,            None),
+  ##                   %
+  'TeX':            ( '%',      None,            None),
+  'Erlang':         ( '%',      None,            None),
   ##                  '
-  'QBasic':         ( 1,   None,         None),
-  'VB.net':         ( 1,   None,         None),
-  ##                  ;
-  'REBOL':          ( 1,   None,         None),
-  'LLVM':           ( 1,   None,         None),
-  ##                 --
-  'Ada':            ( 2,   None,         None),
-  'Eiffel':         ( 2,   None,         None),
-  'vhdl':           ( 2,   None,         None),
+  'QBasic':         ( "'",      None,            None),
+  'VB.net':         ( "'",      None,            None),
+  ##                   ;
+  'REBOL':          ( ';',      None,            None),
+  'LLVM':           ( ';',      None,            None),
+  'INI':            ( ';',      None,            None),
+  ##                   --
+  'Ada':            ( '--',     None,            None),
+  'Eiffel':         ( '--',     None,            None),
+  'vhdl':           ( '--',     None,            None),
   # ``*>`` as an inline comment is not supported.
   ##                  Six ignored characters followed by * or /.
-  'COBOL':          ( 7,   None,         None),
-  ##                  ;
-  'INI':            ( 1,   None,         None),
-  ##                  #
-  'YAML':           ( 1,   None,         None),
+  'COBOL':          ('123456*', None,            None),
+  ##                   #
+  'YAML':           ( '#',      None,            None),
 
   # These languages have failing unit tests
   # ---------------------------------------
