@@ -72,24 +72,23 @@ def _source_read(
     if is_source_code(app.env, docname):
         # See if it's an extension we should process.
         try:
-            base_docname = os.path.basename(docname)
             # See if ``source_file`` matches any of the globs.
             lexer = None
             lfg = app.config.CodeChat_lexer_for_glob
             for glob, lexer_alias in lfg.items():
-                if fnmatch.fnmatch(base_docname, glob):
+                if fnmatch.fnmatch(docname, glob):
                     # On a match, pass the specified lexer alias.
                     lexer = get_lexer(alias=lexer_alias)
                     break
             # Do this after checking the CodeChat_lexer_for_glob list, since
             # this will raise an exception on failure.
-            lexer = lexer or get_lexer(filename=base_docname, code=source[0])
+            lexer = lexer or get_lexer(filename=docname, code=source[0])
 
             app.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
-        except (KeyError, pygments.util.ClassNotFound):
+        except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
-            pass
+            app.warn(e, docname)
 #
 # Return True if the supplied docname is source code.
 def is_source_code(
