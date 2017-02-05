@@ -228,12 +228,14 @@ def get_lexer(
 # of the string.
 def len_cdi(cdi_string):
     cdi = []
+    # Takes each item in the tuple and gets the length of the item
     for i in cdi_string:
         if i != None:
             a = len(i)
         else:
             a = None
         cdi.append(a)
+    # Creates a new tuple from the list of lengths
     tuple(cdi)
     return cdi
 
