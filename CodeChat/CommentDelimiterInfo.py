@@ -116,11 +116,11 @@ COMMENT_DELIMITER_INFO = {
   # making the delimiter length large. This allows it to work with ``=head1``,
   # ``=begin``, ``=begin comment``, and a host of others.
   ##                  #, =a string, =another string
-  """'Perl':           ( 1,   1000,         1000),"""
+  # """'Perl':           ( 1,   1000,         1000),"""
   # PODs not supported in Perl6, since they conflict with the new block-style
   # comments: ``#`[`` ~ ``]``, or any other pair.
   ##                   #,       #'(,               )
-  """'Perl6':          ( '#',     "#'(",             ')'),"""
+  # """'Perl6':          ( '#',     "#'(",             ')'),"""
   ##                   #,    =begin,            =end
   'Ruby':           ( '#',  '=begin',          '=end'),
   ##                   #
