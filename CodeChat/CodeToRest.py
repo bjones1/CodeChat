@@ -222,22 +222,21 @@ def get_lexer(
     if code:
         return guess_lexer(code, **options)
 
-# .. len_cdi
+# .. _len_cdi
 #
 # Transforms the comment delimiter info from strings into the length
 # of the string.
-def len_cdi(cdi_string):
+def _len_cdi(cdi_string):
     cdi = []
     # Takes each item in the tuple and gets the length of the item
     for i in cdi_string:
-        if i != None:
+        if i is not None:
             a = len(i)
         else:
             a = None
         cdi.append(a)
-    # Creates a new tuple from the list of lengths
-    tuple(cdi)
-    return cdi
+    # Creates a new tuple from the list of lengths and returns it
+    return tuple(cdi)
 
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
@@ -268,7 +267,7 @@ def _lexer_to_rest(
     _debug_print('Lexer: {}\n'.format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
-    cdi = len_cdi(COMMENT_DELIMITER_INFO[lexer.name])
+    cdi = _len_cdi(COMMENT_DELIMITER_INFO[lexer.name])
     # * If there's no multi-line start info, then classify generic comments as
     #   inline.
     comment_is_inline = not cdi[1]

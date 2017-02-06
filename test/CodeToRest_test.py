@@ -46,7 +46,7 @@ from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
 from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
   _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP, \
-  _pygments_lexer, len_cdi
+  _pygments_lexer, _len_cdi
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 
@@ -1449,8 +1449,8 @@ class TestCodeToHtmlFile(object):
 #
 # Tests of lexer_to_code and subroutines
 # ======================================
-c_lexer= len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name])
-py_lexer= len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name])
+c_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name])
+py_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name])
 
 class TestCodeToRestNew(object):
     # Check that a simple file or string is tokenized correctly.
