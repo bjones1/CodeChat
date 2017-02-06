@@ -42,7 +42,6 @@ COMMENT_DELIMITER_INFO = {
   # ------------------------------------------
   # See :doc:`../test/CodeToRest_test.py` for the tests.
   ## Language name: inline, block opening, block closing
-  ##                   //,       /*,              */
   'C':              ( '//',     '/*',            '*/'),
   'C++':            ( '//',     '/*',            '*/'),
   'Java':           ( '//',     '/*',            '*/'),
@@ -50,6 +49,7 @@ COMMENT_DELIMITER_INFO = {
   'ActionScript 3': ( '//',     '/*',            '*/'),
   'C#':             ( '//',     '/*',            '*/'),
   # Note: also has   ``/+``  ~  ``+/`` for nested block comments.
+  # (reST to code will use characters in tuple)
   'D':              ( '//',     '/*',            '*/'),
   'Go':             ( '//',     '/*',            '*/'),
   'JavaScript':     ( '//',     '/*',            '*/'),
@@ -77,41 +77,31 @@ COMMENT_DELIMITER_INFO = {
 
   # Note: PHP allows ``#`` or ``//`` as an inline comment. We only support
   # ``#``.
-  ##                   #,        /*,              */
   'PHP':            ( '#',      '/*',            '*/'),
-  ##                  ;,   %comment\n,   %endcomment  -- block comments not tested.
+  # Block comments not tested.
   'NASM':           (';', '%comment\n', '%endcomment'),
   # In Python, docstrings are treated as multi-line comments.
-  ##                   #,        """,            """
   'Python':         ( '#',      '"""',          '"""'),
   'Python 3':       ( '#',      '"""',          '"""'),
-  ##                             /*,              */
-  'CSS':            (None,      '/*',            '*/'),
+  'CSS':            (None,       '/*',           '*/'),
   # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
   # block comments, but I don't see this anywhere in man bash. These aren't
   # supported.
-  ##                   #
   'Bash':           ( '#',      None,            None),
   'Tcsh':           ( '#',      None,            None),
   # The only valid comment type is ``REM``. Neither ``:`` or ``::`` are
   # classified as a comment.
-  ##                   REM
   'Batchfile':      ( 'REM',    None,            None),
-  ##                   %,        %{,              %}
   'Matlab':         ( '%',      '%{',            '%}'),
-  ##                   --,       /*,              */
   'SQL':            ( '--',     '/*',            '*/'),
-  ##                   #,        <#,              #>
   'PowerShell':     ( '#',      '<#',            '#>'),
   # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
-  ##                   #,        /*,              */
   'GAS':            ( '#',      '/*',            '*/'),
-  ##                   ;,        /*,              */
   'autohotkey':     ( ';',      '/*',            '*/'),
-  ##                   %,        /*,              */
   'Prolog':         ( '%',      '/*',            '*/'),
-  ##                   ;,       #cs,             #ce
   'AutoIt':         ( ';',     '#cs',           '#ce'),
+
+  # TODO : get Perl and Perl6 working
   # PODs begin and end on a line starting with =string. Toss the entire line by
   # making the delimiter length large. This allows it to work with ``=head1``,
   # ``=begin``, ``=begin comment``, and a host of others.
@@ -121,59 +111,44 @@ COMMENT_DELIMITER_INFO = {
   # comments: ``#`[`` ~ ``]``, or any other pair.
   ##                   #,       #'(,               )
   # """'Perl6':          ( '#',     "#'(",             ')'),"""
-  ##                   #,    =begin,            =end
+
   'Ruby':           ( '#',  '=begin',          '=end'),
-  ##                   #
   'S':              ( '#',      None,            None),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
   # is not supported.
-  ##                   --        {-,              -}
   'Haskell':        ( '--',     '{-',            '-}'),
   # ``(*`` ~ ``*)`` not supported.
-  ##                   //,        {,               }
   'Delphi':         ( '//',      '{',             '}'),
-  ##                   //,       (*,              *)
   'AppleScript':    ( '//',     '(*',            '*)'),
-  ##                   ;,        #|,              |#
   'Common Lisp':    ( ';',      '#|',            '|#'),
   # ``--[=[`` ~ ``]=]`` not supported.
-  ##                   --,     --[[,              ]]
   'Lua':            ( '--',   '--[[',            ']]'),
-  ##                   ;
   'Clojure':        ( ';',      None,            None),
   'Scheme':         ( ';',      None,            None),
-  ##                           <!--,             -->
   'HTML':           (None,    '<!--',           '-->'),
-  ##                          <!---,             -->
   'MXML':           (None,   '<!---',           '-->'),
-  ##                   !
   'Fortran':        ( '!',      None,            None),
-  ##                  ⍝
   'APL':            ( '⍝',      None,            None),
-  ##                   #
   'Makefile':       ( '#',      None,            None),
   'RPMSpec':        ( '#',      None,            None),
   'Nimrod':         ( '#',      None,            None),
-  ##                  ; or #
+  ##                 ; or #
+  # (reST to code will use '#')
   'NSIS':           ( '#',      None,            None),
-  ##                   %
   'TeX':            ( '%',      None,            None),
   'Erlang':         ( '%',      None,            None),
-  ##                  '
   'QBasic':         ( "'",      None,            None),
   'VB.net':         ( "'",      None,            None),
-  ##                   ;
   'REBOL':          ( ';',      None,            None),
   'LLVM':           ( ';',      None,            None),
   'INI':            ( ';',      None,            None),
-  ##                   --
   'Ada':            ( '--',     None,            None),
   'Eiffel':         ( '--',     None,            None),
   'vhdl':           ( '--',     None,            None),
   # ``*>`` as an inline comment is not supported.
-  ##                  Six ignored characters followed by * or /.
+  # TODO : figure out what six characters will precede '*' when converting reST to code
+  ## Six ignored characters followed by * or /.
   'COBOL':          ('123456*', None,            None),
-  ##                   #
   'YAML':           ( '#',      None,            None),
 
   # These languages have failing unit tests
