@@ -43,22 +43,9 @@ import inspect
 #
 # Third-party imports
 # -------------------
-# Used to open files with unknown encodings and to run docutils itself.
-from docutils import io, core
-# Import CodeBlock as a base class for FencedCodeBlock.
-from docutils.parsers.rst.directives.body import CodeBlock
-# Import directives to register the new FencedCodeBlock and SetLine directives.
-from docutils.parsers.rst import directives, Directive
 # For the docutils default stylesheet and template
-import docutils.writers.html4css1
-from docutils.writers.html4css1 import Writer
-from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
-    get_lexer_for_mimetype, guess_lexer_for_filename, guess_lexer, get_all_lexers
-from pygments.util import text_type, guess_decode
-from pygments.lexer import _encoding_map
-from pygments.token import Token
-from pygments.filter import apply_filters
-import ast
+from pygments.lexers import get_all_lexers
+
 #
 # Local application imports
 # -------------------------
@@ -66,7 +53,12 @@ from CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 #
 
 
+# Functions
+# =========
+# Converting the reST file into whatever language code you would like
+#
 
+# Find the file extension needed, given the language name
 def find_file_ext(new_file_language):
     found = 0
     for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
@@ -75,16 +67,21 @@ def find_file_ext(new_file_language):
             if longname == new_file_language:
                 file_ext_raw = filename_patterns[0]
                 found = 1
-
+    # If we support the language, return the file extension.
+    # Else, return None
     if found == 1:
+        # Use only the '.py' part of '*.py' and similar.
         file_ext_list = file_ext_raw.split('*', 1)
         file_ext = file_ext_list[-1]
         return file_ext
     else:
         return None
-
+#
+# Gather the location of the file to be translated and the name of the language
+# that the file will be translated into.
 def file_info():
     file_name_raw = str(input('What is the name of the file to be translated? '))
+    # This takes just the file location and name (it removes the extension)
     file_name_list = file_name_raw.rsplit('.', 1)
     file_name = file_name_list[0]
 
@@ -97,31 +94,44 @@ def file_info():
         new_file_language = str(input('We could not find that one. Please try again: '))
 
     return [file_name, new_file_language, file_ext]
+#
 
+# Get the tuple of delimiters from our dictionary.
 def restore_comments(language):
     return COMMENT_DELIMITER_INFO[language]
+#
 
+# Allows the use of languages that have only inline comments or only block comments
+# Checks to make sure the comment type is available and returns that information
+def language_comment_type(comment_delimiters):
+    inline = False
+    block = False
+    if comment_delimiters[0] is not None:
+        inline = True
+    if comment_delimiters[1] is not None:
+        block = True
+    return [inline, block]
+#
+
+# Tells the program whether to make a block comment or an inline comment.
+# Number of lines required for the block comment to activate is currently 10,000 consecutive comments.
+# Block comments also activate if the language has no inline comments.
+# Inline comments also activate if the language has no block comments.
 def formulate_comment(list, new_file_language, is_block_comment, position, line_counter):
     comment_delimiters = restore_comments(new_file_language)
-    if is_block_comment is False:
+    comment_type = language_comment_type(comment_delimiters)
+    if is_block_comment is False and comment_type[0] is True:
+        return formulate_inline_comment(list, comment_delimiters)
+    elif is_block_comment is True and comment_type[1] is False:
         return formulate_inline_comment(list, comment_delimiters)
     else:
+        if is_block_comment is False:
+            line_counter = None
         return formulate_block_comment(list, comment_delimiters, position, line_counter)
+#
 
-
+#
 def formulate_inline_comment(list, comment_delimiters):
-
-    #spaces = list.split(' ')
-    #space_count = 0
-    #for item in spaces:
-    #    if item == '':
-    #        space_count += 1
-    #    else:
-    #        break
-    #f = ''
-    #for index in range(space_count):
-    #    f += ' '
-    #f += '{} '.format(comment_delimiters[0]) + list[space_count:] + '\n'
 
     f = '{} '.format(comment_delimiters[0]) + list + '\n'
     return f
@@ -129,12 +139,16 @@ def formulate_inline_comment(list, comment_delimiters):
 
 def formulate_block_comment(list, comment_delimiters, position, line_counter):
 
-    if position == line_counter:
-        f = '{} '.format(comment_delimiters[1]) + list + '\n'
-    elif position > 0:
-        f = ' * ' + list + '\n'
+    if line_counter is None:
+        f = '{} '.format(comment_delimiters[1]) + list + ' {}'.format(comment_delimiters[2]) + '\n'
+
     else:
-        f = ' * ' + list + ' {}'.format(comment_delimiters[2]) + '\n'
+        if position == line_counter:
+            f = '{} '.format(comment_delimiters[1]) + list + '\n'
+        elif position > 0:
+            f = ' * ' + list + '\n'
+        else:
+            f = ' * ' + list + ' {}'.format(comment_delimiters[2]) + '\n'
 
     return f
 
@@ -165,6 +179,7 @@ def file_interpreter():
                     file_out.write(f)
                     i += 1
                 try:
+                    # skips over the  added code including the setline part of the code.
                     i += 9
                 # this exception catches the case that the file ends with code rather than a comment
                 except:
@@ -184,17 +199,20 @@ def file_interpreter():
                 # also, needs to be int() in order to work in the for loop. size starts out as a float.
                 size = int(size*2)
 
+                # skips over the  added code including the setline part of the code.
                 i += 7
 
                 while list[i+1] != '.. raw:: html':
                     spaces = ''
                     for index in range(size):
                         spaces += ' '
-                    s = formulate_comment(list[i], new_file_language, False, 0, 0)
+
+                    s = formulate_comment(list[i], new_file_language, False, 0, None)
                     f = spaces + s
                     file_out.write(f)
                     i += 1
 
+                # skips over the  added code including the setline part of the code.
                 i += 7
 
 
@@ -214,6 +232,7 @@ def file_interpreter():
                     except:
                         temp_i += 1
                         break
+                # This line sets the limit for consecutive comments turning into block comments
                 if line_counter < 10000:
                     is_block_comment = False
                     position = 0
