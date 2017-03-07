@@ -111,17 +111,19 @@ def formulate_comment(list, new_file_language, is_block_comment, position, line_
 
 def formulate_inline_comment(list, comment_delimiters):
 
-    spaces = list.split(' ')
-    space_count = 0
-    for item in spaces:
-        if item == '':
-            space_count += 1
-        else:
-            break
-    f = ''
-    for index in range(space_count):
-        f += ' '
-    f += '{} '.format(comment_delimiters[0]) + list[space_count:] + '\n'
+    #spaces = list.split(' ')
+    #space_count = 0
+    #for item in spaces:
+    #    if item == '':
+    #        space_count += 1
+    #    else:
+    #        break
+    #f = ''
+    #for index in range(space_count):
+    #    f += ' '
+    #f += '{} '.format(comment_delimiters[0]) + list[space_count:] + '\n'
+
+    f = '{} '.format(comment_delimiters[0]) + list + '\n'
     return f
 
 
@@ -153,56 +155,89 @@ def file_interpreter():
 
     i = 0
     while i < len(list):
-        if list[i] == '':
-            try:
-                list[i+1]
-                if list[i+1] == '.. fenced-code::':
-                    i += 4
-                    while list[i] != ' Ending fence':
-                        s = list[i].split(' ', 1)
-                        f = s[1] + '\n'
-                        file_out.write(f)
-                        i += 1
-                    i += 4
+        try:
+            list[i+1]
+            if list[i+1] == '.. fenced-code::':
+                i += 4
+                while list[i] != ' Ending fence':
+                    s = list[i].split(' ', 1)
+                    f = s[1] + '\n'
+                    file_out.write(f)
+                    i += 1
+                try:
+                    i += 9
+                # this exception catches the case that the file ends with code rather than a comment
+                except:
+                    i += 8
 
-                else:
-                    i += 5
-                    temp_i = i
-                    line_counter = 0
+            # This is to find the <div> comments and turn them into comments.
+            elif list[i+1] == '.. raw:: html':
+                # used to control the line number of the document
+                i += 3
+                # splits the line into ' <div style="margin-left' and '{size}em;">'
+                s = list[i].split(':', 1)
+                # splits '{size}em;">' into '{size}' and 'm;">'
+                s2 = s[1].split('e', 1)
+                # turns '{size}' into a number of divs ex. 1.0 or 3.5
+                size = float(s2[0])
+                # gets the number of spaces needed to put the comment(s) back where it was
+                # also, needs to be int() in order to work in the for loop. size starts out as a float.
+                size = int(size*2)
 
-                    while list[temp_i+1] != '.. fenced-code::':
-                        line_counter += 1
+                i += 7
+
+                while list[i+1] != '.. raw:: html':
+                    spaces = ''
+                    for index in range(size):
+                        spaces += ' '
+                    s = formulate_comment(list[i], new_file_language, False, 0, 0)
+                    f = spaces + s
+                    file_out.write(f)
+                    i += 1
+
+                i += 7
+
+
+            else:
+
+                i += 0
+
+                temp_i = i
+                line_counter = 0
+
+                while list[temp_i+1] != '.. fenced-code::':
+                    line_counter += 1
+                    temp_i += 1
+                    try:
+                        list[temp_i+1]
+                        stuff = 0
+                    except:
                         temp_i += 1
-                        try:
-                            list[temp_i+1]
-                            stuff = 0
-                        except:
-                            temp_i += 1
-                            break
-                    if line_counter < 4:
-                        is_block_comment = False
-                        position = 0
-                    else:
-                        is_block_comment = True
-                        position = line_counter
+                        break
+                if line_counter < 10000:
+                    is_block_comment = False
+                    position = 0
+                else:
+                    is_block_comment = True
+                    position = line_counter
 
 
-                    while list[i+1] != '.. fenced-code::':
+                while list[i+1] != '.. fenced-code::':
+                    f = formulate_comment(list[i], new_file_language, is_block_comment, position, line_counter)
+                    file_out.write(f)
+                    position -= 1
+                    i += 1
+                    try:
+                        list[i+1]
+                        stuff = 0
+                    except:
                         f = formulate_comment(list[i], new_file_language, is_block_comment, position, line_counter)
                         file_out.write(f)
-                        position -= 1
                         i += 1
-                        try:
-                            list[i+1]
-                            stuff = 0
-                        except:
-                            f = formulate_comment(list[i], new_file_language, is_block_comment, position, line_counter)
-                            file_out.write(f)
-                            i += 1
-                            break
-            except:
-                i += 1
-                break
+                        break
+        except:
+            i += 1
+            break
 
 
     file_out.close()
