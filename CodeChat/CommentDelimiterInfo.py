@@ -146,9 +146,9 @@ COMMENT_DELIMITER_INFO = {
   'Eiffel':         ( '--',     None,            None),
   'vhdl':           ( '--',     None,            None),
   # ``*>`` as an inline comment is not supported.
-  # TODO : figure out what six characters will precede '*' when converting reST to code
+  # six spaces will precede '*' when converting reST to code
   ## Six ignored characters followed by * or /.
-  'COBOL':          ('123456*', None,            None),
+  'COBOL':          ('      *', None,            None),
   'YAML':           ( '#',      None,            None),
 
   # These languages have failing unit tests
