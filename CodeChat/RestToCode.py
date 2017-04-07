@@ -162,12 +162,20 @@ def file_interpreter():
     string = file.read()
     file.close()
 
+    file_out = open('{}{}'.format(file_name, file_ext), 'w')
+    f = rest_to_code(string, new_file_language)
+    file_out.write(f)
+    file_out.close()
+
+
+# core function: take string as input, returns a string
+# TODO write tests also junk input and empty file, a bunch of different languages
+# TODO comments
+def rest_to_code(string, new_language):
+    i = 0
     string = string.replace('\t', '    ')
     list = string.split('\n')
-
-    file_out = open('{}{}'.format(file_name, file_ext), 'w')
-
-    i = 0
+    string_out = ""
     while i < len(list):
         try:
             list[i+1]
@@ -176,11 +184,12 @@ def file_interpreter():
                 while list[i] != ' Ending fence':
                     s = list[i].split(' ', 1)
                     f = s[1] + '\n'
-                    file_out.write(f)
+                    string_out += f
+                    # file_out.write(f)
                     i += 1
                 try:
                     # skips over the  added code including the setline part of the code.
-                    i += 9
+                    i += 9 # TODO assert the code between here to make sure it is what we think it should be
                 # this exception catches the case that the file ends with code rather than a comment
                 except:
                     i += 8
@@ -207,9 +216,10 @@ def file_interpreter():
                     for index in range(size):
                         spaces += ' '
 
-                    s = formulate_comment(list[i], new_file_language, False, 0, None)
+                    s = formulate_comment(list[i], new_language, False, 0, None)
                     f = spaces + s
-                    file_out.write(f)
+                    string_out += f
+                    # file_out.write(f)
                     i += 1
 
                 # skips over the  added code including the setline part of the code.
@@ -242,16 +252,18 @@ def file_interpreter():
 
 
                 while list[i+1] != '.. fenced-code::':
-                    f = formulate_comment(list[i], new_file_language, is_block_comment, position, line_counter)
-                    file_out.write(f)
+                    f = formulate_comment(list[i], new_language, is_block_comment, position, line_counter)
+                    string_out += f
+                    # file_out.write(f)
                     position -= 1
                     i += 1
                     try:
                         list[i+1]
                         stuff = 0
                     except:
-                        f = formulate_comment(list[i], new_file_language, is_block_comment, position, line_counter)
-                        file_out.write(f)
+                        f = formulate_comment(list[i], new_language, is_block_comment, position, line_counter)
+                        string_out += f
+                        # file_out.write(f)
                         i += 1
                         break
         except:
@@ -259,7 +271,8 @@ def file_interpreter():
             break
 
 
-    file_out.close()
+    return string_out
+    # file_out.close()
 
 
 
