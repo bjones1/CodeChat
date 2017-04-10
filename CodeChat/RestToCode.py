@@ -44,12 +44,13 @@ import inspect
 # Third-party imports
 # -------------------
 # For the docutils default stylesheet and template
+# from CodeChat import CommentDelimiterInfo
 from pygments.lexers import get_all_lexers
 
 #
 # Local application imports
 # -------------------------
-from CommentDelimiterInfo import COMMENT_DELIMITER_INFO
+from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 #
 
 
@@ -169,9 +170,9 @@ def file_interpreter():
 
 
 # core function: take string as input, returns a string
-# TODO write tests also junk input and empty file, a bunch of different languages
 # TODO comments
 def rest_to_code(string, new_language):
+    boolean = False
     i = 0
     string = string.replace('\t', '    ')
     list = string.split('\n')
@@ -180,22 +181,39 @@ def rest_to_code(string, new_language):
         try:
             list[i+1]
             if list[i+1] == '.. fenced-code::':
+                # Makes sure that the lines that are supposed to be there are there.
+                if list[i+2] != '' or list[i+3] != ' Beginning fence':
+                    boolean = True
+                    break
                 i += 4
                 while list[i] != ' Ending fence':
+                    # take the front space off
                     s = list[i].split(' ', 1)
                     f = s[1] + '\n'
                     string_out += f
                     # file_out.write(f)
                     i += 1
                 try:
-                    # skips over the  added code including the setline part of the code.
-                    i += 9 # TODO assert the code between here to make sure it is what we think it should be
+                    # skips over the  added code not including the setline part of the code.
+                    # Makes sure that the lines that are supposed to be there are there.
+                    if list[i+1] != '' or list[i+2] != '..' or list[i+3] != '':
+                        boolean = True
+                        break
+                    i += 4
                 # this exception catches the case that the file ends with code rather than a comment
                 except:
-                    i += 8
+                    # Makes sure that the lines that are supposed to be there are there.
+                    if list[i+1] != '' or list[i+2] != '..' or list[i+3] != '':
+                        boolean = True
+                        break
+                    i += 3
 
             # This is to find the <div> comments and turn them into comments.
             elif list[i+1] == '.. raw:: html':
+                # Makes sure that the lines that are supposed to be there are there.
+                if list[i+2] != '' or list[i+3][0:24] != ' <div style="margin-left':
+                    boolean = True
+                    break
                 # used to control the line number of the document
                 i += 3
                 # splits the line into ' <div style="margin-left' and '{size}em;">'
@@ -208,6 +226,11 @@ def rest_to_code(string, new_language):
                 # also, needs to be int() in order to work in the for loop. size starts out as a float.
                 size = int(size*2)
 
+                # Makes sure that the lines that are supposed to be there are there.
+                if (list[i+1] != '' or list[i+2] != '' or list[i+3][0:13] != '.. set-line::'
+                    or list[i+4] != '' or list[i+5] != '..' or list[i+6] != ''):
+                        boolean = True
+                        break
                 # skips over the  added code including the setline part of the code.
                 i += 7
 
@@ -222,13 +245,21 @@ def rest_to_code(string, new_language):
                     # file_out.write(f)
                     i += 1
 
-                # skips over the  added code including the setline part of the code.
+                # Makes sure that the lines that are supposed to be there are there.
+                if (list[i+2] != '' or list[i+3] != ' </div>' or list[i+4] != ''
+                    or list[i+5] != '..' or list[i+6] != ''):
+                        boolean = True
+                        break
+                # skips over the  added code
                 i += 7
 
-
-            else:
-
-                i += 0
+            #
+            elif list[i+1][0:13] == '.. set-line::':
+                # Makes sure that the lines that are supposed to be there are there.
+                if list[i+2] != '' or list[i+3] != '..' or list[i+4] != '':
+                    boolean = True
+                    break
+                i += 5
 
                 temp_i = i
                 line_counter = 0
@@ -266,10 +297,20 @@ def rest_to_code(string, new_language):
                         # file_out.write(f)
                         i += 1
                         break
+            else:
+                boolean = True
+                break
+
+            if boolean:
+                break
         except:
+            if list[i] != '':
+                boolean = True
             i += 1
             break
 
+    if boolean:
+        return "This was not recognised as valid reST. Please check your input and try again."
 
     return string_out
     # file_out.close()
@@ -277,4 +318,4 @@ def rest_to_code(string, new_language):
 
 
 
-file_interpreter()
+# file_interpreter()
