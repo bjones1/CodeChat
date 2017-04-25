@@ -18,6 +18,7 @@ History of recent changes
     - Consistent treatment of path in globs stored in ``CodeChat_lexer_for_glob``.
     - Better error messages for incorrect lexers specified in ``CodeChat_lexer_for_glob``.
     - CI fixes.
+    - Better feedback of parse errors in Python source.
 
 - 1.4.1, 19-Jan-2017
 
