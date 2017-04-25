@@ -278,7 +278,10 @@ def _lexer_to_rest(
     # \1. Invoke a Pygments lexer on the provided source code, obtaining an
     #     iterable of tokens. Also analyze Python code for docstrings.
     #
-    token_iter, ast_docstring = _pygments_lexer(code_str, lexer)
+    token_iter, ast_docstring, ast_syntax_error = _pygments_lexer(code_str, lexer)
+    # Prepend any syntax error found to the output.
+    if ast_syntax_error:
+        out_file.write('.. error:: {}\n\n'.format(ast_syntax_error))
 
     # \2. Combine tokens from the lexer into three groups: whitespace, comment,
     #     or other.
@@ -375,6 +378,8 @@ def _pygments_lexer(
     # So, process this with AST if this is Python or Python3 code to find docstrings.
     # If found, store line number and docstring into ``ast_docstring``.
     ast_docstring = {}
+    # Provide a place to store syntax errors resutling from parsing the Python code.
+    ast_syntax_error = ''
     # Determine if code is Python or Python3. Note that AST processing cannot
     # support Python 2 specific syntax (e.g. the ``<>`` operator).
     if lexer.name == 'Python' or lexer.name == 'Python 3':
@@ -393,11 +398,12 @@ def _pygments_lexer(
                 except (AttributeError, TypeError):
                     pass
         except SyntaxError as err:
-            print('SyntaxError: {}\n'.format(err), file=sys.stdout)
+            # Take the file name (which shows up as ``<unknown>`` out of the error message returned.
+            ast_syntax_error = 'SyntaxError: {}. Docstrings cannot be processed.\n'.format(err).replace('<unknown>, ', '')
 
     # Now, run the lexer.
     return (_pygments_get_tokens_postprocess(lexer, preprocessed_code_str),
-            ast_docstring)
+            ast_docstring, ast_syntax_error)
 #
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
