@@ -23,18 +23,16 @@ matrix:
     # before_install_ for details).
     language: generic
     # See https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-.travis.yml.
-    # Note that pyenv requres a full version specifier; selecting only 3.3
-    # produces an error: ``python-build: definition not found: 3.3``.
-    env: PYTHON=3.6.0
+    env: INSTALL_TYPE=macpython VERSION=3.6 VENV=venv
   - os: osx
     language: generic
-    env: PYTHON=3.5.3
+    env: INSTALL_TYPE=macpython VERSION=3.5 VENV=venv
   - os: osx
     language: generic
-    env: PYTHON=3.4.6
+    env: INSTALL_TYPE=macpython VERSION=3.4 VENV=venv
   - os: osx
     language: generic
-    env: PYTHON=3.3.6
+    env: INSTALL_TYPE=macpython VERSION=3.3 VENV=venv
 
 # _`before_install`: Perform the manual steps on OS X to install python3 and
 # activate venv, since Python support is not available, per the list of
@@ -44,25 +42,10 @@ matrix:
 # See also the `pyenv docs <https://github.com/yyuu/pyenv/blob/master/README.md>`_.
 before_install: |
   if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    brew update
-    # Per the `pyenv homebrew recommendations <https://github.com/yyuu/pyenv/wiki#suggested-build-environment>`_.
-    brew install openssl readline
-    # See https://docs.travis-ci.com/user/osx-ci-environment/#A-note-on-upgrading-packages.
-    # I didn't do this above because it works and I'm lazy.
-    brew outdated pyenv || brew upgrade pyenv
-    # virtualenv doesn't work without pyenv knowledge. venv in Python 3.3
-    # doesn't provide Pip by default. So, use `pyenv-virtualenv <https://github.com/yyuu/pyenv-virtualenv/blob/master/README.md>`_.
-    brew install pyenv-virtualenv
-    pyenv install $PYTHON
-    # I would expect something like ``pyenv init; pyenv local $PYTHON`` or
-    # ``pyenv shell $PYTHON`` would work, but ``pyenv init`` doesn't seem to
-    # modify the Bash environment. ??? So, I hand-set the variables instead.
-    export PYENV_VERSION=$PYTHON
-    export PATH="/Users/travis/.pyenv/shims:${PATH}"
-    pyenv-virtualenv venv
-    source venv/bin/activate
-    # A manual check that the correct version of Python is running.
-    python --version
+    git clone https://github.com/MacPython/terryfy.git
+    # Avoid printing the lines from the script below.
+    source terryfy/travis_tools.sh
+    get_python_environment $INSTALL_TYPE $VERSION $VENV
   fi
 
 install:
@@ -76,6 +59,7 @@ install:
 
 # Run the tests.
 script:
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then source terryfy/test_tools.sh; fi
   # On OS X, ``py.test`` with no parameters runs all CodeChat tests, then
   # discovers others that fail. Try to avoid this. Also, invoking ``py.test``
   # refers to the system Python. So, run it as a module to use the selected
