@@ -18,9 +18,9 @@
 # *********************************************************
 # CodeToRest.py - a module to translate source code to reST
 # *********************************************************
-# The API_ lists four function which convert source code into either reST or
+# The API_ lists four functions which convert source code into either reST or
 # HTML. For a discussion on how this is accomplished, the lexer_to_rest_
-# function forms the core of the alogorithm; Step_5_ gives a detailed
+# function forms the core of the alogorithm; `step 5 <Step_5>`_ gives a detailed
 # explanation of how the code is translated to reST.
 #
 # .. contents::
@@ -32,14 +32,9 @@
 #
 # Standard library
 # ----------------
-# For stderr.
 import sys
-# For calling code_to_rest with a string. While using cStringIO would be
-# great, it doesn't support Unicode, so we can't.
 from io import StringIO
-# To find a file's extension and locate data files.
 import os.path
-# For enumerations.
 from enum import Enum
 # To clean up docstrings.
 import inspect
@@ -53,7 +48,6 @@ from docutils.parsers.rst.directives.body import CodeBlock
 # Import directives to register the new FencedCodeBlock and SetLine directives.
 from docutils.parsers.rst import directives, Directive
 # For the docutils default stylesheet and template
-import docutils.writers.html4css1
 from docutils.writers.html4css1 import Writer
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
     get_lexer_for_mimetype, guess_lexer_for_filename, guess_lexer
