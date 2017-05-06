@@ -736,7 +736,7 @@ class TestCodeToRest(object):
                 'comment\n\n', ['AutoIt'])
 
     # Perl. (currently not available)
-    """def test_45(self):
+    def test_45(self):
         self.mt('print "Hello World!"\n'
                 '# Comment here\n',
                 bf +
@@ -791,7 +791,7 @@ class TestCodeToRest(object):
     def test_49(self):
         self.mt('#`( embedded comment)\n',
                 sl(-3) +
-                'embedded comment\n', ['Perl6'])"""
+                'embedded comment\n', ['Perl6'])
 
     # S.
     def test_50(self):
