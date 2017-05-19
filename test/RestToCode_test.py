@@ -16,7 +16,7 @@
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
 # *********************************
-# CodeToRest_test.py - Unit testing
+# RestToCode_test.py - Unit testing
 # *********************************
 # This test bench exercises the CodeToRest module. First, set up for
 # development (see :ref:`To-package`). To run, execute ``py.test`` from the
