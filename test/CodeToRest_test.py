@@ -755,42 +755,6 @@ class TestCodeToRest(object):
                 ' print "Hello World!"\n' +
                 ef, ['Perl6', 'Perl'])
 
-    def test_47_a(self):
-        self.mt('=pod\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '=cut\n',
-                sl(-3) +
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '\n', ['Perl'])
-
-    def test_47_b(self):
-        self.mt('=for\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '=cut\n',
-                sl(-3) +
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '\n', ['Perl'])
-
-    def test_47_c(self):
-        self.mt('=begin\n'
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '=cut\n',
-                sl(-3) +
-                'multi-\n'
-                'line\n'
-                'comment\n'
-                '\n', ['Perl'])
-
     # New comment syntax in Perl6. No PODs supported.
     def test_49(self):
         self.mt('#`( embedded comment)\n',
