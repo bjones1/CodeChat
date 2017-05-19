@@ -27,30 +27,17 @@
 # These are listed in the order prescribed by `PEP 8
 # <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
-# Standard library
-# ----------------
-# For stderr.
-import sys
-# For calling code_to_rest with a string. While using cStringIO would be
-# great, it doesn't support Unicode, so we can't.
-from io import StringIO
-# To find a file's extension and locate data files.
-import os.path
-# For enumerations.
-from enum import Enum
-# To clean up docstrings.
-import inspect
 #
 # Third-party imports
 # -------------------
 # For the docutils default stylesheet and template
-# from CodeChat import CommentDelimiterInfo
 from pygments.lexers import get_all_lexers
+from docutils import io
 
 #
 # Local application imports
 # -------------------------
-from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
+from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 #
 
 
@@ -71,16 +58,17 @@ def find_file_ext(new_file_language):
     # If we support the language, return the file extension.
     # Else, return None
     if found == 1:
-        # Use only the '.py' part of '*.py' and similar.
+        # Use only the ``.py`` part of ``*.py`` and similar.
         file_ext_list = file_ext_raw.split('*', 1)
         file_ext = file_ext_list[-1]
         return file_ext
     else:
         return None
+
 #
 # Gather the location of the file to be translated and the name of the language
 # that the file will be translated into.
-def file_info():
+def file_info(source_path, out_path): # TODO make the file import be from docutils and pygments
     file_name_raw = str(input('What is the name of the file to be translated? '))
     # This takes just the file location and name (it removes the extension)
     file_name_list = file_name_raw.rsplit('.', 1)
@@ -154,19 +142,26 @@ def formulate_block_comment(list, comment_delimiters, position, line_counter):
     return f
 
 
-def file_interpreter():
+def file_interpreter(source_path=None, out_path=None, input_encoding=None, output_encoding='utf-8'):
+    # TODO make this work
 
-    file_name, new_file_language, file_ext = file_info()
+    file_name, new_file_language, file_ext = file_info(source_path, out_path)
 
+    if source_path is None:
+        source_path = '{}.rst'.format(file_name)
+    if out_path is None:
+        out_path = '{}{}'.format(file_name, file_ext)
 
-    file = open('{}.rst'.format(file_name))
-    string = file.read()
-    file.close()
+    # Use docutil's I/O classes to better handle and sniff encodings.
+    #
+    # Note: both these classes automatically close themselves after a
+    # read or write.
+    fi = io.FileInput(source_path=source_path, encoding=input_encoding)
+    fo = io.FileOutput(destination_path=out_path, encoding=output_encoding)
+    rest_str = fi.read()
+    code = rest_to_code(rest_str, new_file_language)
+    fo.write(code)
 
-    file_out = open('{}{}'.format(file_name, file_ext), 'w')
-    f = rest_to_code(string, new_file_language)
-    file_out.write(f)
-    file_out.close()
 
 
 # core function: take string as input, returns a string
@@ -191,7 +186,6 @@ def rest_to_code(string, new_language):
                     s = list[i].split(' ', 1)
                     f = s[1] + '\n'
                     string_out += f
-                    # file_out.write(f)
                     i += 1
                 try:
                     # skips over the  added code not including the setline part of the code.
@@ -233,7 +227,8 @@ def rest_to_code(string, new_language):
                         break
                 # skips over the  added code including the setline part of the code.
                 i += 7
-
+# TODO work in enki, get docutils to work, combine tests, create file tests, pull request
+# TODO Document things
                 while list[i+1] != '.. raw:: html':
                     spaces = ''
                     for index in range(size):
@@ -242,7 +237,6 @@ def rest_to_code(string, new_language):
                     s = formulate_comment(list[i], new_language, False, 0, None)
                     f = spaces + s
                     string_out += f
-                    # file_out.write(f)
                     i += 1
 
                 # Makes sure that the lines that are supposed to be there are there.
@@ -285,7 +279,6 @@ def rest_to_code(string, new_language):
                 while list[i+1] != '.. fenced-code::':
                     f = formulate_comment(list[i], new_language, is_block_comment, position, line_counter)
                     string_out += f
-                    # file_out.write(f)
                     position -= 1
                     i += 1
                     try:
@@ -294,7 +287,6 @@ def rest_to_code(string, new_language):
                     except:
                         f = formulate_comment(list[i], new_language, is_block_comment, position, line_counter)
                         string_out += f
-                        # file_out.write(f)
                         i += 1
                         break
             else:
@@ -313,9 +305,8 @@ def rest_to_code(string, new_language):
         return "This was not recognised as valid reST. Please check your input and try again."
 
     return string_out
-    # file_out.close()
 
 
 
 
-# file_interpreter()
+#file_interpreter()
