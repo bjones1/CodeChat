@@ -142,31 +142,32 @@ def formulate_block_comment(list, comment_delimiters, position, line_counter):
     return f
 
 
-def file_interpreter(source_path=None, out_path=None, input_encoding=None, output_encoding='utf-8'):
+def rest_to_code_file(source_rst_path=None, out_path=None, lang=None, input_encoding=None, output_encoding='utf-8'):
     # TODO make this work
 
-    file_name, new_file_language, file_ext = file_info(source_path, out_path)
+    if lang is None:
+        file_name, lang, file_ext = file_info(source_rst_path, out_path)
 
-    if source_path is None:
-        source_path = '{}.rst'.format(file_name)
-    if out_path is None:
-        out_path = '{}{}'.format(file_name, file_ext)
+        if source_rst_path is None:
+            source_rst_path = '{}.rst'.format(file_name)
+        if out_path is None:
+            out_path = '{}{}'.format(file_name, file_ext)
 
     # Use docutil's I/O classes to better handle and sniff encodings.
     #
     # Note: both these classes automatically close themselves after a
     # read or write.
-    fi = io.FileInput(source_path=source_path, encoding=input_encoding)
+    fi = io.FileInput(source_path=source_rst_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=out_path, encoding=output_encoding)
     rest_str = fi.read()
-    code = rest_to_code(rest_str, new_file_language)
+    code = rest_to_code_string(rest_str, lang)
     fo.write(code)
 
 
 
 # core function: take string as input, returns a string
 # TODO comments
-def rest_to_code(string, new_language):
+def rest_to_code_string(string, new_language):
     boolean = False
     i = 0
     string = string.replace('\t', '    ')
