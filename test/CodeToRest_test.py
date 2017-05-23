@@ -42,7 +42,7 @@ from pygments.lexers import get_lexer_by_name
 #
 # Local application imports
 # -------------------------
-from CodeChat.RestToCode import rest_to_code
+from CodeChat.RestToCode import rest_to_code_string
 from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
 from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
@@ -100,6 +100,10 @@ div_end = ('\n'
            '..\n'
            '\n')
 
+# The string that results from rest_to_code not understanding the material.
+error_str = "This was not recognised as valid reST. Please check your input and try again."
+
+
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
 class TestCodeToRest(object):
@@ -115,9 +119,9 @@ class TestCodeToRest(object):
 
         for alias in alias_seq:
             rest = code_to_rest_string(code_str, alias=alias)
-            code = rest_to_code(rest, alias)
+            code = rest_to_code_string(rest, alias)
             rest2 = code_to_rest_string(code_str, alias=alias)
-            code2 = rest_to_code(rest2, alias)
+            code2 = rest_to_code_string(rest2, alias)
             assert ((code == code2) and (rest == expected_rest_str))
 
     # A single line of code.
@@ -1819,3 +1823,27 @@ comment
            (3, '\n')], out_stringio)
         assert (out_stringio.getvalue() == div(1.5, -3) + '\ncomment\n\n' + div_end)
 
+
+class TestRestToCode_ERR_Catching(object):
+
+    # Error testing main code
+    def et(self, rest, alias_seq=('C', 'C', 'C++',
+      'Java', 'ActionScript', 'C#', 'D', 'Go', 'JavaScript', 'Objective-C',
+      'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog', 'Dart', 'Juttle',
+      'Objective-J', 'TypeScript', 'Arduino', 'Clay', 'CUDA', 'eC', 'MQL',
+      'nesC', 'Pike', 'SWIG', 'Vala', 'Zephir', 'Haxe')):
+
+        for alias in alias_seq:
+
+            code = rest_to_code_string(rest, alias)
+            assert code == error_str
+
+
+    def test_1(self):
+        self.et('hello')
+
+    def test_2(self):
+        self.et('\n'
+                '.. fenced-code::\n'
+                '\n'
+                ' Beginning fene\n')
