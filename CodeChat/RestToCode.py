@@ -39,13 +39,15 @@ from docutils import io
 # -------------------------
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 #
-
-
-# Functions
-# =========
-# Converting the reST file into whatever language code you would like
 #
-
+#
+# Supporting Functions
+# ====================
+# This section covers all functions that support the main two functions rest_to_code_string_
+# and rest_to_code_file_. 
+#
+# .. _find_file_ext:
+#
 # Find the file extension needed, given the language name
 def find_file_ext(new_file_language):
     found = 0
@@ -56,7 +58,7 @@ def find_file_ext(new_file_language):
                 file_ext_raw = filename_patterns[0]
                 found = 1
     # If we support the language, return the file extension.
-    # Else, return None
+    # Else, return ``None``
     if found == 1:
         # Use only the ``.py`` part of ``*.py`` and similar.
         file_ext_list = file_ext_raw.split('*', 1)
@@ -64,17 +66,23 @@ def find_file_ext(new_file_language):
         return file_ext
     else:
         return None
-
+#
+# .. _file_info:
 #
 # Gather the location of the file to be translated and the name of the language
 # that the file will be translated into.
-def file_info(source_path, out_path): # TODO make the file import be from docutils and pygments
+# This is the only part of the code that needs to be filled out by the user at runtime.
+#
+# The user can skip this by providing a language in the parameters of rest_to_code_file_.
+def file_info(source_path, out_path):
     file_name_raw = str(input('What is the name of the file to be translated? '))
     # This takes just the file location and name (it removes the extension)
     file_name_list = file_name_raw.rsplit('.', 1)
     file_name = file_name_list[0]
 
     new_file_language = str(input('What is the language you would like? '))
+    # This section allows the program to determine if we support the language
+    # that the user has input.
     file_ext = None
     while file_ext is None:
         file_ext = find_file_ext(new_file_language)
@@ -84,12 +92,14 @@ def file_info(source_path, out_path): # TODO make the file import be from docuti
 
     return [file_name, new_file_language, file_ext]
 #
-
+# .. _restore_comments:
+#
 # Get the tuple of delimiters from our dictionary.
 def restore_comments(language):
     return COMMENT_DELIMITER_INFO[language]
 #
-
+# .. _language_comment_type:
+#
 # Allows the use of languages that have only inline comments or only block comments
 # Checks to make sure the comment type is available and returns that information
 def language_comment_type(comment_delimiters):
@@ -101,7 +111,8 @@ def language_comment_type(comment_delimiters):
         block = True
     return [inline, block]
 #
-
+# .. _formulate_comment:
+#
 # Tells the program whether to make a block comment or an inline comment.
 # Number of lines required for the block comment to activate is currently 10,000 consecutive comments.
 # Block comments also activate if the language has no inline comments.
@@ -118,14 +129,16 @@ def formulate_comment(list, new_file_language, is_block_comment, position, line_
             line_counter = None
         return formulate_block_comment(list, comment_delimiters, position, line_counter)
 #
-
+# .. _formulate_inline_comment:
 #
 def formulate_inline_comment(list, comment_delimiters):
 
     f = '{} '.format(comment_delimiters[0]) + list + '\n'
     return f
 
-
+#
+# .. _formulate_block_comment:
+#
 def formulate_block_comment(list, comment_delimiters, position, line_counter):
 
     if line_counter is None:
@@ -141,9 +154,10 @@ def formulate_block_comment(list, comment_delimiters, position, line_counter):
 
     return f
 
-
+#
+# .. _rest_to_code_file:
+#
 def rest_to_code_file(source_rst_path=None, out_path=None, lang=None, input_encoding=None, output_encoding='utf-8'):
-    # TODO make this work
 
     if lang is None:
         file_name, lang, file_ext = file_info(source_rst_path, out_path)
@@ -162,9 +176,9 @@ def rest_to_code_file(source_rst_path=None, out_path=None, lang=None, input_enco
     rest_str = fi.read()
     code = rest_to_code_string(rest_str, lang)
     fo.write(code)
-
-
-
+#
+# .. _rest_to_code_string:
+#
 # core function: take string as input, returns a string
 # TODO comments
 def rest_to_code_string(string, new_language):
