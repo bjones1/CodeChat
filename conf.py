@@ -241,11 +241,6 @@ html_static_path = ['CodeChat.css']
 # using the given strftime format.
 html_last_updated_fmt = '%b, %d, %Y'
 
-# `html_use_smartypants <http://sphinx-doc.org/config.html#confval-html_use_smartypants>`_:
-# If true, `SmartyPants <http://daringfireball.net/projects/smartypants/>`_ will
-# be used to convert quotes and dashes to typographically correct entities.
-html_use_smartypants = True
-
 # `html_sidebars <http://sphinx-doc.org/config.html#confval-html_sidebars>`_:
 # Custom sidebar templates, maps document names to template names.
 # Set this per the `Alabaster theme customizations`_.
