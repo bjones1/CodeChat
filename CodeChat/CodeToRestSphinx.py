@@ -37,10 +37,10 @@
 #
 # Standard library
 # ----------------
-import os.path
 from os import path
 import fnmatch
 import codecs
+from pathlib import Path
 #
 # Third-party imports
 # -------------------
@@ -76,7 +76,7 @@ def _source_read(
             lexer = None
             lfg = app.config.CodeChat_lexer_for_glob
             for glob, lexer_alias in lfg.items():
-                if fnmatch.fnmatch(docname, glob):
+                if Path(docname).match(glob):
                     # On a match, pass the specified lexer alias.
                     lexer = get_lexer(alias=lexer_alias)
                     break
@@ -103,7 +103,7 @@ def is_source_code(
     # the name and extension using `doc2path
     # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
     docname_ext = env.doc2path(docname, None)
-    return os.path.normpath(docname_ext) == os.path.normpath(docname)
+    return Path(docname_ext) == Path(docname)
 #
 # Monkeypatch
 # ===========
