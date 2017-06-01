@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    CodeChat.css
+   default.css
    conf.py
 
 
