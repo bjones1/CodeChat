@@ -33,6 +33,8 @@
 # -------------------
 # Used to run docutils.
 from docutils import io
+from tempfile import mkstemp
+import os
 #
 # Local application imports
 # -------------------------
@@ -46,28 +48,42 @@ from CodeChat.CodeToRest import code_to_rest_file
 class TestRestToCode_file_tests(object):
 
     # Testing in files
-    def ft(self, code_file, rest_file, modded_code_file1, modded_code_file2, lang='Python'):
+    def ft(self, code_file_name=None, lang='Python', lexer=None):
 
-        code_to_rest_file(code_file, rest_file)
+        file_name = code_file_name.rsplit('.')
+        ext = '.' + file_name[-1]
+        fr, rest_file = mkstemp(suffix='.rst')
+        fm1, modded_code_file1 = mkstemp(suffix=ext)
+        fm2, modded_code_file2 = mkstemp(suffix=ext)
+        os.close(fr)
+        os.close(fm1)
+        os.close(fm2)
+        code_to_rest_file(code_file_name, rest_file, alias=lexer)
         rest_to_code_file(rest_file, modded_code_file1, lang)
-        code_to_rest_file(modded_code_file1, rest_file)
+        code_to_rest_file(modded_code_file1, rest_file, alias=lexer)
         rest_to_code_file(rest_file, modded_code_file2, lang)
         f1 = io.FileInput(source_path=modded_code_file1)
         f2 = io.FileInput(source_path=modded_code_file2)
         code1 = f1.read()
         code2 = f2.read()
+        os.remove(rest_file)
+        os.remove(modded_code_file1)
+        os.remove(modded_code_file2)
         assert (code1 == code2)
 
 
 
 
     def test_1(self):
-        self.ft('CodeChat\\CodeToRest.py','TestFiles\\t.rst','TestFiles\\t1.py','TestFiles\\t2.py')
+        self.ft(code_file_name='CodeChat\\CodeToRest.py')
 
-#TODO test 2 currently fails due to the interpreted lexer being 'CSS+Lasso'
+
     def test_2(self):
-        self.ft('CodeChat.css','TestFiles\\t.rst','TestFiles\\t1.css','TestFiles\\t2.css','CSS')
+        self.ft(code_file_name='CodeChat.css',lang='CSS',lexer='css')
 
 
     def test_3(self):
-        self.ft('TestFiles\\Empty.c','TestFiles\\t.rst','TestFiles\\t1.c','TestFiles\\t2.c','C')
+        fd, tmp_path = mkstemp(suffix='.c')
+        os.close(fd)
+        self.ft(code_file_name=tmp_path,lang='C')
+        os.remove(tmp_path)
