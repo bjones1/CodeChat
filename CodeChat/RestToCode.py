@@ -33,6 +33,7 @@
 # For the docutils default stylesheet and template
 from pygments.lexers import get_all_lexers
 from docutils import io
+from pygments.lexers import find_lexer_class
 
 #
 # Local application imports
@@ -52,7 +53,22 @@ from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 def find_file_ext(
   # See lang_.
   lang):
-    found = 0
+    # TODO Make a test for finding the file extention.
+    if lang in COMMENT_DELIMITER_INFO:
+        # `find_lexer_class <http://pygments.org/docs/api/#pygments.lexers.find_lexer_class>`_
+        # operates on the `name <http://pygments.org/docs/api/#pygments.lexer.Lexer.name>`_
+        # which is different from the `alias <http://pygments.org/docs/api/#pygments.lexer.Lexer.aliases>`_
+        # . The name is an attribute of every lexer class
+        lexer_class = find_lexer_class(lang)
+        # This grabs the first `filename <http://pygments.org/docs/api/#pygments.lexer.Lexer.filenames>`_.
+        file_ext_raw = lexer_class.filenames[0]
+        # Use only the ``.py`` part of ``*.py`` and similar.
+        file_ext_list = file_ext_raw.split('*', 1)
+        file_ext = file_ext_list[-1]
+        return file_ext
+    else:
+        return None
+'''    found = 0
     for longname, aliases, filename_patterns, mimetypes in get_all_lexers():
         # Pick only filenames we have comment info for.
         if longname in COMMENT_DELIMITER_INFO:
@@ -61,13 +77,14 @@ def find_file_ext(
                 found = 1
     # If we support the language, return the file extension.
     # Else, return ``None``
+    # TODO do a for/else statement. use break to
     if found == 1:
         # Use only the ``.py`` part of ``*.py`` and similar.
         file_ext_list = file_ext_raw.split('*', 1)
         file_ext = file_ext_list[-1]
         return file_ext
     else:
-        return None
+        return None'''
 #
 # .. _file_info:
 #
@@ -103,14 +120,7 @@ def file_info(
         new_file_language = str(input('We could not find that one. Please try again: '))
 
     return [source_rst_path, new_file_language, file_ext]
-#
-# .. _restore_comments:
-#
-# Get the tuple of delimiters from our dictionary.
-def restore_comments(
-  # See lang_.
-  lang):
-    return COMMENT_DELIMITER_INFO[lang]
+# |
 #
 # .. _language_comment_type:
 #
@@ -120,18 +130,13 @@ def language_comment_type(
   # .. _comment_delimiters:
   #
   # This is the Value in the dictionary found in :doc:`CommentDelimiterInfo.py`
-  # Ex: ``( '#',      '"""',          '"""')`` for the key ``'Python'``
-  # and ``( '//',     '/*',            '*/')`` for the key ``'C'``
+  #
+  # | Ex: ``( '#',      '"""',          '"""')`` for the key ``'Python'``
+  # | and ``( '//',     '/*',            '*/')`` for the key ``'C'``
   comment_delimiters):
-    inline = False
-    block = False
     # If the language supports inline comments, index zero will have a string.
-    if comment_delimiters[0] is not None:
-        inline = True
     # If the language supports block comments, index one will have a string.
-    if comment_delimiters[1] is not None:
-        block = True
-    return [inline, block]
+    return [comment_delimiters[0] is not None, comment_delimiters[1] is not None]
 #
 # .. _formulate_comment:
 #
@@ -163,7 +168,7 @@ def formulate_comment(
   #
   line_counter):
     # Grab the comment delimiters for the given language
-    comment_delimiters = restore_comments(lang)
+    comment_delimiters = COMMENT_DELIMITER_INFO[lang]
     # Check to see what kinds of comments the language supports
     comment_type = language_comment_type(comment_delimiters)
     # Create an inline comment
@@ -205,8 +210,11 @@ def formulate_block_comment(
 
     # This covers the case that the language does not support inline comments.
     # It places block comment delimiters around a single line to give an inline effect
+    # There is no added space between the end of the comment and the end delimiter because this
+    # space is not taken out in the Code to reST translation. If a space is added, it is no 
+    # longer round trip stable. (It adds a space every time it is translated.)
     if line_counter is None:
-        f = '{} '.format(comment_delimiters[1]) + line + ' {}'.format(comment_delimiters[2]) + '\n'
+        f = '{} '.format(comment_delimiters[1]) + line + '{}'.format(comment_delimiters[2]) + '\n'
     # This is the regular block comment case.
     else:
         # It places the open comment delimiter in front of the first line of the comment,
@@ -218,7 +226,7 @@ def formulate_block_comment(
             f = ' * ' + line + '\n'
         # It places the closing comment delimiter at the end of the last line of the comment.
         else:
-            f = ' * ' + line + ' {}'.format(comment_delimiters[2]) + '\n'
+            f = ' * ' + line + '{}'.format(comment_delimiters[2]) + '\n'
 
     return f
 #
