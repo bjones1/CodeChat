@@ -202,6 +202,8 @@ def get_lexer(
   # See options_.
   **options):
 
+    options.setdefault('tabsize',4)
+
     if lexer:
         return lexer
     if alias:
@@ -216,7 +218,7 @@ def get_lexer(
     if code:
         return guess_lexer(code, **options)
 
-# .. _len_cdi
+# .. _len_cdi:
 #
 # Transforms the comment delimiter info from strings into the length
 # of the string.
