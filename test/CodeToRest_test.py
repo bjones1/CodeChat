@@ -100,9 +100,6 @@ div_end = ('\n'
            '..\n'
            '\n')
 
-# The string that results from rest_to_code not understanding the material.
-error_str = "This was not recognised as valid reST. Please check your input and try again."
-
 
 # This acutally tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
@@ -201,6 +198,26 @@ class TestCodeToRest(object):
                 'testing\n'
                 'more testing\n' +
                 div_end)
+
+    def test_9_tab(self):
+        self.mt('\t// testing\n'
+                '\t// more testing',
+                div(2.0, -3) +
+                'testing\n'
+                'more testing\n' +
+                div_end)
+
+    def test_9_tab2(self):
+        self.mt('\t// testing\n'
+                '\t// more testing\n'
+                '\tCode',
+                div(2.0, -3) +
+                'testing\n'
+                'more testing\n' +
+                div_end +
+                bf +
+                '     Code\n' +
+                ef)
 
     # Code to comment transition.
     def test_9a(self):
@@ -1823,27 +1840,3 @@ comment
            (3, '\n')], out_stringio)
         assert (out_stringio.getvalue() == div(1.5, -3) + '\ncomment\n\n' + div_end)
 
-
-class TestRestToCode_ERR_Catching(object):
-
-    # Error testing main code
-    def et(self, rest, alias_seq=('C', 'C', 'C++',
-      'Java', 'ActionScript', 'C#', 'D', 'Go', 'JavaScript', 'Objective-C',
-      'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog', 'Dart', 'Juttle',
-      'Objective-J', 'TypeScript', 'Arduino', 'Clay', 'CUDA', 'eC', 'MQL',
-      'nesC', 'Pike', 'SWIG', 'Vala', 'Zephir', 'Haxe')):
-
-        for alias in alias_seq:
-
-            code = rest_to_code_string(rest, alias)
-            assert code == error_str
-
-
-    def test_1(self):
-        self.et('hello')
-
-    def test_2(self):
-        self.et('\n'
-                '.. fenced-code::\n'
-                '\n'
-                ' Beginning fene\n')
