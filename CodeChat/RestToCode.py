@@ -46,10 +46,9 @@ from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 # ====================
 # This section covers all functions that support the main two functions rest_to_code_string_
 # and rest_to_code_file_. 
+# |
 #
-# .. _find_file_ext:
-#
-# Find the file extension needed, given the language name
+# _`find_file_ext`: Find the file extension needed, given the language name
 def find_file_ext(
   # See lang_.
   lang):
@@ -85,10 +84,9 @@ def find_file_ext(
         return file_ext
     else:
         return None'''
+# |
 #
-# .. _file_info:
-#
-# Gather the location of the file to be translated and the name of the language
+# _`file_info`: Gather the location of the file to be translated and the name of the language
 # that the file will be translated into.
 # This is the only part of the code that needs to be filled out by the user at runtime.
 #
@@ -122,50 +120,41 @@ def file_info(
     return [source_rst_path, new_file_language, file_ext]
 # |
 #
-# .. _language_comment_type:
-#
-# Allows the use of languages that have only inline comments or only block comments
+# _`language_comment_type`: Allows the use of languages that have only inline comments or only block comments
 # Checks to make sure the comment type is available and returns that information
 def language_comment_type(
-  # .. _comment_delimiters:
-  #
-  # This is the Value in the dictionary found in :doc:`CommentDelimiterInfo.py`
-  #
+  # | _`comment_delimiters`: This is the Value in the dictionary found in :doc:`CommentDelimiterInfo.py`
   # | Ex: ``( '#',      '"""',          '"""')`` for the key ``'Python'``
   # | and ``( '//',     '/*',            '*/')`` for the key ``'C'``
   comment_delimiters):
     # If the language supports inline comments, index zero will have a string.
     # If the language supports block comments, index one will have a string.
     return [comment_delimiters[0] is not None, comment_delimiters[1] is not None]
+# |
 #
-# .. _formulate_comment:
-#
-# Tells the program whether to make a block comment or an inline comment.
+# _`formulate_comment`:Tells the program whether to make a block comment or an inline comment.
 # Number of lines required for the block comment to activate is currently `10,000 consecutive comments
 # <number_consecutive_comments_>`_.
 # Block comments also activate if the language has no inline comments.
 # Inline comments also activate if the language has no block comments.
 def formulate_comment(
-  # .. _line:
-  #
-  # This is a string of reST that will be turned into a comment by placing
+  # _`line`: This is a string of reST that will be turned into a comment by placing
   # the correct `comment delimiters <comment_delimiters_>`_ in the correct places.
   line,
   # See lang_.
   lang,
-  # .. _is_block_comment:
-  #
-  # This is a boolean value that tells the program whether to make line_ into
+  # _`is_block_comment`: This is a boolean value that tells the program whether to make line_ into
   # an inline comment or a block comment.
   # This might be overruled if the `language <lang_>`_ does not support the wanted type of comment.
   is_block_comment,
-  # .. _position:
-  #
-  #
+  # _`position`: This variable is an integer, and when paired with `line_counter`_, it allows block
+  # comments to be reformatted. The integer starts at the same value as `line_counter`_ and is
+  # decremented by one for each line that is written to the string. Once it reaches ``0``, the `end
+  # comment delimiter <comment_delimiters>`_ is placed at the end of the line.
   position,
-  # .. _line_counter:
-  #
-  #
+  # _`line_counter`: This variable is an integer. It is the number of lines that exist in this block
+  # comment. It remains constant as `position`_ decrements. It is also used to check to see if there
+  # are `enough lines <number_consecutive_comments>`_ to be considered a block comment.
   line_counter):
     # Grab the comment delimiters for the given language
     comment_delimiters = COMMENT_DELIMITER_INFO[lang]
@@ -181,10 +170,9 @@ def formulate_comment(
         if is_block_comment is False:
             line_counter = None
         return formulate_block_comment(line, comment_delimiters, position, line_counter)
+# |
 #
-# .. _formulate_inline_comment:
-#
-# Formulates an inline comment
+# _`formulate_inline_comment`: Formulates an inline comment
 def formulate_inline_comment(
   # See line_.
   line,
@@ -193,11 +181,9 @@ def formulate_inline_comment(
 
     f = '{} '.format(comment_delimiters[0]) + line + '\n'
     return f
-
+# |
 #
-# .. _formulate_block_comment:
-#
-# Formulates a block comment one line at a time.
+# _`formulate_block_comment`: Formulates a block comment one line at a time.
 def formulate_block_comment(
   # See line_.
   line,
@@ -234,35 +220,24 @@ def formulate_block_comment(
 # ==============
 # This section contains the main two functions rest_to_code_string_
 # and rest_to_code_file_.
+# |
 #
-# .. _rest_to_code_file:
-#
-# This function uses rest_to_code_string_ to convert a reST file into
+# _`rest_to_code_file`: This function uses rest_to_code_string_ to convert a reST file into
 # another language. Inputs a reST file, outputs a code file.
 def rest_to_code_file(
-  # .. _source_rst_path:
-  #
-  # Path to a source reST file to process.
+  # _`source_rst_path`: Path to a source reST file to process.
   source_rst_path=None,
-  # .. _out_path:
-  #
-  # Path to a destination code file to create. It will be overwritten if it
+  # _`out_path`:Path to a destination code file to create. It will be overwritten if it
   # already exists.
   out_path=None,
-  # .. _lang:
-  #
-  # Specify the language that the reST will be translated into. This is the key to
+  # _`lang`: Specify the language that the reST will be translated into. This is the key to
   # the dictionary found in :doc:`CommentDelimiterInfo.py`
   # Ex: ``'Python'`` and ``'C'``
   lang=None,
-  # .. _input_encoding:
-  #
-  # Encoding to use for the input file. The default of None detects the encoding
+  # _`input_encoding`: Encoding to use for the input file. The default of None detects the encoding
   # of the input file.
   input_encoding=None,
-  # .. _output_encoding:
-  #
-  # Encoding to use for the output file.
+  # _`output_encoding`: Encoding to use for the output file.
   output_encoding='utf-8'):
 
     if lang is None:
@@ -285,15 +260,12 @@ def rest_to_code_file(
     code = rest_to_code_string(rest_str, lang)
     # Write the code to the output file.
     fo.write(code)
+# |
 #
-# .. _rest_to_code_string:
-#
-# Take string of reST as input, returns a string of code. The string is
+# _`rest_to_code_string`: Take string of reST as input, returns a string of code. The string is
 # separated into lines and fed through the conversion one line at a time.
 def rest_to_code_string(
-  # .. _rest_str:
-  #
-  # The string of reST that will get converted into code.
+  # _`rest_str`: The string of reST that will get converted into code.
   # This string is generally multiple lines. The program separates and processes all the lines it is given.
   rest_str,
   # See lang_.
@@ -452,9 +424,8 @@ def rest_to_code_string(
             i += 1
             break
 
-    # .. _boolean:
-    #
-    # If boolean is set to True, there was a line of invalid reST, so the program returns an error string.
+
+    # _`boolean`: If boolean is set to True, there was a line of invalid reST, so the program returns an error string.
     if boolean:
         return "This was not recognised as valid reST. Please check your input and try again."
 
