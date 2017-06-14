@@ -98,6 +98,15 @@ class TestRestToCodeString(object):
                 'Code\n',
                 'C++')
 
+    # Single line block comment  to code transition
+    # No inline delimiters
+    def test_2b(self):
+        self.mt('/* Single line block comment*/\n'
+                'Code\n',
+                '/* Single line block comment*/\n'
+                'Code\n',
+                'CSS')
+
     # Multi-line block comment to code transition
     def test_3(self):
         self.mt('/* Multi-line\n'
@@ -109,15 +118,6 @@ class TestRestToCodeString(object):
                 '// comment\n'
                 'Code\n',
                 'C')
-
-    # Single line block comment  to code transition
-    # No inline delimiters
-    def test_2b(self):
-        self.mt('/* Single line block comment*/\n'
-                'Code\n',
-                '/* Single line block comment*/\n'
-                'Code\n',
-                'CSS')
 
     # Multi-line block comment to code transition
     # No inline delimiters
@@ -141,6 +141,18 @@ class TestRestToCodeString(object):
                 '    Code\n'
                 'Code2\n',
                 'C')
+
+    #  ``<div>`` testing
+    # No inline delimiters
+    def test_4b(self):
+        self.mt('\t/* Comment*/\n'
+                '\tCode\n'
+                'Code2\n',
+                '    /* Comment*/\n'
+                '    Code\n'
+                'Code2\n',
+                'CSS')
+
 
 
 class TestRestToCodeFileTests(object):
@@ -193,3 +205,15 @@ class TestRestToCodeFileTests(object):
         os.close(fd)
         self.rt_given_file(code_file_name=tmp_path, lang='C')
         os.remove(tmp_path)
+
+    # file_info and find_file_ext test
+    # | ``def test_4(self):``
+    # | ``    self.rt_given_file(lang=None)``
+    #
+    # The program will not allow for tests on ``file_info`` and ``find_file_ext``.
+    # The program uses temporary files which have names but are not given to the user.
+    # If a test were to be created, you would need to make ``rest_file=None`` in the first
+    # ``rest_to_code_file()`` and allow the user to copy/paste the temporary file used in
+    # the first ``code_to_rest_file`` to store the reST. You also have to give a ``code_file_name``.
+    # I found a import that you could use to copy a string to the clipboard. Pyperclip does this.
+    # Tkinter also does this.
