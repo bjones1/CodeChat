@@ -175,9 +175,9 @@ class TestRestToCodeFileTests(object):
         os.close(fm2)
         # Translate the code to rest and back again twice. This will ensure that it is round trip stable.
         code_to_rest_file(code_file_name, rest_file, alias=lexer)
-        rest_to_code_file(rest_file, modded_code_file1, lang)
+        rest_to_code_file(lang, rest_file, modded_code_file1)
         code_to_rest_file(modded_code_file1, rest_file, alias=lexer)
-        rest_to_code_file(rest_file, modded_code_file2, lang)
+        rest_to_code_file(lang, rest_file, modded_code_file2)
         # Open and read the two code files.
         f1 = io.FileInput(source_path=modded_code_file1)
         f2 = io.FileInput(source_path=modded_code_file2)

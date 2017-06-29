@@ -163,16 +163,16 @@ def formulate_block_comment(
 # _`rest_to_code_file`: This function uses rest_to_code_string_ to convert a reST file into
 # another language. Inputs a reST file, outputs a code file.
 def rest_to_code_file(
+  # _`lang`: Specify the language that the reST will be translated into. This is the key to
+  # the dictionary found in :doc:`CommentDelimiterInfo.py`
+  # Ex: ``'Python'`` or ``'C'``
+  lang,
   # _`source_rst_path`: Path to a source reST file to process.
   source_rst_path,
   # _`out_path`:Path to a destination code file to create. It will be overwritten if it
   # already exists. If out_path_ is None, the output path will be the source_rst_path_
   # but with the correct file extension for the given lang_
   out_path=None,
-  # _`lang`: Specify the language that the reST will be translated into. This is the key to
-  # the dictionary found in :doc:`CommentDelimiterInfo.py`
-  # Ex: ``'Python'`` or ``'C'``
-  lang,
   # _`input_encoding`: Encoding to use for the input file. The default of None detects the encoding
   # of the input file.
   input_encoding=None,
