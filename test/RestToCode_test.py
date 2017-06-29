@@ -38,7 +38,8 @@ import os
 #
 # Local application imports
 # -------------------------
-from CodeChat.RestToCode import rest_to_code_file, rest_to_code_string
+from CodeChat.RestToCode import rest_to_code_file, rest_to_code_string, \
+    find_file_ext
 from CodeChat.CodeToRest import code_to_rest_file, code_to_rest_string
 
 
@@ -206,14 +207,15 @@ class TestRestToCodeFileTests(object):
         self.rt_given_file(code_file_name=tmp_path, lang='C')
         os.remove(tmp_path)
 
-    # file_info and find_file_ext test
-    # | ``def test_4(self):``
-    # | ``    self.rt_given_file(lang=None)``
-    #
-    # The program will not allow for tests on ``file_info`` and ``find_file_ext``.
-    # The program uses temporary files which have names but are not given to the user.
-    # If a test were to be created, you would need to make ``rest_file=None`` in the first
-    # ``rest_to_code_file()`` and allow the user to copy/paste the temporary file used in
-    # the first ``code_to_rest_file`` to store the reST. You also have to give a ``code_file_name``.
-    # I found a import that you could use to copy a string to the clipboard. Pyperclip does this.
-    # Tkinter also does this.
+    # find_file_ext test
+    def test_find_file_ext_1(self):
+        ext = find_file_ext('Python')
+        assert ext == '.py'
+
+    def test_find_file_ext_2(self):
+        ext = find_file_ext('Pthon')
+        assert ext is None
+
+    def test_find_file_ext_3(self):
+        ext = find_file_ext('C')
+        assert ext == '.c'
