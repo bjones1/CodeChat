@@ -34,6 +34,7 @@
 from pygments.lexers import get_all_lexers
 from docutils import io
 from pygments.lexers import find_lexer_class
+from pypandoc import convert_text
 
 #
 # Local application imports
@@ -369,4 +370,81 @@ def rest_to_code_string(
     if boolean:
         return "This was not recognised as valid reST. Please check your input and try again."
 
+    return string_out
+# |
+#
+# _`html_to_code_file`: This function uses html_to_code_string_ to convert a HTML file into
+# another language. Inputs a HTML file, outputs a code file.
+def html_to_code_file(
+  # See lang_
+  lang,
+  # _`source_html_path`: Path to a source HTML file to process.
+  source_html_path,
+  # See out_path_. If out_path_ is None, the output path will be the source_html_path_
+  # but with the correct file extension for the given lang_
+  out_path=None,
+  # See input_encoding_
+  input_encoding=None,
+  # See output_encoding_
+  output_encoding='utf-8'):
+
+    if out_path is None:
+        # Find the file extension of the given language.
+        file_ext = find_file_ext(lang)
+        # Obtain the file path without the ``.rst`` extension.
+        file_name_list = source_html_path.rsplit('.', 1)
+        file_name = file_name_list[0]
+        # Place the file extension on the file path.
+        out_path = '{}{}'.format(file_name, file_ext)
+
+    # Use docutil's I/O classes to better handle and sniff encodings.
+    #
+    # Note: both these classes automatically close themselves after a
+    # read or write.
+    fi = io.FileInput(source_path=source_html_path, encoding=input_encoding)
+    fo = io.FileOutput(destination_path=out_path, encoding=output_encoding)
+    # Gather the entire file into a singe string for easy parsing.
+    html_str = fi.read()
+    # Convert the string of HTML to code.
+    code = html_to_code_string(html_str, lang)
+    # Write the code to the output file.
+    fo.write(code)
+# |
+#
+# _`html_to_code_string`: Take string of HTML as input, returns a string of code. The string is
+# separated into lines and fed through the conversion one line at a time.
+def html_to_code_string(
+  # _`html_str`: The string of HTML that will get converted into code.
+  # This string is generally multiple lines. The program separates and processes all the lines it is given.
+  html_str,
+  # See lang_.
+  lang):
+
+    # Take out the 2 style sheets; they are not needed
+    for i in range(2):
+        try:
+            html_list = html_str.split('<style type="text/css">', 1)
+            html_list2 = html_list[1].split('</style>\n', 1)
+            html_str = html_list[0] + html_list2[1]
+        # If the style sheets are not in the string, get out of the for loop.
+        except:
+            break
+    has_code_block = True
+    string_out = ""
+    while has_code_block:
+        try:
+            html_to_run, html_to_parse = html_str.split('<pre class="code literal-block">\n', 1)
+            rst = convert_text(html_to_run, to='rst', format='html')
+
+            code, html_str = html_to_parse.split('</pre>', 1)
+            string_out = string_out + rst + code
+        except:
+            rst = convert_text(html_str, to='rst', format='html')
+            string_out = string_out + rst
+            has_code_block = False
+
+
+
+
+    #string_out = html_str
     return string_out
