@@ -35,6 +35,7 @@ from pygments.lexers import get_all_lexers
 from docutils import io
 from pygments.lexers import find_lexer_class
 from pypandoc import convert_text
+from lxml import html
 
 #
 # Local application imports
@@ -368,7 +369,8 @@ def rest_to_code_string(
 
     # _`boolean`: If boolean is set to True, there was a line of invalid reST, so the program returns an error string.
     if boolean:
-        return "This was not recognised as valid reST. Please check your input and try again."
+        # return "This was not recognised as valid reST. Please check your input and try again."
+        string_out += "This was not recognised as valid reST. Please check your input and try again."
 
     return string_out
 # |
@@ -420,7 +422,125 @@ def html_to_code_string(
   # See lang_.
   lang):
 
+    string_out = "\n.. set-line:: -3\n\n..\n\n"
+
+    def traverse_etree(element):
+        nonlocal string_out
+        if isinstance(element.tag, str):
+            tag = element.tag
+            if tag == "p":
+                string_out += '\n.. set-line:: -3\n\n..\n\n'
+                if element.get("id") is not None:
+                    s = element.get("id")
+                    s = s.replace('-', '_')
+                    string_out += '.. _{}:\n\n'.format(s)
+                if element.text is not None:
+                    # ``element.text`` starts out as ``NoneType``, so tell the program to convert it to a string.
+                    string_out += str(element.text)
+            elif tag == "div":
+                div(element)
+                if element.get("class") == "contents topic":
+                    return
+            elif tag == "pre":
+                s = str(element.text)
+                s = s.replace('\n', '\n ')
+                s, _ = s.rsplit(" ", 1)
+                string_out += '\n.. fenced-code::\n\n Beginning fence\n {} Ending fence\n\n..\n\n'.format(s)
+            elif tag == "a":
+                link(element)
+            elif tag == "b":
+                string_out += '**{}**'.format(element.text)
+                if element.tail is not None:
+                    string_out += str(element.tail)
+            elif tag == "i" or tag == "em":
+                string_out += '*{}*'.format(element.text)
+                if element.tail is not None:
+                    string_out += str(element.tail)
+            elif tag == "span":
+                if element.get("class") == "target":
+                    string_out += '_`{}`'.format(element.text)
+                if element.tail is not None:
+                    string_out += str(element.tail)
+            elif tag == "tt":
+                if element.get("class") == "docutils literal":
+                    string_out += '``{}'.format(element.text)
+
+        for child in element:
+            traverse_etree(child)
+
+        if isinstance(element.tag, str):
+            tag = element.tag
+            if tag == "p":
+                string_out += '\n'
+            elif tag == "div":
+                div_end(element)
+            elif tag == "tt":
+                string_out += '``'
+                if element.tail is not None:
+                    string_out += str(element.tail)
+
+    def div(element):
+        nonlocal string_out
+        if element.get("style") is not None:
+            string_out += '\n.. raw:: html\n\n <div style="{}">\n\n'.format(element.get("style"))
+        elif element.get("class") == "contents topic":
+            string_out += "\n.. contents::\n\n"
+
+    def div_end(element):
+        nonlocal string_out
+        if element.get("style") is not None:
+            string_out += '\n\n.. raw:: html\n\n </div>\n\n..\n\n'
+
+
+    def link(element):
+        nonlocal string_out
+        if element.get("class") == "reference internal":
+            target = element.get("href")
+            _, target = target.split("#")
+            target = target.replace('-', '_')
+            string_out += '`{} <{}_>`_'.format(element.text, target)
+        elif element.get("class") == "reference external":
+            target = element.get("href")
+            string_out += '`{} <{}>`_'.format(element.text, target)
+        if element.tail is not None:
+            string_out += str(element.tail)
+
+
+    # Take out the xml encoding; it messes up the tree
+    for i in range(1):
+        try:
+            html_list = html_str.split('<?xml', 1)
+            html_list2 = html_list[1].split('.dtd">\n', 1)
+            html_str = html_list[0] + html_list2[1]
+        # If the style sheets are not in the string, get out of the for loop.
+        except:
+            break
     # Take out the 2 style sheets; they are not needed
+    for i in range(2):
+        try:
+            html_list = html_str.split('<style type="text/css">', 1)
+            html_list2 = html_list[1].split('</style>\n', 1)
+            html_str = html_list[0] + html_list2[1]
+        # If the style sheets are not in the string, get out of the for loop.
+        except:
+            break
+
+    # This needs to be preprocessed because there are cases where there are ``<span>``(s) in the middle,
+    # preventing the end tics from being placed in the right spot
+    #html_str = html_str.replace('<tt class="docutils literal">', '``')
+    #html_str = html_str.replace('</tt>', '``')
+    root = html.fromstring(html_str)
+
+    traverse_etree(root)
+    # need to write a recursive function so it can catch all the levels of divs
+
+
+    # string_out = rest_to_code_string(string_out, lang)
+
+    return string_out
+
+
+'''    # Take out the 2 style sheets; they are not needed
     for i in range(2):
         try:
             html_list = html_str.split('<style type="text/css">', 1)
@@ -448,3 +568,5 @@ def html_to_code_string(
 
     #string_out = html_str
     return string_out
+'''
+
