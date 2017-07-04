@@ -40,7 +40,7 @@ import os
 # -------------------------
 from CodeChat.RestToCode import rest_to_code_file, rest_to_code_string, \
     find_file_ext
-from CodeChat.CodeToRest import code_to_rest_file, code_to_rest_string
+from CodeChat.CodeToRest import code_to_rest_file, code_to_rest_string, code_to_html_file
 
 
 
@@ -217,3 +217,7 @@ class TestRestToCodeFileTests(object):
     def test_find_file_ext_3(self):
         ext = find_file_ext('C')
         assert ext == '.c'
+
+    def test_delete(self):
+        code_to_html_file('C:\\Users\\Austin\\Documents\\SmartGit\\CodeChat_jones\\CodeChat\\RestToCode.py',
+                          'C:\\Users\\Austin\\Desktop\\Test\\RestToCode.html')
