@@ -101,16 +101,11 @@ COMMENT_DELIMITER_INFO = {
   'Prolog':         ( '%',      '/*',            '*/'),
   'AutoIt':         ( ';',     '#cs',           '#ce'),
 
-  # TODO : get Perl and Perl6 working
-  # PODs begin and end on a line starting with =string. Toss the entire line by
-  # making the delimiter length large. This allows it to work with ``=head1``,
-  # ``=begin``, ``=begin comment``, and a host of others.
-  ##                  #, =a string, =another string
-  'Perl':           ( '#',   '=begin ' + '*'*1000, '=end ' + '*'*1000),
+  # `PODs <https://docs.perl6.org/language/pod>`_ not supported. Only single line comments
+  'Perl':           ( '#',      None,            None),
   # PODs not supported in Perl6, since they conflict with the new block-style
   # comments: ``#`[`` ~ ``]``, or any other pair.
-  ##                   #,       #'(,               )
-  'Perl6':          ( '#',     "#`(",             ')'),
+  'Perl6':          ( '#',     "#'(",             ')'),
 
   'Ruby':           ( '#',  '=begin',          '=end'),
   'S':              ( '#',      None,            None),
@@ -146,9 +141,9 @@ COMMENT_DELIMITER_INFO = {
   'Eiffel':         ( '--',     None,            None),
   'vhdl':           ( '--',     None,            None),
   # ``*>`` as an inline comment is not supported.
-  # TODO : figure out what six characters will precede '*' when converting reST to code
+  # six spaces will precede '*' when converting reST to code
   ## Six ignored characters followed by * or /.
-  'COBOL':          ('123456*', None,            None),
+  'COBOL':          ('      *', None,            None),
   'YAML':           ( '#',      None,            None),
 
   # These languages have failing unit tests
