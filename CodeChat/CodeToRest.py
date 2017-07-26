@@ -202,6 +202,12 @@ def get_lexer(
   # See options_.
   **options):
 
+    # This sets the default tabsize to 4 spaces in
+    # `Pygments' lexer <http://pygments.org/docs/api/#pygments.lexer.Lexer>`_,
+    # and this link is a list  of
+    # `all available lexers <http://pygments.org/docs/lexers/#available-lexers>`_
+    options.setdefault('tabsize', 4)
+
     if lexer:
         return lexer
     if alias:

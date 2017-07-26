@@ -28,3 +28,7 @@ MANIFEST
 CodeChat.egg-info/
 sphinx-enki-info.txt
 CodeChat/CodeToRestSphinx.py.html
+
+# PyCharm-generated files
+.idea/
+.cache/

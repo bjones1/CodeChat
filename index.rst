@@ -43,6 +43,7 @@ Developer documentation
 
    CodeChat/__init__.py
    CodeChat/CodeToRest.py
+   CodeChat/RestToCode.py
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
    docs/history.rst
@@ -55,6 +56,7 @@ Testing
 
    test/pytest.ini
    test/CodeToRest_test.py
+   test/RestToCode_test.py
    .travis.yml
    appveyor.yml
 
