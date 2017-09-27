@@ -22,27 +22,11 @@
 #
 # Packaging notes
 # ===============
-# Packaging on Python is a mess, IMHO. It takes an easy job and makes it hard.
-#
-# A quick summary: distutils_ can't
-# install dependencies from PyPI_, so use setuptools_. A source distribution is
-# a good idea becaues it can run on a bare Python installation with no other
-# installs required, but there's no standard format (.zip?, .tar.gz?, etc.). An
-# .egg is nice, but requires setuptools/pip/ez_setup installed. The .whl
-# (`Python wheel <http://wheel.readthedocs.org/en/latest/>`_)
-# is the latest and greatest format that superceeds eggs, but with similar
-# problems (requires wheel to be installed).
-#
 # Reading to get up to speed:
 #
 # * `Python Packaging User Guide <http://packaging.python.org/en/latest/>`_ -
 #   the most up-to-date reference I've found so far. Tells which tools to
 #   actually use.
-#
-# * `distutils <http://docs.python.org/distutils/index.html>`_ - The built-in
-#   installer. Tells what to do, but not what actually happens. It doesn't have
-#   the ability to install dependencies from `PyPI <http://pypi.python.org>`_,
-#   which I need.
 #
 # * `setuptools <https://pythonhosted.org/setuptools>`_ - A distutils
 #   replacement which can install dependencies, so I use it.
@@ -54,11 +38,11 @@
 # Create a source distribution, a built distribution, then upload both to
 # `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_::
 #
-#   pip install -U wheel # If it's not installed.
+#   pip install -U pip setuptools wheel twine
 #   python setup.py sdist bdist_wheel
-#   python -m twine upload dist\CodeChat-1.4.0*
+#   python -m twine upload dist\CodeChat-1.5.0*
 #
-# I can't get ``python setup.py upload`` to work. Of course, replace the version number in the command above.
+# Of course, replace the version number in the command above.
 #
 # To `upload docs
 # <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
@@ -70,12 +54,7 @@
 # For `development
 # <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
-#  ``python setup.py develop``
-#
-# Yajo helped `package this for Linux
-# <https://build.opensuse.org/package/show/home:yajo:enki/python-codechat>`_.
-# Thanks so much. See also :doc:`Linux_packaging/python-codechat.spec`.
-# Unfortunately, the Linux packaging is untested.
+#  ``pip install -e .``
 #
 # Packaging script
 # ================
@@ -90,29 +69,26 @@
 # <https://github.com/pypa/sampleproject/commit/4687e26c8a61e72ae401ec94fc1e5c0e17465b73>`_.
 #
 # Always prefer setuptools over distutils
-from setuptools import setup, find_packages
+from setuptools import setup
 # To use a consistent encoding
-from codecs import open
 from os import path
 # Imports for `version parse code`_.
 import sys
 import os
 import re
-import io
 
 here = path.abspath(path.dirname(__file__))
 
 # Get the long description from the relevant file.
 with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     long_description = f.read()
-    # The inclusion of a raw tag causes PyPI_ to not render the reST. Ouch.
-    # Remove it before uploading.
+    # The inclusion of a raw tag causes `PyPI <http://pypi.python.org>`_ to not render the reST. Ouch. Remove it before uploading.
     long_description = re.sub('\.\. raw.*<\/iframe>', '', long_description, flags=re.DOTALL)
 
 # This code was copied from `version parse code`_. See ``version`` in the call
 # to ``setup`` below.
 def read(*names, **kwargs):
-    with io.open(
+    with open(
         os.path.join(os.path.dirname(__file__), *names),
         encoding=kwargs.get("encoding", "utf8")
     ) as fp:
@@ -128,8 +104,8 @@ def find_version(*file_paths):
 
 # My code
 # -------
-# We support Python 3.3 and higher.
-assert sys.version_info >= (3, 3)
+# We support Python 3.4 and higher. I could instead use `python_requires <https://packaging.python.org/tutorials/distributing-packages/#python-requires>`_, but it seems like this is a new feature, so avoid it for now so that installs on older Python versions still work.
+assert sys.version_info >= (3, 4)
 
 setup(
     # This must comply with `PEP 0426
@@ -187,17 +163,13 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    #
-    install_requires=(
-      # `Enum <https://docs.python.org/3/library/enum.html>`_ was introduced in
-      # Python 3.4. Use a backport of it if needed.
-      (['enum34'] if sys.version_info.minor == 3 else [])
-      # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
-      # <CodeChat/CodeToRest.py>` can be executed from the command line if the
-      # packages below are installed, :doc:`CodeToRestSphinx.py
-      # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
-      + ['docutils>=0.13.1',
-         'pygments>=2.1']),
+    install_requires=([
+        # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
+        # <CodeChat/CodeToRest.py>` can be executed from the command line if the
+        # packages below are installed, :doc:`CodeToRestSphinx.py
+        # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
+        'docutils>=0.13.1',
+        'pygments>=2.1']),
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
