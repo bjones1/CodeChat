@@ -133,9 +133,8 @@ setup(
     # The project's main homepage.
     url='https://pythonhosted.org/CodeChat/README.html',
 
-    # Obscure my e-mail address to help defeat spam-bots.
     author="Bryan A. Jones",
-    author_email="bjones AT ece.msstate.edu",
+    author_email="bjones@ece.msstate.edu",
 
     license='GPLv3+',
 
