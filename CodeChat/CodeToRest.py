@@ -275,32 +275,69 @@ def _lexer_to_rest(
     #   comments.
     comment_is_block = not cdi[0]
 
-    # \1. Invoke a Pygments lexer on the provided source code, obtaining an
-    #     iterable of tokens. Also analyze Python code for docstrings.
+    # Include a header containing some `CodeChat style`_. Don't put this in a separate ``.js`` file, since docutils doesn't have an easy way to include it.
+    out_file.write(codechat_style)
+
+    # 1.    Invoke a Pygments lexer on the provided source code, obtaining an
+    #       iterable of tokens. Also analyze Python code for docstrings.
     #
     token_iter, ast_docstring, ast_syntax_error = _pygments_lexer(code_str, lexer)
     # Prepend any syntax error found to the output.
     if ast_syntax_error:
         out_file.write('.. error:: {}\n\n'.format(ast_syntax_error))
 
-    # \2. Combine tokens from the lexer into three groups: whitespace, comment,
-    #     or other.
+    # 2.    Combine tokens from the lexer into three groups: whitespace, comment,
+    #       or other.
     token_group = _group_lexer_tokens(token_iter, comment_is_inline,
                                       comment_is_block, ast_docstring)
 
-    # \3. Make a per-line list of [group, ws_len, string], so that the last
-    #     string in each list ends with a newline. Change the group of block
-    #     comments that actually span multiple lines.
+    # 3.    Make a per-line list of [group, ws_len, string], so that the last
+    #       string in each list ends with a newline. Change the group of block
+    #       comments that actually span multiple lines.
     gathered_group = _gather_groups_on_newlines(token_group, cdi)
 
-    # \4. Classify each line. For reST-formatted comments, remove the leading
-    #     whitespace and all comment characters (the // or #, for example).
-    #
-    # Then classify.
+    # 4.    Classify each line. For reST-formatted comments, remove the leading
+    #       whitespace and all comment characters (the // or #, for example).
     classified_group = _classify_groups(gathered_group, cdi)
 
-    # \5. Run a state machine to output the corresponding reST.
+    # 5.    Run a state machine to output the corresponding reST.
     _generate_rest(classified_group, out_file)
+#
+# .. _CodeChat style:
+#
+# CodeChat style
+# --------------
+# `../CodeChat.css` provides some of the CSS needed to properly format CodeChat documents. However, not all the necessary styling can be accomplished using CSS. This script sets the styles that can't be set in CSS. Specifically, it removes the bottom margin for cases where code follows a paragraph. The expected structure:
+#
+# .. code-block:: HTML
+#   :linenos:
+#
+#   <div style="margin-left: xem;">  An indent from CodeChat -- not present with no indent.
+#       <p>Text.</p>                 DO NOT change this element's bottom margin.
+#       <p>Some text here</p>        This could also be a <ul> or an <ol>.
+#   </div>
+#   <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
+#       ...Some code here...
+#   </div>
+codechat_style = (
+    '.. raw:: html\n'
+    '\n'
+    # Only style after the `DOM is ready <https://learn.jquery.com/using-jquery-core/document-ready/>`_.
+    ' <script type="text/javascript">$( document ).ready(function() {'
+        # Pick the last ``<p>``, ``<ul>``, or ``<ol>`` inside a ``<div style="margin-left:``. See the `CSS selectors <https://www.w3schools.com/cssref/css_selectors.asp>`_ page.
+        'let sel1 = $("div[style*=margin-left]>p:last-child, div[style*=margin-left]>ul:last-child, div[style*=margin-left]>ol:last-child")'
+            # Now, keep only those elements that are followed by a ``<div class="highlight-xx">``.
+            '.filter(function () { return $(this).parent().next("[class*=highlight-]").length; });'
+
+        # Pick a ``<p>``, ``<ul>``, or ``<ol>`` followed by a ``<div class="highlight-xxx">``.
+        'let sel2 = $("p+div[class*=highlight-], ul+div[class*=highlight-], ol+div[class*=highlight-]")'
+            # Select the ``<p>``, ``<ul>``, or ``<ol>`` -- CSS always selects the last item in a selector (in this case, the ``<div class="highlight-xxx">``).
+            '.prev();'
+
+        # Remove the bottom margin for these cases.
+        'sel1.add(sel2).css("margin-bottom", "0px");'
+    '});</script>\n\n'
+)
 #
 #
 # Step 1 of lexer_to_rest_

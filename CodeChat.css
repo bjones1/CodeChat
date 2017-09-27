@@ -1,24 +1,8 @@
-/* .. Copyright (C) 2012-2016 Bryan A. Jones.
+/* .. highlight:: CSS
 
-      This file is part of CodeChat.
-
-      CodeChat is free software: you can redistribute it and/or modify it under
-      the terms of the GNU General Public License as published by the Free
-      Software Foundation, either version 3 of the License, or (at your option)
-      any later version.
-
-      CodeChat is distributed in the hope that it will be useful, but WITHOUT
-      ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-      FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-      more details.
-
-      You should have received a copy of the GNU General Public License along
-      with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
-
-
-   *************************************************
+   ********************************************
    CodeChat.css - Style sheet for CodeChat docs
-   *************************************************
+   ********************************************
    Stylesheet for use with CodeChat's extensions to Docutils.
 
    The overall goal is to allow comments (everything but ``<pre>`` tags) to
@@ -53,46 +37,28 @@ pre.literal-block {
     margin-right: 0px;
 }
 
-/* Remove the bottom margin around all elements, so they're only separated
-   by a top margin.
-
-    This is actually a bad thing: the spacing between dissimilar elements may
-    not be correct. However, I can't find a CSS rule to modify the
-    margins of elements which preceed code, so I just change them all.
+/* Place code immediately next to any surrounding paragraphs for docutils output. */
+pre.literal-block,
+/* Do the same for Sphinx. Remove the top margin when a paragraph follows code. The expected structure is:
+ *
+ * .. code-block:: html
+ *  :linenos:
+ *
+ *  <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
+ *      ...Some code here...
+ *  </div>
+ *  <div style="margin-left: xem;">  An indent from CodeChat -- not present with no indent.
+ *      <p>Some text here</p>        This could also be a <ul> or and <ol>.
+ *  </div>
+ *
+ * Note that the bottom margin styling is handled by `CodeChat style`.
  */
-p, blockquote, div.body h1, div.body h2, div.body h3, div.body h4, div.body h5, div.body h6, div.body ul   /* Sphinx */
-               div h1,      div h2,      div h3,      div h4,      div h5,      div h6,      div ul.simple /* docutils */
-{
-    margin-bottom: 0px;
-}
-
-/* Paragraphs have a non-zero margin-top, which adds a blank line when it
-   follows code. Remove this.
- */
-div p:first-child {
-  margin-top: 0px;
-}
-
-/* Remove the top margin of all comments which follow code, placing them
-   next to code. Note that Sphinx encloses code in a
-   ``<div class="highlight-language_name">`` element.
-
-   Also, note that this will need to be duplicated for all highlighted
-   languages (yuck). I can't find a CSS rule to select class named using a
-   regular expression.
-
-   Note: This isn't needed for the new alabaster theme. Why? Is there
-   a workaround / better way to do this?
-
-   This line handles docutils output.
-*/
-pre.literal-block + *,
-/* The remaining lines handle Sphinx output. */
-div.highlight-none + *,
-div.highlight-nasm + *,
-div.highlight-c + *,
-div.highlight-python + *,
-div.highlight-python3 + * {
-  margin-top: 0px;
+div[class*=highlight-]+div[style*=margin-left]>p,
+div[class*=highlight-]+p,
+div[class*=highlight-]+div[style*=margin-left]>ul,
+div[class*=highlight-]+ul,
+div[class*=highlight-]+div[style*=margin-left]>ol,
+div[class*=highlight-]+ol {
+  margin-top: 0em;
 }
 
