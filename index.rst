@@ -57,6 +57,7 @@ Testing
    test/pytest.ini
    test/CodeToRest_test.py
    test/RestToCode_test.py
+   test/HtmlToCode_test.py
    .travis.yml
    appveyor.yml
 

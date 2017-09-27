@@ -534,7 +534,7 @@ def html_to_code_string(
         except:
             break
 
-    # This needs to be preprocessed because there are cases where there are ``<span>``(s) in the middle,
+    # This needs to be preprocessed because there are cases where there are ``<span>``\ (s) in the middle,
     # preventing the end tics from being placed in the right spot
     #html_str = html_str.replace('<tt class="docutils literal">', '``')
     #html_str = html_str.replace('</tt>', '``')
