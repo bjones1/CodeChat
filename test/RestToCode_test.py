@@ -194,7 +194,7 @@ class TestRestToCodeFileTests(object):
 
     # Python file test
     def test_1(self):
-        self.rt_given_file(code_file_name='CodeChat\\CodeToRest.py')
+        self.rt_given_file(code_file_name='CodeChat/CodeToRest.py')
 
     # CSS file test
     def test_2(self):
