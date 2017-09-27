@@ -42,7 +42,7 @@ from pygments.lexers import get_lexer_by_name
 #
 # Local application imports
 # -------------------------
-from CodeChat.RestToCode import rest_to_code_string
+from CodeChat.RestToCode import rest_to_code_string, remove_codechat_style
 from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
 from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
@@ -119,7 +119,7 @@ class TestCodeToRest(object):
             code = rest_to_code_string(rest, alias)
             rest2 = code_to_rest_string(code_str, alias=alias)
             code2 = rest_to_code_string(rest2, alias)
-            assert code == code2 and rest == expected_rest_str
+            assert code == code2 and remove_codechat_style(rest) == expected_rest_str
             if expected_code_str is not None:
                 assert code == expected_code_str
 

@@ -120,8 +120,7 @@ class TestRestToCodeString(object):
                 'Code\n',
                 'C')
 
-    # Multi-line block comment to code transition
-    # No inline delimiters
+    # Multi-line block comment to code transition, no inline delimiters.
     def test_3b(self):
         self.mt('/* Multi-line\n'
                 ' * block\n'
@@ -133,7 +132,7 @@ class TestRestToCodeString(object):
                 'Code\n',
                 'CSS')
 
-    #  ``<div>`` testing
+    # ``<div>`` testing
     def test_4(self):
         self.mt('\t// Comment\n'
                 '\tCode\n'
@@ -143,8 +142,7 @@ class TestRestToCodeString(object):
                 'Code2\n',
                 'C')
 
-    #  ``<div>`` testing
-    # No inline delimiters
+    # ``<div>`` testing, no inline delimiters
     def test_4b(self):
         self.mt('\t/* Comment*/\n'
                 '\tCode\n'

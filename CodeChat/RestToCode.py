@@ -39,13 +39,14 @@ from pygments.lexers import find_lexer_class
 # Local application imports
 # -------------------------
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
+from .CodeToRest import codechat_style
 #
 #
 #
 # Supporting Functions
 # ====================
 # This section covers all functions that support the main two functions rest_to_code_string_
-# and rest_to_code_file_. 
+# and rest_to_code_file_.
 # |
 #
 # _`find_file_ext`: Find the file extension needed, given the language name
@@ -135,7 +136,7 @@ def formulate_block_comment(
     # This covers the case that the language does not support inline comments.
     # It places block comment delimiters around a single line to give an inline effect
     # There is no added space between the end of the comment and the end delimiter because this
-    # space is not taken out in the Code to reST translation. If a space is added, it is no 
+    # space is not taken out in the Code to reST translation. If a space is added, it is no
     # longer round trip stable. (It adds a space every time it is translated.)
     if line_counter is None:
         f = '{} {}{}\n'.format(comment_delimiters[1], line, comment_delimiters[2])
@@ -200,6 +201,15 @@ def rest_to_code_file(
     code = rest_to_code_string(rest_str, lang)
     # Write the code to the output file.
     fo.write(code)
+
+# Remove the `CodeChat style` from the beginning of the given reST if it's present.
+def remove_codechat_style(rest):
+        # If the rest begind with the `CodeChat style`,
+        if rest.startswith(codechat_style):
+            # Snip it off.
+            return rest[len(codechat_style):]
+        else:
+            return rest
 # |
 #
 # _`rest_to_code_string`: Take string of reST as input, returns a string of code. The string is
@@ -215,6 +225,7 @@ def rest_to_code_string(
     # This replaces all tabs with four spaces. This is put into place to
     # maintain a consistent translation and promote healthy habits.
     rest_str = rest_str.replace('\t', '    ')
+    rest_str = remove_codechat_style(rest_str)
     # Split the reST string into lines. These are compiled into the line_list.
     line_list = rest_str.split('\n')
     string_out = ""
