@@ -169,7 +169,8 @@ setup(
         # packages below are installed, :doc:`CodeToRestSphinx.py
         # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
         'docutils>=0.13.1',
-        'pygments>=2.1']),
+        'pygments>=2.1',
+        'lxml']),
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
