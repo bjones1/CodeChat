@@ -43,4 +43,6 @@ from CodeChat.RestToCode import html_to_code_file, html_to_code_string, \
 from CodeChat.CodeToRest import code_to_html_string, code_to_html_file
 
 
-html_to_code_file('Python', 'C:\\Users\\Austin\\Desktop\\Test\\RestToCode.html')
+# TODO. See last test in RestToCode_test.py.
+def xtest_1():
+    html_to_code_file('Python', 'C:\\Users\\Austin\\Desktop\\Test\\RestToCode.html')

@@ -218,6 +218,7 @@ class TestRestToCodeFileTests(object):
         ext = find_file_ext('C')
         assert ext == '.c'
 
-    def test_delete(self):
+    # TODO.
+    def xtest_delete(self):
         code_to_html_file('C:\\Users\\Austin\\Documents\\SmartGit\\CodeChat_jones\\CodeChat\\RestToCode.py',
                           'C:\\Users\\Austin\\Desktop\\Test\\RestToCode.html')

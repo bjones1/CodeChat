@@ -31,10 +31,8 @@
 # Third-party imports
 # -------------------
 # For the docutils default stylesheet and template
-from pygments.lexers import get_all_lexers
 from docutils import io
 from pygments.lexers import find_lexer_class
-from pypandoc import convert_text
 from lxml import html
 
 #
