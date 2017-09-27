@@ -119,12 +119,12 @@ source_suffix = '.rst'
 
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
-# any file wihch matches the given `glob-style pattern
+# any file wihch matches the given glob-style pattern (e.g. `glob
 # <https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.match>`_.
 CodeChat_lexer_for_glob = {
-    # ``CodeChat.css`` is auto-detected as a CSS + Lasso file by Pygments,
-    # causing it to display incorrectly. Define it as CSS only.
-    'CodeChat.css': 'CSS',
+    # CSS files are auto-detected as a CSS + Lasso file by Pygments,
+    # causing it to display incorrectly. Define them as CSS only.
+    '*.css': 'CSS',
     }
 
 # **CodeChat note:** _`CodeChat_excludes` is a list of exclude_patterns_ which

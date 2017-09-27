@@ -124,16 +124,14 @@ source_suffix = '.rst'
 #
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
-# any file wihch matches the given `glob-style pattern
+# any file wihch matches the given glob-style pattern (e.g. `glob
 # <https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.match>`_.
 CodeChat_lexer_for_glob = {
-    # ``CodeChat.css`` is auto-detected as a CSS + Lasso file by Pygments,
-    # causing it to display incorrectly. Define it as CSS only, both in the
-    # root path and in the template subdirectory.
-    'CodeChat.css': 'CSS',
-    # The ``MANIFEST.in`` files uses # as a comment.
-    # So does Python. Ugly, no?
-    'MANIFEST.in'  : 'Python',
+    # CSS files are auto-detected as a CSS + Lasso file by Pygments,
+    # causing it to display incorrectly. Define them as CSS only.
+    '*.css': 'CSS',
+    # The ``MANIFEST.in`` file uses # as a comment. So does Perl.. Ugly, no?
+    'MANIFEST.in'  : 'Perl',
     }
 
 # .. _CodeChat_excludes:
@@ -161,8 +159,6 @@ master_doc = 'index'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-                    # Ignore Mercurial repo.
-                    '.hg',
                     # Ignore setup.py output.
                     'build',
                     'dist',
@@ -171,8 +167,6 @@ exclude_patterns = [
                     '_build',
                     # Ignore this file's output.
                     'sphinx-enki-info.txt',
-                    # Ignore file from external web site.
-                    'ez_setup.py',
                     # Ignore HTML -- the license and test output.
                     '**.html',
                     ]
