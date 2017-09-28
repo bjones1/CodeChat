@@ -47,18 +47,15 @@ pre.literal-block,
  *  <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
  *      ...Some code here...
  *  </div>
- *  <div style="margin-left: xem;">  An indent from CodeChat -- not present with no indent.
- *      <p>Some text here</p>        This could also be a <ul> or and <ol>.
+ *  <div class="CodeChat-indent">    An indent from CodeChat -- not present with no indent.
+ *      <p>Some text here</p>        This could be any element, not just <p>.
+ *      <p>Other text.</p>           Do NOT style this element.
  *  </div>
  *
  * Note that the bottom margin styling is handled by `CodeChat style`.
  */
-div[class*=highlight-]+div[style*=margin-left]>p,
-div[class*=highlight-]+p,
-div[class*=highlight-]+div[style*=margin-left]>ul,
-div[class*=highlight-]+ul,
-div[class*=highlight-]+div[style*=margin-left]>ol,
-div[class*=highlight-]+ol {
+div[class*=highlight-]+div.CodeChat-indent>*,
+div[class*=highlight-]+* {
   margin-top: 0em;
 }
 

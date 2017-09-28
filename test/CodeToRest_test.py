@@ -75,7 +75,7 @@ def div(
 
     return ('\n'
             '.. raw:: html\n'
-            '\n <div style="margin-left:{}em;">\n'
+            '\n <div class="CodeChat-indent" style="margin-left:{}em;">\n'
             '\n').format(size) + sl(line)
 
 # After a ``<div>``, ``_generate_rest`` inserts a ``set-line`` directive. This
@@ -1557,7 +1557,7 @@ class TestRestToHtml(object):
                        div_end) ==
                        '<h1 class="title">Heading</h1>\n'
                        '\n'
-                       '<div style="margin-left:1.0em;"><!--  -->\n'
+                       '<div class="CodeChat-indent" style="margin-left:1.0em;"><!--  -->\n'
                        '<p>Body.</p>\n'
                        '</div><!--  -->')
 

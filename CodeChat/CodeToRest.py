@@ -312,9 +312,9 @@ def _lexer_to_rest(
 # .. code-block:: HTML
 #   :linenos:
 #
-#   <div style="margin-left: xem;">  An indent from CodeChat -- not present with no indent.
+#   <div class="CodeChat-indent">    An indent from CodeChat -- not present with no indent.
 #       <p>Text.</p>                 DO NOT change this element's bottom margin.
-#       <p>Some text here</p>        This could also be a <ul> or an <ol>.
+#       <p>Some text here</p>        This could be any element.
 #   </div>
 #   <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
 #       ...Some code here...
@@ -324,14 +324,14 @@ codechat_style = (
     '\n'
     # Only style after the `DOM is ready <https://learn.jquery.com/using-jquery-core/document-ready/>`_.
     ' <script type="text/javascript">$( document ).ready(function() {'
-        # Pick the last ``<p>``, ``<ul>``, or ``<ol>`` inside a ``<div style="margin-left:``. See the `CSS selectors <https://www.w3schools.com/cssref/css_selectors.asp>`_ page.
-        'let sel1 = $("div[style*=margin-left]>p:last-child, div[style*=margin-left]>ul:last-child, div[style*=margin-left]>ol:last-child")'
+        # Pick the last element inside a ``<div class="CodeChat-indent">``. See the `CSS selectors <https://www.w3schools.com/cssref/css_selectors.asp>`_ page.
+        'let sel1 = $("div.CodeChat-indent>*:last-child")'
             # Now, keep only those elements that are followed by a ``<div class="highlight-xx">``.
             '.filter(function () { return $(this).parent().next("[class*=highlight-]").length; });'
 
-        # Pick a ``<p>``, ``<ul>``, or ``<ol>`` followed by a ``<div class="highlight-xxx">``.
-        'let sel2 = $("p+div[class*=highlight-], ul+div[class*=highlight-], ol+div[class*=highlight-]")'
-            # Select the ``<p>``, ``<ul>``, or ``<ol>`` -- CSS always selects the last item in a selector (in this case, the ``<div class="highlight-xxx">``).
+        # Pick an element followed by a ``<div class="highlight-xxx">``.
+        'let sel2 = $("*+div[class*=highlight-]")'
+            # Select the element -- CSS always selects the last item in a selector (in this case, the ``<div class="highlight-xxx">``).
             '.prev();'
 
         # Remove the bottom margin for these cases.
@@ -445,7 +445,7 @@ def _pygments_lexer(
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
 # Provide a way to perform preprocessing on text before lexing it. This code was
-# copied from pygments.lexer.Lexer.get_token, v. 2.1.3.
+# copied from ``pygments.lexer.Lexer.get_token``, v. 2.1.3.
 def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     """
     Return an iterable of (tokentype, value) pairs generated from
@@ -500,7 +500,7 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     # the preprocessed text.
     return text
 
-# This code was copied from pygments.lexer.Lexer.get_token, v. 2.1.3 (the last
+# This code was copied from ``pygments.lexer.Lexer.get_token``, v. 2.1.3 (the last
 # few lines).
 def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
     def streamer():
@@ -1330,7 +1330,7 @@ def _generate_rest(
                 # Add an indent if needed.
                 if type_ > 0:
                     out_file.write('\n.. raw:: html\n\n'
-                      ' <div style="margin-left:{}em;">\n\n'.format(0.5*type_))
+                      ' <div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(0.5*type_))
                 # Specify the line number in the source, so that errors will be
                 # accurately reported. This isn't necessary in code blocks,
                 # since errors can't occur.

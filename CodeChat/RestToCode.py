@@ -270,7 +270,7 @@ def rest_to_code_string(
             # This is to find the ``<div>`` comments and turn them into comments.
             elif line_list[i+1] == '.. raw:: html':
                 # Makes sure that the lines that are supposed to be there are there.
-                if line_list[i+2] != '' or line_list[i+3][0:24] != ' <div style="margin-left':
+                if line_list[i+2] != '' or not line_list[i+3].startswith(' <div class="CodeChat-indent" style="margin-left'):
                     # See boolean_.
                     boolean = True
                     break
