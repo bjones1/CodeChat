@@ -44,13 +44,6 @@
 #
 # Of course, replace the version number in the command above.
 #
-# To `upload docs
-# <http://pythonhosted.org/setuptools/setuptools.html#upload-docs-upload-package-documentation-to-pypi>`_,
-# which are placed `here <http://pythonhosted.org/CodeChat/>`__
-# (make sure to run Sphinx first, so the docs will be current):
-#
-#    ``python setup.py upload_docs --upload-dir=_build\html``
-#
 # For `development
 # <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
