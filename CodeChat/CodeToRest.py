@@ -32,7 +32,6 @@
 #
 # Standard library
 # ----------------
-import sys
 from io import StringIO
 import os.path
 from enum import Enum
@@ -322,23 +321,50 @@ def _lexer_to_rest(
 codechat_style = (
     '.. raw:: html\n'
     '\n'
-    # Only style after the `DOM is ready <https://learn.jquery.com/using-jquery-core/document-ready/>`_.
-    ' <script type="text/javascript">$( document ).ready(function() {'
-        # Pick the last element inside a ``<div class="CodeChat-indent">``. See the `CSS selectors <https://www.w3schools.com/cssref/css_selectors.asp>`_ page.
-        'let sel1 = $("div.CodeChat-indent>*:last-child")'
-            # Now, keep only those elements that are followed by a ``<div class="highlight-xx">``.
-            '.filter(function () { return $(this).parent().next("[class*=highlight-]").length; });'
+    ' <script type="text/javascript">'
+    # Only style after the `DOM is ready <https://stackoverflow.com/questions/799981/document-ready-equivalent-without-jquery>`_.
+    'document.addEventListener("DOMContentLoaded", function(event) {'
+        # Walk the tree in the given direction.
+        'let walk_tree = function('
+            # The jQuery elements to walk.
+            'elements,'
+            # The walker function: ``x => x.next/prevElementSibling``.
+            'func_walk,'
+            # Which child to select, ``x => first/lastElementChild``.
+            'func_child) {'
 
-        # Pick an element followed by a ``<div class="highlight-xxx">``.
-        'let sel2 = $("*+div[class*=highlight-]")'
-            # Select the element -- CSS always selects the last item in a selector (in this case, the ``<div class="highlight-xxx">``).
-            '.prev();'
+            # Create an array to hold the children found.
+            'let walk_children = [];'
+            # For each element in the list of elements, find all its next/previous children.
+            'for (let index = 0; index < elements.length; ++index) {'
+                # If the current element (``that``) doesn't have a next/previous sibling, ascend the tree until we find one. Similar to `.closest <https://api.jquery.com/closest/>`_, except that the criteria is "has a prev/next sibling", which I don't know how to encode as a selector.
+                'let that = elements[index];'
+                'while (!func_walk(that)) {'
+                    'that = that.parentElement;'
+                '}'
+                # We found a next/previous sibling. Go there.
+                'that = func_walk(that);'
 
-        # Remove the bottom margin for these cases.
-        'sel1.add(sel2).css("margin-bottom", "0px");'
-    '});</script>\n\n'
+                # Include the next/previous sibling in the output.
+                'walk_children.push(that);'
+                # Add all first/last children of this node to the output.
+                'while (func_child(that)) {'
+                    'that = func_child(that);'
+                    'walk_children.push(that);'
+                '}'
+            '}'
+            'return walk_children;'
+        '};'
+
+        # All CodeChat-produced code is marked by the ``fenced-code`` class.
+        'let code = document.getElementsByClassName("fenced-code");'
+        # Go to the next node from code, then set the margin-top of all first children to 0 so that there will be no extra space between the code and the following comment.
+        'walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => x.style.marginTop = 0);'
+        # Same, but remove space between a comment and the following code.
+        'walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => x.style.marginBottom = 0);'
+    '});'
+    '</script>'
 )
-#
 #
 # Step 1 of lexer_to_rest_
 # ------------------------
@@ -1419,6 +1445,9 @@ class _FencedCodeBlock(CodeBlock):
                 if self.content[-i - 1]:
                     break
                 self.content[-i - 1] = ' '
+
+        # Mark all fenced code with a specific class, for styling.
+        self.options['classes'] = ['fenced-code']
 
         # Now, process the resulting contents as a code block.
         nodeList = CodeBlock.run(self)
