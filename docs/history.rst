@@ -16,6 +16,11 @@ History of recent changes
 
     -   No changes yet.
 
+-   1.5.1, 27-Sep-2017
+
+    -   Improved CSS formatting.
+    -   Docs now hosted on readthedocs.
+
 -   1.5.0, 27-Sep-2017
 
     -   Added MXML and 15 C-like languages.
