@@ -1,12 +1,12 @@
 .. Copyright (C) 2012-2016 Bryan A. Jones.
 
-   This file is part of CodeChat.
+    This file is part of CodeChat.
 
-   CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    CodeChat is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-   CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
 *****************************
 A programmer's word processor
@@ -15,15 +15,15 @@ A programmer's word processor
 
 .. Note that hyperlinks don't use the typical :doc: syntax here, because:
 
-   1. This same file will be processed by reST-only tools on the GitHub and PyPI pages, so :doc: will produce errors.
+    1. This same file will be processed by reST-only tools on the GitHub and PyPI pages, so :doc: will produce errors.
 
-   2. Pointing to the doc homepage causes GitHub and PyPI links to automatically refer users to the full documentation set, rather than the single file (this one) hosted automatically there.
+    2. Pointing to the doc homepage causes GitHub and PyPI links to automatically refer users to the full documentation set, rather than the single file (this one) hosted automatically there.
 
 .. The following includes a YouTube CodeChat playlist.
 
 .. raw:: html
 
-   <iframe width="853" height="480" src="https://www.youtube.com/embed/videoseries?list=PLOJAqFa3UI2EmpUOy7PhAJ7adRnBZkC6U" frameborder="0" allowfullscreen></iframe>
+    <iframe width="853" height="480" src="https://www.youtube.com/embed/videoseries?list=PLOJAqFa3UI2EmpUOy7PhAJ7adRnBZkC6U" frameborder="0" allowfullscreen></iframe>
 
 Installation
 ============
@@ -46,15 +46,15 @@ Examples
 ========
 Some examples of literate programming using CodeChat:
 
-* Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <https://pythonhosted.org/CodeChat/>`_
-* Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
-* Use of a numbered list to explain a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
-* Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
-* Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
-* Use of a screenshot to demonstrate the operation of a `3-D simulation <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/homework_1_solution.html>`_.
-* Use of equations and diagrams in `scientific computing <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/mav3d_simulation.html#dynamics>`_.
-* Use of equations to explain the resulting code for an `integrator <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/integrating_omega_3d.html>`_.
-* CodeChat is used for code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
+*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <https://pythonhosted.org/CodeChat/>`_
+*   Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
+*   Use of a numbered list to explain a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
+*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
+*   Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
+*   Use of a screenshot to demonstrate the operation of a `3-D simulation <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/homework_1_solution.html>`_.
+*   Use of equations and diagrams in `scientific computing <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/mav3d_simulation.html#dynamics>`_.
+*   Use of equations to explain the resulting code for an `integrator <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/integrating_omega_3d.html>`_.
+*   CodeChat is used for code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
 
 
 Contributing
