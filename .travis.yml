@@ -11,7 +11,6 @@ python:
   - 3.6
   - 3.5
   - 3.4
-  - 3.3
 
 # See https://docs.travis-ci.com/user/customizing-the-build/#Build-Matrix. This
 # manually includes additional OS X tests to the matrix of Linux tests defined
@@ -30,7 +29,6 @@ matrix:
   - os: osx
     language: generic
     env: INSTALL_TYPE=macpython VERSION=3.4 VENV=venv
-  # Don't test Python 3.3 on Mac -- it fails with ``2017-04-25 05:09:18.364 installer[2456:5683] Package /Volumes/Python/Python.mpkg/Contents/Packages/PythonFramework-3.3.pkg uses a deprecated pre-10.2 format (or uses a newer format but is invalid).``.
 
 # _`before_install`: Perform the manual steps on OS X to install python3 and
 # activate venv, since Python support is not available, per the list of
