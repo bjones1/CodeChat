@@ -36,26 +36,3 @@ pre.literal-block {
     margin-left: 0px;
     margin-right: 0px;
 }
-
-/* Place code immediately next to any surrounding paragraphs for docutils output. */
-pre.literal-block,
-/* Do the same for Sphinx. Remove the top margin when a paragraph follows code. The expected structure is:
- *
- * .. code-block:: html
- *  :linenos:
- *
- *  <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
- *      ...Some code here...
- *  </div>
- *  <div class="CodeChat-indent">    An indent from CodeChat -- not present with no indent.
- *      <p>Some text here</p>        This could be any element, not just <p>.
- *      <p>Other text.</p>           Do NOT style this element.
- *  </div>
- *
- * Note that the bottom margin styling is handled by `CodeChat style`.
- */
-div[class*=highlight-]+div.CodeChat-indent>*,
-div[class*=highlight-]+* {
-  margin-top: 0em;
-}
-
