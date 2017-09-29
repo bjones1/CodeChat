@@ -1,34 +1,36 @@
 // .. Copyright (C) 2012-2016 Bryan A. Jones.
 //
-//      This file is part of CodeChat.
+//  This file is part of CodeChat.
 //
-//      CodeChat is free software: you can redistribute it and/or modify it under
-//      the terms of the GNU General Public License as published by the Free
-//      Software Foundation, either version 3 of the License, or (at your option)
-//      any later version.
+//  CodeChat is free software: you can redistribute it and/or modify it under
+//  the terms of the GNU General Public License as published by the Free
+//  Software Foundation, either version 3 of the License, or (at your option)
+//  any later version.
 //
-//      CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
-//      WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-//      FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
-//      details.
+//  CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
+//  WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+//  FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+//  details.
 //
-//      You should have received a copy of the GNU General Public License along
-//      with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+//  You should have received a copy of the GNU General Public License along
+//  with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 //
 //
 // .. Tell Sphinx to use the C++ syntax highligher for this file, instead of the
-//      default Python highligher.
+//  default Python highligher.
 //
 // .. highlight:: c++
-//
-// .. note::
-//
-//      This "source file" does not contain any useful, executable code. Instead,
-//      it exemplifies literate programming style.
 //
 // ****************************************************
 // style_guide.cpp - Style recommendations for CodeChat
 // ****************************************************
+// .. note::
+//
+//  This "source file" does not contain any useful, executable code. Instead,
+//  it exemplifies literate programming style.
+//
+// Syntax
+// ======
 // Before covering style, the following shows the syntax used to embed reST in
 // comments. The rules used to determine if a comment will be interpreted as
 // reST are:
@@ -65,7 +67,8 @@
     i = 0; // Comments with code are not
     j = 1; /* interpreted as reST. */
 //
-//
+// Guidelines
+// ==========
 // In using CodeChat with Sphinx, I've developed a set of guidelines to make my
 // code more consistent and readable. These are my recommendations. Refer to the
 // examples in :doc:`../README` to see these principles applied to actual source
@@ -162,6 +165,13 @@
 //      <http://tarantsov.com/hackers-coding-style-guide/why-tabs-should-be-avoided.html>`_.
 //      They make the resulting HTML less predictable. A tab after the inital
 //      comment character(s) won't be recognized as a reST-formatted comment.
+//
+// *    Select tab stops and stick with them. Don't indent based on the size of
+//      the preceeding reST element -- this makes code difficult to edit. For
+//      example, note how this list is constructed: not as ``* A bullet
+//      here...``, but ``*    A bullet here`` to align with tab stops. (Per the
+//      preceeding point, no tabs are used, just tab stops; in my case, all
+//      indents are aligned to 4 space boundaries.)
 //
 // *    Use in-line `hyperlinks <http://sphinx-doc.org/rest.html#external-links>`_
 //      (as in this document), rather than separating the link and its definition.
