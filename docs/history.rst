@@ -16,6 +16,11 @@ History of recent changes
 
     -   No changes yet.
 
+-   1.5.2, 29-Sep-2017
+
+    -   More CSS formatting improvements; added a test page.
+    -   Remove Linux packaging, since it's out of date.
+
 -   1.5.1, 27-Sep-2017
 
     -   Improved CSS formatting.
