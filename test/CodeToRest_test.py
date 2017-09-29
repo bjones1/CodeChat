@@ -1476,7 +1476,7 @@ class TestRestToHtml(object):
                        '\n testing'
                        '\n'
                        ' Second fence\n') ==
-                       '<pre class="code literal-block">\n'
+                       '<pre class="code fenced-code literal-block">\n'
                        'testing\n'
                        '</pre>')
 
@@ -1488,7 +1488,7 @@ class TestRestToHtml(object):
                        '\n testing'
                        '\n'
                        ' Second fence\n') ==
-                       '<pre class="code literal-block">\n'
+                       '<pre class="code fenced-code literal-block">\n'
                        ' \n'
                        'testing\n'
                        '</pre>')
@@ -1501,7 +1501,7 @@ class TestRestToHtml(object):
                        ' testing\n'
                        '\n'
                        ' Second fence\n') ==
-                       '<pre class="code literal-block">\n'
+                       '<pre class="code fenced-code literal-block">\n'
                        'testing\n'
                        ' \n'
                        '</pre>')
@@ -1516,7 +1516,7 @@ class TestRestToHtml(object):
                        ' First fence\n'
                        ' testing\n'
                        ' Second fence\n') ==
-                       '<pre class="code python literal-block">\n'
+                       '<pre class="code python fenced-code literal-block">\n'
                        '<span class="name">testing</span>\n'
                        '</pre>')
 
@@ -1528,7 +1528,7 @@ class TestRestToHtml(object):
                        '\n'
                        ' testing\n'
                        ' Second fence\n') ==
-                       '<pre class="code python literal-block">\n'
+                       '<pre class="code python fenced-code literal-block">\n'
                        ' \n'
                        '<span class="name">testing</span>\n'
                        '</pre>')
@@ -1541,7 +1541,7 @@ class TestRestToHtml(object):
                        ' testing\n'
                        '\n'
                        ' Second fence\n') ==
-                       '<pre class="code python literal-block">\n'
+                       '<pre class="code python fenced-code literal-block">\n'
                        '<span class="name">testing</span>\n'
                        ' \n'
                        '</pre>')
@@ -1568,7 +1568,7 @@ class TestRestToHtml(object):
                        ef +
                        sl(-2) +
                        ' Comment\n') ==
-                       '<pre class="code literal-block">\n'
+                       '<pre class="code fenced-code literal-block">\n'
                        'Code\n'
                        '</pre>\n'
                        '<!--  -->\n'
