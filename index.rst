@@ -60,6 +60,7 @@ Testing
    test/HtmlToCode_test.py
    .travis.yml
    appveyor.yml
+   docs/style_test.py
 
 ************************
 Documentation generation
@@ -78,7 +79,6 @@ Packaging
 
    setup.py
    MANIFEST.in
-   Linux_packaging/python-codechat.spec
 
 ################
 Index and search
