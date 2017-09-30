@@ -16,6 +16,10 @@ History of recent changes
 
     -   No changes yet.
 
+-   1.5.3, 29-Sep-2017
+
+    -   CSS fixes to work with all built-in Sphinx styles.
+
 -   1.5.2, 29-Sep-2017
 
     -   More CSS formatting improvements; added a test page.
