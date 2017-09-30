@@ -337,20 +337,22 @@ codechat_style = (
             'let walk_children = [];'
             # For each element in the list of elements, find all its next/previous children.
             'for (let index = 0; index < elements.length; ++index) {'
-                # If the current element (``that``) doesn't have a next/previous sibling, ascend the tree until we find one. Similar to `.closest <https://api.jquery.com/closest/>`_, except that the criteria is "has a prev/next sibling", which I don't know how to encode as a selector.
+                # If the current element (``that``) doesn't have a next/previous sibling, ascend the tree until we find one or reach the top.
                 'let that = elements[index];'
-                'while (!func_walk(that)) {'
+                'while (that && !func_walk(that)) {'
                     'that = that.parentElement;'
                 '}'
-                # We found a next/previous sibling. Go there.
-                'that = func_walk(that);'
+                'if (that) {'
+                    # We found a next/previous sibling. Go there.
+                    'that = func_walk(that);'
 
-                # Include the next/previous sibling in the output.
-                'walk_children.push(that);'
-                # Add all first/last children of this node to the output.
-                'while (func_child(that)) {'
-                    'that = func_child(that);'
+                    # Include the next/previous sibling in the output.
                     'walk_children.push(that);'
+                    # Add all first/last children of this node to the output.
+                    'while (that && func_child(that)) {'
+                        'that = func_child(that);'
+                        'walk_children.push(that);'
+                    '}'
                 '}'
             '}'
             'return walk_children;'
@@ -359,9 +361,9 @@ codechat_style = (
         # All CodeChat-produced code is marked by the ``fenced-code`` class.
         'let code = document.getElementsByClassName("fenced-code");'
         # Go to the next node from code, then set the margin-top of all first children to 0 so that there will be no extra space between the code and the following comment.
-        'walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => x.style.marginTop = 0);'
+        'walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => { x.style.marginTop = 0; x.style.paddingTop = 0;});'
         # Same, but remove space between a comment and the following code.
-        'walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => x.style.marginBottom = 0);'
+        'walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => { x.style.marginBottom = 0; x.style.paddingBottom = 0;});'
     '});'
     '</script>'
 )

@@ -24,15 +24,16 @@
 /* Remove all top and bottom space around ``<pre>``, making it single-spaced.
    Also, remove the border so that code and comments mix more naturally.
  */
-pre {
-    padding: 0px;
+.fenced-code pre, div.fenced-code div.highlight {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
     margin-top: 0px;
     margin-bottom: 0px;
+    margin-left: 0px;
     border: none;
+    -webkit-box-shadow: none;
 }
 
-/* reST's default style sheet indents literal blocks. Remove this indent. */
-pre.literal-block {
-    margin-left: 0px;
-    margin-right: 0px;
-}
+/*
+

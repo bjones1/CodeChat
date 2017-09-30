@@ -182,7 +182,7 @@ if to_code:
 #
 # Literal blocks
 # --------------
-# I don't know that testing this makes sense -- Sphinx applies Pygments highlighting to this, anyway.
+# Testing is a bit tricky, since the styling is very close to code already.
 #
 # ::
 #
