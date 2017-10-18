@@ -39,6 +39,8 @@ import re
 from docutils import core
 from pygments.token import Token
 from pygments.lexers import get_lexer_by_name
+import pygments.util
+import pytest
 #
 # Local application imports
 # -------------------------
@@ -50,6 +52,11 @@ from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
   _pygments_lexer, _len_cdi
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
+# See if we have the PIC24 lexer installed.
+try:
+    PIC24 = get_lexer_by_name('PIC24')
+except pygments.util.ClassNotFound:
+    PIC24 = None
 
 # Define some commonly-used strings to make testing less verbose. Per the
 # :ref:`summary_and_implementation`, "Code blocks must be preceeded and followed
@@ -688,6 +695,7 @@ class TestCodeToRest(object):
                 ef, ['NASM'])
 
     # Assembly (PIC24).
+    @pytest.mark.skipif(PIC24 is None, reason='PIC24 lexer not installed.')
     def test_25a(self):
         self.mt('; Comment\n'
                 ' \n'
