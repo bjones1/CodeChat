@@ -80,6 +80,8 @@ COMMENT_DELIMITER_INFO = {
   'PHP':            ( '#',      '/*',            '*/'),
   # Block comments not tested.
   'NASM':           (';', '%comment\n', '%endcomment'),
+  # PIC24 not tested.
+  'PIC24':          (';',       '/*',            '*/'),
   # In Python, docstrings are treated as multi-line comments.
   'Python':         ( '#',      '"""',          '"""'),
   'Python 3':       ( '#',      '"""',          '"""'),

@@ -687,6 +687,20 @@ class TestCodeToRest(object):
                 '  \n' +
                 ef, ['NASM'])
 
+    # Assembly (PIC24).
+    def test_25a(self):
+        self.mt('; Comment\n'
+                ' \n'
+                'start: bra start\n'
+                ' \n',
+                sl(-3) +
+                'Comment\n' +
+                bf +
+                '  \n'
+                ' start: bra start\n'
+                '  \n' +
+                ef, ['PIC24'])
+
     # Bash.
     def test_26(self):
         self.mt('# Comment\n'
