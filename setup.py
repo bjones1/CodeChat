@@ -124,7 +124,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://pythonhosted.org/CodeChat/README.html',
+    url='http://codechat.readthedocs.io/en/latest/',
 
     author="Bryan A. Jones",
     author_email="bjones@ece.msstate.edu",

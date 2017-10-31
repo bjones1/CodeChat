@@ -27,7 +27,7 @@ A programmer's word processor
 
 Installation
 ============
-See the `installation intructions <https://pythonhosted.org/CodeChat/docs/install.html>`_.
+See the `installation intructions <http://codechat.readthedocs.io/en/latest/docs/install.html>`_.
 
 
 Background
@@ -37,7 +37,7 @@ Put simply, literate programming (LP) is the realization that a program is a doc
 
 Tutorial
 ========
-The `CodeChat tutorial <https://pythonhosted.org/CodeChat/docs/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
+The `CodeChat tutorial <http://codechat.readthedocs.io/en/latest/docs/tutorial.html>`_ guides new users into exploring CodeChat's literate programming abilities. Start here! Or, peruse the examples below to see the ways in which CodeChat transforms plain source code into beautiful documents.
 
 
 .. _tutorial-examples:
@@ -46,11 +46,11 @@ Examples
 ========
 Some examples of literate programming using CodeChat:
 
-*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <https://pythonhosted.org/CodeChat/>`_
-*   Use of tables to help design a `simple parser <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
-*   Use of a numbered list to explain a `simple state machine <https://pythonhosted.org/CodeChat/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
-*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <https://pythonhosted.org/CodeChat/conf.py.html>`_.
-*   Use of fonts to show what ``setup.py`` `commands to run <https://pythonhosted.org/CodeChat/setup.py.html>`_
+*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <http://codechat.readthedocs.io/en/latest/>`_
+*   Use of tables to help design a `simple parser <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
+*   Use of a numbered list to explain a `simple state machine <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
+*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <http://codechat.readthedocs.io/en/latest/conf.py.html>`_.
+*   Use of fonts to show what ``setup.py`` `commands to run <http://codechat.readthedocs.io/en/latest/setup.py.html>`_
 *   Use of a screenshot to demonstrate the operation of a `3-D simulation <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/homework_1_solution.html>`_.
 *   Use of equations and diagrams in `scientific computing <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/mav3d_simulation.html#dynamics>`_.
 *   Use of equations to explain the resulting code for an `integrator <https://dl.dropboxusercontent.com/u/2337351/CodeChat_MAVs/integrating_omega_3d.html>`_.
