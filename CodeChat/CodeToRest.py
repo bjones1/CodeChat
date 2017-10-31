@@ -361,9 +361,15 @@ codechat_style = (
         # All CodeChat-produced code is marked by the ``fenced-code`` class.
         'let code = document.getElementsByClassName("fenced-code");'
         # Go to the next node from code, then set the margin-top of all first children to 0 so that there will be no extra space between the code and the following comment.
-        'walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => { x.style.marginTop = 0; x.style.paddingTop = 0;});'
+        'walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => {'
+            'x.style.marginTop = 0;'
+            'x.style.paddingTop = 0;'
+        '});'
         # Same, but remove space between a comment and the following code.
-        'walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => { x.style.marginBottom = 0; x.style.paddingBottom = 0;});'
+        'walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => {'
+            'x.style.marginBottom = 0;'
+            'x.style.paddingBottom = 0;'
+        '});'
     '});'
     '</script>'
 )
