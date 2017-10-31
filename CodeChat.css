@@ -24,7 +24,7 @@
 /* Remove all top and bottom space around ``<pre>``, making it single-spaced.
    Also, remove the border so that code and comments mix more naturally.
  */
-.fenced-code pre, div.fenced-code div.highlight {
+.fenced-code pre, div.fenced-code div.highlight, pre.fenced-code {
     padding-top: 0px;
     padding-bottom: 0px;
     padding-left: 0px;
