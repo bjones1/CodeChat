@@ -91,7 +91,7 @@ def _source_read(
 
             # Add in the highlight language to use, unless there's potentially `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_. It's hard to know in this case where the ``.. highlight`` directive can be safely placed. Putting it before file-wide metadata demotes it to not being metadata. Finding the right place to put the ``.. highlight`` directive after the metadata is difficult to know.
             if not re.search('^:(tocdepth|nocomments|orphan):', source[0], re.MULTILINE):
-                source[0] = '.. highlight:: {}\n\n{}'.format(lexer.name, source[0])
+                source[0] = '.. highlight:: {}\n\n{}'.format(lexer.aliases[0], source[0])
 
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
