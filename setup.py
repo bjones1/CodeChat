@@ -40,9 +40,7 @@
 #
 #   python -m pip install -U pip setuptools wheel twine
 #   python setup.py sdist bdist_wheel
-#   python -m twine upload dist\CodeChat-1.5.6*
-#
-# Of course, replace the version number in the command above.
+#   python -m twine upload dist/*
 #
 # For `development
 # <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
