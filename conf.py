@@ -49,7 +49,7 @@ import alabaster
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = 'CodeChat'
-copyright = '2016, Bryan A. Jones'
+copyright = '2017, Bryan A. Jones'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
@@ -73,7 +73,7 @@ release = version
 
 # `highlight_language <http://sphinx-doc.org/config.html#confval-highlight_language>`_:
 # The default language to highlight source code in.
-highlight_language = 'python'
+highlight_language = 'python3'
 
 # `pygments_style <http://sphinx-doc.org/config.html#confval-pygments_style>`_:
 # The style name to use for Pygments highlighting of source code.
@@ -131,8 +131,8 @@ CodeChat_lexer_for_glob = {
     # causing it to display incorrectly. Define them as CSS only.
     '*.css': 'CSS',
     # The ``MANIFEST.in`` file uses # as a comment. So does Perl.. Ugly, no?
-    'MANIFEST.in'  : 'Perl',
-    }
+    'MANIFEST.in' : 'Perl',
+}
 
 # .. _CodeChat_excludes:
 #
@@ -159,17 +159,19 @@ master_doc = 'index'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 exclude_patterns = [
-                    # Ignore setup.py output.
-                    'build',
-                    'dist',
-                    'CodeChat.egg-info',
-                    # Ignore Sphinx output.
-                    '_build',
-                    # Ignore this file's output.
-                    'sphinx-enki-info.txt',
-                    # Ignore HTML -- the license and test output.
-                    '**.html',
-                    ]
+    # Ignore setup.py output.
+    'build',
+    'dist',
+    '*.egg-info',
+    '.cache',
+    '__pycache__',
+    # Ignore Sphinx output.
+    '_build',
+    # Ignore this file's output.
+    'sphinx-enki-info.txt',
+    # Ignore HTML -- the license and test output.
+    '**.html',
+]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
 # reST default role (used for this markup: ```text```) to use for all documents.

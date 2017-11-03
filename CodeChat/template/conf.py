@@ -70,7 +70,7 @@ release = 'version 0.0'
 
 # `highlight_language <http://sphinx-doc.org/config.html#confval-highlight_language>`_:
 # The default language to highlight source code in.
-highlight_language = 'python'
+highlight_language = 'python3'
 
 # `pygments_style <http://sphinx-doc.org/config.html#confval-pygments_style>`_:
 # The style name to use for Pygments highlighting of source code.
@@ -149,19 +149,22 @@ master_doc = 'index'
 # `exclude_patterns <http://sphinx-doc.org/config.html#confval-exclude_patterns>`_:
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
+#
+# **Important:** Do **NOT** add ``CodeChat.css`` to this list; this will
+# instruct Sphinx not to copy it to the ``_static`` directory, where it
+# is needed to properly lay out CodeChat output. Instead, to exclude it
+# from the documents produced by Sphinx, add it to CodeChat_excludes_.
 exclude_patterns = [
-# **CodeChat notes:**
+    # **CodeChat notes:**
+    #
     # By default, Enki will instruct Sphinx to place all Sphinx output in
     # ``_build``; this directory should therefore be excluded from the list of
     # source files.
     '_build',
     # The ``CodeToRestSphinx`` extension creates a file named
     # ``sphinx-enki-info.txt``, which should be ignored by Sphinx.
-    'sphinx-enki-info.txt']
-    # **Important:** Do **NOT** add ``CodeChat.css`` to this list; this will
-    # instruct Sphinx not to copy it to the ``_static`` directory, where it
-    # is needed to properly lay out CodeChat output. Instead, to exclude it
-    # from the documents produced by Sphinx, add it to CodeChat_excludes_.
+    'sphinx-enki-info.txt',
+]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
 # reST default role (used for this markup: ```text```) to use for all documents.
