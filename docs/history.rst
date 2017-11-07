@@ -16,6 +16,11 @@ History of recent changes
 
     -   No changes yet.
 
+-   1.5.7, 6-Nov-2017
+
+    -   Fixed auto-generated ``.. highlight`` directive to use correct name.
+    -   Fixed CSS for the ReadTheDocs theme.
+
 -   1.5.6, 31-Oct-2017
 
     -   Fixed styles for use with Docutils.
