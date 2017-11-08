@@ -104,7 +104,7 @@ pygments_style = 'sphinx'
 # documentation needs a minimal Sphinx version, state it here. **CodeChat
 # note:** CodeChat has been tested with Sphinx 1.1 and above. Older versions may
 # or may not work.
-needs_sphinx = '1.3'
+needs_sphinx = '1.5'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
@@ -163,14 +163,17 @@ exclude_patterns = [
     'build',
     'dist',
     '*.egg-info',
-    '.cache',
-    '__pycache__',
     # Ignore Sphinx output.
     '_build',
     # Ignore this file's output.
     'sphinx-enki-info.txt',
     # Ignore HTML -- the license and test output.
     '**.html',
+    # Misc files.
+    '.cache',
+    '__pycache__',
+    'Thumbs.db',
+    '.DS_Store',
 ]
 
 # `default_role <http://sphinx-doc.org/config.html#confval-default_role>`_: The
@@ -267,9 +270,18 @@ html_sidebars = {
 # If true, the index is split into individual pages for each letter.
 ##html_split_index = False
 
+# `html_copy_source <http://sphinx-doc.org/config.html#confval-html_copy_source>`_:
+# If true, the reST sources are included in the HTML build as _sources/name.
+html_copy_source = True
+
 # `html_show_sourcelink <http://sphinx-doc.org/config.html#confval-html_show_sourcelink>`_:
 # If true, links to the reST sources are added to the pages.
 html_show_sourcelink = True
+
+# `html_sourcelink_suffix <http://sphinx-doc.org/config.html#confval-html_sourcelink_suffix>`_:
+# Suffix to be appended to source links (see html_show_sourcelink), unless they
+# have this suffix already.
+html_sourcelink_suffix = ''
 
 # `html_show_sphinx <http://sphinx-doc.org/config.html#confval-html_show_sphinx>`_:
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.

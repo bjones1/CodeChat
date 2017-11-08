@@ -42,7 +42,7 @@ from os import path
 import fnmatch
 import codecs
 from pathlib import Path
-#
+
 # Third-party imports
 # -------------------
 from sphinx.util import get_matching_files
@@ -50,25 +50,25 @@ from sphinx.util.matching import compile_matchers
 import sphinx.environment
 from sphinx.util.osutil import SEP
 import pygments.util
-#
+
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, get_lexer
 from .CommentDelimiterInfo import SUPPORTED_GLOBS
 from . import __version__
-#
+
 # source-read event
 # =================
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
 def _source_read(
-  # _`app`: The `Sphinx application object <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx>`_.
-  app,
-  # _`docname`: The name of the document that was read. It contains a path relative to the
-  # project directory and (typically) no extension.
-  docname,
-  # A list whose single element is the contents of the source file.
-  source):
+    # _`app`: The `Sphinx application object <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx>`_.
+    app,
+    # _`docname`: The name of the document that was read. It contains a path
+    # relative to the project directory and (typically) no extension.
+    docname,
+    # A list whose single element is the contents of the source file.
+    source):
 
     if is_source_code(app.env, docname):
         # See if it's an extension we should process.
@@ -89,7 +89,13 @@ def _source_read(
             app.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
 
-            # Add in the highlight language to use, unless there's potentially `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_. It's hard to know in this case where the ``.. highlight`` directive can be safely placed. Putting it before file-wide metadata demotes it to not being metadata. Finding the right place to put the ``.. highlight`` directive after the metadata is difficult to know.
+            # Add in the highlight language to use, unless there's potentially
+            # `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_.
+            # It's hard to know in this case where the ``.. highlight``
+            # directive can be safely placed. Putting it before file-wide
+            # metadata demotes it to not being metadata. Finding the right place
+            # to put the ``.. highlight`` directive after the metadata is
+            # difficult to know.
             if not re.search('^:(tocdepth|nocomments|orphan):', source[0], re.MULTILINE):
                 source[0] = '.. highlight:: {}\n\n{}'.format(lexer.aliases[0], source[0])
 
@@ -99,10 +105,10 @@ def _source_read(
 #
 # Return True if the supplied docname is source code.
 def is_source_code(
-  # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
-  env,
-  # See docname_.
-  docname):
+    # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
+    env,
+    # See docname_.
+    docname):
 
     # If the docname's extension doesn't change when asking for its full path,
     # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
@@ -111,14 +117,14 @@ def is_source_code(
     # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
     docname_ext = env.doc2path(docname, None)
     return Path(docname_ext) == Path(docname)
-#
+
 # Monkeypatch
 # ===========
 # Sphinx doesn't naturally look for source files. Simply adding all supported
 # source file extensions to ``conf.py``'s `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_
 # doesn't work, since ``foo.c`` and ``foo.h`` will now both been seen as the
 # docname ``foo``, making then indistinguishable.
-#
+
 # get_matching_docs patch
 # -----------------------
 # So, do a bit of monkeypatching: for source files, make their docname the same
@@ -151,7 +157,7 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
 # import get_matching_docs``. So, `where to patch <https://docs.python.org/dev/library/unittest.mock.html#where-to-patch>`_
 # is in ``sphinx.environment`` instead of ``sphinx.util``.
 sphinx.environment.get_matching_docs = _get_matching_docs
-#
+
 # doc2path patch
 # --------------
 # Next, the way docnames get transformed back to a full path needs to be fixed
@@ -189,7 +195,42 @@ def _doc2path(self, docname, base=True, suffix=None):
         return path.join(base, docname) + suffix
 
 sphinx.environment.BuildEnvironment.doc2path = _doc2path
-#
+
+# Correct naming for the "show source" option
+# ===========================================
+# The following function corrects the extension of source files in the "
+# source" link. By default, Sphinx (in ``sphinx.builders.html.StandaloneHTMLBuilder.get_doc_context``)
+# creates a sourcename by appending a file's extension to the value returned by
+# ``doc2path``. For non-source files, ``doc2path``'s return value contains no
+# extension, so this works fine. However, for source files, ``doc2path``'s
+# return value contains an extension, so that appending the extension to source
+# files produces a doubled extension -- ``.py.py``, for example.
+def _html_page_context(
+    # See app_.
+    app,
+    # The canonical name of the page being rendered, that is, without the
+    # ``.html`` suffix and using slashes as path separators.
+    pagename,
+    # The name of the template to render; this will be 'page.html' for all pages
+    # from reST documents.
+    templatename,
+    # A dictionary of values that are given to the template engine to render the
+    # page and can be modified to include custom values. Keys must be strings.
+    context,
+    # A doctree when the page is created from a reST documents; None when the
+    # page is created from an HTML template alone.
+    doctree):
+
+    sourcename = context.get('sourcename')
+    ext = Path(pagename).suffix
+    # The extension Sphinx uses optinonally includes the `html_sourcelink_suffix <http://www.sphinx-doc.org/en/stable/config.html#confval-html_sourcelink_suffix>`_.
+    sphinx_ext = ext + ('' if ext == app.config.html_sourcelink_suffix else app.config.html_sourcelink_suffix)
+    double_ext = ext + sphinx_ext
+    # Only provide the rename if necessary.
+    if sourcename and ext and sourcename.endswith(double_ext):
+        # Take off the second of the double extensions.
+        context['sourcename'] = sourcename[:-len(double_ext)] + sphinx_ext
+
 # Enki_ support
 # =============
 # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know the
@@ -198,8 +239,8 @@ sphinx.environment.BuildEnvironment.doc2path = _doc2path
 # loaded yet. See also global_config_. Instead, wait for the builder-inited_
 # event, when the config_ settings are available.
 def _builder_inited(
-  # See app_.
-  app):
+    # See app_.
+    app):
 
     try:
         with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
@@ -208,15 +249,15 @@ def _builder_inited(
         # If ``html_file_suffix`` is None (TypeError), Enki will assume
         # ``.html``.
         pass
-#
+
 # Extension setup
 # ===============
 # This routine defines the `entry point
 # <http://sphinx-doc.org/extdev/appapi.html>`_ called by Sphinx to initialize
 # this extension.
 def setup(
-  # See app_.
-  app):
+    # See app_.
+    app):
 
     # Ensure we're using at least Sphinx v1.3 using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
@@ -239,6 +280,9 @@ def setup(
     # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
     # event to write out settings specified in ``conf.py``.
     app.connect('builder-inited', _builder_inited)
+    # Use the `html-page-context <http://www.sphinx-doc.org/en/stable/extdev/appapi.html#event-html-page-context>`_
+    # event to correct the extension of source files.
+    app.connect('html-page-context', _html_page_context)
 
     # .. _global_config:
     #
@@ -250,5 +294,7 @@ def setup(
     _config = app.config
 
     # Return `extension metadata <http://sphinx-doc.org/extdev/index.html>`_.
-    return {'version' : __version__,
-            'parallel_read_safe' : True }
+    return {
+        'version': __version__,
+        'parallel_read_safe': True
+    }
