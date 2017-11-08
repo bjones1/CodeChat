@@ -91,26 +91,6 @@
 //      *   Use ``-`` for subsections.
 //      *   Use ``^`` for subsubsections.
 //      *   Use ``"`` for subsubsubsections.
-//
-// *    Rather than leaving blank lines between code and a section, place empty
-//      comments. This makes the resulting HTML look better by suppressing an
-//      unnecessary newline. For example, correct use is:
-    void foo() {
-    }
-//
-// Title
-// -----
-//      Note that the comment character before the section title suppresses a
-//      newline.
-//
-//      Incorrect:
-        void foo() {
-        }
-
-// Title
-// -----
-//      Note the unnecesary newline before the section title above.
-//
 // *    Headings may be indented, but this causes problems in the resulting HTML by
 //      indenting too much. **Avoid this.**
     void foo(int i_sum) {
@@ -130,11 +110,11 @@
             // Overindented text.
 //
 // An unindented heading -- correct
-// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+// --------------------------------
         // Now, text and code will be indented correctly.
 //
-// *    Document functions, classes, parameters, etc. on the preeceding line. For
-//      example:
+// *    Document functions, classes, parameters, etc. on the preeceding line.
+//      For example:
 //
 //   Provide a series of utilities to assist in eating a balanced diet.
     class DietBalancer {
@@ -142,10 +122,10 @@
         //
         // Return value: Amount of bananas, in pounds, needed.
         int bananas_for_balanced_diet(
-          // Amount of apples available, in pounds.
-          apples,
-          // Amount of oranges available, in pounds.
-          orangs) {
+            // Amount of apples available, in pounds.
+            apples,
+            // Amount of oranges available, in pounds.
+            oranges) {
 
             // Per `myPlate <http://www.choosemyplate.gov/food-groups/fruits-amount.pdf>`_,
             // the following calculations determine the needed mass of bananas.
