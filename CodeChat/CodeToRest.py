@@ -37,7 +37,7 @@ import os.path
 from enum import Enum
 # To clean up docstrings.
 import inspect
-#
+
 # Third-party imports
 # -------------------
 # Used to open files with unknown encodings and to run docutils itself.
@@ -55,11 +55,11 @@ from pygments.lexer import _encoding_map
 from pygments.token import Token
 from pygments.filter import apply_filters
 import ast
-#
+
 # Local application imports
 # -------------------------
 from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
-#
+
 # API
 # ===
 # The following routines provide easy access to the core functionality of this
@@ -71,15 +71,15 @@ from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 # This function converts a string containg code to reST, returning the result
 # as a string.
 def code_to_rest_string(
-  # .. _code_str:
-  #
-  # The code to translate to reST.
-  code_str,
-  # .. _options:
-  #
-  # Specify the lexer (see get_lexer_ arguments), and provide it any other
-  # needed options.
-  **options):
+    # .. _code_str:
+    #
+    # The code to translate to reST.
+    code_str,
+    # .. _options:
+    #
+    # Specify the lexer (see get_lexer_ arguments), and provide it any other
+    # needed options.
+    **options):
 
     # Use a StringIO to capture writes into a string.
     output_rst = StringIO()
@@ -90,24 +90,24 @@ def code_to_rest_string(
 #
 # Convert a source file to a reST file.
 def code_to_rest_file(
-  # .. _source_path:
-  #
-  # Path to a source code file to process.
-  source_path,
-  # Path to a destination reST file to create. It will be overwritten if it
-  # already exists.
-  rst_path,
-  # .. _input_encoding:
-  #
-  # Encoding to use for the input file. The default of None detects the encoding
-  # of the input file.
-  input_encoding=None,
-  # .. _output_encoding:
-  #
-  # Encoding to use for the output file.
-  output_encoding='utf-8',
-  # See options_.
-  **options):
+    # .. _source_path:
+    #
+    # Path to a source code file to process.
+    source_path,
+    # Path to a destination reST file to create. It will be overwritten if it
+    # already exists.
+    rst_path,
+    # .. _input_encoding:
+    #
+    # Encoding to use for the input file. The default of None detects the
+    # encoding of the input file.
+    input_encoding=None,
+    # .. _output_encoding:
+    #
+    # Encoding to use for the output file.
+    output_encoding='utf-8',
+    # See options_.
+    **options):
 
     # Use docutil's I/O classes to better handle and sniff encodings.
     #
@@ -126,13 +126,13 @@ def code_to_rest_file(
 # This converts a string containing source code to HTML, which it returns as a
 # string.
 def code_to_html_string(
-  # See code_str_.
-  code_str,
-  # A file-like object where warnings and errors will be written, or None to
-  # send them to stderr.
-  warning_stream=None,
-  # See options_.
-  **options):
+    # See code_str_.
+    code_str,
+    # A file-like object where warnings and errors will be written, or None to
+    # send them to stderr.
+    warning_stream=None,
+    # See options_.
+    **options):
 
     rest = code_to_rest_string(code_str, **options)
     # `docutils
@@ -158,15 +158,15 @@ def code_to_html_string(
 #
 # Convert source code stored in a file to HTML, which is saved in another file.
 def code_to_html_file(
-  # See source_path_.
-  source_path,
-  # Destination file name to hold the generated HTML. This file will be
-  # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
-  html_path=None,
-  # See input_encoding_.
-  input_encoding=None,
-  # See output_encoding_.
-  output_encoding='utf-8'):
+    # See source_path_.
+    source_path,
+    # Destination file name to hold the generated HTML. This file will be
+    # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
+    html_path=None,
+    # See input_encoding_.
+    input_encoding=None,
+    # See output_encoding_.
+    output_encoding='utf-8'):
 
     html_path = html_path or source_path + '.html'
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
@@ -177,8 +177,8 @@ def code_to_html_file(
     html = code_to_html_string(code_str, lexer=lexer)
 
     fo.write(html)
-#
-#
+
+
 # Supporting routines
 # -------------------
 #
@@ -187,19 +187,19 @@ def code_to_html_file(
 # Provide several ways to find a lexer. Provide any of the following arguments,
 # and this function will return the appropriate lexer for it.
 def get_lexer(
-  # The lexer itself, which will simply be returned.
-  lexer=None,
-  # The `short name <http://pygments.org/docs/lexers/>`_, or alias, of the
-  # lexer to use.
-  alias=None,
-  # The filename of the source file to lex.
-  filename=None,
-  # The MIME type of the source file to lex.
-  mimetype=None,
-  # The code to be highlighted, used to guess a lexer.
-  code=None,
-  # See options_.
-  **options):
+    # The lexer itself, which will simply be returned.
+    lexer=None,
+    # The `short name <http://pygments.org/docs/lexers/>`_, or alias, of the
+    # lexer to use.
+    alias=None,
+    # The filename of the source file to lex.
+    filename=None,
+    # The MIME type of the source file to lex.
+    mimetype=None,
+    # The code to be highlighted, used to guess a lexer.
+    code=None,
+    # See options_.
+    **options):
 
     # This sets the default tabsize to 4 spaces in
     # `Pygments' lexer <http://pygments.org/docs/api/#pygments.lexer.Lexer>`_,
@@ -242,8 +242,8 @@ def _debug_print(val):
     # Uncomment for debug prints.
     #print(val),
     pass
-#
-#
+
+
 # .. _lexer_to_rest:
 #
 # Implementation
@@ -254,14 +254,14 @@ def _debug_print(val):
 #
 # **This routine is the heart of the algorithm.**
 def _lexer_to_rest(
-  # See code_str_.
-  code_str,
-  # .. _lexer:
-  #
-  # The lexer used to analyze the code.
-  lexer,
-  # See out_file_.
-  out_file):
+    # See code_str_.
+    code_str,
+    # .. _lexer:
+    #
+    # The lexer used to analyze the code.
+    lexer,
+    # See out_file_.
+    out_file):
 
     _debug_print('Lexer: {}\n'.format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
@@ -301,7 +301,7 @@ def _lexer_to_rest(
 
     # 5.    Run a state machine to output the corresponding reST.
     _generate_rest(classified_group, out_file)
-#
+
 # .. _CodeChat style:
 #
 # CodeChat style
@@ -373,14 +373,14 @@ codechat_style = (
     '});'
     '</script>'
 )
-#
+
 # Step 1 of lexer_to_rest_
 # ------------------------
 def _pygments_lexer(
-  # See code_str_.
-  code_str,
-  # See lexer_.
-  lexer):
+    # See code_str_.
+    code_str,
+    # See lexer_.
+    lexer):
 
     # Pygments does some cleanup on the code given to it before lexing it. If
     # this is Python code, we want to run AST on that cleaned-up version, so
@@ -475,7 +475,7 @@ def _pygments_lexer(
     # Now, run the lexer.
     return (_pygments_get_tokens_postprocess(lexer, preprocessed_code_str),
             ast_docstring, ast_syntax_error)
-#
+
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
 # Provide a way to perform preprocessing on text before lexing it. This code was
@@ -544,26 +544,26 @@ def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
     if not unfiltered:
         stream = apply_filters(stream, self.filters, self)
     return stream
-#
-#
+
+
 # Step 2 of lexer_to_rest_
 # ------------------------
 # Given tokens, group them.
 def _group_lexer_tokens(
-  # An interable of (tokentype, string) pairs provided by the lexer, per
-  # `get_tokens
-  # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
-  iter_token,
-  # .. _comment_is_inline:
-  #
-  # When true, classify generic comments as inline.
-  comment_is_inline,
-  # .. _comment_is_block:
-  #
-  # When true, classify generic comment as block comments.
-  comment_is_block,
-  # Docstring dict found from AST scanning.
-  ast_docstring):
+    # An interable of (tokentype, string) pairs provided by the lexer, per
+    # `get_tokens
+    # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
+    iter_token,
+    # .. _comment_is_inline:
+    #
+    # When true, classify generic comments as inline.
+    comment_is_inline,
+    # .. _comment_is_block:
+    #
+    # When true, classify generic comment as block comments.
+    comment_is_block,
+    # Docstring dict found from AST scanning.
+    ast_docstring):
 
     # Keep track of the current group, string, and line no.
     current_string = ''
@@ -603,37 +603,37 @@ def _group_lexer_tokens(
     # Output final pair, if we have it.
     if current_string:
         yield current_group, current_string
-#
-#
+
+
 # Supporting routines and definitions
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 # Define the groups into which tokens will be placed.
 class _GROUP(Enum):
-  # The basic classification used by group_for_tokentype_.
-  whitespace = 1
-  inline_comment = 2
-  other = 3
-  # A ``/* comment */``-style comment contained in one string.
-  block_comment = 4
-  # Grouping is::
-  #
-  #    /* BLOCK_COMMENT_START
-  #       BLOCK_COMMENT_BODY, (repeats for all comment body)
-  #       BLOCK_COMMENT_END */
-  block_comment_start = 5
-  block_comment_body = 6
-  block_comment_end = 7
-#
+    # The basic classification used by group_for_tokentype_.
+    whitespace = 1
+    inline_comment = 2
+    other = 3
+    # A ``/* comment */``-style comment contained in one string.
+    block_comment = 4
+    # Grouping is::
+    #
+    #    /* BLOCK_COMMENT_START
+    #       BLOCK_COMMENT_BODY, (repeats for all comment body)
+    #       BLOCK_COMMENT_END */
+    block_comment_start = 5
+    block_comment_body = 6
+    block_comment_end = 7
+
 # .. _group_for_tokentype:
 #
 # Given a tokentype, group it.
 def _group_for_tokentype(
-  # The tokentype to place into a group.
-  tokentype,
-  # See comment_is_inline_.
-  comment_is_inline,
-  # See comment_is_block_.
-  comment_is_block):
+    # The tokentype to place into a group.
+    tokentype,
+    # See comment_is_inline_.
+    comment_is_inline,
+    # See comment_is_block_.
+    comment_is_block):
 
     # The list of Pygments `tokens <http://pygments.org/docs/tokens/>`_ lists
     # ``Token.Text`` (how a newline is classified) and ``Token.Whitespace``.
@@ -657,20 +657,20 @@ def _group_for_tokentype(
         return _GROUP.inline_comment
 
     return _GROUP.other
-#
-#
+
+
 # Step #3 of lexer_to_rest_
 # -------------------------
 # Given an iterable of groups, break them into lists based on newlines. The list
 # consists of (group, comment_leading_whitespace_length, string) tuples.
 def _gather_groups_on_newlines(
-  # An iterable of (group, string) pairs provided by
-  # ``group_lexer_tokens``.
-  iter_grouped,
-  # .. _comment_delim_info:
-  #
-  # An element of COMMENT_DELIMITER_INFO for the language being classified.
-  comment_delim_info):
+    # An iterable of (group, string) pairs provided by
+    # ``group_lexer_tokens``.
+    iter_grouped,
+    # .. _comment_delim_info:
+    #
+    # An element of COMMENT_DELIMITER_INFO for the language being classified.
+    comment_delim_info):
 
     # Keep a list of (group, string) tuples we're accumulating.
     l = []
@@ -751,8 +751,8 @@ def _gather_groups_on_newlines(
     # Output final group, if one is still accumulating.
     if l:
         yield l
-#
-#
+
+
 # Block comment indentation processing
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 #
@@ -827,18 +827,18 @@ def _gather_groups_on_newlines(
 #      So, to recognize:
 #
 def _is_space_indented_line(
-  # A line from a multi-line comment to examine.
-  line,
-  # The expected indent to check for; a length, in characters.
-  indent_len,
-  # Placeholder for delimiter expected near the end of an indent (one
-  # character). Not used by this function, but this function must take the
-  # same parameters as is_delim_indented_line_.
-  delim,
-  # True if this is the last line of a multi-line comment.
-  is_last,
-  # See comment_delim_info_.
-  comment_delim_info):
+    # A line from a multi-line comment to examine.
+    line,
+    # The expected indent to check for; a length, in characters.
+    indent_len,
+    # Placeholder for delimiter expected near the end of an indent (one
+    # character). Not used by this function, but this function must take the
+    # same parameters as is_delim_indented_line_.
+    delim,
+    # True if this is the last line of a multi-line comment.
+    is_last,
+    # See comment_delim_info_.
+    comment_delim_info):
 
     # A line containing only whitespace is always considered valid.
     if line.isspace():
@@ -858,8 +858,8 @@ def _is_space_indented_line(
         return True
     # No other correctly indented cases.
     return False
-#
-#
+
+
 # (continuing from the list above...)
 #
 # #. Multiple lines, indented with spaces followed by a delimiter. For example:
@@ -898,34 +898,34 @@ def _is_space_indented_line(
 # .. _is_delim_indented_line:
 #
 def _is_delim_indented_line(
-  # A line from a multi-line comment to examine.
-  line,
-  # The expected indent to check for; a length, in characters.
-  indent_len,
-  # Delimiter expected near the end of an indent (one character).
-  delim,
-  # True if this is the last line of a multi-line comment.
-  is_last,
-  # See comment_delim_info_.
-  comment_delim_info):
+    # A line from a multi-line comment to examine.
+    line,
+    # The expected indent to check for; a length, in characters.
+    indent_len,
+    # Delimiter expected near the end of an indent (one character).
+    delim,
+    # True if this is the last line of a multi-line comment.
+    is_last,
+    # See comment_delim_info_.
+    comment_delim_info):
 
-     # A line the correct number of spaces, followed by a delimiter then either
-     # a space or a newline is correctly indented.
-     if (len(line) >= indent_len and line[:indent_len - 2].isspace() and
-         line[indent_len - 2] == delim and line[indent_len - 1] in '\n '):
-         return True
-     # Last line possibility: indent_len - 2 spaces followed by the delimiter
-     # is a valid indent. For example, an indent of 3 begins with ``/* comment``
-     # and can end with ``_*/``, a total of (indent_len == 3) - (2 spaces
-     # that are usually a * followed by a space) + (closing delim ``*/`` length
-     # of 2 chars) == 3.
-     if ( is_last and len(line) == indent_len - 2 +
-          comment_delim_info[2] and line[:indent_len - 2].isspace() ):
-         return True
-     # No other correctly indented cases.
-     return False
-#
-#
+    # A line the correct number of spaces, followed by a delimiter then either
+    # a space or a newline is correctly indented.
+    if (len(line) >= indent_len and line[:indent_len - 2].isspace() and
+        line[indent_len - 2] == delim and line[indent_len - 1] in '\n '):
+        return True
+    # Last line possibility: indent_len - 2 spaces followed by the delimiter
+    # is a valid indent. For example, an indent of 3 begins with ``/* comment``
+    # and can end with ``_*/``, a total of (indent_len == 3) - (2 spaces
+    # that are usually a * followed by a space) + (closing delim ``*/`` length
+    # of 2 chars) == 3.
+    if ( is_last and len(line) == indent_len - 2 +
+         comment_delim_info[2] and line[:indent_len - 2].isspace() ):
+        return True
+    # No other correctly indented cases.
+    return False
+
+
 # Step #4 of lexer_to_rest_
 # -------------------------
 # Classify the output of ``gather_groups_on_newlines`` into either a code or
@@ -943,12 +943,12 @@ def _is_delim_indented_line(
 #      Currently, it outputs len(leading whitespace characters), comment text +
 #      newline.
 def _classify_groups(
-  # An iterable of [(group1, string1_no_newline), (group2, string2_no_newline),
-  # ..., (groupN, stringN_ending_newline)], produced by
-  # ``gather_groups_on_newlines``.
-  iter_gathered_groups,
-  # See comment_delim_info_.
-  comment_delim_info):
+    # An iterable of [(group1, string1_no_newline), (group2, string2_no_newline),
+    # ..., (groupN, stringN_ending_newline)], produced by
+    # ``gather_groups_on_newlines``.
+    iter_gathered_groups,
+    # See comment_delim_info_.
+    comment_delim_info):
 
     # Keep track of block comment state.
     is_block_rest_comment = False
@@ -1008,19 +1008,19 @@ def _classify_groups(
             is_block_rest_comment = False
 
         yield type_, string
-#
-#
+
+
 # Supporting routines
 # ^^^^^^^^^^^^^^^^^^^
 # Given a (group, string) tuple, return the string with comment delimiter
 # removed if it is a comment, or just the string if it's not a comment.
 def _remove_comment_delim(
-  # The group this string was classified into.
-  group,
-  # The string corresponding to this group.
-  string,
-  # See comment_delim_info_.
-  comment_delim_info):
+    # The group this string was classified into.
+    group,
+    # The string corresponding to this group.
+    string,
+    # See comment_delim_info_.
+    comment_delim_info):
 
     # Number of characters in a single-line comment delimiter.
     (len_inline_comment_delim,
@@ -1049,11 +1049,11 @@ def _remove_comment_delim(
 #    This code isn't used yet -- it's for a rewrite which will support multiple
 #    delimiters.
 def _remove_beginning_comment_delim(
-  # Either the number of characters in the beginning delimiter, or a tuple of
-  # strings which give all valie beginning comment delimiters.
-  beginning_comment_delim_seq,
-  # The string which start with the delimiter to be removed.
-  string):
+    # Either the number of characters in the beginning delimiter, or a tuple of
+    # strings which give all valie beginning comment delimiters.
+    beginning_comment_delim_seq,
+    # The string which start with the delimiter to be removed.
+    string):
 
     # Loop through all delimiters.
     for bcd in beginning_comment_delim_seq:
@@ -1068,13 +1068,13 @@ def _remove_beginning_comment_delim(
 # Determine if the given line is a comment to be interpreted by reST.
 # Supports ``remove_comment_chars``, ``classify_groups``.
 def _is_rest_comment(
-  # A sequence of (group, string) representing a single line.
-  line_list,
-  # True if this line contains the body or end of a block comment
-  # that will be interpreted by reST.
-  is_block_rest_comment,
-  # See lexer_.
-  lexer):
+    # A sequence of (group, string) representing a single line.
+    line_list,
+    # True if this line contains the body or end of a block comment
+    # that will be interpreted by reST.
+    is_block_rest_comment,
+    # See lexer_.
+    lexer):
 
     # See if there is any _GROUP.other in this line. If so, it's not a reST
     # comment.
@@ -1120,8 +1120,8 @@ def _is_rest_comment(
 def _is_block_body_or_end(group):
     return group in (_GROUP.block_comment_body, _GROUP.block_comment_end)
 
-#
-#
+
+
 # .. _Step_5:
 #
 # Step #5 of lexer_to_rest_
@@ -1333,12 +1333,12 @@ def _is_block_body_or_end(group):
 # previous state (output a closing fence or closing ``</div>``, then enter the
 # new state (output a fenced code block or an opening ``<div style=...>``.
 def _generate_rest(
-  # An iterable of (type, string) pairs, one per line.
-  classified_lines,
-  # .. _out_file:
-  #
-  # A file-like output to which the reST text is written.
-  out_file):
+    # An iterable of (type, string) pairs, one per line.
+    classified_lines,
+    # .. _out_file:
+    #
+    # A file-like output to which the reST text is written.
+    out_file):
 
     # Keep track of the current type. Begin with a 0-indent comment.
     current_type = -2
@@ -1389,16 +1389,16 @@ def _generate_rest(
 
     # When done, exit the last state.
     _exit_state(current_type, out_file)
-#
-#
+
+
 # Supporting routines
 # """""""""""""""""""
 # Output text produce when exiting a state. Supports generate_rest_ above.
 def _exit_state(
-  # The type (classification) of the last line.
-  type_,
-  # See out_file_.
-  out_file):
+    # The type (classification) of the last line.
+    type_,
+    # See out_file_.
+    out_file):
 
     # Code state: emit an ending fence.
     if type_ == -1:
@@ -1409,8 +1409,8 @@ def _exit_state(
     # Initial state. Nothing needed.
     else:
         pass
-#
-#
+
+
 # Supporting reST directives
 # """"""""""""""""""""""""""
 # Create a fenced code block: the first and last lines are presumed to be

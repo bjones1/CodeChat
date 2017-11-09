@@ -97,8 +97,8 @@
         if (i_sum) {
             // Indented heading -- **bad**
             // ---------------------------
-            // This comment isn't indented as it should be, one bad result of
-            // indenting a heading.
+            // The next line of code isn't indented as it should be, one bad
+            // result of indenting a heading.
             assert(i_sum > 1);
             // Another indented heading -- **bad**
             // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
