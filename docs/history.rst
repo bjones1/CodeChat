@@ -12,9 +12,12 @@
 History of recent changes
 *************************
 
--   Development version:
+-   1.5.8, 8-Nov-2017
 
-    -   No changes yet.
+    -   Update minimum required Sphinx version to 1.5.
+    -   Turn show source option on by default.
+    -   Fix duplicate extensions on source files.
+    -   Update style guide for improved formatting introduced in v1.5.0.
 
 -   1.5.7, 6-Nov-2017
 
