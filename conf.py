@@ -264,7 +264,7 @@ html_sidebars = {
 
 # `html_use_index <http://sphinx-doc.org/config.html#confval-html_use_index>`_:
 # If false, no index is generated.
-##html_use_index = True
+html_use_index = False
 
 # `html_split_index <http://sphinx-doc.org/config.html#confval-html_split_index>`_:
 # If true, the index is split into individual pages for each letter.

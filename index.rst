@@ -81,8 +81,7 @@ Packaging
    setup.py
    MANIFEST.in
 
-################
-Index and search
-################
-* :ref:`genindex`
+######
+Search
+######
 * :ref:`search`
