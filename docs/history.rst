@@ -12,6 +12,10 @@
 History of recent changes
 *************************
 
+-   `Github master <https://github.com/bjones1/CodeChat>`_
+
+    -   Update docs
+
 -   1.5.8, 8-Nov-2017
 
     -   Update minimum required Sphinx version to 1.5.

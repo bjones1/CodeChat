@@ -92,7 +92,7 @@
 //      *   Use ``^`` for subsubsections.
 //      *   Use ``"`` for subsubsubsections.
 // *    Headings may be indented, but this causes problems in the resulting HTML by
-//      indenting too much. **Avoid this.**
+//      indenting too much. **Avoid this.** See `this issue <https://github.com/bjones1/CodeChat/issues/7>`_ for more information.
     void foo(int i_sum) {
         if (i_sum) {
             // Indented heading -- **bad**
