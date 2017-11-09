@@ -51,10 +51,11 @@ Developer documentation
 *******
 Testing
 *******
+To run the tests, execute ``pytest test`` from the root directory of the project.
+
 .. toctree::
    :maxdepth: 2
 
-   test/pytest.ini
    test/CodeToRest_test.py
    test/RestToCode_test.py
    test/HtmlToCode_test.py
