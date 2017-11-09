@@ -43,9 +43,9 @@
 #   python -m twine upload dist/*
 #
 # For `development
-# <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
+# <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_::
 #
-#  ``pip install -e .``
+#   pip install -e .
 #
 # Packaging script
 # ================
@@ -160,7 +160,8 @@ setup(
         # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
         'docutils>=0.13.1',
         'pygments>=2.1',
-        'lxml']),
+        'lxml'
+    ]),
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
