@@ -47,6 +47,7 @@ Developer documentation
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
    docs/history.rst
+   .gitignore
 
 *******
 Testing

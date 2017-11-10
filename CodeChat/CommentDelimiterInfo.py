@@ -15,10 +15,10 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ************************************************************************
-# CommentDelimiterInfo.py - Info on comment delimiters for many languages.
-# ************************************************************************
-# :doc:`CodeChat <__init__.py>` relies on knowledge of the comment
+# *********************************************************
+# |docname| - Info on comment delimiters for many languages
+# *********************************************************
+# `CodeChat <__init__.py>` relies on knowledge of the comment
 # delimiters for each supported language. This file consists of a large table
 # which provides this information.
 #
@@ -30,7 +30,7 @@
 # Third-party imports
 # -------------------
 from pygments.lexers import get_all_lexers
-#
+
 # Supported languages
 # ===================
 # Based on the unique name for each lexer, provide some additional information
@@ -152,7 +152,7 @@ COMMENT_DELIMITER_INFO = {
   # ---------------------------------------
   # None at this time.
   }
-#
+
 # Supported extensions
 # ====================
 # Compute a list of supported filename globs: supported by the lexer and

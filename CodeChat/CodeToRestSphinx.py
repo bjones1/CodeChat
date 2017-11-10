@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *************************************************************************
-# CodeToRestSphinx.py - a Sphinx extension to translate source code to reST
-# *************************************************************************
+# ***************************************************************
+# |docname| - a Sphinx extension to translate source code to reST
+# ***************************************************************
 # This modules enables Sphinx to read in source files by converting the source
 # code to reST before passing the file on to Sphinx. The overall design:
 #
@@ -259,9 +259,9 @@ def setup(
     # See app_.
     app):
 
-    # Ensure we're using at least Sphinx v1.3 using `require_sphinx
+    # Ensure we're using at new enough Sphinx using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
-    app.require_sphinx('1.3')
+    app.require_sphinx('1.5')
 
     # Use the `source-read <http://sphinx-doc.org/extdev/appapi.html#event-source-read>`_
     # event hook to transform source code to reST before Sphinx processes it.

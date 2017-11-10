@@ -17,9 +17,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# **********************************************************
-# MANIFEST.in - Non-source files to include in setup package
-# **********************************************************
+# ********************************************************
+# |docname| - Non-source files to include in setup package
+# ********************************************************
 # Include the GPL with the distribution.
 include CodeChat/LICENSE.html
 # Template files must also be included.

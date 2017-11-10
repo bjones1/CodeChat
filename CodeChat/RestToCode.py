@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *********************************************************
-# RestToCode.py - a module to translate reST to source code
-# *********************************************************
+# *****************************************************
+# |docname| - a module to translate reST to source code
+# *****************************************************
 #
 #
 # .. contents::
@@ -27,7 +27,6 @@
 # These are listed in the order prescribed by `PEP 8
 # <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
-#
 # Third-party imports
 # -------------------
 # For the docutils default stylesheet and template
@@ -35,14 +34,11 @@ from docutils import io
 from pygments.lexers import find_lexer_class
 from lxml import html
 
-#
 # Local application imports
 # -------------------------
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 from .CodeToRest import codechat_style
-#
-#
-#
+
 # Supporting Functions
 # ====================
 # This section covers all functions that support the main two functions rest_to_code_string_
@@ -154,7 +150,7 @@ def formulate_block_comment(
             f = ' * {}{}\n'.format(line, comment_delimiters[2])
 
     return f
-#
+
 # Core Functions
 # ==============
 # This section contains the main two functions rest_to_code_string_
@@ -578,4 +574,3 @@ def html_to_code_string(
     #string_out = html_str
     return string_out
 '''
-

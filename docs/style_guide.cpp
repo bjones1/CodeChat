@@ -15,15 +15,9 @@
 //  You should have received a copy of the GNU General Public License along
 //  with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 //
-//
-// .. Tell Sphinx to use the C++ syntax highligher for this file, instead of the
-//  default Python highligher.
-//
-// .. highlight:: c++
-//
-// ****************************************************
-// style_guide.cpp - Style recommendations for CodeChat
-// ****************************************************
+// **********************************************
+// |docname| - Style recommendations for CodeChat
+// **********************************************
 // .. note::
 //
 //  This "source file" does not contain any useful, executable code. Instead,
@@ -130,6 +124,8 @@
             // Per `myPlate <http://www.choosemyplate.gov/food-groups/fruits-amount.pdf>`_,
             // the following calculations determine the needed mass of bananas.
             /// ...Code omitted...
+//
+// *    Use the ``|docname|`` replacement in the title to insert this file's name. See the top of this file for an example.
 //
 // *    Insert a per-source file table of contents (such as the one at the
 //      beginning of :doc:`../README`) to provide a quick overview of the file's

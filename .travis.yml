@@ -15,11 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *************************************
-# .travis.yml - Travis CI configuration
-# *************************************
-# .. highlight:: yaml
-#
+# ***********************************
+# |docname| - Travis CI configuration
+# ***********************************
 # See https://docs.travis-ci.com/user/multi-os/.
 os: linux
 # See https://docs.travis-ci.com/user/languages/python.

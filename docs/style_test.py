@@ -1,8 +1,23 @@
-# .. highlight:: python
+# .. Copyright (C) 2012-2017 Bryan A. Jones.
 #
-# ******************************************
-# style_test.py - Styling tests for CodeChat
-# ******************************************
+#    This file is part of CodeChat.
+#
+#    CodeChat is free software: you can redistribute it and/or modify it under
+#    the terms of the GNU General Public License as published by the Free
+#    Software Foundation, either version 3 of the License, or (at your option)
+#    any later version.
+#
+#    CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
+#    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+#    FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+#    details.
+#
+#    You should have received a copy of the GNU General Public License along
+#    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+#
+# **************************************
+# |docname| - Styling tests for CodeChat
+# **************************************
 # This file contains no useful code, but serves as a test bed to make sure code to comment transitions are styled correctly. The syntax below prevents linter complaints.
 to_code = None
 def to_indented_code(): pass

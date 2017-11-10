@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# **********************************************************************
-# conf.py - Sphinx configuration for generating CodeChat's documentation
-# **********************************************************************
+# ************************************************************************
+# |docname| - Sphinx configuration for generating CodeChat's documentation
+# ************************************************************************
 # This file configures Sphinx, which transforms restructured text (reST) into
 # html. See Sphinx `build configuration file docs
 # <http://sphinx-doc.org/config.html>`_ for more information on the settings
@@ -101,10 +101,8 @@ pygments_style = 'sphinx'
 # `General configuration <http://sphinx-doc.org/config.html#general-configuration>`_
 # ----------------------------------------------------------------------------------
 # `extensions <http://sphinx-doc.org/config.html#confval-extensions>`_: If your
-# documentation needs a minimal Sphinx version, state it here. **CodeChat
-# note:** CodeChat has been tested with Sphinx 1.1 and above. Older versions may
-# or may not work.
-needs_sphinx = '1.5'
+# documentation needs a minimal Sphinx version, state it here.
+##needs_sphinx = '1.5'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
@@ -115,6 +113,17 @@ extensions = ['CodeChat.CodeToRestSphinx', 'alabaster']
 # `templates_path <http://sphinx-doc.org/config.html#confval-templates_path>`_:
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# `rst_epilog <http://www.sphinx-doc.org/en/stable/config.html#confval-rst_epilog>`_:
+# A string of reStructuredText that will be included at the end of every source
+# file that is read.
+rst_epilog = (
+# Provide a convenient way to refer to a source file's name. See `_docname_role`.
+"""
+
+.. |docname| replace:: :docname:`name`
+"""
+)
 
 # `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_:
 # The suffix of source filenames. Add ``.in`` and ``.spec`` files (see below).
@@ -130,8 +139,9 @@ CodeChat_lexer_for_glob = {
     # CSS files are auto-detected as a CSS + Lasso file by Pygments,
     # causing it to display incorrectly. Define them as CSS only.
     '*.css': 'CSS',
-    # The ``MANIFEST.in`` file uses # as a comment. So does Perl.. Ugly, no?
-    'MANIFEST.in' : 'Perl',
+    # These` files use # as a comment. So does Perl.. Ugly, no?
+    'MANIFEST.in': 'Perl',
+    '.gitignore': 'Perl',
 }
 
 # .. _CodeChat_excludes:

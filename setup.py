@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ***************************************
-# setup.py - Package and install CodeChat
-# ***************************************
+# ****************************************
+# |docname| - Package and install CodeChat
+# ****************************************
 # Builds and installs CodeChat.
 #
 # Packaging notes

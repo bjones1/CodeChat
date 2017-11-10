@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *********************************
-# CodeToRest_test.py - Unit testing
-# *********************************
+# ************************
+# |docname| - Unit testing
+# ************************
 # This test bench exercises the CodeToRest module. First, set up for
 # development (see :ref:`To-package`). To run, execute ``py.test`` from the
 # command line. Note the period in this command -- ``pytest`` does **NOT** work
@@ -32,7 +32,7 @@
 # ---------------
 from io import StringIO
 import re
-#
+
 # Third-party imports
 # -------------------
 # Used to run docutils.
@@ -41,7 +41,7 @@ from pygments.token import Token
 from pygments.lexers import get_lexer_by_name
 import pygments.util
 import pytest
-#
+
 # Local application imports
 # -------------------------
 from CodeChat.RestToCode import rest_to_code_string, remove_codechat_style
@@ -436,7 +436,7 @@ class TestCodeToRest(object):
                 'Code\n'
                 '//  Comment\n'
                 '// \n')
-#
+
 # Block comment indent removal: indents with spaces
 # -------------------------------------------------
     # Removal of leading whitespace in block comments.
@@ -507,7 +507,7 @@ class TestCodeToRest(object):
                 ' // line\n'
                 ' // comment\n'
                 ' //   \n')
-#
+
 # Block comment indent removal: indents with delimiters
 # -----------------------------------------------------
     # Removal of leading whitespace in block comments.
@@ -578,7 +578,7 @@ class TestCodeToRest(object):
                 ' // line\n'
                 ' // comment\n'
                 ' //   \n')
-#
+
 # Other block comment testing
 # ---------------------------
     def test_19_2(self):
@@ -624,7 +624,7 @@ class TestCodeToRest(object):
                 '// line\n'
                 '// comment  inline\n'
                 '// \n')
-#
+
 # Other languages
 # ---------------
     # A bit of Python testing.
@@ -1436,7 +1436,7 @@ class TestCodeToRest(object):
                 bf +
                 '         pass\n' +
                 ef, ['Python3'])
-#
+
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
@@ -1488,7 +1488,7 @@ class TestRestToHtml(object):
                   '\n'
                   ' First fence\n'
                   ' Second fence\n') )
-#
+
 # Check newline preservation **without** syntax highlighting
 # ----------------------------------------------------------
     # Check output of a one-line code block surrounded by fences.
@@ -1527,7 +1527,7 @@ class TestRestToHtml(object):
                        'testing\n'
                        ' \n'
                        '</pre>')
-#
+
 # Check newline preservation **with** syntax highlighting
 # -------------------------------------------------------
     # Check output of a one-line syntax-highlighted code block surrounded by
@@ -1598,13 +1598,13 @@ class TestRestToHtml(object):
                        '<blockquote>\n'
                        'Comment</blockquote>')
 
-#
+
 # Poor coverage of code_to_html_file
 # ==================================
 class TestCodeToHtmlFile(object):
     def test_1(self):
         code_to_html_file('CodeChat/CodeToRestSphinx.py')
-#
+
 # Tests of lexer_to_code and subroutines
 # ======================================
 c_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name])
@@ -1689,7 +1689,7 @@ main(){
            (_GROUP.inline_comment, 0, '// Empty.\n')],
           [(_GROUP.other, 0, '}'), (_GROUP.whitespace, 0, '\n')] ]
         assert gathered_group == expected_group
-#
+
 # remove_comment_chars tests
 # --------------------------
     def test_4a(self):
@@ -1736,7 +1736,7 @@ main(){
     def test_4k(self):
         assert _remove_comment_delim(_GROUP.block_comment_end,
           '*/', c_lexer) == ''
-#
+
 # _is_space_indented_line tests
 # -----------------------------
     # Tests of block comment body indentation using spaces.
@@ -1772,7 +1772,7 @@ main(){
                                        3, '*', True, (2, 2, 2)) == False
         assert _is_delim_indented_line(' */',
                                        3, '*', True, (2, 2, 2)) == True
-#
+
 # _is_rest_comment tests
 # ----------------------
     # newline only
@@ -1910,7 +1910,7 @@ main(){
         assert _is_rest_comment([
           (_GROUP.inline_comment, 0, '#'),
           (_GROUP.whitespace, 0, '\n')], True, py_lexer)
-#
+
 # Classifier tests
 # ----------------
     # Test comment.
@@ -1969,7 +1969,7 @@ main(){
                                     (-1, 'main(){\n'),
                                     ( 2,   'Empty.\n'),
                                     (-1, '}\n')]
-#
+
 # reST generation tests
 # ---------------------
     def test_11(self):
