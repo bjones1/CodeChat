@@ -14,6 +14,10 @@ History of recent changes
 
 -   `Github master <https://github.com/bjones1/CodeChat>`_
 
+    -   No changes yet
+
+-   1.5.9, 10-Nov-2017
+
     -   Update and clean up docs.
     -   Add the ``|docname|`` substitution definition and underlying role.
     -   Place min Sphinx version requirement only in `../CodeChat/CodeToRest.py`; remove it from `../conf.py`.
