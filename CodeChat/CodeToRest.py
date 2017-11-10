@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# *********************************************************
-# CodeToRest.py - a module to translate source code to reST
-# *********************************************************
+# *****************************************************
+# |docname| - a module to translate source code to reST
+# *****************************************************
 # The API_ lists four functions which convert source code into either reST or
 # HTML. For a discussion on how this is accomplished, the lexer_to_rest_
 # function forms the core of the alogorithm; `step 5 <Step_5>`_ gives a detailed
@@ -35,17 +35,17 @@
 from io import StringIO
 import os.path
 from enum import Enum
-# To clean up docstrings.
 import inspect
+from pathlib import Path
 
 # Third-party imports
 # -------------------
 # Used to open files with unknown encodings and to run docutils itself.
-from docutils import io, core
+from docutils import io, core, nodes
 # Import CodeBlock as a base class for FencedCodeBlock.
 from docutils.parsers.rst.directives.body import CodeBlock
 # Import directives to register the new FencedCodeBlock and SetLine directives.
-from docutils.parsers.rst import directives, Directive
+from docutils.parsers.rst import directives, Directive, roles
 # For the docutils default stylesheet and template
 from docutils.writers.html4css1 import Writer
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
@@ -1411,8 +1411,8 @@ def _exit_state(
         pass
 
 
-# Supporting reST directives
-# """"""""""""""""""""""""""
+# Supporting reST directives and roles
+# """"""""""""""""""""""""""""""""""""
 # Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
@@ -1532,6 +1532,51 @@ class _SetLine(Directive):
         # This directive create no nodes.
         return []
 
-# Register the new fenced code block directive with docutils.
+# .. _`_docname_role`:
+#
+# _docname_role
+# -------------
+# Create a role which returns a specified part of the `docname <http://www.sphinx-doc.org/en/stable/extdev/envapi.html#sphinx.environment.BuildEnvironment.docname>`_ (the path to the current document). Syntax: ``:docname:`attr``` returns the ``attr`` method of the docname as a `Path <https://docs.python.org/3/library/pathlib.html#methods-and-properties>`_. For example, ``:docname:`name``` would return the name of the current docname_.
+#
+# This function returns a tuple of two values:
+#
+# 0. A list of nodes which will be inserted into the document tree at the point where the interpreted role was encountered (can be an empty list).
+# #. A list of system messages, which will be inserted into the document tree immediately after the end of the current block (can also be empty).
+def _docname_role(
+    # The local name of the interpreted role, the role name actually used in the document.
+    roleName,
+    # A string containing the enitre interpreted text input, including the role and markup. Return it as a problematic node linked to a system message if a problem is encountered.
+    rawtext,
+    # The interpreted text content.
+    text,
+    # The line number where the interpreted text begins.
+    lineno,
+    # The docutils.parsers.rst.states.Inliner object that called this function. It contains the several attributes useful for error reporting and document tree access.
+    inliner,
+    # A dictionary of directive options for customization (from the "role" directive), to be interpreted by this function. Used for additional attributes for the generated elements and other functionality.
+    options={},
+    # A list of strings, the directive content for customization (from the "role" directive). To be interpreted by the role function.
+    content=[]):
+
+    # See https://doughellmann.com/blog/2010/05/09/defining-custom-roles-in-sphinx/.
+    env = inliner.document.settings.env
+    try:
+        # Invoke
+        p = Path(env.docname)
+        # Return p.<text> using `getattr <https://docs.python.org/3/library/functions.html#getattr>`_.
+        path_component = str(getattr(p, text, p))
+    except Exception as e:
+        # Report an error.
+        msg = inliner.reporter.error(
+            'Invalid path component {}: {}'.format(text, e), line=lineno
+        )
+        prb = inliner.problematic(rawtext, rawtext, msg)
+        return [prb], [msg]
+    # Return the path component as text.
+    return [nodes.Text(path_component, rawtext, **options)], []
+
+
+# Register the new directives and role with docutils.
 directives.register_directive('fenced-code', _FencedCodeBlock)
 directives.register_directive('set-line', _SetLine)
+roles.register_local_role('docname', _docname_role)
