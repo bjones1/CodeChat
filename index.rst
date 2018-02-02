@@ -42,6 +42,7 @@ Developer documentation
    :maxdepth: 2
 
    CodeChat/__init__.py
+   CodeChat/SourceClassifier.py
    CodeChat/CodeToRest.py
    CodeChat/RestToCode.py
    CodeChat/CodeToRestSphinx.py

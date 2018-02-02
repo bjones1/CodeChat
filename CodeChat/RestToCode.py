@@ -36,8 +36,8 @@ from lxml import html
 
 # Local application imports
 # -------------------------
-from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
-from .CodeToRest import codechat_style
+from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
+from .CodeToRest import rest_codechat_style
 
 # Supporting Functions
 # ====================
@@ -201,9 +201,9 @@ def rest_to_code_file(
 # Remove the `CodeChat style` from the beginning of the given reST if it's present.
 def remove_codechat_style(rest):
         # If the rest begind with the `CodeChat style`,
-        if rest.startswith(codechat_style):
+        if rest.startswith(rest_codechat_style):
             # Snip it off.
-            return rest[len(codechat_style):]
+            return rest[len(rest_codechat_style):]
         else:
             return rest
 # |

@@ -14,7 +14,7 @@ History of recent changes
 
 -   `Github master <https://github.com/bjones1/CodeChat>`_
 
-    -   No changes yet
+    -   Refactor code: separate source code classifier from reST output.
 
 -   1.5.9, 10-Nov-2017
 

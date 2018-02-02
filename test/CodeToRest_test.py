@@ -45,10 +45,11 @@ import pytest
 # Local application imports
 # -------------------------
 from CodeChat.RestToCode import rest_to_code_string, remove_codechat_style
-from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file
-from CodeChat.CodeToRest import _remove_comment_delim, _group_lexer_tokens, \
+from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file, \
+    _generate_rest
+from CodeChat.SourceClassifier import _remove_comment_delim, _group_lexer_tokens, \
   _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
-  _generate_rest, _is_space_indented_line, _is_delim_indented_line, _GROUP, \
+  _is_space_indented_line, _is_delim_indented_line, _GROUP, \
   _pygments_lexer, _len_cdi
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 

@@ -1,4 +1,4 @@
-# .. Copyright (C) 2012-2017 Bryan A. Jones.
+# .. Copyright (C) 2012-2018 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -57,6 +57,7 @@ from .CodeToRest import code_to_rest_string, get_lexer
 from .CommentDelimiterInfo import SUPPORTED_GLOBS
 from . import __version__
 
+
 # source-read event
 # =================
 # The source-read_ event occurs when a source file is read. If it's code, this
@@ -102,7 +103,8 @@ def _source_read(
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
             app.warn(e, docname)
-#
+
+
 # Return True if the supplied docname is source code.
 def is_source_code(
     # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
@@ -118,13 +120,14 @@ def is_source_code(
     docname_ext = env.doc2path(docname, None)
     return Path(docname_ext) == Path(docname)
 
+
 # Monkeypatch
 # ===========
 # Sphinx doesn't naturally look for source files. Simply adding all supported
 # source file extensions to ``conf.py``'s `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_
 # doesn't work, since ``foo.c`` and ``foo.h`` will now both been seen as the
 # docname ``foo``, making then indistinguishable.
-
+#
 # get_matching_docs patch
 # -----------------------
 # So, do a bit of monkeypatching: for source files, make their docname the same
@@ -153,10 +156,12 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
                 yield filename
                 break
 
+
 # Note that this is referenced in ``sphinx.environment`` by ``from sphinx.util
 # import get_matching_docs``. So, `where to patch <https://docs.python.org/dev/library/unittest.mock.html#where-to-patch>`_
 # is in ``sphinx.environment`` instead of ``sphinx.util``.
 sphinx.environment.get_matching_docs = _get_matching_docs
+
 
 # doc2path patch
 # --------------
@@ -196,6 +201,7 @@ def _doc2path(self, docname, base=True, suffix=None):
 
 sphinx.environment.BuildEnvironment.doc2path = _doc2path
 
+
 # Correct naming for the "show source" option
 # ===========================================
 # The following function corrects the extension of source files in the "
@@ -231,6 +237,7 @@ def _html_page_context(
         # Take off the second of the double extensions.
         context['sourcename'] = sourcename[:-len(double_ext)] + sphinx_ext
 
+
 # Enki_ support
 # =============
 # `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know the
@@ -249,6 +256,7 @@ def _builder_inited(
         # If ``html_file_suffix`` is None (TypeError), Enki will assume
         # ``.html``.
         pass
+
 
 # Extension setup
 # ===============
