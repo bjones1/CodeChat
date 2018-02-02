@@ -20,7 +20,7 @@
 # *****************************************************
 # The API_ lists four functions which convert source code into either reST or
 # HTML. For a discussion on how this is accomplished, the lexer_to_rest_
-# function forms the core of the alogorithm; `step 5 <Step_5>`_ gives a detailed
+# function forms the core of the algorithm; `step 5 <Step_5>`_ gives a detailed
 # explanation of how the code is translated to reST.
 #
 # .. contents::
@@ -46,7 +46,7 @@ from docutils import io, core, nodes
 from docutils.parsers.rst.directives.body import CodeBlock
 # Import directives to register the new FencedCodeBlock and SetLine directives.
 from docutils.parsers.rst import directives, Directive, roles
-# For the docutils default stylesheet and template
+# For the docutils default style sheet and template
 from docutils.writers.html4css1 import Writer
 from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
     get_lexer_for_mimetype, guess_lexer_for_filename, guess_lexer
@@ -68,7 +68,7 @@ from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 #
 # .. _code_to_rest_string:
 #
-# This function converts a string containg code to reST, returning the result
+# This function converts a string containing code to reST, returning the result
 # as a string.
 def code_to_rest_string(
     # .. _code_str:
@@ -141,7 +141,7 @@ def code_to_html_string(
     html = core.publish_string(rest, writer_name='html',
       settings_overrides={
         # Include our custom css file: provide the path to the default css and
-        # then to our css. The stylesheet dirs must include docutils defaults.
+        # then to our css. The style sheet dirs must include docutils defaults.
         'stylesheet_path': ','.join(Writer.default_stylesheets + ['CodeChat.css']),
         'stylesheet_dirs': Writer.default_stylesheet_dirs +
             [os.path.join(os.path.dirname(__file__), 'template')],
@@ -440,7 +440,7 @@ def _pygments_lexer(
     #    >>> print(foo.__doc__)
     #    A comment. More. And more.
     #
-    # It's probabaly best not to support this case. Unfortunately, AST reports
+    # It's probably best not to support this case. Unfortunately, AST reports
     # this as a single string, rather than as a list of several elements.
     # The approach: make sure the docstring found by ast is in the text of a
     # Pygments string token. If so, replace the string token by a block
@@ -774,7 +774,7 @@ def _gather_groups_on_newlines(
 #
 #    In the code above, the text of the comment begins at column 6 of line 4,
 #    with the letter A. Therefore, line 7 lacks the necessary 6-space indent,
-#    so that no indententation will be removed from this comment.
+#    so that no indentation will be removed from this comment.
 #
 #    If line 6 was indented properly, the resulting reST would be:
 #
@@ -814,7 +814,7 @@ def _gather_groups_on_newlines(
 #         */
 #
 #      have consistent indentation. In particular, the last line of a multi-line
-#      comment may contain zero or more whitespace chararacters followed by the
+#      comment may contain zero or more whitespace characters followed by the
 #      closing block comment delimiter. However,
 #
 #      .. code-block:: c
@@ -979,7 +979,7 @@ def _classify_groups(
             # Strip all comment characters off the strings and combine them.
             string = ''.join([_remove_comment_delim(group, string,
               comment_delim_info) for group, ws_len, string in l])
-            # Remove the inital space character from the first comment,
+            # Remove the initial space character from the first comment,
             # or ws_len chars from body or end comments.
             if _is_block_body_or_end(first_group):
                 # Some of the body or end block lines may be just whitespace.
@@ -1086,7 +1086,7 @@ def _is_rest_comment(
     if group_tuple == (_GROUP.whitespace, ):
         return False
 
-    # Find the first comment. There may be whitespace preceeding it, so select
+    # Find the first comment. There may be whitespace preceding it, so select
     # the correct index.
     first_comment_index = 1 if group_tuple[0] == _GROUP.whitespace else 0
     first_group = group_tuple[first_comment_index]
@@ -1126,7 +1126,7 @@ def _is_block_body_or_end(group):
 #
 # Step #5 of lexer_to_rest_
 # -------------------------
-# When creating reST block containing code or comments, two difficulies
+# When creating reST block containing code or comments, two difficulties
 # arise: preserving the indentation
 # of both source code and comments; and preserving empty lines of code at the
 # beginning or end of a block of code. In the following examples, examine both
@@ -1182,7 +1182,7 @@ def _is_block_body_or_end(group):
 # Preserving indentation
 # ^^^^^^^^^^^^^^^^^^^^^^
 # The same fence approach also preserves indentation. Without the fences,
-# indendentation is consumed by the reST parser:
+# indentation is consumed by the reST parser:
 #
 # +--------------------------+-------------------------+-----------------------------------+
 # + Python source            + Translated to reST      + Translated to (simplified) HTML   |
@@ -1319,9 +1319,9 @@ def _is_block_body_or_end(group):
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^
 # This boils down to the following basic rules:
 #
-# #. Code blocks must be preceeded and followed by a removed marker (fences).
+# #. Code blocks must be preceded and followed by a removed marker (fences).
 #
-# #. Comments must be preeceded and followed by reST which sets the left
+# #. Comments must be preceded and followed by reST which sets the left
 #    margin based on the number of spaces before the comment.
 #
 # #. Both must be followed by an empty, unindented `reST comment`_.
@@ -1372,12 +1372,12 @@ def _generate_rest(
                 # After this directive, the following text may be indented,
                 # which would make it a part of the ``set-line`` directive! So,
                 # include an empty comment to terminate the ``set-line``, making
-                # any following indents a separate syntatical element. See the
+                # any following indents a separate syntactical element. See the
                 # end of `reST comment syntax <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#comments>`_
                 # for more discussion.
                 out_file.write('\n.. set-line:: {}\n\n..\n\n'.format(line - 4))
 
-        # Output string based on state. All code needs an inital space to
+        # Output string based on state. All code needs an initial space to
         # place it inside the fenced-code block.
         if type_ == -1:
             out_file.write(' ')
@@ -1448,7 +1448,7 @@ class _FencedCodeBlock(CodeBlock):
         # backwards, adding spaces until the first non-blank line.
         if not processedAllContent:
             for i, _ in enumerate(self.content):
-                # Recall Python indexing: while 0 is the first elemment in a
+                # Recall Python indexing: while 0 is the first element in a
                 # list, -1 is the last element, so offset all indices by -1.
                 if self.content[-i - 1]:
                     break
@@ -1470,7 +1470,7 @@ class _FencedCodeBlock(CodeBlock):
         # ``Sphinx.highlighting.highlight_block`` (see the ``force`` argument)
         # and in ``Sphinx.writers.html.HTMLWriter.visit_literal_block``, where
         # the ``code-block`` directive (which supports fragments of code, not
-        # just parsable code) has ``highlight_args['force'] = True`` set. This
+        # just parseable code) has ``highlight_args['force'] = True`` set. This
         # should be ignored by docutils, so it's done for both Sphinx and
         # docutils. **Note:** This is based on examining Sphinx 1.3.1 source
         # code.
@@ -1545,7 +1545,7 @@ class _SetLine(Directive):
 def _docname_role(
     # The local name of the interpreted role, the role name actually used in the document.
     roleName,
-    # A string containing the enitre interpreted text input, including the role and markup. Return it as a problematic node linked to a system message if a problem is encountered.
+    # A string containing the entire interpreted text input, including the role and markup. Return it as a problematic node linked to a system message if a problem is encountered.
     rawtext,
     # The interpreted text content.
     text,
