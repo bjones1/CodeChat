@@ -179,3 +179,13 @@ History of recent changes
     -   Updated docs.
     -   Used ``..`` instead of marker to indent comments, producing cleaner ReST.
     -   Split ``CodeToRest`` into ``CodeToRest``, ``CodeToRestSphinx`` modules.
+
+********************
+Ideas for the future
+********************
+-   Support Markdown, of some flavor; probably `CommonMark <http://spec.commonmark.org/>`_.
+-   Support CodeChat with Markdown in Sphinx; perhaps use `recommonmark <http://recommonmark.readthedocs.org/>`_?
+-   Implement this as a docutils or `Sphinx parser <http://www.sphinx-doc.org/en/stable/extdev/parserapi.html>`_ instead? Although I see little benefit in doing this.
+-   Provide an ``include-code`` directive, like `include <http://docutils.sourceforge.net/docs/ref/rst/directives.html#include>`_. The tricky thing would to somehow get the line numbering to work correctly.
+-   Add support for `Jekyll <https://jekyllrb.com>`_ by creating a `converter plugin <https://jekyllrb.com/docs/plugins/#converters>`_. Since all Jekyll markup files must begin with YAML from matter, and source code can't, use something like the `Jekyll Optional Front Matter plugin <https://github.com/benbalter/jekyll-optional-front-matter>`_.  A Jekyll plugin would need to invoke Python CodeChat functions. Perhaps a multi-language RPC framework would allow Ruby to communicate with Python? See `Apache Thrift <https://thrift.apache.org/>`_ and `ZeroG Ice <https://zeroc.com/products/ice>`_.
+-   As above, but use `mdBook <https://rust-lang-nursery.github.io/mdBook/>`_ or `GitBook <https://github.com/GitbookIO/gitbook>`_ instead.
