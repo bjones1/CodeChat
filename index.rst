@@ -44,6 +44,7 @@ Developer documentation
    CodeChat/__init__.py
    CodeChat/SourceClassifier.py
    CodeChat/CodeToRest.py
+   CodeChat/CodeToMarkdown.py
    CodeChat/RestToCode.py
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
@@ -59,6 +60,7 @@ To run the tests, execute ``pytest test`` from the root directory of the project
    :maxdepth: 2
 
    test/CodeToRest_test.py
+   test/CodeToMarkdown_test.py
    test/RestToCode_test.py
    test/HtmlToCode_test.py
    .travis.yml
