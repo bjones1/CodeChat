@@ -42,7 +42,7 @@ if to_code:
 #
 # Transitions
 # -----------
-# A transiton
+# A transition
 #
 # ----
 if to_code:
@@ -50,7 +50,7 @@ if to_code:
 #
 # and back.
 
-# A transiton
+# A transition
 #
 # ----
     to_indented_code()

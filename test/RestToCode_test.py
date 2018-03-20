@@ -46,7 +46,7 @@ from CodeChat.CodeToRest import code_to_rest_file, code_to_rest_string, code_to_
 
 
 # The string that results from rest_to_code not understanding the material.
-error_str = "This was not recognised as valid reST. Please check your input and try again."
+error_str = "This was not recognized as valid reST. Please check your input and try again."
 
 
 class TestRestToCodeErrCatching(object):

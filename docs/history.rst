@@ -16,12 +16,13 @@ History of recent changes
 
     -   Refactor code: separate source code classifier from reST output.
     -   Add support for Markdown.
+    -   Tested to work with Sphinx 1.7.
 
 -   1.5.9, 10-Nov-2017
 
     -   Update and clean up docs.
     -   Add the ``|docname|`` substitution definition and underlying role.
-    -   Place min Sphinx version requirement only in `../CodeChat/CodeToRest.py`; remove it from `../conf.py`.
+    -   Place minimum Sphinx version requirement only in `../CodeChat/CodeToRest.py`; remove it from `../conf.py`.
 
 -   1.5.8, 8-Nov-2017
 
@@ -165,7 +166,7 @@ History of recent changes
 
     -   Fixes so that CodeChat's Sphinx extension now works.
     -   File encoding can now be specified.
-    -   Installaiton instructions added and docs reworked.
+    -   Installation instructions added and docs reworked.
 
 -   0.0.11, released 1-May-2014:
 

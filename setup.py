@@ -111,8 +111,8 @@ setup(
     # Project Version
     # <https://packaging.python.org/en/latest/single_source_version.html>`_.
     # While I like something simple, such as ``import CodeChat`` then
-    # ``version=CodeChat.__version__`` here, this means any dependeninces of
-    # :doc:`__init__.py <CodeChat/__init__.py>` will be requred to run setup,
+    # ``version=CodeChat.__version__`` here, this means any dependencies of
+    # :doc:`__init__.py <CodeChat/__init__.py>` will be required to run setup,
     # a bad thing. So, instead I read the file in ``setup.py`` and parse the
     # version with a regex (see `version parse code
     # <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).

@@ -229,7 +229,7 @@ def _html_page_context(
 
     sourcename = context.get('sourcename')
     ext = Path(pagename).suffix
-    # The extension Sphinx uses optinonally includes the `html_sourcelink_suffix <http://www.sphinx-doc.org/en/stable/config.html#confval-html_sourcelink_suffix>`_.
+    # The extension Sphinx uses optionally includes the `html_sourcelink_suffix <http://www.sphinx-doc.org/en/stable/config.html#confval-html_sourcelink_suffix>`_.
     sphinx_ext = ext + ('' if ext == app.config.html_sourcelink_suffix else app.config.html_sourcelink_suffix)
     double_ext = ext + sphinx_ext
     # Only provide the rename if necessary.

@@ -200,7 +200,7 @@ def rest_to_code_file(
 
 # Remove the `CodeChat style` from the beginning of the given reST if it's present.
 def remove_codechat_style(rest):
-        # If the rest begind with the `CodeChat style`,
+        # If the rest begins with the `CodeChat style`,
         if rest.startswith(rest_codechat_style):
             # Snip it off.
             return rest[len(rest_codechat_style):]
@@ -228,7 +228,7 @@ def rest_to_code_string(
     # While there are still lines left, convert them.
     while i < len(line_list):
         # This try/except pair is put in place to catch unexpected input.
-        # If the try doesnt work, it checks to see if it is even valid reST input.
+        # If the try doesn't work, it checks to see if it is even valid reST input.
         try:
             line_list[i+1]
             # This is translation for regular code, not comments
@@ -374,8 +374,8 @@ def rest_to_code_string(
 
     # _`boolean`: If boolean is set to True, there was a line of invalid reST, so the program returns an error string.
     if boolean:
-        # return "This was not recognised as valid reST. Please check your input and try again."
-        string_out += "This was not recognised as valid reST. Please check your input and try again."
+        # Return an error message.
+        string_out += "This was not recognized as valid reST. Please check your input and try again."
 
     return string_out
 # |

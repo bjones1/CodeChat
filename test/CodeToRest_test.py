@@ -60,7 +60,7 @@ except pygments.util.ClassNotFound:
     PIC24 = None
 
 # Define some commonly-used strings to make testing less verbose. Per the
-# :ref:`summary_and_implementation`, "Code blocks must be preceeded and followed
+# :ref:`summary_and_implementation`, "Code blocks must be preceded and followed
 # by a removed marker (fences)." These two functions (begin fence == ``bf``, end
 # fence == ``ef``) contain the fence strings ``_generate_rest`` produces.
 bf = ('\n'
@@ -109,7 +109,7 @@ div_end = ('\n'
            '\n')
 
 
-# This acutally tests using ``code_to_rest_string``, since that makes
+# This actually tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
 class TestCodeToRest(object):
 # C-like language tests
@@ -1820,7 +1820,7 @@ main(){
         assert _is_rest_comment([
           (_GROUP.block_comment, 0, '/* */')], False, c_lexer)
 
-    ## /* comments */ with and without preceeding whitespace.
+    ## /* comments */ with and without preceding whitespace.
     def test_4ag(self):
         assert _is_rest_comment([
           (_GROUP.block_comment, 0, '/* comment */')], False, c_lexer)
@@ -1830,7 +1830,7 @@ main(){
           (_GROUP.whitespace, 0, '  '),
           (_GROUP.block_comment, 0, '/* comment */')], False, c_lexer)
 
-    ## /*comments */ with and without preceeding whitespace.
+    ## /*comments */ with and without preceding whitespace.
     def test_4ai(self):
         assert not _is_rest_comment([
           (_GROUP.block_comment, 0, '/*comment */')], False, c_lexer)
@@ -1840,7 +1840,7 @@ main(){
           (_GROUP.whitespace, 0, '  '),
           (_GROUP.block_comment, 0, '/*comment */')], False, c_lexer)
 
-    ## /* comments with and without preceeding whitespace.
+    ## /* comments with and without preceding whitespace.
     def test_4ak(self):
         assert _is_rest_comment([
           (_GROUP.block_comment_start, 0, '/* comment\n')], False, c_lexer)
@@ -1850,7 +1850,7 @@ main(){
           (_GROUP.whitespace, 0, '  '),
           (_GROUP.block_comment_start, 0, '/* comment\n')], False, c_lexer)
 
-    ## /*comments with and without preceeding whitespace.
+    ## /*comments with and without preceding whitespace.
     def test_4am(self):
         assert not _is_rest_comment([
           (_GROUP.block_comment_start, 0, '/*comment\n')], False, c_lexer)

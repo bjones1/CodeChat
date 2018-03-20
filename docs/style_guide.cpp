@@ -31,7 +31,7 @@
 //
 // #.   A comment must be placed on a line containing only comments or whitespace,
 //      but no code, preprocessor directives, etc.
-// #.   One space must follow the opening comment delimier.
+// #.   One space must follow the opening comment delimiter.
 //
 // The following provide examples of the source code and its interpretation. The
 // following source code...
@@ -39,7 +39,7 @@
 // .. code-block:: c
 //  :linenos:
 //
-//  // A line containing only a comment in interpred as reST.
+//  // A line containing only a comment in interpreted as reST.
 //      // Indented lines will be properly indented in the output, as well.
 //      /* Block comments may also be used.
 //         They may span multiple lines. */
@@ -51,7 +51,7 @@
 //
 // ...becomes...
 //
-// A line containing only a comment in interpred as reST.
+// A line containing only a comment in interpreted as reST.
     // Indented lines will be properly indented in the output, as well.
     /* Block comments may also be used.
        They may span multiple lines. */
@@ -107,7 +107,7 @@
 // --------------------------------
         // Now, text and code will be indented correctly.
 //
-// *    Document functions, classes, parameters, etc. on the preeceding line.
+// *    Document functions, classes, parameters, etc. on the preceding line.
 //      For example:
 //
 //   Provide a series of utilities to assist in eating a balanced diet.
@@ -139,20 +139,20 @@
 //
 // *    `Avoid tabs
 //      <http://tarantsov.com/hackers-coding-style-guide/why-tabs-should-be-avoided.html>`_.
-//      They make the resulting HTML less predictable. A tab after the inital
+//      They make the resulting HTML less predictable. A tab after the initial
 //      comment character(s) won't be recognized as a reST-formatted comment.
 //
 // *    Select tab stops and stick with them. Don't indent based on the size of
-//      the preceeding reST element -- this makes code difficult to edit. For
+//      the preceding reST element -- this makes code difficult to edit. For
 //      example, note how this list is constructed: not as ``* A bullet
 //      here...``, but ``*    A bullet here`` to align with tab stops. (Per the
-//      preceeding point, no tabs are used, just tab stops; in my case, all
+//      preceding point, no tabs are used, just tab stops; in my case, all
 //      indents are aligned to 4 space boundaries.)
 //
 // *    Use in-line `hyperlinks <http://sphinx-doc.org/rest.html#external-links>`_
 //      (as in this document), rather than separating the link and its definition.
 //      Include hyperlinks to essential information you find while searching the
-//      web: that magic post from stackoverflow that solved (or promised to and
+//      web: that magic post from Stack Overflow that solved (or promised to and
 //      didn't) your problem. Link to a reference manual when calling from a
 //      documented API. Link to other parts of your code that cooperate with the
 //      lines you're documenting.
@@ -188,7 +188,7 @@
 //      your program. For example, use external drawing programs to produce
 //      diagrams. Take a screenshot of a GUI or some graphical result from your
 //      code. Scan and mark up a datasheet, showing what choices you made in your
-//      code. Take a picture of your code in use -- GPS nagivation on a smart phone,
+//      code. Take a picture of your code in use -- GPS navigation on a smart phone,
 //      etc.
 //
 // *    Avoid the use of `Sphinx domains <http://sphinx-doc.org/domains.html>`_.

@@ -120,7 +120,7 @@ def _debug_print(val):
 #
 # Implementation
 # ==============
-# This function transforms source code in any format supported by `CommentDelimiterInfo.py` into an interable of ``(type, string)`` tuples, where:
+# This function transforms source code in any format supported by `CommentDelimiterInfo.py` into an iterable of ``(type, string)`` tuples, where:
 #
 # - ``type`` is an integer giving the number of spaces in this comment's indent, or -1 if the comment is code. Note that non-CodeChat comments are classified as code.
 # - ``string`` is one line of code or comment, ending with a newline. Comments are supplied with the indent and delimiters removed.
@@ -381,7 +381,7 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
         if text.startswith(u'\ufeff'):
             text = text[len(u'\ufeff'):]
 
-    # text now *is* a unicode string
+    # text now *is* a Unicode string
     text = text.replace('\r\n', '\n')
     text = text.replace('\r', '\n')
     if self.stripall:
@@ -413,7 +413,7 @@ def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
 # -----------------------
 # Given tokens, group them.
 def _group_lexer_tokens(
-    # An interable of (tokentype, string) pairs provided by the lexer, per
+    # An iterable of (tokentype, string) pairs provided by the lexer, per
     # `get_tokens
     # <http://pygments.org/docs/api/#pygments.lexer.Lexer.get_tokens>`_.
     iter_token,
@@ -446,7 +446,7 @@ def _group_lexer_tokens(
                 tokentype = Token.Comment.Multiline
                 string = inspect.cleandoc(string)
                 # Insert an extra space after the docstring delimiter, making
-                # this look like a reST commment.
+                # this look like a reST comment.
                 string = string[0:3] + ' ' + string[3:]
         group = _group_for_tokentype(tokentype, comment_is_inline,
           comment_is_block)
@@ -913,7 +913,7 @@ def _remove_comment_delim(
 #    delimiters.
 def _remove_beginning_comment_delim(
     # Either the number of characters in the beginning delimiter, or a tuple of
-    # strings which give all valie beginning comment delimiters.
+    # strings which give all valid beginning comment delimiters.
     beginning_comment_delim_seq,
     # The string which start with the delimiter to be removed.
     string):
