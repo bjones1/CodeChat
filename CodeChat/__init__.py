@@ -21,6 +21,13 @@
 # This file defines this directory as a Python package, which contains the
 # CodeChat application.
 #
+# .. digraph:: Overview
+#
+#   "Source code" -> "ReST" [label="code_to_rest"]
+#   "ReST" -> "HTML" [label="docutils.publish_string\lSphinx\l"]
+#   "HTML" -> "ReST" [label="html_to_rest"]
+#
+#
 # Give the version number, which is read by `../setup.py` during packaging.
 # This is chosen following the `version convention
 # <http://packaging.python.org/en/latest/tutorial.html#version>`_.

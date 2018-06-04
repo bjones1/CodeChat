@@ -49,7 +49,7 @@ import alabaster
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = 'CodeChat'
-copyright = '2017, Bryan A. Jones'
+copyright = '2018, Bryan A. Jones'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
@@ -108,7 +108,7 @@ pygments_style = 'sphinx'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
 # note:** The ``CodeChat.CodeToRestSphinx`` extension is mandatory; without it,
 # CodeChat will not translate source code to reST and then (via Sphinx) to html.
-extensions = ['CodeChat.CodeToRestSphinx', 'alabaster']
+extensions = ['CodeChat.CodeToRestSphinx', 'alabaster', 'sphinx.ext.graphviz']
 
 # `templates_path <http://sphinx-doc.org/config.html#confval-templates_path>`_:
 # Add any paths that contain templates here, relative to this directory.
