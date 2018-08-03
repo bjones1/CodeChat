@@ -37,7 +37,6 @@
 #
 # Standard library
 # ----------------
-import re
 from os import path
 import fnmatch
 import codecs
@@ -53,7 +52,7 @@ import pygments.util
 
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, get_lexer
+from .CodeToRest import code_to_rest_string, get_lexer, add_highlight_language
 from .CommentDelimiterInfo import SUPPORTED_GLOBS
 from . import __version__
 
@@ -89,16 +88,7 @@ def _source_read(
             # Translate code to reST.
             app.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
-
-            # Add in the highlight language to use, unless there's potentially
-            # `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_.
-            # It's hard to know in this case where the ``.. highlight``
-            # directive can be safely placed. Putting it before file-wide
-            # metadata demotes it to not being metadata. Finding the right place
-            # to put the ``.. highlight`` directive after the metadata is
-            # difficult to know.
-            if not re.search('^:(tocdepth|nocomments|orphan):', source[0], re.MULTILINE):
-                source[0] = '.. highlight:: {}\n\n{}'.format(lexer.aliases[0], source[0])
+            source[0] = add_highlight_language(source[0], lexer)
 
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
@@ -199,13 +189,14 @@ def _doc2path(self, docname, base=True, suffix=None):
     else:
         return path.join(base, docname) + suffix
 
+
 sphinx.environment.BuildEnvironment.doc2path = _doc2path
 
 
 # Correct naming for the "show source" option
 # ===========================================
-# The following function corrects the extension of source files in the "
-# source" link. By default, Sphinx (in ``sphinx.builders.html.StandaloneHTMLBuilder.get_doc_context``)
+# The following function corrects the extension of source files in the
+# "source" link. By default, Sphinx (in ``sphinx.builders.html.StandaloneHTMLBuilder.get_doc_context``)
 # creates a sourcename by appending a file's extension to the value returned by
 # ``doc2path``. For non-source files, ``doc2path``'s return value contains no
 # extension, so this works fine. However, for source files, ``doc2path``'s

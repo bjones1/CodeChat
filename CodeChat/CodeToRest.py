@@ -33,17 +33,18 @@
 from io import StringIO
 import os.path
 from pathlib import Path
+import re
 
 # Third-party imports
 # -------------------
-# Used to open files with unknown encodings and to run docutils itself.
 from docutils import io, core, nodes
-# Import CodeBlock as a base class for FencedCodeBlock.
 from docutils.parsers.rst.directives.body import CodeBlock
-# Import directives to register the new FencedCodeBlock and SetLine directives.
 from docutils.parsers.rst import directives, Directive, roles
-# For the docutils default style sheet and template
 from docutils.writers.html4css1 import Writer
+from docutils.parsers.rst import states
+from docutils import statemachine, utils
+from docutils.utils.error_reporting import SafeString, ErrorString
+
 
 # Local application imports
 # -------------------------
@@ -110,8 +111,9 @@ def code_to_rest_file(
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     code_str = fi.read()
-    lexer = get_lexer(filename=source_path, code=code_str, **options)
-    rst = code_to_rest_string(code_str, lexer=lexer)
+    # If not already present, provde the filename of the source to help in identifying a lexer.
+    options.setdefault('filename', source_path)
+    rst = code_to_rest_string(code_str, **options)
     fo.write(rst)
 
 
@@ -538,7 +540,7 @@ class _FencedCodeBlock(CodeBlock):
         # Note that the nodeList returned by the CodeBlock directive contains
         # only a single ``literal_block`` node. The setting should be applied to
         # it.
-        nodeList[0]['highlight_args'] = {'force' : True}
+        nodeList[0]['highlight_args'] = {'force': True}
 
         return nodeList
 
@@ -638,7 +640,161 @@ def _docname_role(
     return [nodes.Text(path_component, rawtext, **options)], []
 
 
+# .. add_highlight_language:
+#
+# add_highlight_language
+# ^^^^^^^^^^^^^^^^^^^^^^
+# This function returns the ``source``; it also prepends a Sphinx `highlight directive <http://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-highlight>`_ if possible.
+def add_highlight_language(
+    # The source reST to potentially prepend a `highlight directive`_ to.
+    source,
+    # The lexer which was used to produce this source.
+    lexer):
+
+    # If there's `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_, then it's hard to know where the `highlight directive`_ can be safely placed:
+    #
+    # - Putting it before file-wide metadata demotes it to not being metadata.
+    # - Finding the right place to put the ``.. highlight`` directive after the metadata is difficult to know.
+    if not re.search('^:(tocdepth|nocomments|orphan):', source, re.MULTILINE):
+        # There's no file-wide metadata. Add the `highlight directive`_.
+        return '.. highlight:: {}\n\n{}'.format(lexer.aliases[0], source)
+    else:
+        # There might be file-wide metadata.
+        return source
+
+
+# .. _`_CodeInclude`:
+#
+# _CodeInclude
+# ^^^^^^^^^^^^
+# Provide a way to include source code to be processed by CodeChat.
+#
+# This is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``.
+class _CodeInclude(Directive):
+
+    """
+    Include content read from a separate source file.
+
+    Content will be lexed based on the provided lexer then parsed by the
+    parser. The encoding of the included file can be specified. Only
+    a part of the given file argument may be included by specifying
+    start and end line or text to match before and/or after the text
+    to be used.
+    """
+
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+    # **Updated** ``option_spec`` for this directive.
+    option_spec = {'lexer': directives.unchanged,
+                   'encoding': directives.encoding,
+                   'tab-width': int,
+                   'start-line': int,
+                   'end-line': int,
+                   'start-after': directives.unchanged_required,
+                   'end-before': directives.unchanged_required}
+
+    standard_include_path = os.path.join(os.path.dirname(states.__file__),
+                                         'include')
+
+    def run(self):
+        """Include a file as part of the content of this reST file."""
+        if not self.state.document.settings.file_insertion_enabled:
+            raise self.warning('"%s" directive disabled.' % self.name)
+        source = self.state_machine.input_lines.source(
+            self.lineno - self.state_machine.input_offset - 1)
+        source_dir = os.path.dirname(os.path.abspath(source))
+        path = directives.path(self.arguments[0])
+        if path.startswith('<') and path.endswith('>'):
+            path = os.path.join(self.standard_include_path, path[1:-1])
+        path = os.path.normpath(os.path.join(source_dir, path))
+        path = utils.relative_path(None, path)
+        path = nodes.reprunicode(path)
+        encoding = self.options.get(
+            'encoding', self.state.document.settings.input_encoding)
+        e_handler=self.state.document.settings.input_encoding_error_handler
+        tab_width = self.options.get(
+            'tab-width', self.state.document.settings.tab_width)
+        try:
+            self.state.document.settings.record_dependencies.add(path)
+            include_file = io.FileInput(source_path=path,
+                                        encoding=encoding,
+                                        error_handler=e_handler)
+        except UnicodeEncodeError as error:
+            raise self.severe('Problems with "%s" directive path:\n'
+                              'Cannot encode input file path "%s" '
+                              '(wrong locale?).' %
+                              (self.name, SafeString(path)))
+        except IOError as error:
+            raise self.severe('Problems with "%s" directive path:\n%s.' %
+                      (self.name, ErrorString(error)))
+        startline = self.options.get('start-line', None)
+        endline = self.options.get('end-line', None)
+        try:
+            if startline or (endline is not None):
+                lines = include_file.readlines()
+                rawtext = ''.join(lines[startline:endline])
+            else:
+                rawtext = include_file.read()
+        except UnicodeError as error:
+            raise self.severe('Problem with "%s" directive:\n%s' %
+                              (self.name, ErrorString(error)))
+        # start-after/end-before: no restrictions on newlines in match-text,
+        # and no restrictions on matching inside lines vs. line boundaries
+        after_text = self.options.get('start-after', None)
+        if after_text:
+            # skip content in rawtext before *and incl.* a matching text
+            after_index = rawtext.find(after_text)
+            if after_index < 0:
+                raise self.severe('Problem with "start-after" option of "%s" '
+                                  'directive:\nText not found.' % self.name)
+            rawtext = rawtext[after_index + len(after_text):]
+        before_text = self.options.get('end-before', None)
+        if before_text:
+            # skip content in rawtext after *and incl.* a matching text
+            before_index = rawtext.find(before_text)
+            if before_index < 0:
+                raise self.severe('Problem with "end-before" option of "%s" '
+                                  'directive:\nText not found.' % self.name)
+            rawtext = rawtext[:before_index]
+
+        # **Added code** from here...
+        ##---------------------------
+        # Only Sphinx has the ``env`` attribute.
+        env = getattr(self.state.document.settings, 'env', None)
+
+        # If the lexer is specified, include it.
+        code_to_rest_options = {}
+        lexer_alias = self.options.get('lexer')
+        if lexer_alias:
+            code_to_rest_options['alias'] = lexer_alias
+        elif env:
+            # If Sphinx is running, try getting a user-specified lexer from the Sphinx configuration.
+            lfg = env.app.config.CodeChat_lexer_for_glob
+            for glob, lexer_alias in lfg.items():
+                if Path(path).match(glob):
+                    code_to_rest_options['alias'] = lexer_alias
+
+        # Translate the source code to reST.
+        lexer = get_lexer(filename=path, code=rawtext, **code_to_rest_options)
+        rawtext = code_to_rest_string(rawtext, lexer=lexer)
+
+        # If Sphinx is running, insert the appropriate highlight directive.
+        if env:
+            rawtext = add_highlight_language(rawtext, lexer)
+        ##------------
+        # ... to here.
+
+        include_lines = statemachine.string2lines(rawtext, tab_width,
+                                                  convert_whitespace=True)
+        # **Deleted code**: Options for ``literal`` and ``code`` don't apply.
+        self.state_machine.insert_input(include_lines, path)
+        return []
+
+
 # Register the new directives and role with docutils.
 directives.register_directive('fenced-code', _FencedCodeBlock)
 directives.register_directive('set-line', _SetLine)
+# Imitate Sphinx's naming convention of `literalinclude <http://www.sphinx-doc.org/en/stable/markup/code.html#directive-literalinclude>`_.
+directives.register_directive('codeinclude', _CodeInclude)
 roles.register_local_role('docname', _docname_role)
