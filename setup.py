@@ -20,6 +20,7 @@
 # ****************************************
 # Builds and installs CodeChat.
 #
+#
 # Packaging notes
 # ===============
 # Reading to get up to speed:
@@ -30,6 +31,7 @@
 #
 # * `setuptools <https://pythonhosted.org/setuptools>`_ - A distutils
 #   replacement which can install dependencies, so I use it.
+#
 #
 # .. _to-package:
 #
@@ -47,9 +49,11 @@
 #
 #   pip install -e .
 #
+#
 # Packaging script
 # ================
 # Otherwise known as the evils of ``setup.py``.
+#
 #
 # PyPA copied code
 # ----------------
@@ -76,6 +80,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
     # The inclusion of a raw tag causes `PyPI <http://pypi.python.org>`_ to not render the reST. Ouch. Remove it before uploading.
     long_description = re.sub('\.\. raw.*<\/iframe>', '', long_description, flags=re.DOTALL)
 
+
 # This code was copied from `version parse code`_. See ``version`` in the call
 # to ``setup`` below.
 def read(*names, **kwargs):
@@ -85,6 +90,7 @@ def read(*names, **kwargs):
     ) as fp:
         return fp.read()
 
+
 def find_version(*file_paths):
     version_file = read(*file_paths)
     version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
@@ -92,6 +98,7 @@ def find_version(*file_paths):
     if version_match:
         return version_match.group(1)
     raise RuntimeError("Unable to find version string.")
+
 
 # My code
 # -------

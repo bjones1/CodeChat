@@ -19,7 +19,7 @@
 # |docname| - a module to translate source code to reST
 # *****************************************************
 # The API_ lists four functions which convert source code into either reST or
-# HTML. It relies on `source_lexer` to classify the source as code or comment, then `_generate_rest`_ to convert this to reST. `Supporting reST directives and roles`_ defines CodeChat-specific syntax used in this conversion.
+# HTML. It relies on `source_lexer` to classify the source as code or comment, then `_generate_rest`_ to convert this to reST. `Supporting reST directives and roles`_ define CodeChat-specific syntax used in this conversion.
 #
 # .. contents::
 #
@@ -50,6 +50,7 @@ from docutils.writers.html4css1 import Writer
 from .SourceClassifier import source_lexer, get_lexer, _debug_print, \
     codechat_style
 
+
 # API
 # ===
 # The following routines provide easy access to the core functionality of this
@@ -74,6 +75,7 @@ def code_to_rest_string(
         output_rst.write('.. error:: {}\n\n'.format(ast_syntax_error))
     _generate_rest(classified_lines, output_rst)
     return output_rst.getvalue()
+
 
 # .. _code_to_rest_file:
 #
@@ -112,6 +114,7 @@ def code_to_rest_file(
     rst = code_to_rest_string(code_str, lexer=lexer)
     fo.write(rst)
 
+
 # .. _code_to_html_string:
 #
 # This converts a string containing source code to HTML, which it returns as a
@@ -145,6 +148,7 @@ def code_to_html_string(
         'warning_stream' : warning_stream})
     return html
 
+
 # .. _code_to_html_file:
 #
 # Convert source code stored in a file to HTML, which is saved in another file.
@@ -152,7 +156,7 @@ def code_to_html_file(
     # See source_path_.
     source_path,
     # Destination file name to hold the generated HTML. This file will be
-    # overwritten. If not supplied, *source_path*\ ``.html`` will be assumed.
+    # overwritten. If not supplied, ``source_path.html`` will be assumed.
     html_path=None,
     # See input_encoding_.
     input_encoding=None,
@@ -538,6 +542,7 @@ class _FencedCodeBlock(CodeBlock):
 
         return nodeList
 
+
 # This directive allows changing the line number at which errors will be
 # reported. ``.. set-line:: 10`` makes the current line report as line 10,
 # regardless of its actual location in the file.
@@ -588,6 +593,7 @@ class _SetLine(Directive):
         # This directive create no nodes.
         return []
 
+
 # .. _`_docname_role`:
 #
 # _docname_role
@@ -607,7 +613,7 @@ def _docname_role(
     text,
     # The line number where the interpreted text begins.
     lineno,
-    # The docutils.parsers.rst.states.Inliner object that called this function. It contains the several attributes useful for error reporting and document tree access.
+    # The ``docutils.parsers.rst.states.Inliner`` object that called this function. It contains the several attributes useful for error reporting and document tree access.
     inliner,
     # A dictionary of directive options for customization (from the "role" directive), to be interpreted by this function. Used for additional attributes for the generated elements and other functionality.
     options={},

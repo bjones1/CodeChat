@@ -54,8 +54,8 @@ def code(code_str):
 # a ``set-line`` directive to show line numbers of the comments correctly. This
 # function generates the same string.
 def div(
-   # The size of the indent, in characters.
-   size):
+    # The size of the indent, in characters.
+    size):
 
     # Each space = 0.5 em, so a 3-space indent would be ``size=1.5``.
     return '\n<div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(size*0.5)
