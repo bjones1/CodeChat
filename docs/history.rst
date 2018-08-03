@@ -193,7 +193,7 @@ Ideas for the future
 
     -   For Sphinx.
     -   For ``code_to_xxx_file`` functions.
-    -   For the directives and role in `CodeChat/CodeToRest.py`.
+    -   For the directives and role in `../CodeChat/CodeToRest.py`.
 
--   Support CodeChat with Markdown in Sphinx; perhaps use `recommonmark <http://recommonmark.readthedocs.org/>`_?
+-   Support CodeChat with Markdown in Sphinx. Need to add some way to specify the markup used, either on a file-by-file basis, or as a config setting for the whole project.
 -   Use a `add_source_parser <http://www.sphinx-doc.org/en/master/extdev/appapi.html#sphinx.application.Sphinx.add_source_parser>`_ instead of the current monkeypatching approach for better Sphinx support. Note that Sphinx 1.8 is deprecating the ``suffix`` argument. The big challenge/question: given two documents named ``doc.md`` and ``doc.rst``, do they have differing docnames?
