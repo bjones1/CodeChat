@@ -44,7 +44,7 @@ import alabaster
 ##sys.path.insert(0, os.path.abspath('.'))
 #
 # `Project information <http://sphinx-doc.org/config.html#project-information>`_
-# ------------------------------------------------------------------------------
+# ==============================================================================
 # `project <http://sphinx-doc.org/config.html#confval-project>`_  and
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
@@ -99,7 +99,7 @@ pygments_style = 'sphinx'
 
 #
 # `General configuration <http://sphinx-doc.org/config.html#general-configuration>`_
-# ----------------------------------------------------------------------------------
+# ==================================================================================
 # `extensions <http://sphinx-doc.org/config.html#confval-extensions>`_: If your
 # documentation needs a minimal Sphinx version, state it here.
 ##needs_sphinx = '1.5'
@@ -129,8 +129,6 @@ rst_epilog = (
 # The suffix of source filenames. Add ``.in`` and ``.spec`` files (see below).
 source_suffix = '.rst'
 
-# .. _CodeChat_lexer_for_glob:
-#
 # **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
 # (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
 # any file which matches the given glob-style pattern (e.g. `glob
@@ -139,17 +137,15 @@ CodeChat_lexer_for_glob = {
     # CSS files are auto-detected as a CSS + Lasso file by Pygments,
     # causing it to display incorrectly. Define them as CSS only.
     '*.css': 'CSS',
-    # These` files use # as a comment. So does Perl.. Ugly, no?
+    # These` files use # as a comment. So does Perl. Ugly, no?
     'MANIFEST.in': 'Perl',
     '.gitignore': 'Perl',
 }
 
-# .. _CodeChat_excludes:
-#
-# **CodeChat note::** This is a list of exclude_patterns_ which applies only to
-# source documents; exclude_patterns_ will exclude the given files from all of
-# Sphinx (for example, files here won't be included even if they're mentioned in
-# html_static_path_.
+# **CodeChat note:** _`CodeChat_excludes` is a list of exclude_patterns_ which
+# applies only to source documents; in constrast, exclude_patterns_ will exclude
+# the given files from all of Sphinx (for example, exclude_patterns_ files
+# won't be included even if they're mentioned in html_static_path_).
 CodeChat_excludes = []
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
@@ -199,7 +195,7 @@ default_role = 'any'
 keep_warnings = True
 #
 # `Options for HTML output <http://sphinx-doc.org/config.html#options-for-html-output>`_
-# --------------------------------------------------------------------------------------
+# ======================================================================================
 # `html_theme <http://sphinx-doc.org/config.html#confval-html_theme>`_: The
 # theme to use for HTML and HTML Help pages.
 html_theme = 'alabaster'

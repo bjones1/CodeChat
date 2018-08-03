@@ -21,6 +21,7 @@
 #
 #
 # .. contents::
+#   :local:
 #
 # Imports
 # =======

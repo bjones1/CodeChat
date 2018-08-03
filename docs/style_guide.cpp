@@ -23,6 +23,8 @@
 //  This "source file" does not contain any useful, executable code. Instead,
 //  it exemplifies literate programming style.
 //
+// .. _CodeChat syntax:
+//
 // Syntax
 // ======
 // Before covering style, the following shows the syntax used to embed reST in

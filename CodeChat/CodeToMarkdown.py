@@ -61,6 +61,8 @@ from .SourceClassifier import source_lexer, get_lexer, _debug_print, \
 #
 # .. _code_to_markdown_string:
 #
+# code_to_markdown_string
+# -----------------------
 # This function converts a string containing source code to Markdown, preserving all indentations of both source code and comments. To do so, the comment characters are stripped from CodeChat-formatted comments and all code is placed inside fenced code blocks.
 def code_to_markdown_string(
     # _`code_str`: the code to translate to markdown.
@@ -81,6 +83,8 @@ def code_to_markdown_string(
 
 # .. _code_to_markdown_file:
 #
+# code_to_markdown_file
+# ---------------------
 # Convert a source file to a Markdown file.
 def code_to_markdown_file(
     # .. _source_path:

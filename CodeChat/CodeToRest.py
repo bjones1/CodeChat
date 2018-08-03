@@ -22,6 +22,8 @@
 # HTML. It relies on `source_lexer` to classify the source as code or comment, then `_generate_rest`_ to convert this to reST. `Supporting reST directives and roles`_ define CodeChat-specific syntax used in this conversion.
 #
 # .. contents::
+#   :local:
+#   :depth: 2
 #
 # Imports
 # =======
@@ -60,6 +62,8 @@ from .SourceClassifier import source_lexer, get_lexer, _debug_print, \
 #
 # .. _code_to_rest_string:
 #
+# code_to_rest_string
+# -------------------
 # This function converts a string containing source code to reST, preserving all indentations of both source code and comments. To do so, the comment characters are stripped from reST-formatted comments and all code is placed inside code blocks.
 def code_to_rest_string(
     # _`code_str`: the code to translate to reST.
@@ -80,6 +84,8 @@ def code_to_rest_string(
 
 # .. _code_to_rest_file:
 #
+# code_to_rest_file
+# -----------------
 # Convert a source file to a reST file.
 def code_to_rest_file(
     # .. _source_path:
@@ -119,6 +125,8 @@ def code_to_rest_file(
 
 # .. _code_to_html_string:
 #
+# code_to_html_string
+# -------------------
 # This converts a string containing source code to HTML, which it returns as a
 # string.
 def code_to_html_string(
@@ -153,6 +161,8 @@ def code_to_html_string(
 
 # .. _code_to_html_file:
 #
+# code_to_html_file
+# -----------------
 # Convert source code stored in a file to HTML, which is saved in another file.
 def code_to_html_file(
     # See source_path_.
@@ -475,6 +485,11 @@ def _exit_state(
 
 # Supporting reST directives and roles
 # ------------------------------------
+#
+# .. _`_FencedCodeBlock`:
+#
+# _FencedCodeBlock
+# ^^^^^^^^^^^^^^^^
 # Create a fenced code block: the first and last lines are presumed to be
 # fences, which keep the parser from discarding whitespace. Drop these, then
 # treat everything else as code.
@@ -545,6 +560,10 @@ class _FencedCodeBlock(CodeBlock):
         return nodeList
 
 
+# .. _`_SetLine`:
+#
+# _SetLine
+# ^^^^^^^^
 # This directive allows changing the line number at which errors will be
 # reported. ``.. set-line:: 10`` makes the current line report as line 10,
 # regardless of its actual location in the file.

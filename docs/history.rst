@@ -17,11 +17,14 @@ History of recent changes
     -   Refactor code: separate source code classifier from reST output.
     -   Add support for Markdown.
     -   Tested to work with Sphinx 1.7.
+    -   Add the `codeinclude <_CodeInclude>` directive.
+    -   Provide default destination filenames for ``code_to_xxx_file`` functions.
+    -   Add the `reference_manual`.
 
 -   1.5.9, 10-Nov-2017
 
     -   Update and clean up docs.
-    -   Add the ``|docname|`` substitution definition and underlying role.
+    -   Add the ``|docname|`` substitution definition and `underlying role <_docname_role>`.
     -   Place minimum Sphinx version requirement only in `../CodeChat/CodeToRest.py`; remove it from `../conf.py`.
 
 -   1.5.8, 8-Nov-2017
@@ -185,9 +188,12 @@ History of recent changes
 ********************
 Ideas for the future
 ********************
--   Support Markdown, of some flavor; probably `CommonMark <http://spec.commonmark.org/>`_.
+-   Write a decent manual.
+-   Testing:
+
+    -   For Sphinx.
+    -   For ``code_to_xxx_file`` functions.
+    -   For the directives and role in `CodeChat/CodeToRest.py`.
+
 -   Support CodeChat with Markdown in Sphinx; perhaps use `recommonmark <http://recommonmark.readthedocs.org/>`_?
--   Implement this as a docutils or `Sphinx parser <http://www.sphinx-doc.org/en/stable/extdev/parserapi.html>`_ instead? Although I see little benefit in doing this.
--   Provide an ``include-code`` directive, like `include <http://docutils.sourceforge.net/docs/ref/rst/directives.html#include>`_. The tricky thing would to somehow get the line numbering to work correctly.
--   Add support for `Jekyll <https://jekyllrb.com>`_ by creating a `converter plugin <https://jekyllrb.com/docs/plugins/#converters>`_. Since all Jekyll markup files must begin with YAML from matter, and source code can't, use something like the `Jekyll Optional Front Matter plugin <https://github.com/benbalter/jekyll-optional-front-matter>`_.  A Jekyll plugin would need to invoke Python CodeChat functions. Perhaps a multi-language RPC framework would allow Ruby to communicate with Python? See `Apache Thrift <https://thrift.apache.org/>`_ and `ZeroG Ice <https://zeroc.com/products/ice>`_.
--   As above, but use `mdBook <https://rust-lang-nursery.github.io/mdBook/>`_ or `GitBook <https://github.com/GitbookIO/gitbook>`_ instead.
+-   Use a `add_source_parser <http://www.sphinx-doc.org/en/master/extdev/appapi.html#sphinx.application.Sphinx.add_source_parser>`_ instead of the current monkeypatching approach for better Sphinx support. Note that Sphinx 1.8 is deprecating the ``suffix`` argument. The big challenge/question: given two documents named ``doc.md`` and ``doc.rst``, do they have differing docnames?

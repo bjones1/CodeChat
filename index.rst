@@ -24,6 +24,7 @@ User documentation
    docs/rest-primer.rst
    docs/style_guide.cpp
    docs/install.rst
+   docs/reference_manual.rst
 
 **********************
 Template documentation
