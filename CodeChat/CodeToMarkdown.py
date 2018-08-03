@@ -18,7 +18,7 @@
 # *********************************************************
 # |docname| - a module to translate source code to Markdown
 # *********************************************************
-# The API_ lists two functions which convert source code into either Markdown. It relies on `source_lexer` to classify the source as code or comment, then `_generate_markdown`_ to convert this to Markdown. To convert this output to HTML using `Markdown <https://python-markdown.github.io/>`_ or `CommonMark <https://github.com/rtfd/CommonMark-py#commonmark-py>`_:
+# The API_ lists two functions which convert source code into Markdown. It relies on `source_lexer` to classify the source as code or comment, then `_generate_markdown`_ to convert this to Markdown. To convert this output to HTML using `Markdown <https://python-markdown.github.io/>`_ or `CommonMark <https://github.com/rtfd/CommonMark-py#commonmark-py>`_:
 #
 # .. code-block:: Python
 #   :linenos:
@@ -88,8 +88,8 @@ def code_to_markdown_file(
     # Path to a source code file to process.
     source_path,
     # Path to a destination Markdown file to create. It will be overwritten if it
-    # already exists.
-    md_path,
+    # already exists. If not specified, it is ``source_path.md``.
+    md_path=None,
     # .. _input_encoding:
     #
     # Encoding to use for the input file. The default of None detects the
@@ -102,10 +102,14 @@ def code_to_markdown_file(
     # See `options <options>`.
     **options):
 
+    # Provide a default ``rst_path``.
+    if not md_path:
+        md_path = source_path + '.md'
     with open(source_path, encoding=input_encoding) as fi:
         code_str = fi.read()
-    lexer = get_lexer(filename=source_path, code=code_str, **options)
-    rst = code_to_markdown_string(code_str, lexer=lexer)
+    # If not already present, provde the filename of the source to help in identifying a lexer.
+    options.setdefault('filename', source_path)
+    rst = code_to_markdown_string(code_str, **options)
     with open(md_path, 'w', encoding=output_encoding) as fo:
         fo.write(rst)
 
@@ -135,7 +139,6 @@ def _generate_markdown(
 
     # Keep track of the current line number.
     line = 1
-
 
     for type_, string in classified_lines:
         _debug_print('type_ = {}, line = {}, string = {}\n'.format(type_, line, [string]))

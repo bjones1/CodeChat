@@ -84,7 +84,7 @@ def code_to_rest_file(
     # Path to a source code file to process.
     source_path,
     # Path to a destination reST file to create. It will be overwritten if it
-    # already exists.
+    # already exists. If not specified, it is ``source_path.rst``.
     rst_path,
     # .. _input_encoding:
     #
@@ -98,6 +98,9 @@ def code_to_rest_file(
     # See `options <options>`.
     **options):
 
+    # Provide a default ``rst_path``.
+    if not rst_path:
+        rst_path = source_path + '.rst'
     # Use docutil's I/O classes to better handle and sniff encodings.
     #
     # Note: both these classes automatically close themselves after a
