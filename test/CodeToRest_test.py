@@ -32,6 +32,7 @@
 # ---------------
 from io import StringIO
 import re
+import shutil
 
 # Third-party imports
 # -------------------
@@ -111,7 +112,7 @@ div_end = ('\n'
 
 # This actually tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
-class TestCodeToRest(object):
+class TestCodeToRest:
 # C-like language tests
 # =====================
     # multi-test: Check that the given code's output is correct over several
@@ -1441,7 +1442,7 @@ class TestCodeToRest(object):
 # Fenced code block testing
 # =========================
 # Use docutils to test converting a fenced code block to HTML.
-class TestRestToHtml(object):
+class TestRestToHtml:
     # Use docutils to convert reST to HTML, then look at the resulting string.
     def t(self, rest):
         html = core.publish_string(rest, writer_name='html').decode('utf-8')
@@ -1602,16 +1603,20 @@ class TestRestToHtml(object):
 
 # Poor coverage of code_to_html_file
 # ==================================
-class TestCodeToHtmlFile(object):
-    def test_1(self):
-        code_to_html_file('CodeChat/CodeToRestSphinx.py')
+class TestCodeToHtmlFile:
+    def test_1(self, tmpdir):
+        test_file = 'CodeToRestSphinx.py'
+        test_file_dest = tmpdir.join(test_file)
+        shutil.copyfile('CodeChat/' + test_file, str(test_file_dest))
+        code_to_html_file(str(test_file_dest))
+
 
 # Tests of lexer_to_code and subroutines
 # ======================================
 c_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name])
 py_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name])
 
-class TestCodeToRestNew(object):
+class TestCodeToRestNew:
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
         test_py_code = '# A comment\nan_identifier\n'
