@@ -44,10 +44,16 @@ from pathlib import Path
 
 # Third-party imports
 # -------------------
+from six import iteritems
 from sphinx.util import get_matching_files
 from sphinx.util.matching import compile_matchers
 import sphinx.environment
 from sphinx.util.osutil import SEP
+# The location of this class varies with the Sphinx version. It's only needed for Sphinx 1.8.0+.
+try:
+    from sphinx.io import FiletypeNotFoundError
+except ImportError:
+    FiletypeNotFoundError = None
 import pygments.util
 
 # Local application imports
@@ -158,7 +164,7 @@ sphinx.environment.get_matching_docs = _get_matching_docs
 # Next, the way docnames get transformed back to a full path needs to be fixed
 # for source files. Specifically, a docname might be the source file, without
 # adding an extension. This code comes from ``sphinx.environment`` of Sphinx
-# 1.3.1. See also the official `doc2path <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_
+# 1.8.1. See also the official `doc2path <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_
 # Sphinx docs.
 def _doc2path(self, docname, base=True, suffix=None):
     """Return the filename for the document name.
@@ -170,18 +176,17 @@ def _doc2path(self, docname, base=True, suffix=None):
     """
     docname = docname.replace(SEP, path.sep)
     if suffix is None:
+        # Use first candidate if there is not a file for any suffix
+        suffix = next(iter(self.config.source_suffix))
         for candidate_suffix in self.config.source_suffix:
             if path.isfile(path.join(self.srcdir, docname) +
                            candidate_suffix):
                 suffix = candidate_suffix
                 break
         else:
-            # Three lines of code added here -- check for the no-extenion case.
+            # Two lines of code added here -- check for the no-extenion case.
             if path.isfile(path.join(self.srcdir, docname)):
                 suffix = ''
-            else:
-                # document does not exist
-                suffix = self.config.source_suffix[0]
     if base is True:
         return path.join(self.srcdir, docname) + suffix
     elif base is None:
@@ -191,6 +196,29 @@ def _doc2path(self, docname, base=True, suffix=None):
 
 
 sphinx.environment.BuildEnvironment.doc2path = _doc2path
+
+
+# get_filetype patch
+# ------------------
+# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as restructuredtext. This was taken from ``sphinx.io``, version 1.8.1. This patch only matters for Sphinx 1.8.0+; previous versions work without it.
+def _get_filetype(source_suffix, filename):
+    # type: (Dict[unicode, unicode], unicode) -> unicode
+    for suffix, filetype in iteritems(source_suffix):
+        if filename.endswith(suffix):
+            # If default filetype (None), considered as restructuredtext.
+            return filetype or 'restructuredtext'
+    else:
+        # The following code was added.
+        source_suffixpatterns = ( SUPPORTED_GLOBS |
+                                 set(_config.CodeChat_lexer_for_glob.keys()) )
+        for source_suffixpattern in source_suffixpatterns:
+            if fnmatch.fnmatch(filename, source_suffixpattern):
+                return 'restructuredtext'
+        # This was the existing code.
+        raise FiletypeNotFoundError
+
+
+sphinx.io.get_filetype = _get_filetype
 
 
 # Correct naming for the "show source" option
@@ -258,7 +286,7 @@ def setup(
     # See app_.
     app):
 
-    # Ensure we're using at new enough Sphinx using `require_sphinx
+    # Ensure we're using a new enough Sphinx using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
     app.require_sphinx('1.5')
 

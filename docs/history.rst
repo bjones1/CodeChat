@@ -12,7 +12,15 @@
 History of recent changes
 *************************
 
--   `Github master <https://github.com/bjones1/CodeChat>`_
+-   `Github master <https://github.com/bjones1/CodeChat>`_:
+
+    -   No changes yet.
+
+-   1.6.1, 25-Sep-2018:
+
+    -   Updates to work with Sphinx 1.8.
+
+-   1.6.0, 3-Aug-2018:
 
     -   Refactor code: separate source code classifier from reST output.
     -   Add support for Markdown.
