@@ -148,7 +148,7 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
                 break
         # The following code was added.
         for source_suffixpattern in source_suffixpatterns:
-            if fnmatch.fnmatch(filename, source_suffixpattern):
+            if Path(filename).match(source_suffixpattern):
                 yield filename
                 break
 
@@ -209,12 +209,14 @@ def _get_filetype(source_suffix, filename):
             return filetype or 'restructuredtext'
     else:
         # The following code was added.
+        # Ideally, verify that the provided ``filename`` matches a CodeChat suffix, using code like that in `get_matching_docs`. However, the ``filename`` presented is a full path, not a path relative to the source directory. Therefore, some patterns, such as ``.gitignore``, won't work.
         source_suffixpatterns = ( SUPPORTED_GLOBS |
                                  set(_config.CodeChat_lexer_for_glob.keys()) )
         for source_suffixpattern in source_suffixpatterns:
-            if fnmatch.fnmatch(filename, source_suffixpattern):
+            if Path(filename).match(source_suffixpattern):
                 return 'restructuredtext'
         # This was the existing code.
+        print(filename)
         raise FiletypeNotFoundError
 
 
