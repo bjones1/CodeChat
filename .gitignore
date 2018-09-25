@@ -24,20 +24,16 @@ syntax: glob
 *.pyo
 
 # CodeChat-generated files
-*.py.rst
-*.bat.rst
-*.ini.rst
-_build
+_build/
 
 # Files created when packaging
-build
-dist
+build/
+dist/
 
 # Others
-MANIFEST
 CodeChat.egg-info/
 sphinx-enki-info.txt
-CodeChat/CodeToRestSphinx.py.html
+.pytest_cache/
 
 # PyCharm-generated files
 .idea/
