@@ -19,6 +19,8 @@ History of recent changes
 -   1.6.1, 25-Sep-2018:
 
     -   Updates to work with Sphinx 1.8.
+    -   Use consistent matching of ``CodeChat_lexer_for_glob``.
+    -   Various bits of code cleanup.
 
 -   1.6.0, 3-Aug-2018:
 
