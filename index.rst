@@ -24,10 +24,11 @@ User documentation
    docs/style_guide.cpp
    docs/install.rst
    docs/reference_manual.rst
+   docs/history.rst
 
 
 Template documentation
-======================
+----------------------
 The following shows the documentation produced by a template CodeChat project.
 
 .. toctree::
@@ -48,7 +49,6 @@ Developer documentation
    CodeChat/RestToCode.py
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
-   docs/history.rst
    .gitignore
 
 
