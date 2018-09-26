@@ -39,13 +39,12 @@
 # ----------------
 from os import path
 import fnmatch
-import codecs
 from pathlib import Path
 
 # Third-party imports
 # -------------------
 from six import iteritems
-from sphinx.util import get_matching_files
+from sphinx.util import get_matching_files, logging
 from sphinx.util.matching import compile_matchers
 import sphinx.environment
 from sphinx.util.osutil import SEP
@@ -65,6 +64,10 @@ from . import __version__
 
 # source-read event
 # =================
+# Create a logger for issuing warnings during the build process.
+logger = logging.getLogger(__name__)
+
+
 # The source-read_ event occurs when a source file is read. If it's code, this
 # routine changes it into reST.
 def _source_read(
@@ -87,7 +90,7 @@ def _source_read(
                     # On a match, pass the specified lexer alias.
                     lexer = get_lexer(alias=lexer_alias)
                     break
-            # Do this after checking the CodeChat_lexer_for_glob list, since
+            # Do this after checking the ``CodeChat_lexer_for_glob`` list, since
             # this will raise an exception on failure.
             lexer = lexer or get_lexer(filename=docname, code=source[0])
 
@@ -98,10 +101,11 @@ def _source_read(
 
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
-            app.warn(e, docname)
+            logger.warning('Unsupported source code language: ' + str(e),
+                           location=docname)
 
 
-# Return True if the supplied docname is source code.
+# Return True if the supplied ``docname`` is source code.
 def is_source_code(
     # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
     env,
@@ -122,12 +126,13 @@ def is_source_code(
 # Sphinx doesn't naturally look for source files. Simply adding all supported
 # source file extensions to ``conf.py``'s `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_
 # doesn't work, since ``foo.c`` and ``foo.h`` will now both been seen as the
-# docname ``foo``, making then indistinguishable.
+# docname ``foo``, making then indistinguishable. See also my `post on
+# sphinx-users <https://groups.google.com/d/msg/sphinx-users/CH8FW-tK1T0/_IHuAUW5GQAJ>`_.
 #
 # get_matching_docs patch
 # -----------------------
 # So, do a bit of monkeypatching: for source files, make their docname the same
-# as the file name; for reST file, allow Sphinx to strip off the extension as
+# as the file name; for reST files, allow Sphinx to strip off the extension as
 # before. The first patch accomplishes this. It comes from ``sphinx.util``, line
 # 92 and following in Sphinx 1.3.1.
 def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
@@ -138,8 +143,6 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
     """
     suffixpatterns = ['*' + s for s in suffixes]
     # The following two lines were added.
-    source_suffixpatterns = ( SUPPORTED_GLOBS |
-                             set(_config.CodeChat_lexer_for_glob.keys()) )
     exclude_matchers += compile_matchers(_config.CodeChat_excludes)
     for filename in get_matching_files(dirname, exclude_matchers):
         for suffixpattern in suffixpatterns:
@@ -147,16 +150,25 @@ def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
                 yield filename[:-len(suffixpattern)+1]
                 break
         # The following code was added.
-        for source_suffixpattern in source_suffixpatterns:
-            if Path(filename).match(source_suffixpattern):
-                yield filename
-                break
+        if is_supported_language(filename):
+            yield filename
 
 
 # Note that this is referenced in ``sphinx.environment`` by ``from sphinx.util
 # import get_matching_docs``. So, `where to patch <https://docs.python.org/dev/library/unittest.mock.html#where-to-patch>`_
 # is in ``sphinx.environment`` instead of ``sphinx.util``.
 sphinx.environment.get_matching_docs = _get_matching_docs
+
+
+# Return True if the provided filename is a source code langauge CodeChat supports.
+def is_supported_language(filename):
+    source_suffixpatterns = ( SUPPORTED_GLOBS |
+                             set(_config.CodeChat_lexer_for_glob.keys()) )
+    path_filename = Path(filename)
+    for source_suffixpattern in source_suffixpatterns:
+        if path_filename.match(source_suffixpattern):
+            return True
+    return False
 
 
 # doc2path patch
@@ -169,10 +181,10 @@ sphinx.environment.get_matching_docs = _get_matching_docs
 def _doc2path(self, docname, base=True, suffix=None):
     """Return the filename for the document name.
 
-    If *base* is True, return absolute path under self.srcdir.
-    If *base* is None, return relative path to self.srcdir.
-    If *base* is a path string, return absolute path under that.
-    If *suffix* is not None, add it instead of config.source_suffix.
+    -   If *base* is True, return absolute path under self.srcdir.
+    -   If *base* is None, return relative path to self.srcdir.
+    -   If *base* is a path string, return absolute path under that.
+    -   If *suffix* is not None, add it instead of config.source_suffix.
     """
     docname = docname.replace(SEP, path.sep)
     if suffix is None:
@@ -200,7 +212,7 @@ sphinx.environment.BuildEnvironment.doc2path = _doc2path
 
 # get_filetype patch
 # ------------------
-# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as restructuredtext. This was taken from ``sphinx.io``, version 1.8.1. This patch only matters for Sphinx 1.8.0+; previous versions work without it.
+# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.io``, version 1.8.1. This patch only matters for Sphinx 1.8.0+; previous versions work without it.
 def _get_filetype(source_suffix, filename):
     # type: (Dict[unicode, unicode], unicode) -> unicode
     for suffix, filetype in iteritems(source_suffix):
@@ -209,12 +221,8 @@ def _get_filetype(source_suffix, filename):
             return filetype or 'restructuredtext'
     else:
         # The following code was added.
-        # Ideally, verify that the provided ``filename`` matches a CodeChat suffix, using code like that in `get_matching_docs patch`_. However, the ``filename`` presented is a full path, not a path relative to the source directory. Therefore, some patterns, such as ``.gitignore``, won't work.
-        source_suffixpatterns = ( SUPPORTED_GLOBS |
-                                 set(_config.CodeChat_lexer_for_glob.keys()) )
-        for source_suffixpattern in source_suffixpatterns:
-            if Path(filename).match(source_suffixpattern):
-                return 'restructuredtext'
+        if is_supported_language(filename):
+            return 'restructuredtext'
         # This was the existing code.
         raise FiletypeNotFoundError
 

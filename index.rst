@@ -8,14 +8,13 @@
 
    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+****************************
 CodeChat's table of contents
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+****************************
 Welcome to CodeChat's documentation! For new users, begin by reading :doc:`README`. For others, documentation for this program is divided into the following two sections.
 
-##################
 User documentation
-##################
+==================
 .. toctree::
    :maxdepth: 2
 
@@ -26,9 +25,9 @@ User documentation
    docs/install.rst
    docs/reference_manual.rst
 
-**********************
+
 Template documentation
-**********************
+======================
 The following shows the documentation produced by a template CodeChat project.
 
 .. toctree::
@@ -36,9 +35,9 @@ The following shows the documentation produced by a template CodeChat project.
 
    CodeChat/template/index.rst
 
-#######################
+
 Developer documentation
-#######################
+=======================
 .. toctree::
    :maxdepth: 2
 
@@ -52,9 +51,9 @@ Developer documentation
    docs/history.rst
    .gitignore
 
-*******
+
 Testing
-*******
+-------
 To run the tests, execute ``pytest test`` from the root directory of the project.
 
 .. toctree::
@@ -68,25 +67,25 @@ To run the tests, execute ``pytest test`` from the root directory of the project
    appveyor.yml
    docs/style_test.py
 
-************************
+
 Documentation generation
-************************
+------------------------
 .. toctree::
    :maxdepth: 2
 
    conf.py
    CodeChat.css
 
-*********
+
 Packaging
-*********
+---------
 .. toctree::
    :maxdepth: 2
 
    setup.py
    MANIFEST.in
 
-######
+
 Search
-######
+======
 * :ref:`search`
