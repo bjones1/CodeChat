@@ -29,12 +29,14 @@ User documentation
 
 Template documentation
 ----------------------
-The following shows the documentation produced by a template CodeChat project.
+The following shows the documentation produced by a CodeChat project template.
 
 .. toctree::
    :maxdepth: 2
 
    CodeChat/template/index.rst
+   CodeChat/template/CodeChat.css
+   CodeChat/template/default.css
 
 
 Developer documentation

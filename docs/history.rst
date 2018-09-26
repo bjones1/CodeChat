@@ -15,6 +15,7 @@ History of recent changes
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
     -   Corrected the link to the GPL license.
+    -   Move CSS files out of the template project's ``index.rst``.
 
 -   1.6.1, 25-Sep-2018:
 
