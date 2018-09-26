@@ -270,7 +270,7 @@ def _builder_inited(
     app):
 
     try:
-        with codecs.open('sphinx-enki-info.txt', 'wb', 'utf-8') as f:
+        with open('sphinx-enki-info.txt', 'w', encoding='utf-8') as f:
             f.write(app.config.html_file_suffix)
     except TypeError:
         # If ``html_file_suffix`` is None (TypeError), Enki will assume
