@@ -14,12 +14,12 @@ History of recent changes
 
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Corrected the link to the GPL license.
 
 -   1.6.1, 25-Sep-2018:
 
     -   Updates to work with Sphinx 1.8.
-    -   Use consistent matching of ``CodeChat_lexer_for_glob``.
+    -   Use consistent matching for ``CodeChat_lexer_for_glob``.
     -   Various bits of code cleanup.
 
 -   1.6.0, 3-Aug-2018:
@@ -198,7 +198,6 @@ History of recent changes
 ********************
 Ideas for the future
 ********************
--   Write a decent manual.
 -   Testing:
 
     -   For Sphinx.
@@ -206,4 +205,3 @@ Ideas for the future
     -   For the directives and role in `../CodeChat/CodeToRest.py`.
 
 -   Support CodeChat with Markdown in Sphinx. Need to add some way to specify the markup used, either on a file-by-file basis, or as a config setting for the whole project.
--   Use a `add_source_parser <http://www.sphinx-doc.org/en/master/extdev/appapi.html#sphinx.application.Sphinx.add_source_parser>`_ instead of the current monkeypatching approach for better Sphinx support. Note that Sphinx 1.8 is deprecating the ``suffix`` argument. The big challenge/question: given two documents named ``doc.md`` and ``doc.rst``, do they have differing docnames?
