@@ -74,7 +74,7 @@ Documentation generation
    :maxdepth: 2
 
    conf.py
-   CodeChat.css
+   CodeChat.css.rst
 
 
 Packaging
