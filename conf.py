@@ -35,8 +35,6 @@
 #
 # Use the CodeChat version date in its generated documentation.
 import CodeChat
-# Import the `Alabaster theme customizations <https://github.com/bitprophet/alabaster#installation>`_.
-import alabaster
 #
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -108,11 +106,11 @@ pygments_style = 'sphinx'
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
 # note:** The ``CodeChat.CodeToRestSphinx`` extension is mandatory; without it,
 # CodeChat will not translate source code to reST and then (via Sphinx) to html.
-extensions = ['CodeChat.CodeToRestSphinx', 'alabaster', 'sphinx.ext.graphviz']
+extensions = ['CodeChat.CodeToRestSphinx', 'sphinx.ext.graphviz']
 
 # `templates_path <http://sphinx-doc.org/config.html#confval-templates_path>`_:
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+##templates_path = []
 
 # `rst_epilog <http://www.sphinx-doc.org/en/stable/config.html#confval-rst_epilog>`_:
 # A string of reStructuredText that will be included at the end of every source
@@ -168,15 +166,12 @@ exclude_patterns = [
     # Ignore setup.py output.
     'build',
     'dist',
-    '*.egg-info',
     # Ignore Sphinx output.
     '_build',
-    # Ignore this file's output.
+    # Ignore CodeChat's output.
     'sphinx-enki-info.txt',
-    # Ignore HTML -- the license and test output.
-    '**.html',
     # Misc files.
-    '.cache',
+    '.pytest_cache',
     '__pycache__',
     'Thumbs.db',
     '.DS_Store',
@@ -211,8 +206,7 @@ html_theme = 'alabaster'
 
 # `html_theme_path <http://sphinx-doc.org/config.html#confval-html_theme_path>`_:
 # Add any paths that contain custom themes here, relative to this directory.
-# Set this per the `Alabaster theme customizations`_.
-html_theme_path = [alabaster.get_path()]
+##html_theme_path = []
 
 # `html_title <http://sphinx-doc.org/config.html#confval-html_title>`_: The
 # name for this set of Sphinx documents.  If None, it defaults to ``<project>
@@ -248,7 +242,8 @@ html_last_updated_fmt = '%b, %d, %Y'
 
 # `html_sidebars <http://sphinx-doc.org/config.html#confval-html_sidebars>`_:
 # Custom sidebar templates, maps document names to template names.
-# Set this per the `Alabaster theme customizations`_.
+# Set this per the `Alabaster theme customizations <https://github.com/bitprophet/alabaster#installation>`_.
+
 html_sidebars = {
     '**': [
         'about.html',
