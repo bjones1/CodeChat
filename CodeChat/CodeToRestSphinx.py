@@ -95,7 +95,7 @@ def _source_read(
             lexer = lexer or get_lexer(filename=docname, code=source[0])
 
             # Translate code to reST.
-            app.info('Converted using the {} lexer.'.format(lexer.name))
+            logger.info('Converted using the {} lexer.'.format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
             source[0] = add_highlight_language(source[0], lexer)
 

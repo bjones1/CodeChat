@@ -16,6 +16,7 @@ History of recent changes
 
     -   Corrected the link to the GPL license.
     -   Move CSS files out of the template project's ``index.rst``.
+    -   Use ``logger.info`` instead of the deprecated ``app.info``.
 
 -   1.6.1, 25-Sep-2018:
 
