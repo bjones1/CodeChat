@@ -17,6 +17,7 @@ History of recent changes
     -   Corrected the link to the GPL license.
     -   Move CSS files out of the template project's ``index.rst``.
     -   Use ``logger.info`` instead of the deprecated ``app.info``.
+    -   Update to Sphinx 2.0; drop support for older Sphinx versions.
 
 -   1.6.1, 25-Sep-2018:
 

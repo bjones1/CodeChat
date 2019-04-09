@@ -37,22 +37,18 @@
 #
 # Standard library
 # ----------------
-from os import path
-import fnmatch
+import os
 from pathlib import Path
 
 # Third-party imports
 # -------------------
-from six import iteritems
 from sphinx.util import get_matching_files, logging
+from sphinx.project import EXCLUDE_PATHS
 from sphinx.util.matching import compile_matchers
-import sphinx.environment
-from sphinx.util.osutil import SEP
-# The location of this class varies with the Sphinx version. It's only needed for Sphinx 1.8.0+.
-try:
-    from sphinx.io import FiletypeNotFoundError
-except ImportError:
-    FiletypeNotFoundError = None
+import sphinx.project
+from sphinx.util.osutil import SEP, relpath
+from sphinx.io import FiletypeNotFoundError
+from sphinx.locale import __
 import pygments.util
 
 # Local application imports
@@ -129,41 +125,67 @@ def is_source_code(
 # docname ``foo``, making then indistinguishable. See also my `post on
 # sphinx-users <https://groups.google.com/d/msg/sphinx-users/CH8FW-tK1T0/_IHuAUW5GQAJ>`_.
 #
-# get_matching_docs patch
-# -----------------------
-# So, do a bit of monkeypatching: for source files, make their docname the same
-# as the file name; for reST files, allow Sphinx to strip off the extension as
-# before. The first patch accomplishes this. It comes from ``sphinx.util``, line
-# 92 and following in Sphinx 1.3.1.
-def _get_matching_docs(dirname, suffixes, exclude_matchers=()):
-    """Get all file names (without suffixes) matching a suffix in a directory,
-    recursively.
-
-    Exclude files and dirs matching a pattern in *exclude_patterns*.
+# discover patch
+# --------------
+# Add the ``CodeChat_excludes`` in to the other excludes. This code comes from
+# ``sphinx.project.Project``, line 46 and following in Sphinx 2.0.1.
+def _discover(self, exclude_paths=[]):
+    # type: (List[str]) -> Set[str]
+    """Find all document files in the source directory and put them in
+    :attr:`docnames`.
     """
-    suffixpatterns = ['*' + s for s in suffixes]
-    # The following two lines were added.
-    exclude_matchers += compile_matchers(_config.CodeChat_excludes)
-    for filename in get_matching_files(dirname, exclude_matchers):
-        for suffixpattern in suffixpatterns:
-            if fnmatch.fnmatch(filename, suffixpattern):
-                yield filename[:-len(suffixpattern)+1]
-                break
-        # The following code was added.
-        if is_supported_language(filename):
-            yield filename
+    self.docnames = set()
+    # The following line of code was modified by adding CodeChat excludes.
+    excludes = compile_matchers(exclude_paths + EXCLUDE_PATHS + _config.CodeChat_excludes)
+    for filename in get_matching_files(self.srcdir, excludes):  # type: ignore
+        docname = self.path2doc(filename)
+        if docname:
+            if os.access(os.path.join(self.srcdir, filename), os.R_OK):
+                self.docnames.add(docname)
+            else:
+                logger.warning(__("document not readable. Ignored."), location=docname)
+
+    return self.docnames
 
 
-# Note that this is referenced in ``sphinx.environment`` by ``from sphinx.util
-# import get_matching_docs``. So, `where to patch <https://docs.python.org/dev/library/unittest.mock.html#where-to-patch>`_
-# is in ``sphinx.environment`` instead of ``sphinx.util``.
-sphinx.environment.get_matching_docs = _get_matching_docs
+sphinx.project.Project.discover = _discover
+
+
+# path2doc patch
+# --------------
+# For source files, make their docname the same as the file name; for reST
+# files, allow Sphinx to strip off the extension as before. This patch
+# accomplishes this. It comes from ``sphinx.project.Project``, line 46 and
+# following in Sphinx 2.0.1.
+def _path2doc(self, filename):
+    # type: (str) -> str
+    """Return the docname for the filename if the file is document.
+
+    *filename* should be absolute or relative to the source directory.
+    """
+    if filename.startswith(self.srcdir):
+        filename = relpath(filename, self.srcdir)
+    for suffix in self.source_suffix:
+        if filename.endswith(suffix):
+            return filename[:-len(suffix)]
+
+    # The following code was added.
+    if is_supported_language(filename):
+        return filename
+
+    # the file does not have docname
+    return None
+
+
+sphinx.project.Project.path2doc = _path2doc
 
 
 # Return True if the provided filename is a source code langauge CodeChat supports.
 def is_supported_language(filename):
-    source_suffixpatterns = ( SUPPORTED_GLOBS |
-                             set(_config.CodeChat_lexer_for_glob.keys()) )
+    source_suffixpatterns = (
+        SUPPORTED_GLOBS |
+        set(_config.CodeChat_lexer_for_glob.keys())
+    )
     path_filename = Path(filename)
     for source_suffixpattern in source_suffixpatterns:
         if path_filename.match(source_suffixpattern):
@@ -175,47 +197,43 @@ def is_supported_language(filename):
 # --------------
 # Next, the way docnames get transformed back to a full path needs to be fixed
 # for source files. Specifically, a docname might be the source file, without
-# adding an extension. This code comes from ``sphinx.environment`` of Sphinx
-# 1.8.1. See also the official `doc2path <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_
-# Sphinx docs.
-def _doc2path(self, docname, base=True, suffix=None):
+# adding an extension. This code comes from ``sphinx.project.Project`` of Sphinx
+# 2.0.1.
+def _doc2path(self, docname, basedir=True):
+    # type: (str, bool) -> str
     """Return the filename for the document name.
 
-    -   If *base* is True, return absolute path under self.srcdir.
-    -   If *base* is None, return relative path to self.srcdir.
-    -   If *base* is a path string, return absolute path under that.
-    -   If *suffix* is not None, add it instead of config.source_suffix.
+    If *basedir* is True, return as an absolute path.
+    Else, return as a relative path to the source directory.
     """
-    docname = docname.replace(SEP, path.sep)
-    if suffix is None:
-        # Use first candidate if there is not a file for any suffix
-        suffix = next(iter(self.config.source_suffix))
-        for candidate_suffix in self.config.source_suffix:
-            if path.isfile(path.join(self.srcdir, docname) +
-                           candidate_suffix):
-                suffix = candidate_suffix
-                break
-        else:
-            # Two lines of code added here -- check for the no-extenion case.
-            if path.isfile(path.join(self.srcdir, docname)):
-                suffix = ''
-    if base is True:
-        return path.join(self.srcdir, docname) + suffix
-    elif base is None:
-        return docname + suffix
+    docname = docname.replace(SEP, os.path.sep)
+    basename = os.path.join(self.srcdir, docname)
+    for suffix in self.source_suffix:
+        if os.path.isfile(basename + suffix):
+            break
     else:
-        return path.join(base, docname) + suffix
+        # Three lines of code added here -- check for the no-extenion case.
+        if os.path.isfile(os.path.join(self.srcdir, docname)):
+            suffix = ''
+        else:
+            # document does not exist
+            suffix = list(self.source_suffix)[0]
+
+    if basedir:
+        return basename + suffix
+    else:
+        return docname + suffix
 
 
-sphinx.environment.BuildEnvironment.doc2path = _doc2path
+sphinx.project.Project.doc2path = _doc2path
 
 
 # get_filetype patch
 # ------------------
-# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.io``, version 1.8.1. This patch only matters for Sphinx 1.8.0+; previous versions work without it.
+# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.io``, version 1.8.1.
 def _get_filetype(source_suffix, filename):
-    # type: (Dict[unicode, unicode], unicode) -> unicode
-    for suffix, filetype in iteritems(source_suffix):
+    # type: (Dict[str, str], str) -> str
+    for suffix, filetype in source_suffix.items():
         if filename.endswith(suffix):
             # If default filetype (None), considered as restructuredtext.
             return filetype or 'restructuredtext'
@@ -297,7 +315,7 @@ def setup(
 
     # Ensure we're using a new enough Sphinx using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
-    app.require_sphinx('1.5')
+    app.require_sphinx('2.0')
 
     # Use the `source-read <http://sphinx-doc.org/extdev/appapi.html#event-source-read>`_
     # event hook to transform source code to reST before Sphinx processes it.
