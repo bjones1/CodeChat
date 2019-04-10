@@ -14,9 +14,12 @@ History of recent changes
 
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
+    -   No changes yet.
+
+-   1.7.0, 9-Apr-2019:
+
     -   Corrected the link to the GPL license.
     -   Move CSS files out of the template project's ``index.rst``.
-    -   Use ``logger.info`` instead of the deprecated ``app.info``.
     -   Update to Sphinx 2.0; drop support for older Sphinx versions.
     -   Remove unnecessary ``CodeChat_excludes`` configuration variable. Any files in ``html_static_path`` are automatically excluded from the build starting in Sphinx 1.8, so this setting no longer applies.
 
