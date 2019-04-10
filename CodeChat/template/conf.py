@@ -1,4 +1,4 @@
-# .. Copyright (C) 2012-2018 Bryan A. Jones.
+# .. Copyright (C) 2012-2019 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -46,7 +46,7 @@ import sys, os
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = 'Project Name'
-copyright = '2018, Author'
+copyright = '2019, Author'
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
