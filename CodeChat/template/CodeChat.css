@@ -52,6 +52,6 @@
 
 /* Tweak the size of the indent so that code and comments line up. */
 div.CodeChat-indent {
-    /* This is only needed for the ReadTheDocs theme. Otherwise, comment it out. */
-    /* font-size: 10pt; */
+    /* This is only needed for the `ReadTheDocs theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_. Otherwise, comment it out. */
+    /** font-size: 10pt; **/
 }
