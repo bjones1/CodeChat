@@ -18,6 +18,7 @@ History of recent changes
     -   Move CSS files out of the template project's ``index.rst``.
     -   Use ``logger.info`` instead of the deprecated ``app.info``.
     -   Update to Sphinx 2.0; drop support for older Sphinx versions.
+    -   Remove unnecessary ``CodeChat_excludes`` configuration variable. Any files in ``html_static_path`` are automatically excluded from the build starting in Sphinx 1.8, so this setting no longer applies.
 
 -   1.6.1, 25-Sep-2018:
 
@@ -98,7 +99,7 @@ History of recent changes
 
     -   More languages tested, along with some fixes.
     -   Python docstrings are now processed as reST.
-    -   Added the `CodeChat_excludes <CodeChat_excludes>` configuration variable.
+    -   Added the ``CodeChat_excludes`` configuration variable.
 
 -   1.3.1, 29-Apr-2016:
 

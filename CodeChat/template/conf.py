@@ -141,12 +141,6 @@ CodeChat_lexer_for_glob = {
     '*.css': 'CSS',
 }
 
-# **CodeChat note:** _`CodeChat_excludes` is a list of exclude_patterns_ which
-# applies only to source documents; in contrast, exclude_patterns_ will exclude
-# the given files from all of Sphinx (for example, exclude_patterns_ files
-# won't be included even if they're mentioned in html_static_path_).
-CodeChat_excludes = []
-
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
 # The encoding of source files.
 ##source_encoding = 'utf-8-sig'
@@ -166,8 +160,7 @@ master_doc = 'index'
 #
 # **Important:** Do **NOT** add ``CodeChat.css`` to this list; this will
 # instruct Sphinx not to copy it to the ``_static`` directory, where it
-# is needed to properly lay out CodeChat output. Instead, to exclude it
-# from the documents produced by Sphinx, add it to CodeChat_excludes_.
+# is needed to properly lay out CodeChat output.
 exclude_patterns = [
     # Misc files.
     'Thumbs.db',

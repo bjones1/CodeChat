@@ -42,13 +42,10 @@ from pathlib import Path
 
 # Third-party imports
 # -------------------
-from sphinx.util import get_matching_files, logging
-from sphinx.project import EXCLUDE_PATHS
-from sphinx.util.matching import compile_matchers
+from sphinx.util import logging
 import sphinx.project
 from sphinx.util.osutil import SEP, relpath
 from sphinx.io import FiletypeNotFoundError
-from sphinx.locale import __
 import pygments.util
 
 # Local application imports
@@ -125,32 +122,6 @@ def is_source_code(
 # docname ``foo``, making then indistinguishable. See also my `post on
 # sphinx-users <https://groups.google.com/d/msg/sphinx-users/CH8FW-tK1T0/_IHuAUW5GQAJ>`_.
 #
-# discover patch
-# --------------
-# Add the ``CodeChat_excludes`` in to the other excludes. This code comes from
-# ``sphinx.project.Project``, line 46 and following in Sphinx 2.0.1.
-def _discover(self, exclude_paths=[]):
-    # type: (List[str]) -> Set[str]
-    """Find all document files in the source directory and put them in
-    :attr:`docnames`.
-    """
-    self.docnames = set()
-    # The following line of code was modified by adding CodeChat excludes.
-    excludes = compile_matchers(exclude_paths + EXCLUDE_PATHS + _config.CodeChat_excludes)
-    for filename in get_matching_files(self.srcdir, excludes):  # type: ignore
-        docname = self.path2doc(filename)
-        if docname:
-            if os.access(os.path.join(self.srcdir, filename), os.R_OK):
-                self.docnames.add(docname)
-            else:
-                logger.warning(__("document not readable. Ignored."), location=docname)
-
-    return self.docnames
-
-
-sphinx.project.Project.discover = _discover
-
-
 # path2doc patch
 # --------------
 # For source files, make their docname the same as the file name; for reST
@@ -328,8 +299,6 @@ def setup(
     # Add the `CodeChat_lexer_for_glob <CodeChat_lexer_for_glob>` config value. See `add_config_value
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
     app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
-    # Add the `CodeChat_excludes <CodeChat_excludes>` config value.
-    app.add_config_value('CodeChat_excludes', [], 'html')
 
     # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
     # event to write out settings specified in ``conf.py``.
