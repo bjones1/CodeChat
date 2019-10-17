@@ -16,6 +16,12 @@ History of recent changes
 
     -   No changes yet.
 
+-   1.7.1, 18-Oct-2019:
+
+    -   Support MATLAB ``...`` and ``%`` comments, AppleScript ``--`` and ``#`` comments, and PHP ``#`` and ``//`` comments.
+    -   Correctly recognize COBOL comments.
+    -   Define the inline comment delimiter as a sequence of strings, instead of a single string.
+
 -   1.7.0, 9-Apr-2019:
 
     -   Corrected the link to the GPL license.
