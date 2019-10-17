@@ -933,6 +933,9 @@ def _remove_comment_delim(
     ) = (len(comment_delim_info[1]), len(comment_delim_info[2]))
 
     if group == _GROUP.inline_comment:
+        # Special case: COBOL. A comment has the character ``*`` or ``/`` in column 7.
+        if lexer.name == "COBOL":
+            return string[7:] if string[6] in ("*", "/") else string
         # Unline the opening and closing block comment delimiters, the inline comment delimiter may be a sequence. Check each possilibty for a match.
         inline_comment_delim_seq = comment_delim_info[0]
         # Ensure the inline comment delimiter is a sequence.

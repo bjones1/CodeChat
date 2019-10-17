@@ -974,12 +974,9 @@ class TestCodeToRest:
             ["COBOL"],
         )
 
-    # COBOL comments that don't start with ``      *`` aren't recognized.
-    @pytest.mark.xfail
     def test_81_b(self):
         self.mt("      / Comment here\n", sl(-3) + "Comment here\n", ["COBOL"])
 
-    @pytest.mark.xfail
     def test_81_c(self):
         self.mt(
             '       DISPLAY "Hello World!"\n' "      / Comment here\n",
