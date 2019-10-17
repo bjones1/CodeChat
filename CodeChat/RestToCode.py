@@ -73,9 +73,9 @@ def language_comment_type(
   # | Ex: ``( '#',      '"""',          '"""')`` for the key ``'Python'``
   # | and ``( '//',     '/*',            '*/')`` for the key ``'C'``
   comment_delimiters):
-    # If the language supports inline comments, index zero will have a string.
-    # If the language supports block comments, index one will have a string.
-    return [comment_delimiters[0] is not None, comment_delimiters[1] is not None]
+    # If the language supports inline comments, index zero will have a non-empty string.
+    # If the language supports block comments, index one will have a non-empty string.
+    return [bool(comment_delimiters[0]), bool(comment_delimiters[1])]
 # |
 #
 # _`formulate_comment`:Tells the program whether to make a block comment or an inline comment.

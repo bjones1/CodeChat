@@ -51,7 +51,7 @@ from CodeChat.CodeToRest import code_to_rest_string, code_to_html_file, \
 from CodeChat.SourceClassifier import _remove_comment_delim, _group_lexer_tokens, \
     _gather_groups_on_newlines, _is_rest_comment, _classify_groups, \
     _is_space_indented_line, _is_delim_indented_line, _GROUP, \
-    _pygments_lexer, _len_cdi
+    _pygments_lexer
 from CodeChat.CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 
 # See if we have the PIC24 lexer installed.
@@ -110,6 +110,10 @@ div_end = ('\n'
            '\n')
 
 
+# Comment delimiters for C.
+c_comment_delimiter_info = COMMENT_DELIMITER_INFO['C']
+
+
 # This actually tests using ``code_to_rest_string``, since that makes
 # ``code_to_rest`` easy to call.
 class TestCodeToRest:
@@ -128,7 +132,9 @@ class TestCodeToRest:
             code = rest_to_code_string(rest, alias)
             rest2 = code_to_rest_string(code_str, alias=alias)
             code2 = rest_to_code_string(rest2, alias)
-            assert code == code2 and remove_codechat_style(rest) == expected_rest_str
+            assert code == code2
+            print(rest)
+            assert remove_codechat_style(rest) == expected_rest_str
             if expected_code_str is not None:
                 assert code == expected_code_str
 
@@ -756,18 +762,26 @@ class TestCodeToRest:
 
     # MATLAB.
     def test_29(self):
-        self.mt('a = [1 2 3 4];\n'
+        self.mt('a = [1 2 ...\n'
+                '         ... Why not put a comment here?\n'
+                '     3 4];\n'
                 '% Hello\n'
                 '  %{\n'
                 '     to the\n'
                 '     world\n'
                 '  %}\n',
                 bf +
-                ' a = [1 2 3 4];\n' +
+                ' a = [1 2 ...\n' +
                 ef +
-                sl(-2) +
+                div(4.5, -2) +
+                'Why not put a comment here?\n' +
+                div_end +
+                bf +
+                '      3 4];\n' +
+                ef +
+                sl(0) +
                 'Hello\n' +
-                div(1.0, -1) +
+                div(1.0, 1) +
                 '\n'
                 'to the\n'
                 'world\n'
@@ -1005,6 +1019,11 @@ class TestCodeToRest:
                 'Comment here\n', ['AppleScript'])
 
     def test_56_b(self):
+        self.mt('# Comment here\n',
+                sl(-3) +
+                'Comment here\n', ['AppleScript'])
+
+    def test_56_c(self):
         self.mt('display dialog "Hello World!"\n'
                 '-- Comment here\n',
                 bf +
@@ -1299,11 +1318,14 @@ class TestCodeToRest:
                 sl(-2) +
                 'Comment here\n', ['COBOL'])
 
+    # COBOL comments that don't start with ``      *`` aren't recognized.
+    @pytest.mark.xfail
     def test_81_b(self):
         self.mt('      / Comment here\n',
                 sl(-3) +
                 'Comment here\n', ['COBOL'])
 
+    @pytest.mark.xfail
     def test_81_c(self):
         self.mt('       DISPLAY "Hello World!"\n'
                 '      / Comment here\n',
@@ -1613,8 +1635,8 @@ class TestCodeToHtmlFile:
 
 # Tests of lexer_to_code and subroutines
 # ======================================
-c_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name])
-py_lexer = _len_cdi(COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name])
+c_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('C').name]
+py_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name('Python').name]
 
 class TestCodeToRestNew:
     # Check that a simple file or string is tokenized correctly.
@@ -1679,7 +1701,7 @@ main(){
         token_iter, ast_docstring, ast_syntax_error = _pygments_lexer(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False, ast_docstring)
         gathered_group = list(_gather_groups_on_newlines(token_group,
-                                                         (1, 2, 2)))
+                                                         c_comment_delimiter_info))
         expected_group = [
           [(_GROUP.other, 0, '#include'),
             (_GROUP.whitespace, 0, ' '),
@@ -1748,36 +1770,36 @@ main(){
     # Tests of block comment body indentation using spaces.
     def test_4_1(self):
         assert _is_space_indented_line('comment\n',
-                                       3, '*', False, (2, 2, 2)) == False
+                                       3, '*', False, c_comment_delimiter_info) == False
         assert _is_space_indented_line('  comment\n',
-                                       3, '*', False, (2, 2, 2)) == False
+                                       3, '*', False, c_comment_delimiter_info) == False
         assert _is_space_indented_line('   comment\n',
-                                       3, '*', False, (2, 2, 2)) == True
+                                       3, '*', False, c_comment_delimiter_info) == True
 
     # Tests of block comment end indentation using spaces.
     def test_4_2(self):
         assert _is_space_indented_line('*/',
-                                       3, '*', True, (2, 2, 2)) == True
+                                       3, '*', True, c_comment_delimiter_info) == True
         assert _is_space_indented_line(' */',
-                                       3, '*', True, (2, 2, 2)) == True
+                                       3, '*', True, c_comment_delimiter_info) == True
 
     # Tests of block comment body indentation using spaces.
     def test_4_3(self):
         assert _is_delim_indented_line('comment\n',
-                                       3, '*', False, (2, 2, 2)) == False
+                                       3, '*', False, c_comment_delimiter_info) == False
         assert _is_delim_indented_line(' *comment\n',
-                                       3, '*', False, (2, 2, 2)) == False
+                                       3, '*', False, c_comment_delimiter_info) == False
         assert _is_delim_indented_line(' * comment\n',
-                                       3, '*', False, (2, 2, 2)) == True
+                                       3, '*', False, c_comment_delimiter_info) == True
         assert _is_delim_indented_line(' *\n',
-                                       3, '*', False, (2, 2, 2)) == True
+                                       3, '*', False, c_comment_delimiter_info) == True
 
     # Tests of block comment end indentation using spaces.
     def test_4_4(self):
         assert _is_delim_indented_line('*/',
-                                       3, '*', True, (2, 2, 2)) == False
+                                       3, '*', True, c_comment_delimiter_info) == False
         assert _is_delim_indented_line(' */',
-                                       3, '*', True, (2, 2, 2)) == True
+                                       3, '*', True, c_comment_delimiter_info) == True
 
 # _is_rest_comment tests
 # ----------------------
@@ -1964,7 +1986,7 @@ main(){
         lexer = get_lexer_by_name('c')
         token_iter, ast_docstring, ast_syntax_error = _pygments_lexer(self.test_c_code, lexer)
         token_group = _group_lexer_tokens(token_iter, False, False, ast_docstring)
-        gathered_group = _gather_groups_on_newlines(token_group, (2, 2, 2))
+        gathered_group = _gather_groups_on_newlines(token_group, c_comment_delimiter_info)
         classified_group = list( _classify_groups(gathered_group, c_lexer) )
         assert classified_group == [(-1, '#include <stdio.h>\n'),
                                     (-1, '\n'),

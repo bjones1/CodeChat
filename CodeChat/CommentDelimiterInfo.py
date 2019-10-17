@@ -85,16 +85,17 @@ COMMENT_DELIMITER_INFO = {
   # In Python, docstrings are treated as multi-line comments.
   'Python':         ( '#',      '"""',          '"""'),
   'Python 3':       ( '#',      '"""',          '"""'),
-  'CSS':            (None,       '/*',           '*/'),
+  'CSS':            (  '',       '/*',           '*/'),
   # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
   # block comments, but I don't see this anywhere in man bash. These aren't
   # supported.
-  'Bash':           ( '#',      None,            None),
-  'Tcsh':           ( '#',      None,            None),
-  # The only valid comment type is ``REM``. Neither ``:`` or ``::`` are
-  # classified as a comment.
-  'Batchfile':      ( 'REM',    None,            None),
-  'Matlab':         ( '%',      '%{',            '%}'),
+  'Bash':           ( '#',        '',              ''),
+  'Tcsh':           ( '#',        '',              ''),
+  # The only valid comment type is ``rem``. Neither ``:`` or ``::`` are
+  # classified as a comment. Not that this must be a lower-case string, since it
+  # will be compared to a lowercased comment.
+  'Batchfile':      ( 'rem',      '',              ''),
+  'Matlab':         ( ('%', '...'), '%{',            '%}'),
   'SQL':            ( '--',     '/*',            '*/'),
   'PowerShell':     ( '#',      '<#',            '#>'),
   # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
@@ -104,49 +105,48 @@ COMMENT_DELIMITER_INFO = {
   'AutoIt':         ( ';',     '#cs',           '#ce'),
 
   # `PODs <https://docs.perl6.org/language/pod>`_ not supported. Only single line comments
-  'Perl':           ( '#',      None,            None),
+  'Perl':           ( '#',        '',              ''),
   # PODs not supported in Perl6, since they conflict with the new block-style
   # comments: ``#`[`` ~ ``]``, or any other pair.
   'Perl6':          ( '#',     "#'(",             ')'),
 
   'Ruby':           ( '#',  '=begin',          '=end'),
-  'S':              ( '#',      None,            None),
+  'S':              ( '#',        '',              ''),
   # `Bird style <https://wiki.haskell.org/Literate_programming#Bird_Style>`_
   # is not supported.
   'Haskell':        ( '--',     '{-',            '-}'),
   # ``(*`` ~ ``*)`` not supported.
   'Delphi':         ( '//',      '{',             '}'),
-  'AppleScript':    ( '//',     '(*',            '*)'),
+  'AppleScript':    ( ('--', '#'), '(*',            '*)'),
   'Common Lisp':    ( ';',      '#|',            '|#'),
   # ``--[=[`` ~ ``]=]`` not supported.
   'Lua':            ( '--',   '--[[',            ']]'),
-  'Clojure':        ( ';',      None,            None),
-  'Scheme':         ( ';',      None,            None),
-  'HTML':           (None,    '<!--',           '-->'),
-  'MXML':           (None,   '<!---',           '-->'),
-  'Fortran':        ( '!',      None,            None),
-  'APL':            ( '⍝',      None,            None),
-  'Makefile':       ( '#',      None,            None),
-  'RPMSpec':        ( '#',      None,            None),
-  'Nimrod':         ( '#',      None,            None),
-  ##                 ; or #
-  # (reST to code will use '#')
-  'NSIS':           ( '#',      None,            None),
-  'TeX':            ( '%',      None,            None),
-  'Erlang':         ( '%',      None,            None),
-  'QBasic':         ( "'",      None,            None),
-  'VB.net':         ( "'",      None,            None),
-  'REBOL':          ( ';',      None,            None),
-  'LLVM':           ( ';',      None,            None),
-  'INI':            ( ';',      None,            None),
-  'Ada':            ( '--',     None,            None),
-  'Eiffel':         ( '--',     None,            None),
-  'vhdl':           ( '--',     None,            None),
+  'Clojure':        ( ';',        '',              ''),
+  'Scheme':         ( ';',        '',              ''),
+  'HTML':           (  '',    '<!--',           '-->'),
+  'MXML':           (  '',   '<!---',           '-->'),
+  'Fortran':        ( '!',        '',              ''),
+  'APL':            ( '⍝',        '',              ''),
+  'Makefile':       ( '#',        '',              ''),
+  'RPMSpec':        ( '#',        '',              ''),
+  'Nimrod':         ( '#',        '',              ''),
+  # Comments continued on the next line with a ``\`` aren't supported.
+  'NSIS':           ( ('#', ';'), '',              ''),
+  'TeX':            ( '%',        '',              ''),
+  'Erlang':         ( '%',        '',              ''),
+  'QBasic':         ( "'",        '',              ''),
+  'VB.net':         ( "'",        '',              ''),
+  'REBOL':          ( ';',        '',              ''),
+  'LLVM':           ( ';',        '',              ''),
+  'INI':            ( ';',        '',              ''),
+  'Ada':            ( '--',       '',              ''),
+  'Eiffel':         ( '--',       '',              ''),
+  'vhdl':           ( '--',       '',              ''),
   # ``*>`` as an inline comment is not supported.
   # six spaces will precede '*' when converting reST to code
   ## Six ignored characters followed by * or /.
-  'COBOL':          ('      *', None,            None),
-  'YAML':           ( '#',      None,            None),
+  'COBOL':          ('      *',   '',              ''),
+  'YAML':           ( '#',        '',              ''),
 
   # These languages have failing unit tests
   # ---------------------------------------

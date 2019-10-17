@@ -92,23 +92,6 @@ def get_lexer(
         return guess_lexer(code, **options)
 
 
-# .. _len_cdi:
-#
-# Transforms the comment delimiter info from strings into the length
-# of the string.
-def _len_cdi(cdi_string):
-    cdi = []
-    # Takes each item in the tuple and gets the length of the item
-    for i in cdi_string:
-        if i is not None:
-            a = len(i)
-        else:
-            a = None
-        cdi.append(a)
-    # Creates a new tuple from the list of lengths and returns it
-    return tuple(cdi)
-
-
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
@@ -137,7 +120,7 @@ def source_lexer(
     _debug_print('Lexer: {}\n'.format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
-    cdi = _len_cdi(COMMENT_DELIMITER_INFO[lexer.name])
+    cdi = COMMENT_DELIMITER_INFO[lexer.name]
     # * If there's no multi-line start info, then classify generic comments as
     #   inline.
     comment_is_inline = not cdi[1]
@@ -542,6 +525,9 @@ def _gather_groups_on_newlines(
     # end portions of a block comment.
     ws_len = 0
 
+    # The length of an opening block comment
+    len_opening_block_comment = len(comment_delim_info[1])
+
     # Accumulate until we find a newline, then yield that.
     for group, string in iter_grouped:
         _debug_print('group = {}, string = {}\n'.format(group, [string]))
@@ -556,7 +542,7 @@ def _gather_groups_on_newlines(
             # Look for an indented multi-line comment block. First, determine
             # what the indent must be: (column in which comment starts) +
             # (length of comment delimiter) + (1 space).
-            ws_len = comment_delim_info[1] + 1
+            ws_len = len_opening_block_comment + 1
             for group_, ws_len_, string_ in l:
                 ws_len += len(string_)
             # Determine the indent style (all spaces, or spaces followed by a
@@ -570,8 +556,8 @@ def _gather_groups_on_newlines(
             # should be discarded. To make this "easy", I define
             # comment_delim_info[1] as a very large number, so that the entire
             # line will be discarded. Hence, the need for the hack below.
-            last_delim_char = string[comment_delim_info[1] - 1:
-                                     comment_delim_info[1]]
+            last_delim_char = string[len_opening_block_comment - 1:
+                                     len_opening_block_comment]
             if _is_space_indented_line(splitlines[1], ws_len, last_delim_char,
               len(splitlines) == 1, comment_delim_info):
                 is_indented_line = _is_space_indented_line
@@ -712,7 +698,7 @@ def _is_space_indented_line(
 
     # The closing delimiter will always be followed by a newline, hence the - 1
     # factor.
-    line_except_closing_delim = line[:-comment_delim_info[2] - 1]
+    line_except_closing_delim = line[:-len(comment_delim_info[2]) - 1]
     # Last line: zero or more whitespaces followed by the closing block comment
     # delimiter is valid. Since ``''.isspace() == False``, check for this case
     # and consider it true.
@@ -783,7 +769,7 @@ def _is_delim_indented_line(
     # that are usually a * followed by a space) + (closing delim ``*/`` length
     # of 2 chars) == 3.
     if ( is_last and len(line) == indent_len - 2 +
-         comment_delim_info[2] and line[:indent_len - 2].isspace() ):
+         len(comment_delim_info[2]) and line[:indent_len - 2].isspace() ):
         return True
     # No other correctly indented cases.
     return False
@@ -885,15 +871,31 @@ def _remove_comment_delim(
     # See comment_delim_info_.
     comment_delim_info):
 
-    # Number of characters in a single-line comment delimiter.
-    (len_inline_comment_delim,
-    # Number of characters in an opening block comment.
-    len_opening_block_comment_delim,
-    # Number of characters in an closing block comment.
-    len_closing_block_comment_delim) = comment_delim_info
+    comment_delim_info,
+):
+
+    (
+        # Number of characters in an opening block comment.
+        len_opening_block_comment_delim,
+        # Number of characters in an closing block comment.
+        len_closing_block_comment_delim,
+    ) = (
+        len(comment_delim_info[1]),
+        len(comment_delim_info[2]),
+    )
 
     if group == _GROUP.inline_comment:
-        return string[len_inline_comment_delim:]
+        # Unline the opening and closing block comment delimiters, the inline comment delimiter may be a sequence. Check each possilibty for a match.
+        inline_comment_delim_seq = comment_delim_info[0]
+        # Ensure the inline comment delimiter is a sequence.
+        if isinstance(inline_comment_delim_seq, str):
+            inline_comment_delim_seq = (inline_comment_delim_seq, )
+        # Look at each possibility for a match.
+        string_lower = string.lower()
+        for inline_comment_delim in inline_comment_delim_seq:
+            if string_lower.startswith(inline_comment_delim):
+                return string[len(inline_comment_delim):]
+        return string
     if group == _GROUP.block_comment:
         return string[ len_opening_block_comment_delim:
                       -len_closing_block_comment_delim]
