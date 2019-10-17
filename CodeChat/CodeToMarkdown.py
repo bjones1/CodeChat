@@ -50,8 +50,7 @@ from io import StringIO
 
 # Local application imports
 # -------------------------
-from .SourceClassifier import source_lexer, get_lexer, _debug_print, \
-    codechat_style
+from .SourceClassifier import source_lexer, get_lexer, _debug_print, codechat_style
 
 
 # API
@@ -68,15 +67,18 @@ def code_to_markdown_string(
     # _`code_str`: the code to translate to markdown.
     code_str,
     # See `options <options>`.
-    **options):
+    **options
+):
 
     # Use a StringIO to capture writes into a string.
     output_md = StringIO()
     # Include a header containing some `CodeChat style`.
-    output_md.write(codechat_style + '\n\n')
-    ast_syntax_error, classified_lines = source_lexer(code_str, get_lexer(code=code_str, **options))
+    output_md.write(codechat_style + "\n\n")
+    ast_syntax_error, classified_lines = source_lexer(
+        code_str, get_lexer(code=code_str, **options)
+    )
     if ast_syntax_error:
-        output_md.write('# Error\n{}\n'.format(ast_syntax_error))
+        output_md.write("# Error\n{}\n".format(ast_syntax_error))
     _generate_markdown(classified_lines, output_md)
     return output_md.getvalue()
 
@@ -98,30 +100,31 @@ def code_to_markdown_file(
     #
     # Encoding to use for the input file. The default of None detects the
     # encoding of the input file.
-    input_encoding='utf-8',
+    input_encoding="utf-8",
     # .. _output_encoding:
     #
     # Encoding to use for the output file.
-    output_encoding='utf-8',
+    output_encoding="utf-8",
     # See `options <options>`.
-    **options):
+    **options
+):
 
     # Provide a default ``rst_path``.
     if not md_path:
-        md_path = source_path + '.md'
+        md_path = source_path + ".md"
     with open(source_path, encoding=input_encoding) as fi:
         code_str = fi.read()
     # If not already present, provde the filename of the source to help in identifying a lexer.
-    options.setdefault('filename', source_path)
+    options.setdefault("filename", source_path)
     rst = code_to_markdown_string(code_str, **options)
-    with open(md_path, 'w', encoding=output_encoding) as fo:
+    with open(md_path, "w", encoding=output_encoding) as fo:
         fo.write(rst)
 
 
 # Converting classified code to markdown
 # ======================================
 # The fence used for a `fenced code block <http://spec.commonmark.org/0.27/#fenced-code-blocks>`_. We hope the code doesn't contain this.
-_fence = '`' * 100
+_fence = "`" * 100
 
 
 # _generate_markdown
@@ -136,7 +139,8 @@ def _generate_markdown(
     # .. _out_file:
     #
     # A file-like output to which the markdown text is written.
-    out_file):
+    out_file,
+):
 
     # Keep track of the current type. Begin with neither comment nor code.
     current_type = -2
@@ -145,7 +149,9 @@ def _generate_markdown(
     line = 1
 
     for type_, string in classified_lines:
-        _debug_print('type_ = {}, line = {}, string = {}\n'.format(type_, line, [string]))
+        _debug_print(
+            "type_ = {}, line = {}, string = {}\n".format(type_, line, [string])
+        )
 
         # See if there's a change in state.
         if current_type != type_:
@@ -156,12 +162,16 @@ def _generate_markdown(
             #
             # Code state: emit the beginning of a fenced block.
             if type_ == -1:
-                out_file.write(_fence + '\n')
+                out_file.write(_fence + "\n")
             # Comment state: emit an opening indent for non-zero indents.
             else:
                 # Add an indent if needed.
                 if type_ > 0:
-                    out_file.write('\n<div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(0.5*type_))
+                    out_file.write(
+                        '\n<div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(
+                            0.5 * type_
+                        )
+                    )
 
         out_file.write(string)
 
@@ -180,14 +190,15 @@ def _exit_state(
     # The type (classification) of the last line.
     type_,
     # See out_file_.
-    out_file):
+    out_file,
+):
 
     # Code state: emit an ending fence.
     if type_ == -1:
-        out_file.write(_fence + '\n')
+        out_file.write(_fence + "\n")
     # Comment state: emit a closing indent.
     elif type_ > 0:
-        out_file.write('\n</div>\n\n')
+        out_file.write("\n</div>\n\n")
     # Initial state or non-indented comment. Nothing needed.
     else:
         pass

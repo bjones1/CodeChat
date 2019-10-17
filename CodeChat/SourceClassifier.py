@@ -34,8 +34,13 @@ import inspect
 
 # Third-party imports
 # -------------------
-from pygments.lexers import get_lexer_for_filename, get_lexer_by_name, \
-    get_lexer_for_mimetype, guess_lexer_for_filename, guess_lexer
+from pygments.lexers import (
+    get_lexer_for_filename,
+    get_lexer_by_name,
+    get_lexer_for_mimetype,
+    guess_lexer_for_filename,
+    guess_lexer,
+)
 from pygments.util import text_type, guess_decode
 from pygments.lexer import _encoding_map
 from pygments.token import Token
@@ -69,13 +74,14 @@ def get_lexer(
     # The code to be highlighted, used to guess a lexer.
     code=None,
     # _`options`: Specify the lexer (see `get_lexer` arguments), and provide it any other needed options.
-    **options):
+    **options
+):
 
     # This sets the default tabsize to 4 spaces in
     # `Pygments' lexer <http://pygments.org/docs/api/#pygments.lexer.Lexer>`_,
     # and this link is a list  of
     # `all available lexers <http://pygments.org/docs/lexers/#available-lexers>`_
-    options.setdefault('tabsize', 4)
+    options.setdefault("tabsize", 4)
 
     if lexer:
         return lexer
@@ -95,7 +101,7 @@ def get_lexer(
 # Provide the ability to print debug info if needed.
 def _debug_print(val):
     # Uncomment for debug prints.
-    #print(val),
+    # print(val),
     pass
 
 
@@ -115,9 +121,10 @@ def source_lexer(
     # .. _lexer:
     #
     # The lexer used to analyze the code.
-    lexer):
+    lexer,
+):
 
-    _debug_print('Lexer: {}\n'.format(lexer.name))
+    _debug_print("Lexer: {}\n".format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
     cdi = COMMENT_DELIMITER_INFO[lexer.name]
@@ -135,8 +142,9 @@ def source_lexer(
 
     # 2.    Combine tokens from the lexer into three groups: whitespace, comment,
     #       or other.
-    token_group = _group_lexer_tokens(token_iter, comment_is_inline,
-                                      comment_is_block, ast_docstring)
+    token_group = _group_lexer_tokens(
+        token_iter, comment_is_inline, comment_is_block, ast_docstring
+    )
 
     # 3.    Make a per-line list of [group, ws_len, string], so that the last
     #       string in each list ends with a newline. Change the group of block
@@ -168,53 +176,53 @@ codechat_style = (
     # Only style after the `DOM is ready <https://stackoverflow.com/questions/799981/document-ready-equivalent-without-jquery>`_.
     'document.addEventListener("DOMContentLoaded", function(event) {'
         # Walk the tree in the given direction.
-        'let walk_tree = function('
+        "let walk_tree = function("
             # The jQuery elements to walk.
-            'elements,'
+            "elements,"
             # The walker function: ``x => x.next/prevElementSibling``.
-            'func_walk,'
+            "func_walk,"
             # Which child to select, ``x => first/lastElementChild``.
-            'func_child) {'
+            "func_child) {"
 
             # Create an array to hold the children found.
-            'let walk_children = [];'
+            "let walk_children = [];"
             # For each element in the list of elements, find all its next/previous children.
-            'for (let index = 0; index < elements.length; ++index) {'
-                # If the current element (``that``) doesn't have a next/previous sibling, ascend the tree until we find one or reach the top.
-                'let that = elements[index];'
-                'while (that && !func_walk(that)) {'
-                    'that = that.parentElement;'
-                '}'
-                'if (that) {'
+            "for (let index = 0; index < elements.length; ++index) {"
+                # If the current element (``that``) does not have a next/previous sibling, ascend the tree until we find one or reach the top.
+                "let that = elements[index];"
+                "while (that && !func_walk(that)) {"
+                    "that = that.parentElement;"
+                "}"
+                "if (that) {"
                     # We found a next/previous sibling. Go there.
-                    'that = func_walk(that);'
+                    "that = func_walk(that);"
 
                     # Include the next/previous sibling in the output.
-                    'walk_children.push(that);'
+                    "walk_children.push(that);"
                     # Add all first/last children of this node to the output.
-                    'while (that && func_child(that)) {'
-                        'that = func_child(that);'
-                        'walk_children.push(that);'
-                    '}'
-                '}'
-            '}'
-            'return walk_children;'
-        '};'
+                    "while (that && func_child(that)) {"
+                        "that = func_child(that);"
+                        "walk_children.push(that);"
+                    "}"
+                "}"
+            "}"
+            "return walk_children;"
+        "};"
 
         # All CodeChat-produced code is marked by the ``fenced-code`` class.
         'let code = document.getElementsByClassName("fenced-code");'
         # Go to the next node from code, then set the margin-top of all first children to 0 so that there will be no extra space between the code and the following comment.
-        'walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => {'
-            'x.style.marginTop = 0;'
-            'x.style.paddingTop = 0;'
-        '});'
+        "walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x => {"
+            "x.style.marginTop = 0;"
+            "x.style.paddingTop = 0;"
+        "});"
         # Same, but remove space between a comment and the following code.
-        'walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => {'
-            'x.style.marginBottom = 0;'
-            'x.style.paddingBottom = 0;'
-        '});'
-    '});'
-    '</script>'
+        "walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x => {"
+            "x.style.marginBottom = 0;"
+            "x.style.paddingBottom = 0;"
+        "});"
+    "});"
+    "</script>"
 )
 
 
@@ -224,7 +232,8 @@ def _pygments_lexer(
     # See code_str_.
     code_str,
     # See lexer_.
-    lexer):
+    lexer,
+):
 
     # Pygments does some cleanup on the code given to it before lexing it. If
     # this is Python code, we want to run AST on that cleaned-up version, so
@@ -294,10 +303,10 @@ def _pygments_lexer(
     # If found, store line number and docstring into ``ast_docstring``.
     ast_docstring = {}
     # Provide a place to store syntax errors resutling from parsing the Python code.
-    ast_syntax_error = ''
+    ast_syntax_error = ""
     # Determine if code is Python or Python3. Note that AST processing cannot
     # support Python 2 specific syntax (e.g. the ``<>`` operator).
-    if lexer.name == 'Python' or lexer.name == 'Python 3':
+    if lexer.name == "Python" or lexer.name == "Python 3":
         # Syntax errors cause ``ast.parse`` to fail. Catch and report them.
         try:
             # If so, walk through the preprocessed code to analyze each token.
@@ -314,11 +323,18 @@ def _pygments_lexer(
                     pass
         except SyntaxError as err:
             # Take the file name (which shows up as ``<unknown>`` out of the error message returned.
-            ast_syntax_error = 'SyntaxError: {}. Docstrings cannot be processed.\n'.format(err).replace('<unknown>, ', '')
+            ast_syntax_error = "SyntaxError: {}. Docstrings cannot be processed.\n".format(
+                err
+            ).replace(
+                "<unknown>, ", ""
+            )
 
     # Now, run the lexer.
-    return (_pygments_get_tokens_postprocess(lexer, preprocessed_code_str),
-            ast_docstring, ast_syntax_error)
+    return (
+        _pygments_get_tokens_postprocess(lexer, preprocessed_code_str),
+        ast_docstring,
+        ast_syntax_error,
+    )
 
 
 # Pygments monkeypatching
@@ -335,46 +351,47 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     wanted and applies registered filters.
     """
     if not isinstance(text, text_type):
-        if self.encoding == 'guess':
+        if self.encoding == "guess":
             text, _ = guess_decode(text)
-        elif self.encoding == 'chardet':
+        elif self.encoding == "chardet":
             try:
                 import chardet
             except ImportError:
-                raise ImportError('To enable chardet encoding guessing, '
-                                  'please install the chardet library '
-                                  'from http://chardet.feedparser.org/')
+                raise ImportError(
+                    "To enable chardet encoding guessing, "
+                    "please install the chardet library "
+                    "from http://chardet.feedparser.org/"
+                )
             # check for BOM first
             decoded = None
             for bom, encoding in _encoding_map:
                 if text.startswith(bom):
-                    decoded = text[len(bom):].decode(encoding, 'replace')
+                    decoded = text[len(bom) :].decode(encoding, "replace")
                     break
             # no BOM found, so use chardet
             if decoded is None:
                 enc = chardet.detect(text[:1024])  # Guess using first 1KB
-                decoded = text.decode(enc.get('encoding') or 'utf-8',
-                                      'replace')
+                decoded = text.decode(enc.get("encoding") or "utf-8", "replace")
             text = decoded
         else:
             text = text.decode(self.encoding)
-            if text.startswith(u'\ufeff'):
-                text = text[len(u'\ufeff'):]
+            if text.startswith(u"\ufeff"):
+                text = text[len(u"\ufeff") :]
     else:
-        if text.startswith(u'\ufeff'):
-            text = text[len(u'\ufeff'):]
+        if text.startswith(u"\ufeff"):
+            text = text[len(u"\ufeff") :]
 
     # text now *is* a Unicode string
-    text = text.replace('\r\n', '\n')
-    text = text.replace('\r', '\n')
+    text = text.replace("\r\n", "\n")
+    text = text.replace("\r", "\n")
     if self.stripall:
         text = text.strip()
     elif self.stripnl:
-        text = text.strip('\n')
+        text = text.strip("\n")
     if self.tabsize > 0:
         text = text.expandtabs(self.tabsize)
-    if self.ensurenl and not text.endswith('\n'):
-        text += '\n'
+    if self.ensurenl and not text.endswith("\n"):
+        text += "\n"
     # EDIT: This is not from the original Pygments code. It was added to return
     # the preprocessed text.
     return text
@@ -386,6 +403,7 @@ def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
     def streamer():
         for _, t, v in self.get_tokens_unprocessed(text):
             yield t, v
+
     stream = streamer()
     if not unfiltered:
         stream = apply_filters(stream, self.filters, self)
@@ -409,30 +427,30 @@ def _group_lexer_tokens(
     # When true, classify generic comment as block comments.
     comment_is_block,
     # Docstring dict found from AST scanning.
-    ast_docstring):
+    ast_docstring,
+):
 
     # Keep track of the current group, string, and line no.
-    current_string = ''
+    current_string = ""
     current_group = None
     token_lineno = 1
     # Walk through tokens.
     for tokentype, string in iter_token:
-        _debug_print('tokentype = {}, string = {}\n'.
-                    format(tokentype, [string]))
+        _debug_print("tokentype = {}, string = {}\n".format(tokentype, [string]))
         # Increase token line no. for every newline found.
-        token_lineno += string.count('\n')
+        token_lineno += string.count("\n")
         if tokentype == Token.Literal.String.Doc:
-            _debug_print('token_lineno = {}, token_docstring = {}\n'.
-                  format(token_lineno, string))
+            _debug_print(
+                "token_lineno = {}, token_docstring = {}\n".format(token_lineno, string)
+            )
             # Compare formatted token containing docstring with AST result.
             if ast_docstring.get(token_lineno) == string[3:-3]:
                 tokentype = Token.Comment.Multiline
                 string = inspect.cleandoc(string)
                 # Insert an extra space after the docstring delimiter, making
                 # this look like a reST comment.
-                string = string[0:3] + ' ' + string[3:]
-        group = _group_for_tokentype(tokentype, comment_is_inline,
-          comment_is_block)
+                string = string[0:3] + " " + string[3:]
+        group = _group_for_tokentype(tokentype, comment_is_inline, comment_is_block)
 
         # If there's a change in group, yield what we've accumulated so far,
         # then initialize the state to the newly-found group and string.
@@ -470,6 +488,7 @@ class _GROUP(Enum):
     block_comment_body = 6
     block_comment_end = 7
 
+
 # .. _group_for_tokentype:
 #
 # Given a tokentype, group it.
@@ -479,7 +498,8 @@ def _group_for_tokentype(
     # See comment_is_inline_.
     comment_is_inline,
     # See comment_is_block_.
-    comment_is_block):
+    comment_is_block,
+):
 
     # The list of Pygments `tokens <http://pygments.org/docs/tokens/>`_ lists
     # ``Token.Text`` (how a newline is classified) and ``Token.Whitespace``.
@@ -488,13 +508,17 @@ def _group_for_tokentype(
         return _GROUP.whitespace
     # There is a Token.Comment, but this can refer to inline or block comments.
     # Therefore, use info from CommentDelimiterInfo as a tiebreaker.
-    if (tokentype == Token.Comment.Single or
-      # A few goofy lexers use this as of Pygments 2.1.3. See https://bitbucket.org/birkenfeld/pygments-main/issues/1251/use-of-commentsingleline-instead-of.
-      tokentype == Token.Comment.Singleline or
-      (tokentype == Token.Comment and comment_is_inline) ):
+    if (
+        tokentype == Token.Comment.Single
+        or
+        # A few goofy lexers use this as of Pygments 2.1.3. See https://bitbucket.org/birkenfeld/pygments-main/issues/1251/use-of-commentsingleline-instead-of.
+        tokentype == Token.Comment.Singleline
+        or (tokentype == Token.Comment and comment_is_inline)
+    ):
         return _GROUP.inline_comment
-    if (tokentype == Token.Comment.Multiline or
-      (tokentype == Token.Comment and comment_is_block) ):
+    if tokentype == Token.Comment.Multiline or (
+        tokentype == Token.Comment and comment_is_block
+    ):
         return _GROUP.block_comment
     # If the tiebreaker above doesn't classify a Token.Comment, then assume it
     # to be an inline comment. This occurs in the Matlab lexer using Pygments
@@ -516,7 +540,8 @@ def _gather_groups_on_newlines(
     # .. _comment_delim_info:
     #
     # An element of COMMENT_DELIMITER_INFO for the language being classified.
-    comment_delim_info):
+    comment_delim_info,
+):
 
     # Keep a list of (group, string) tuples we're accumulating.
     l = []
@@ -530,7 +555,7 @@ def _gather_groups_on_newlines(
 
     # Accumulate until we find a newline, then yield that.
     for group, string in iter_grouped:
-        _debug_print('group = {}, string = {}\n'.format(group, [string]))
+        _debug_print("group = {}, string = {}\n".format(group, [string]))
         # A given group (such as a block string) may extend across multiple
         # newlines. Split these groups apart first.
         splitlines = string.splitlines(True)
@@ -556,10 +581,16 @@ def _gather_groups_on_newlines(
             # should be discarded. To make this "easy", I define
             # comment_delim_info[1] as a very large number, so that the entire
             # line will be discarded. Hence, the need for the hack below.
-            last_delim_char = string[len_opening_block_comment - 1:
-                                     len_opening_block_comment]
-            if _is_space_indented_line(splitlines[1], ws_len, last_delim_char,
-              len(splitlines) == 1, comment_delim_info):
+            last_delim_char = string[
+                len_opening_block_comment - 1 : len_opening_block_comment
+            ]
+            if _is_space_indented_line(
+                splitlines[1],
+                ws_len,
+                last_delim_char,
+                len(splitlines) == 1,
+                comment_delim_info,
+            ):
                 is_indented_line = _is_space_indented_line
             else:
                 is_indented_line = _is_delim_indented_line
@@ -567,8 +598,13 @@ def _gather_groups_on_newlines(
             # Look at the second and following lines to see if their indent is
             # consistent.
             for i, line in enumerate(splitlines[1:]):
-                if not is_indented_line(line, ws_len, last_delim_char,
-                  len(splitlines) - 2 == i, comment_delim_info):
+                if not is_indented_line(
+                    line,
+                    ws_len,
+                    last_delim_char,
+                    len(splitlines) - 2 == i,
+                    comment_delim_info,
+                ):
                     # It's inconsistent. Set ws_len to 0 to signal that this
                     # isn't an indented block comment.
                     ws_len = 0
@@ -576,7 +612,7 @@ def _gather_groups_on_newlines(
 
         for index, split_str in enumerate(splitlines):
             # Accumulate results.
-            l.append( (group, ws_len, split_str) )
+            l.append((group, ws_len, split_str))
 
             # For block comments, move from a start to a body group.
             if group == _GROUP.block_comment_start:
@@ -584,12 +620,11 @@ def _gather_groups_on_newlines(
             # If the next line is the last line, update the block
             # group.
             is_next_to_last_line = index == len(splitlines) - 2
-            if (is_next_to_last_line and
-                group == _GROUP.block_comment_body):
+            if is_next_to_last_line and group == _GROUP.block_comment_body:
                 group = _GROUP.block_comment_end
 
             # Yield when we find a newline, then clear our accumulator.
-            if split_str.endswith('\n'):
+            if split_str.endswith("\n"):
                 yield l
                 l = []
 
@@ -687,7 +722,8 @@ def _is_space_indented_line(
     # True if this is the last line of a multi-line comment.
     is_last,
     # See comment_delim_info_.
-    comment_delim_info):
+    comment_delim_info,
+):
 
     # A line containing only whitespace is always considered valid.
     if line.isspace():
@@ -698,12 +734,13 @@ def _is_space_indented_line(
 
     # The closing delimiter will always be followed by a newline, hence the - 1
     # factor.
-    line_except_closing_delim = line[:-len(comment_delim_info[2]) - 1]
+    line_except_closing_delim = line[: -len(comment_delim_info[2]) - 1]
     # Last line: zero or more whitespaces followed by the closing block comment
     # delimiter is valid. Since ``''.isspace() == False``, check for this case
     # and consider it true.
-    if (is_last and (not line_except_closing_delim or
-                     line_except_closing_delim.isspace())):
+    if is_last and (
+        not line_except_closing_delim or line_except_closing_delim.isspace()
+    ):
         return True
     # No other correctly indented cases.
     return False
@@ -756,20 +793,28 @@ def _is_delim_indented_line(
     # True if this is the last line of a multi-line comment.
     is_last,
     # See comment_delim_info_.
-    comment_delim_info):
+    comment_delim_info,
+):
 
     # A line the correct number of spaces, followed by a delimiter then either
     # a space or a newline is correctly indented.
-    if (len(line) >= indent_len and line[:indent_len - 2].isspace() and
-        line[indent_len - 2] == delim and line[indent_len - 1] in '\n '):
+    if (
+        len(line) >= indent_len
+        and line[: indent_len - 2].isspace()
+        and line[indent_len - 2] == delim
+        and line[indent_len - 1] in "\n "
+    ):
         return True
     # Last line possibility: indent_len - 2 spaces followed by the delimiter
     # is a valid indent. For example, an indent of 3 begins with ``/* comment``
     # and can end with ``_*/``, a total of (indent_len == 3) - (2 spaces
     # that are usually a * followed by a space) + (closing delim ``*/`` length
     # of 2 chars) == 3.
-    if ( is_last and len(line) == indent_len - 2 +
-         len(comment_delim_info[2]) and line[:indent_len - 2].isspace() ):
+    if (
+        is_last
+        and len(line) == indent_len - 2 + len(comment_delim_info[2])
+        and line[: indent_len - 2].isspace()
+    ):
         return True
     # No other correctly indented cases.
     return False
@@ -797,14 +842,15 @@ def _classify_groups(
     # ``gather_groups_on_newlines``.
     iter_gathered_groups,
     # See comment_delim_info_.
-    comment_delim_info):
+    comment_delim_info,
+):
 
     # Keep track of block comment state.
     is_block_rest_comment = False
 
     # Walk through groups.
     for l in iter_gathered_groups:
-        _debug_print('[(group, ws_len, string), ...] = {}\n'.format(l))
+        _debug_print("[(group, ws_len, string), ...] = {}\n".format(l))
 
         if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
 
@@ -826,8 +872,12 @@ def _classify_groups(
                 is_block_rest_comment = True
 
             # Strip all comment characters off the strings and combine them.
-            string = ''.join([_remove_comment_delim(group, string,
-              comment_delim_info) for group, ws_len, string in l])
+            string = "".join(
+                [
+                    _remove_comment_delim(group, string, comment_delim_info)
+                    for group, ws_len, string in l
+                ]
+            )
             # Remove the initial space character from the first comment,
             # or ws_len chars from body or end comments.
             if _is_block_body_or_end(first_group):
@@ -838,22 +888,22 @@ def _classify_groups(
                 # nothing.
                 if not string.isspace() and first_ws_len > 0:
                     # The first ws_len - 1 characters should be stripped.
-                    string = string[first_ws_len - 1:]
+                    string = string[first_ws_len - 1 :]
                     # The last character, if it's a space, should also be
                     # stripped.
-                    if string[0] == ' ':
+                    if string[0] == " ":
                         string = string[1:]
             # A comment of ``//\n`` qualifies as a reST comment, but should
             # not have the ``\n`` stripped off. Avoid this case. Otherwise,
             # handle the more typical ``// comment`` case, in which the space
             # after the comment delimiter should be removed.
-            elif len(string) > 0 and string[0] == ' ':
+            elif len(string) > 0 and string[0] == " ":
                 string = string[1:]
 
         # Everything else is considered code.
         else:
             type_ = -1
-            string = ''.join([string for group, ws_len, string in l])
+            string = "".join([string for group, ws_len, string in l])
             is_block_rest_comment = False
 
         yield type_, string
@@ -869,17 +919,18 @@ def _remove_comment_delim(
     # The string corresponding to this group.
     string,
     # See comment_delim_info_.
-    comment_delim_info):
-
     comment_delim_info,
 ):
 
+    # Number of characters in a single-line comment delimiter.
     (
+        len_inline_comment_delim,
         # Number of characters in an opening block comment.
         len_opening_block_comment_delim,
         # Number of characters in an closing block comment.
         len_closing_block_comment_delim,
     ) = (
+        len(comment_delim_info[0]),
         len(comment_delim_info[1]),
         len(comment_delim_info[2]),
     )
@@ -897,8 +948,7 @@ def _remove_comment_delim(
                 return string[len(inline_comment_delim):]
         return string
     if group == _GROUP.block_comment:
-        return string[ len_opening_block_comment_delim:
-                      -len_closing_block_comment_delim]
+        return string[len_opening_block_comment_delim:-len_closing_block_comment_delim]
     if group == _GROUP.block_comment_start:
         return string[len_opening_block_comment_delim:]
     if group == _GROUP.block_comment_end:
@@ -918,13 +968,14 @@ def _remove_beginning_comment_delim(
     # strings which give all valid beginning comment delimiters.
     beginning_comment_delim_seq,
     # The string which start with the delimiter to be removed.
-    string):
+    string,
+):
 
     # Loop through all delimiters.
     for bcd in beginning_comment_delim_seq:
         # If we find one at the beginning of the string, strip it off.
         if string.startswith(bcd):
-            return string[len(bcd):]
+            return string[len(bcd) :]
 
     # Not found -- panic.
     assert False
@@ -939,7 +990,8 @@ def _is_rest_comment(
     # that will be interpreted by reST.
     is_block_rest_comment,
     # See lexer_.
-    lexer):
+    lexer,
+):
 
     # See if there is any _GROUP.other in this line. If so, it's not a reST
     # comment.
@@ -948,7 +1000,7 @@ def _is_rest_comment(
         return False
     # If there's no comments (meaning the entire line is whitespace), it's not a
     # reST comment.
-    if group_tuple == (_GROUP.whitespace, ):
+    if group_tuple == (_GROUP.whitespace,):
         return False
 
     # Find the first comment. There may be whitespace preceding it, so select
@@ -973,9 +1025,9 @@ def _is_rest_comment(
     # To check the other cases, first remove the comment delimiter so we can
     # examine the next character following the delimiter.
     first_comment_text = _remove_comment_delim(first_group, first_string, lexer)
-    first_char_is_rest = ( (len(first_comment_text) > 0 and
-                          first_comment_text[0] in (' ', '\n')) or
-                          len(first_comment_text) == 0 )
+    first_char_is_rest = (
+        len(first_comment_text) > 0 and first_comment_text[0] in (" ", "\n")
+    ) or len(first_comment_text) == 0
     if first_char_is_rest and not _is_block_body_or_end(first_group):
         return True
     return False

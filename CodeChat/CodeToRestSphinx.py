@@ -70,7 +70,7 @@ def _source_read(
     # relative to the project directory and (typically) no extension.
     docname,
     # A list whose single element is the contents of the source file.
-    source
+    source,
 ):
 
     if is_source_code(app.env, docname):
@@ -89,14 +89,15 @@ def _source_read(
             lexer = lexer or get_lexer(filename=docname, code=source[0])
 
             # Translate code to reST.
-            logger.info('Converted using the {} lexer.'.format(lexer.name))
+            logger.info("Converted using the {} lexer.".format(lexer.name))
             source[0] = code_to_rest_string(source[0], lexer=lexer)
             source[0] = add_highlight_language(source[0], lexer)
 
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
-            logger.warning('Unsupported source code language: ' + str(e),
-                           location=docname)
+            logger.warning(
+                "Unsupported source code language: " + str(e), location=docname
+            )
 
 
 # Return True if the supplied ``docname`` is source code.
@@ -104,7 +105,7 @@ def is_source_code(
     # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
     env,
     # See docname_.
-    docname
+    docname,
 ):
 
     # If the docname's extension doesn't change when asking for its full path,
@@ -140,7 +141,7 @@ def _path2doc(self, filename):
         filename = relpath(filename, self.srcdir)
     for suffix in self.source_suffix:
         if filename.endswith(suffix):
-            return filename[:-len(suffix)]
+            return filename[: -len(suffix)]
 
     # The following code was added.
     if is_supported_language(filename):
@@ -156,9 +157,8 @@ sphinx.project.Project.path2doc = _path2doc
 # Return True if the provided filename is a source code langauge CodeChat supports.
 def is_supported_language(filename):
     # type: (str) -> bool
-    source_suffixpatterns = (
-        SUPPORTED_GLOBS |
-        set(_config.CodeChat_lexer_for_glob.keys())
+    source_suffixpatterns = SUPPORTED_GLOBS | set(
+        _config.CodeChat_lexer_for_glob.keys()
     )
     path_filename = Path(filename)
     for source_suffixpattern in source_suffixpatterns:
@@ -188,7 +188,7 @@ def _doc2path(self, docname, basedir=True):
     else:
         # Three lines of code added here -- check for the no-extenion case.
         if os.path.isfile(os.path.join(self.srcdir, docname)):
-            suffix = ''
+            suffix = ""
         else:
             # document does not exist
             suffix = list(self.source_suffix)[0]
@@ -210,11 +210,11 @@ def _get_filetype(source_suffix, filename):
     for suffix, filetype in source_suffix.items():
         if filename.endswith(suffix):
             # If default filetype (None), considered as restructuredtext.
-            return filetype or 'restructuredtext'
+            return filetype or "restructuredtext"
     else:
         # The following code was added.
         if is_supported_language(filename):
-            return 'restructuredtext'
+            return "restructuredtext"
         # This was the existing code.
         raise FiletypeNotFoundError
 
@@ -245,21 +245,22 @@ def _html_page_context(
     context,
     # A doctree when the page is created from a reST documents; None when the
     # page is created from an HTML template alone.
-    doctree
+    doctree,
 ):
 
-    sourcename = context.get('sourcename')
+    sourcename = context.get("sourcename")
     ext = Path(pagename).suffix
     # The extension Sphinx uses optionally includes the `html_sourcelink_suffix <http://www.sphinx-doc.org/en/stable/config.html#confval-html_sourcelink_suffix>`_.
     sphinx_ext = ext + (
-        '' if ext == app.config.html_sourcelink_suffix
+        ""
+        if ext == app.config.html_sourcelink_suffix
         else app.config.html_sourcelink_suffix
     )
     double_ext = ext + sphinx_ext
     # Only provide the rename if necessary.
     if sourcename and ext and sourcename.endswith(double_ext):
         # Take off the second of the double extensions.
-        context['sourcename'] = sourcename[:-len(double_ext)] + sphinx_ext
+        context["sourcename"] = sourcename[: -len(double_ext)] + sphinx_ext
 
 
 # Enki_ support
@@ -275,7 +276,7 @@ def _builder_inited(
 ):
 
     try:
-        with open('sphinx-enki-info.txt', 'w', encoding='utf-8') as f:
+        with open("sphinx-enki-info.txt", "w", encoding="utf-8") as f:
             f.write(app.config.html_file_suffix)
     except TypeError:
         # If ``html_file_suffix`` is None (TypeError), Enki will assume
@@ -295,26 +296,26 @@ def setup(
 
     # Ensure we're using a new enough Sphinx using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
-    app.require_sphinx('2.0')
+    app.require_sphinx("2.0")
 
     # Use the `source-read <http://sphinx-doc.org/extdev/appapi.html#event-source-read>`_
     # event hook to transform source code to reST before Sphinx processes it.
-    app.connect('source-read', _source_read)
+    app.connect("source-read", _source_read)
 
     # Add the CodeChat.css style sheet using `add_css_file
     # <http://www.sphinx-doc.org/en/master/extdev/appapi.html#sphinx.application.Sphinx.add_css_file>`_.
-    app.add_css_file('CodeChat.css')
+    app.add_css_file("CodeChat.css")
 
     # Add the `CodeChat_lexer_for_glob <CodeChat_lexer_for_glob>` config value. See `add_config_value
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
-    app.add_config_value('CodeChat_lexer_for_glob', {}, 'html')
+    app.add_config_value("CodeChat_lexer_for_glob", {}, "html")
 
     # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
     # event to write out settings specified in ``conf.py``.
-    app.connect('builder-inited', _builder_inited)
+    app.connect("builder-inited", _builder_inited)
     # Use the `html-page-context <http://www.sphinx-doc.org/en/stable/extdev/appapi.html#event-html-page-context>`_
     # event to correct the extension of source files.
-    app.connect('html-page-context', _html_page_context)
+    app.connect("html-page-context", _html_page_context)
 
     # .. _global_config:
     #
@@ -326,7 +327,4 @@ def setup(
     _config = app.config
 
     # Return `extension metadata <http://sphinx-doc.org/extdev/index.html>`_.
-    return {
-        'version': __version__,
-        'parallel_read_safe': True
-    }
+    return {"version": __version__, "parallel_read_safe": True}

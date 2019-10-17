@@ -35,135 +35,147 @@
 from docutils import io
 from tempfile import mkstemp
 import os
+
 #
 # Local application imports
 # -------------------------
-from CodeChat.RestToCode import rest_to_code_file, rest_to_code_string, \
-    find_file_ext
-from CodeChat.CodeToRest import code_to_rest_file, code_to_rest_string, code_to_html_file
-
-
+from CodeChat.RestToCode import rest_to_code_file, rest_to_code_string, find_file_ext
+from CodeChat.CodeToRest import (
+    code_to_rest_file,
+    code_to_rest_string,
+    code_to_html_file,
+)
 
 
 # The string that results from rest_to_code not understanding the material.
-error_str = "This was not recognized as valid reST. Please check your input and try again."
+error_str = (
+    "This was not recognized as valid reST. Please check your input and try again."
+)
 
 
 class TestRestToCodeErrCatching(object):
 
     # Error testing main code
-    def et(self, rest, alias_seq=('C', 'C', 'C++',
-      'Java', 'ActionScript', 'C#', 'D', 'Go', 'JavaScript', 'Objective-C',
-      'Rust', 'Scala', 'Swift', 'verilog', 'systemverilog', 'Dart', 'Juttle',
-      'Objective-J', 'TypeScript', 'Arduino', 'Clay', 'CUDA', 'eC', 'MQL',
-      'nesC', 'Pike', 'SWIG', 'Vala', 'Zephir', 'Haxe')):
+    def et(
+        self,
+        rest,
+        alias_seq=(
+            "C",
+            "C",
+            "C++",
+            "Java",
+            "ActionScript",
+            "C#",
+            "D",
+            "Go",
+            "JavaScript",
+            "Objective-C",
+            "Rust",
+            "Scala",
+            "Swift",
+            "verilog",
+            "systemverilog",
+            "Dart",
+            "Juttle",
+            "Objective-J",
+            "TypeScript",
+            "Arduino",
+            "Clay",
+            "CUDA",
+            "eC",
+            "MQL",
+            "nesC",
+            "Pike",
+            "SWIG",
+            "Vala",
+            "Zephir",
+            "Haxe",
+        ),
+    ):
 
         for alias in alias_seq:
 
             code = rest_to_code_string(rest, alias)
             assert code == error_str
 
-
     def test_1(self):
-        self.et('hello')
+        self.et("hello")
 
     def test_2(self):
-        self.et('\n'
-                '.. fenced-code::\n'
-                '\n'
-                ' Beginning fene\n')
+        self.et("\n" ".. fenced-code::\n" "\n" " Beginning fene\n")
 
 
 class TestRestToCodeString(object):
-
     def mt(self, given_code, expected_code, lang):
 
         rest = code_to_rest_string(given_code, alias=lang)
         code = rest_to_code_string(rest, lang)
         assert code == expected_code
 
-
     # Inline comment to code transition
     def test_1(self):
-        self.mt('// Comment\n'
-                'Code\n',
-                '// Comment\n'
-                'Code\n',
-                'C')
+        self.mt("// Comment\n" "Code\n", "// Comment\n" "Code\n", "C")
 
     # Single line block comment  to code transition
     def test_2(self):
-        self.mt('/* Single line block comment*/\n'
-                'Code\n',
-                '// Single line block comment\n'
-                'Code\n',
-                'C++')
+        self.mt(
+            "/* Single line block comment*/\n" "Code\n",
+            "// Single line block comment\n" "Code\n",
+            "C++",
+        )
 
     # Single line block comment  to code transition
     # No inline delimiters
     def test_2b(self):
-        self.mt('/* Single line block comment*/\n'
-                'Code\n',
-                '/* Single line block comment*/\n'
-                'Code\n',
-                'CSS')
+        self.mt(
+            "/* Single line block comment*/\n" "Code\n",
+            "/* Single line block comment*/\n" "Code\n",
+            "CSS",
+        )
 
     # Multi-line block comment to code transition
     def test_3(self):
-        self.mt('/* Multi-line\n'
-                ' * block\n'
-                ' * comment*/\n'
-                'Code\n',
-                '// Multi-line\n'
-                '// block\n'
-                '// comment\n'
-                'Code\n',
-                'C')
+        self.mt(
+            "/* Multi-line\n" " * block\n" " * comment*/\n" "Code\n",
+            "// Multi-line\n" "// block\n" "// comment\n" "Code\n",
+            "C",
+        )
 
     # Multi-line block comment to code transition, no inline delimiters.
     def test_3b(self):
-        self.mt('/* Multi-line\n'
-                ' * block\n'
-                ' * comment*/\n'
-                'Code\n',
-                '/* Multi-line*/\n'
-                '/* block*/\n'
-                '/* comment*/\n'
-                'Code\n',
-                'CSS')
+        self.mt(
+            "/* Multi-line\n" " * block\n" " * comment*/\n" "Code\n",
+            "/* Multi-line*/\n" "/* block*/\n" "/* comment*/\n" "Code\n",
+            "CSS",
+        )
 
     # ``<div>`` testing
     def test_4(self):
-        self.mt('\t// Comment\n'
-                '\tCode\n'
-                'Code2\n',
-                '    // Comment\n'
-                '    Code\n'
-                'Code2\n',
-                'C')
+        self.mt(
+            "\t// Comment\n" "\tCode\n" "Code2\n",
+            "    // Comment\n" "    Code\n" "Code2\n",
+            "C",
+        )
 
     # ``<div>`` testing, no inline delimiters
     def test_4b(self):
-        self.mt('\t/* Comment*/\n'
-                '\tCode\n'
-                'Code2\n',
-                '    /* Comment*/\n'
-                '    Code\n'
-                'Code2\n',
-                'CSS')
-
+        self.mt(
+            "\t/* Comment*/\n" "\tCode\n" "Code2\n",
+            "    /* Comment*/\n" "    Code\n" "Code2\n",
+            "CSS",
+        )
 
 
 class TestRestToCodeFileTests(object):
 
     # Round trip testing in files with a given name
-    def rt_given_file(self, code_file_name=None, lang='Python', lexer=None):
+    def rt_given_file(self, code_file_name=None, lang="Python", lexer=None):
 
         # Get the extension of the given file so you can match it with the temporary files.
-        file_name = code_file_name.rsplit('.')
-        ext = '.' + file_name[-1]
+        file_name = code_file_name.rsplit(".")
+        ext = "." + file_name[-1]
         # Create the 'temporary files <https://docs.python.org/3/library/tempfile.html#tempfile.mkstemp>'_.
-        fr, rest_file = mkstemp(suffix='.rst')
+        fr, rest_file = mkstemp(suffix=".rst")
         fm1, modded_code_file1 = mkstemp(suffix=ext)
         fm2, modded_code_file2 = mkstemp(suffix=ext)
         # Close all files. This is done on an os level because the os thinks they are open.
@@ -186,39 +198,39 @@ class TestRestToCodeFileTests(object):
         os.remove(modded_code_file1)
         os.remove(modded_code_file2)
         # Make sure the code is the same; this shows round trip stability.
-        assert (code1 == code2)
-
-
+        assert code1 == code2
 
     # Python file test
     def test_1(self):
-        self.rt_given_file(code_file_name='CodeChat/CodeToRest.py')
+        self.rt_given_file(code_file_name="CodeChat/CodeToRest.py")
 
     # CSS file test
     def test_2(self):
-        self.rt_given_file(code_file_name='CodeChat.css', lang='CSS', lexer='css')
+        self.rt_given_file(code_file_name="CodeChat.css", lang="CSS", lexer="css")
 
     # Empty file (C) test
     def test_3(self):
-        fd, tmp_path = mkstemp(suffix='.c')
+        fd, tmp_path = mkstemp(suffix=".c")
         os.close(fd)
-        self.rt_given_file(code_file_name=tmp_path, lang='C')
+        self.rt_given_file(code_file_name=tmp_path, lang="C")
         os.remove(tmp_path)
 
     # find_file_ext test
     def test_find_file_ext_1(self):
-        ext = find_file_ext('Python')
-        assert ext == '.py'
+        ext = find_file_ext("Python")
+        assert ext == ".py"
 
     def test_find_file_ext_2(self):
-        ext = find_file_ext('Pthon')
+        ext = find_file_ext("Pthon")
         assert ext is None
 
     def test_find_file_ext_3(self):
-        ext = find_file_ext('C')
-        assert ext == '.c'
+        ext = find_file_ext("C")
+        assert ext == ".c"
 
     # TODO.
     def xtest_delete(self):
-        code_to_html_file('C:\\Users\\Austin\\Documents\\SmartGit\\CodeChat_jones\\CodeChat\\RestToCode.py',
-                          'C:\\Users\\Austin\\Desktop\\Test\\RestToCode.html')
+        code_to_html_file(
+            "C:\\Users\\Austin\\Documents\\SmartGit\\CodeChat_jones\\CodeChat\\RestToCode.py",
+            "C:\\Users\\Austin\\Desktop\\Test\\RestToCode.html",
+        )

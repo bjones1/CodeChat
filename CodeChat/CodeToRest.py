@@ -50,8 +50,7 @@ from docutils.utils.error_reporting import SafeString, ErrorString
 
 # Local application imports
 # -------------------------
-from .SourceClassifier import source_lexer, get_lexer, _debug_print, \
-    codechat_style
+from .SourceClassifier import source_lexer, get_lexer, _debug_print, codechat_style
 
 
 # API
@@ -69,15 +68,18 @@ def code_to_rest_string(
     # _`code_str`: the code to translate to reST.
     code_str,
     # See `options <options>`.
-    **options):
+    **options
+):
 
     # Use a StringIO to capture writes into a string.
     output_rst = StringIO()
     # Include a header containing some `CodeChat style`. Don't put this in a separate ``.js`` file, since docutils doesn't have an easy way to include it.
     output_rst.write(rest_codechat_style)
-    ast_syntax_error, classified_lines = source_lexer(code_str, get_lexer(code=code_str, **options))
+    ast_syntax_error, classified_lines = source_lexer(
+        code_str, get_lexer(code=code_str, **options)
+    )
     if ast_syntax_error:
-        output_rst.write('.. error:: {}\n\n'.format(ast_syntax_error))
+        output_rst.write(".. error:: {}\n\n".format(ast_syntax_error))
     _generate_rest(classified_lines, output_rst)
     return output_rst.getvalue()
 
@@ -103,13 +105,14 @@ def code_to_rest_file(
     # .. _output_encoding:
     #
     # Encoding to use for the output file.
-    output_encoding='utf-8',
+    output_encoding="utf-8",
     # See `options <options>`.
-    **options):
+    **options
+):
 
     # Provide a default ``rst_path``.
     if not rst_path:
-        rst_path = source_path + '.rst'
+        rst_path = source_path + ".rst"
     # Use docutil's I/O classes to better handle and sniff encodings.
     #
     # Note: both these classes automatically close themselves after a
@@ -118,7 +121,7 @@ def code_to_rest_file(
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     code_str = fi.read()
     # If not already present, provde the filename of the source to help in identifying a lexer.
-    options.setdefault('filename', source_path)
+    options.setdefault("filename", source_path)
     rst = code_to_rest_string(code_str, **options)
     fo.write(rst)
 
@@ -136,26 +139,31 @@ def code_to_html_string(
     # send them to stderr.
     warning_stream=None,
     # See `options <options>`.
-    **options):
+    **options
+):
 
     rest = code_to_rest_string(code_str, **options)
     # `docutils
     # <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_
     # converts reST to HTML.
-    html = core.publish_string(rest, writer_name='html',
-      settings_overrides={
-        # Include our custom css file: provide the path to the default css and
-        # then to our css. The style sheet dirs must include docutils defaults.
-        'stylesheet_path': ','.join(Writer.default_stylesheets + ['CodeChat.css']),
-        'stylesheet_dirs': Writer.default_stylesheet_dirs +
-            [os.path.join(os.path.dirname(__file__), 'template')],
-        # Make sure to use Unicode everywhere.
-        'output_encoding': 'unicode',
-        'input_encoding' : 'unicode',
-        # Don't stop processing, no matter what.
-        'halt_level'     : 5,
-        # Capture errors to a string and return it.
-        'warning_stream' : warning_stream})
+    html = core.publish_string(
+        rest,
+        writer_name="html",
+        settings_overrides={
+            # Include our custom css file: provide the path to the default css and
+            # then to our css. The style sheet dirs must include docutils defaults.
+            "stylesheet_path": ",".join(Writer.default_stylesheets + ["CodeChat.css"]),
+            "stylesheet_dirs": Writer.default_stylesheet_dirs
+            + [os.path.join(os.path.dirname(__file__), "template")],
+            # Make sure to use Unicode everywhere.
+            "output_encoding": "unicode",
+            "input_encoding": "unicode",
+            # Don't stop processing, no matter what.
+            "halt_level": 5,
+            # Capture errors to a string and return it.
+            "warning_stream": warning_stream,
+        },
+    )
     return html
 
 
@@ -173,9 +181,10 @@ def code_to_html_file(
     # See input_encoding_.
     input_encoding=None,
     # See output_encoding_.
-    output_encoding='utf-8'):
+    output_encoding="utf-8",
+):
 
-    html_path = html_path or source_path + '.html'
+    html_path = html_path or source_path + ".html"
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=html_path, encoding=output_encoding)
 
@@ -187,11 +196,7 @@ def code_to_html_file(
 
 
 # Provide correct formatting of CodeChat-produced documents in reST based on the `CodeChat style`.
-rest_codechat_style = (
-    '.. raw:: html\n'
-    '\n'
-    ' ' + codechat_style
-)
+rest_codechat_style = ".. raw:: html\n" "\n" " " + codechat_style
 
 
 # Converting classified code to reST
@@ -410,7 +415,8 @@ def _generate_rest(
     # .. _out_file:
     #
     # A file-like output to which the reST text is written.
-    out_file):
+    out_file,
+):
 
     # Keep track of the current type. Begin with a 0-indent comment.
     current_type = -2
@@ -419,7 +425,9 @@ def _generate_rest(
     line = 1
 
     for type_, string in classified_lines:
-        _debug_print('type_ = {}, line = {}, string = {}\n'.format(type_, line, [string]))
+        _debug_print(
+            "type_ = {}, line = {}, string = {}\n".format(type_, line, [string])
+        )
 
         # See if there's a change in state.
         if current_type != type_:
@@ -430,13 +438,17 @@ def _generate_rest(
             #
             # Code state: emit the beginning of a fenced block.
             if type_ == -1:
-                out_file.write('\n.. fenced-code::\n\n Beginning fence\n')
+                out_file.write("\n.. fenced-code::\n\n Beginning fence\n")
             # Comment state: emit an opening indent for non-zero indents.
             else:
                 # Add an indent if needed.
                 if type_ > 0:
-                    out_file.write('\n.. raw:: html\n\n'
-                      ' <div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(0.5*type_))
+                    out_file.write(
+                        "\n.. raw:: html\n\n"
+                        ' <div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(
+                            0.5 * type_
+                        )
+                    )
                 # Specify the line number in the source, so that errors will be
                 # accurately reported. This isn't necessary in code blocks,
                 # since errors can't occur.
@@ -447,12 +459,12 @@ def _generate_rest(
                 # any following indents a separate syntactical element. See the
                 # end of `reST comment syntax <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html#comments>`_
                 # for more discussion.
-                out_file.write('\n.. set-line:: {}\n\n..\n\n'.format(line - 4))
+                out_file.write("\n.. set-line:: {}\n\n..\n\n".format(line - 4))
 
         # Output string based on state. All code needs an initial space to
         # place it inside the fenced-code block.
         if type_ == -1:
-            out_file.write(' ')
+            out_file.write(" ")
         out_file.write(string)
 
         # Update the state.
@@ -470,14 +482,15 @@ def _exit_state(
     # The type (classification) of the last line.
     type_,
     # See out_file_.
-    out_file):
+    out_file,
+):
 
     # Code state: emit an ending fence.
     if type_ == -1:
-        out_file.write(' Ending fence\n\n..\n\n')
+        out_file.write(" Ending fence\n\n..\n\n")
     # Comment state: emit a closing indent.
     elif type_ > 0:
-        out_file.write('\n.. raw:: html\n\n </div>\n\n..\n\n')
+        out_file.write("\n.. raw:: html\n\n </div>\n\n..\n\n")
     # Initial state. Nothing needed.
     else:
         pass
@@ -501,7 +514,7 @@ class _FencedCodeBlock(CodeBlock):
     def run(self):
         # The content must contain at least two lines (the fences).
         if len(self.content) < 2:
-            raise self.error('Fenced code block must contain at least two lines.')
+            raise self.error("Fenced code block must contain at least two lines.")
         # Remove the fences.
         self.content = self.content[1:-1]
         #
@@ -519,7 +532,7 @@ class _FencedCodeBlock(CodeBlock):
             if content:
                 processedAllContent = False
                 break
-            self.content[i] = ' '
+            self.content[i] = " "
         # If we've seen all the content, then don't do it again -- we'd be
         # adding unnecessary spaces. Otherwise, walk from the end of the content
         # backwards, adding spaces until the first non-blank line.
@@ -529,10 +542,10 @@ class _FencedCodeBlock(CodeBlock):
                 # list, -1 is the last element, so offset all indices by -1.
                 if self.content[-i - 1]:
                     break
-                self.content[-i - 1] = ' '
+                self.content[-i - 1] = " "
 
         # Mark all fenced code with a specific class, for styling.
-        self.options['classes'] = ['fenced-code']
+        self.options["classes"] = ["fenced-code"]
 
         # Now, process the resulting contents as a code block.
         nodeList = CodeBlock.run(self)
@@ -555,7 +568,7 @@ class _FencedCodeBlock(CodeBlock):
         # Note that the nodeList returned by the CodeBlock directive contains
         # only a single ``literal_block`` node. The setting should be applied to
         # it.
-        nodeList[0]['highlight_args'] = {'force': True}
+        nodeList[0]["highlight_args"] = {"force": True}
 
         return nodeList
 
@@ -639,7 +652,8 @@ def _docname_role(
     # A dictionary of directive options for customization (from the "role" directive), to be interpreted by this function. Used for additional attributes for the generated elements and other functionality.
     options={},
     # A list of strings, the directive content for customization (from the "role" directive). To be interpreted by the role function.
-    content=[]):
+    content=[],
+):
 
     # See https://doughellmann.com/blog/2010/05/09/defining-custom-roles-in-sphinx/.
     env = inliner.document.settings.env
@@ -651,7 +665,7 @@ def _docname_role(
     except Exception as e:
         # Report an error.
         msg = inliner.reporter.error(
-            'Invalid path component {}: {}'.format(text, e), line=lineno
+            "Invalid path component {}: {}".format(text, e), line=lineno
         )
         prb = inliner.problematic(rawtext, rawtext, msg)
         return [prb], [msg]
@@ -668,15 +682,16 @@ def add_highlight_language(
     # The source reST to potentially prepend a `highlight directive`_ to.
     source,
     # The lexer which was used to produce this source.
-    lexer):
+    lexer,
+):
 
     # If there's `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_, then it's hard to know where the `highlight directive`_ can be safely placed:
     #
     # - Putting it before file-wide metadata demotes it to not being metadata.
     # - Finding the right place to put the ``.. highlight`` directive after the metadata is difficult to know.
-    if not re.search('^:(tocdepth|nocomments|orphan):', source, re.MULTILINE):
+    if not re.search("^:(tocdepth|nocomments|orphan):", source, re.MULTILINE):
         # There's no file-wide metadata. Add the `highlight directive`_.
-        return '.. highlight:: {}\n\n{}'.format(lexer.aliases[0], source)
+        return ".. highlight:: {}\n\n{}".format(lexer.aliases[0], source)
     else:
         # There might be file-wide metadata.
         return source
@@ -705,94 +720,106 @@ class _CodeInclude(Directive):
     optional_arguments = 0
     final_argument_whitespace = True
     # **Updated** ``option_spec`` for this directive.
-    option_spec = {'lexer': directives.unchanged,
-                   'encoding': directives.encoding,
-                   'tab-width': int,
-                   'start-line': int,
-                   'end-line': int,
-                   'start-after': directives.unchanged_required,
-                   'end-before': directives.unchanged_required}
+    option_spec = {
+        "lexer": directives.unchanged,
+        "encoding": directives.encoding,
+        "tab-width": int,
+        "start-line": int,
+        "end-line": int,
+        "start-after": directives.unchanged_required,
+        "end-before": directives.unchanged_required,
+    }
 
-    standard_include_path = os.path.join(os.path.dirname(states.__file__),
-                                         'include')
+    standard_include_path = os.path.join(os.path.dirname(states.__file__), "include")
 
     def run(self):
         """Include a file as part of the content of this reST file."""
         if not self.state.document.settings.file_insertion_enabled:
             raise self.warning('"%s" directive disabled.' % self.name)
         source = self.state_machine.input_lines.source(
-            self.lineno - self.state_machine.input_offset - 1)
+            self.lineno - self.state_machine.input_offset - 1
+        )
         source_dir = os.path.dirname(os.path.abspath(source))
         path = directives.path(self.arguments[0])
-        if path.startswith('<') and path.endswith('>'):
+        if path.startswith("<") and path.endswith(">"):
             path = os.path.join(self.standard_include_path, path[1:-1])
         path = os.path.normpath(os.path.join(source_dir, path))
         path = utils.relative_path(None, path)
         path = nodes.reprunicode(path)
         encoding = self.options.get(
-            'encoding', self.state.document.settings.input_encoding)
-        e_handler=self.state.document.settings.input_encoding_error_handler
+            "encoding", self.state.document.settings.input_encoding
+        )
+        e_handler = self.state.document.settings.input_encoding_error_handler
         tab_width = self.options.get(
-            'tab-width', self.state.document.settings.tab_width)
+            "tab-width", self.state.document.settings.tab_width
+        )
         try:
             self.state.document.settings.record_dependencies.add(path)
-            include_file = io.FileInput(source_path=path,
-                                        encoding=encoding,
-                                        error_handler=e_handler)
+            include_file = io.FileInput(
+                source_path=path, encoding=encoding, error_handler=e_handler
+            )
         except UnicodeEncodeError as error:
-            raise self.severe('Problems with "%s" directive path:\n'
-                              'Cannot encode input file path "%s" '
-                              '(wrong locale?).' %
-                              (self.name, SafeString(path)))
+            raise self.severe(
+                'Problems with "%s" directive path:\n'
+                'Cannot encode input file path "%s" '
+                "(wrong locale?)." % (self.name, SafeString(path))
+            )
         except IOError as error:
-            raise self.severe('Problems with "%s" directive path:\n%s.' %
-                      (self.name, ErrorString(error)))
-        startline = self.options.get('start-line', None)
-        endline = self.options.get('end-line', None)
+            raise self.severe(
+                'Problems with "%s" directive path:\n%s.'
+                % (self.name, ErrorString(error))
+            )
+        startline = self.options.get("start-line", None)
+        endline = self.options.get("end-line", None)
         try:
             if startline or (endline is not None):
                 lines = include_file.readlines()
-                rawtext = ''.join(lines[startline:endline])
+                rawtext = "".join(lines[startline:endline])
             else:
                 rawtext = include_file.read()
         except UnicodeError as error:
-            raise self.severe('Problem with "%s" directive:\n%s' %
-                              (self.name, ErrorString(error)))
+            raise self.severe(
+                'Problem with "%s" directive:\n%s' % (self.name, ErrorString(error))
+            )
         # start-after/end-before: no restrictions on newlines in match-text,
         # and no restrictions on matching inside lines vs. line boundaries
-        after_text = self.options.get('start-after', None)
+        after_text = self.options.get("start-after", None)
         if after_text:
             # skip content in rawtext before *and incl.* a matching text
             after_index = rawtext.find(after_text)
             if after_index < 0:
-                raise self.severe('Problem with "start-after" option of "%s" '
-                                  'directive:\nText not found.' % self.name)
-            rawtext = rawtext[after_index + len(after_text):]
-        before_text = self.options.get('end-before', None)
+                raise self.severe(
+                    'Problem with "start-after" option of "%s" '
+                    "directive:\nText not found." % self.name
+                )
+            rawtext = rawtext[after_index + len(after_text) :]
+        before_text = self.options.get("end-before", None)
         if before_text:
             # skip content in rawtext after *and incl.* a matching text
             before_index = rawtext.find(before_text)
             if before_index < 0:
-                raise self.severe('Problem with "end-before" option of "%s" '
-                                  'directive:\nText not found.' % self.name)
+                raise self.severe(
+                    'Problem with "end-before" option of "%s" '
+                    "directive:\nText not found." % self.name
+                )
             rawtext = rawtext[:before_index]
 
         # **Added code** from here...
         ##---------------------------
         # Only Sphinx has the ``env`` attribute.
-        env = getattr(self.state.document.settings, 'env', None)
+        env = getattr(self.state.document.settings, "env", None)
 
         # If the lexer is specified, include it.
         code_to_rest_options = {}
-        lexer_alias = self.options.get('lexer')
+        lexer_alias = self.options.get("lexer")
         if lexer_alias:
-            code_to_rest_options['alias'] = lexer_alias
+            code_to_rest_options["alias"] = lexer_alias
         elif env:
             # If Sphinx is running, try getting a user-specified lexer from the Sphinx configuration.
             lfg = env.app.config.CodeChat_lexer_for_glob
             for glob, lexer_alias in lfg.items():
                 if Path(path).match(glob):
-                    code_to_rest_options['alias'] = lexer_alias
+                    code_to_rest_options["alias"] = lexer_alias
 
         # Translate the source code to reST.
         lexer = get_lexer(filename=path, code=rawtext, **code_to_rest_options)
@@ -804,16 +831,17 @@ class _CodeInclude(Directive):
         ##------------
         # ... to here.
 
-        include_lines = statemachine.string2lines(rawtext, tab_width,
-                                                  convert_whitespace=True)
+        include_lines = statemachine.string2lines(
+            rawtext, tab_width, convert_whitespace=True
+        )
         # **Deleted code**: Options for ``literal`` and ``code`` don't apply.
         self.state_machine.insert_input(include_lines, path)
         return []
 
 
 # Register the new directives and role with docutils.
-directives.register_directive('fenced-code', _FencedCodeBlock)
-directives.register_directive('set-line', _SetLine)
+directives.register_directive("fenced-code", _FencedCodeBlock)
+directives.register_directive("set-line", _SetLine)
 # Imitate Sphinx's naming convention of `literalinclude <http://www.sphinx-doc.org/en/stable/markup/code.html#directive-literalinclude>`_.
-directives.register_directive('codeinclude', _CodeInclude)
-roles.register_local_role('docname', _docname_role)
+directives.register_directive("codeinclude", _CodeInclude)
+roles.register_local_role("docname", _docname_role)

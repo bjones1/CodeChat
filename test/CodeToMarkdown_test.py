@@ -42,12 +42,12 @@ from CodeChat.CodeToMarkdown import code_to_markdown_string, _fence, codechat_st
 
 
 # Define the Markdown put at the beginning of any the outputs of ``code_to_markdown_string``.
-prolog = codechat_style + '\n\n'
+prolog = codechat_style + "\n\n"
 
 
 # Transform source code into its equivalent Markdown.
 def code(code_str):
-    return _fence + '\n' + code_str + _fence + '\n'
+    return _fence + "\n" + code_str + _fence + "\n"
 
 
 # ``_generate_rest`` inserts a ``<div>`` to format indented comments followed by
@@ -55,14 +55,17 @@ def code(code_str):
 # function generates the same string.
 def div(
     # The size of the indent, in characters.
-    size):
+    size
+):
 
     # Each space = 0.5 em, so a 3-space indent would be ``size=1.5``.
-    return '\n<div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(size*0.5)
+    return '\n<div class="CodeChat-indent" style="margin-left:{}em;">\n\n'.format(
+        size * 0.5
+    )
 
 
 # The standard string which marks the end of a ``<div>``.
-div_end = '\n</div>\n\n'
+div_end = "\n</div>\n\n"
 
 
 class TestCodeToMarkdown(object):
@@ -75,43 +78,42 @@ class TestCodeToMarkdown(object):
 
     # Test pure code.
     def test_1(self):
-        self.run('x = 1', code('x = 1\n'), 'Python')
+        self.run("x = 1", code("x = 1\n"), "Python")
 
     # Test only a comment.
     def test_2(self):
-        self.run('# Testing', 'Testing\n', 'Python')
+        self.run("# Testing", "Testing\n", "Python")
 
     # Test an indented comment.
     def test_3(self):
         self.run(
-            '# Testing\n'
-            '    # 1, 2, 3\n',
-            'Testing\n' +
-            div(4) +
-            '1, 2, 3\n' +
-            div_end, 'Python')
+            "# Testing\n" "    # 1, 2, 3\n",
+            "Testing\n" + div(4) + "1, 2, 3\n" + div_end,
+            "Python",
+        )
 
     # Test an indented comment with code.
     def test_4(self):
         self.run(
-            'def foo(x):\n'
-            '  # Testing\n'
-            '  x = 1\n'
-            '  # 1, 2, 3.\n',
-            code('def foo(x):\n') +
-            div(2) +
-            'Testing\n' +
-            div_end +
-            code('  x = 1\n') +
-            div(2) +
-            '1, 2, 3.\n' +
-            div_end, 'Python')
+            "def foo(x):\n" "  # Testing\n" "  x = 1\n" "  # 1, 2, 3.\n",
+            code("def foo(x):\n")
+            + div(2)
+            + "Testing\n"
+            + div_end
+            + code("  x = 1\n")
+            + div(2)
+            + "1, 2, 3.\n"
+            + div_end,
+            "Python",
+        )
 
     # Test a syntax error in Python code.
     def test_5(self):
         self.run(
-            ' x = 1',
-            '# Error\n'
-            'SyntaxError: unexpected indent (line 1). Docstrings cannot be processed.\n' +
-            '\n' +
-            code(' x = 1\n'), 'Python')
+            " x = 1",
+            "# Error\n"
+            "SyntaxError: unexpected indent (line 1). Docstrings cannot be processed.\n"
+            + "\n"
+            + code(" x = 1\n"),
+            "Python",
+        )
