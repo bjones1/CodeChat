@@ -106,8 +106,12 @@ def sl(
 div_end = "\n" ".. raw:: html\n" "\n" " </div>\n" "\n" "..\n" "\n"
 
 
-# Comment delimiters for C.
+# Commonly-used comment delimiters.
 c_comment_delimiter_info = COMMENT_DELIMITER_INFO["C"]
+py_comment_delimiter_info = COMMENT_DELIMITER_INFO["Python"]
+
+# Commonly-used lexers.
+c_lexer = get_lexer_by_name("c")
 
 
 # This actually tests using ``code_to_rest_string``, since that makes
@@ -1288,10 +1292,6 @@ class TestCodeToHtmlFile:
 
 # Tests of lexer_to_code and subroutines
 # ======================================
-c_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name("C").name]
-py_lexer = COMMENT_DELIMITER_INFO[get_lexer_by_name("Python").name]
-
-
 class TestCodeToRestNew:
     # Check that a simple file or string is tokenized correctly.
     def test_1(self):
@@ -1388,58 +1388,102 @@ main(){
     # remove_comment_chars tests
     # --------------------------
     def test_4a(self):
-        assert _remove_comment_delim(_GROUP.whitespace, "    ", c_lexer) == "    "
+        assert (
+            _remove_comment_delim(
+                _GROUP.whitespace, "    ", c_comment_delimiter_info, c_lexer
+            )
+            == "    "
+        )
 
     def test_4b(self):
         assert (
-            _remove_comment_delim(_GROUP.other, "an_identifier", c_lexer)
+            _remove_comment_delim(
+                _GROUP.other, "an_identifier", c_comment_delimiter_info, c_lexer
+            )
             == "an_identifier"
         )
 
     def test_4c(self):
         assert (
-            _remove_comment_delim(_GROUP.inline_comment, "// comment\n", c_lexer)
+            _remove_comment_delim(
+                _GROUP.inline_comment, "// comment\n", c_comment_delimiter_info, c_lexer
+            )
             == " comment\n"
         )
 
     def test_4d(self):
         assert (
-            _remove_comment_delim(_GROUP.block_comment, "/* comment */", c_lexer)
+            _remove_comment_delim(
+                _GROUP.block_comment, "/* comment */", c_comment_delimiter_info, c_lexer
+            )
             == " comment "
         )
 
     def test_4e(self):
         assert (
-            _remove_comment_delim(_GROUP.block_comment_start, "/* comment\n", c_lexer)
+            _remove_comment_delim(
+                _GROUP.block_comment_start,
+                "/* comment\n",
+                c_comment_delimiter_info,
+                c_lexer,
+            )
             == " comment\n"
         )
 
     def test_4f(self):
         assert (
-            _remove_comment_delim(_GROUP.block_comment_body, "comment\n", c_lexer)
+            _remove_comment_delim(
+                _GROUP.block_comment_body,
+                "comment\n",
+                c_comment_delimiter_info,
+                c_lexer,
+            )
             == "comment\n"
         )
 
     def test_4g(self):
         assert (
-            _remove_comment_delim(_GROUP.block_comment_end, "comment */", c_lexer)
+            _remove_comment_delim(
+                _GROUP.block_comment_end,
+                "comment */",
+                c_comment_delimiter_info,
+                c_lexer,
+            )
             == "comment "
         )
 
     # Newlines should be preserved.
     def test_4h(self):
-        assert _remove_comment_delim(_GROUP.inline_comment, "//\n", c_lexer) == "\n"
+        assert (
+            _remove_comment_delim(
+                _GROUP.inline_comment, "//\n", c_comment_delimiter_info, c_lexer
+            )
+            == "\n"
+        )
 
     def test_4i(self):
         assert (
-            _remove_comment_delim(_GROUP.block_comment_start, "/*\n", c_lexer) == "\n"
+            _remove_comment_delim(
+                _GROUP.block_comment_start, "/*\n", c_comment_delimiter_info, c_lexer
+            )
+            == "\n"
         )
 
     def test_4j(self):
-        assert _remove_comment_delim(_GROUP.block_comment_body, "\n", c_lexer) == "\n"
+        assert (
+            _remove_comment_delim(
+                _GROUP.block_comment_body, "\n", c_comment_delimiter_info, c_lexer
+            )
+            == "\n"
+        )
 
     def test_4k(self):
-        assert _remove_comment_delim(_GROUP.block_comment_end, "*/", c_lexer) == ""
+        assert (
+            _remove_comment_delim(
+                _GROUP.block_comment_end, "*/", c_comment_delimiter_info, c_lexer
+            )
+            == ""
+        )
 
     # _is_space_indented_line tests
     # -----------------------------
@@ -1515,21 +1559,32 @@ main(){
     # ----------------------
     # newline only
     def test_4aa1(self):
-        assert not _is_rest_comment([(_GROUP.whitespace, 0, "\n")], False, c_lexer)
+        assert not _is_rest_comment(
+            [(_GROUP.whitespace, 0, "\n")], False, c_comment_delimiter_info, c_lexer
+        )
 
     # // comments with and without preceeding whitespace.
     def test_4aa(self):
         assert _is_rest_comment(
-            [(_GROUP.inline_comment, 0, "// comment\n")], False, c_lexer
+            [(_GROUP.inline_comment, 0, "// comment\n")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4ab(self):
-        assert _is_rest_comment([(_GROUP.inline_comment, 0, "//\n")], False, c_lexer)
+        assert _is_rest_comment(
+            [(_GROUP.inline_comment, 0, "//\n")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
+        )
 
     def test_4ac(self):
         assert _is_rest_comment(
             [(_GROUP.whitespace, 0, "  "), (_GROUP.inline_comment, 0, "// comment\n")],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
@@ -1537,60 +1592,86 @@ main(){
         assert _is_rest_comment(
             [(_GROUP.whitespace, 0, "  "), (_GROUP.inline_comment, 0, "//\n")],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
     # //comments with and without preceeding whitespace.
     def test_4ae(self):
         assert not _is_rest_comment(
-            [(_GROUP.inline_comment, 0, "//comment\n")], False, c_lexer
+            [(_GROUP.inline_comment, 0, "//comment\n")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4af(self):
         assert not _is_rest_comment(
             [(_GROUP.whitespace, 0, "  "), (_GROUP.inline_comment, 0, "//comment\n")],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
     ## A /**/ comment.
     def test_4ag1(self):
-        assert _is_rest_comment([(_GROUP.block_comment, 0, "/**/")], False, c_lexer)
+        assert _is_rest_comment(
+            [(_GROUP.block_comment, 0, "/**/")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
+        )
 
     ## A /* */ comment.
     def test_4ag2(self):
-        assert _is_rest_comment([(_GROUP.block_comment, 0, "/* */")], False, c_lexer)
+        assert _is_rest_comment(
+            [(_GROUP.block_comment, 0, "/* */")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
+        )
 
     ## /* comments */ with and without preceding whitespace.
     def test_4ag(self):
         assert _is_rest_comment(
-            [(_GROUP.block_comment, 0, "/* comment */")], False, c_lexer
+            [(_GROUP.block_comment, 0, "/* comment */")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4ah(self):
         assert _is_rest_comment(
             [(_GROUP.whitespace, 0, "  "), (_GROUP.block_comment, 0, "/* comment */")],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
     ## /*comments */ with and without preceding whitespace.
     def test_4ai(self):
         assert not _is_rest_comment(
-            [(_GROUP.block_comment, 0, "/*comment */")], False, c_lexer
+            [(_GROUP.block_comment, 0, "/*comment */")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4aj(self):
         assert not _is_rest_comment(
             [(_GROUP.whitespace, 0, "  "), (_GROUP.block_comment, 0, "/*comment */")],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
     ## /* comments with and without preceding whitespace.
     def test_4ak(self):
         assert _is_rest_comment(
-            [(_GROUP.block_comment_start, 0, "/* comment\n")], False, c_lexer
+            [(_GROUP.block_comment_start, 0, "/* comment\n")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4al(self):
@@ -1600,13 +1681,17 @@ main(){
                 (_GROUP.block_comment_start, 0, "/* comment\n"),
             ],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
     ## /*comments with and without preceding whitespace.
     def test_4am(self):
         assert not _is_rest_comment(
-            [(_GROUP.block_comment_start, 0, "/*comment\n")], False, c_lexer
+            [(_GROUP.block_comment_start, 0, "/*comment\n")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4an(self):
@@ -1616,31 +1701,49 @@ main(){
                 (_GROUP.block_comment_start, 0, "/*comment\n"),
             ],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
     # multi-line body and end comments.
     def test_4ao(self):
         assert _is_rest_comment(
-            [(_GROUP.block_comment_body, 0, "comment\n")], True, c_lexer
+            [(_GROUP.block_comment_body, 0, "comment\n")],
+            True,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4ao1(self):
-        assert _is_rest_comment([(_GROUP.block_comment_body, 0, "\n")], True, c_lexer)
+        assert _is_rest_comment(
+            [(_GROUP.block_comment_body, 0, "\n")],
+            True,
+            c_comment_delimiter_info,
+            c_lexer,
+        )
 
     def test_4ap(self):
         assert not _is_rest_comment(
-            [(_GROUP.block_comment_body, 0, "comment\n")], False, c_lexer
+            [(_GROUP.block_comment_body, 0, "comment\n")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4aq(self):
         assert _is_rest_comment(
-            [(_GROUP.block_comment_end, 0, "comment */")], True, c_lexer
+            [(_GROUP.block_comment_end, 0, "comment */")],
+            True,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     def test_4ar(self):
         assert not _is_rest_comment(
-            [(_GROUP.block_comment_end, 0, "comment */")], False, c_lexer
+            [(_GROUP.block_comment_end, 0, "comment */")],
+            False,
+            c_comment_delimiter_info,
+            c_lexer,
         )
 
     ## Multiple /* comments */ on a line.
@@ -1652,6 +1755,7 @@ main(){
                 (_GROUP.block_comment, 0, "/*comment2 */"),
             ],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
@@ -1664,6 +1768,7 @@ main(){
                 (_GROUP.block_comment, 0, "/*comment2 */"),
             ],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
@@ -1676,6 +1781,7 @@ main(){
                 (_GROUP.other, 0, "foo();"),
             ],
             False,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
@@ -1683,6 +1789,7 @@ main(){
         assert not _is_rest_comment(
             [(_GROUP.block_comment_end, 0, "comment */"), (_GROUP.other, 0, "foo();")],
             True,
+            c_comment_delimiter_info,
             c_lexer,
         )
 
@@ -1690,7 +1797,8 @@ main(){
         assert _is_rest_comment(
             [(_GROUP.inline_comment, 0, "#"), (_GROUP.whitespace, 0, "\n")],
             True,
-            py_lexer,
+            py_comment_delimiter_info,
+            c_lexer,
         )
 
     # Classifier tests
@@ -1698,7 +1806,11 @@ main(){
     # Test comment.
     def test_5(self):
         cg = list(
-            _classify_groups([[(_GROUP.inline_comment, 0, "// comment\n")]], c_lexer)
+            _classify_groups(
+                [[(_GROUP.inline_comment, 0, "// comment\n")]],
+                c_comment_delimiter_info,
+                c_lexer,
+            )
         )
         assert cg == [(0, "comment\n")]
 
@@ -1712,6 +1824,7 @@ main(){
                         (_GROUP.inline_comment, 0, "// comment\n"),
                     ]
                 ],
+                c_comment_delimiter_info,
                 c_lexer,
             )
         )
@@ -1728,6 +1841,7 @@ main(){
                         (_GROUP.whitespace, 0, "\n"),
                     ]
                 ],
+                c_comment_delimiter_info,
                 c_lexer,
             )
         )
@@ -1742,6 +1856,7 @@ main(){
                     [(_GROUP.block_comment_body, 3, "   line\n")],
                     [(_GROUP.block_comment_end, 3, "   comment */")],
                 ],
+                c_comment_delimiter_info,
                 c_lexer,
             )
         )
@@ -1755,6 +1870,7 @@ main(){
                     [(_GROUP.block_comment_body, 2, "  line\n")],
                     [(_GROUP.block_comment_end, 2, "  comment*/")],
                 ],
+                c_comment_delimiter_info,
                 c_lexer,
             )
         )
@@ -1762,15 +1878,16 @@ main(){
 
     # From code to classification.
     def test_10(self):
-        lexer = get_lexer_by_name("c")
         token_iter, ast_docstring, ast_syntax_error = _pygments_lexer(
-            self.test_c_code, lexer
+            self.test_c_code, c_lexer
         )
         token_group = _group_lexer_tokens(token_iter, False, False, ast_docstring)
         gathered_group = _gather_groups_on_newlines(
             token_group, c_comment_delimiter_info
         )
-        classified_group = list(_classify_groups(gathered_group, c_lexer))
+        classified_group = list(
+            _classify_groups(gathered_group, c_comment_delimiter_info, c_lexer)
+        )
         assert classified_group == [
             (-1, "#include <stdio.h>\n"),
             (-1, "\n"),

@@ -118,9 +118,7 @@ def _debug_print(val):
 def source_lexer(
     # _`code_str`: the code to classify.
     code_str,
-    # .. _lexer:
-    #
-    # The lexer used to analyze the code.
+    # _`lexer`: The lexer used to analyze the code.
     lexer,
 ):
 
@@ -152,7 +150,7 @@ def source_lexer(
     gathered_group = _gather_groups_on_newlines(token_group, cdi)
 
     # 4.    Classify each line. For CodeChat-formatted comments, remove the leading whitespace and all comment characters (the // or #, for example).
-    return ast_syntax_error, _classify_groups(gathered_group, cdi)
+    return ast_syntax_error, _classify_groups(gathered_group, cdi, lexer)
 
 
 # .. _CodeChat style:
@@ -843,6 +841,8 @@ def _classify_groups(
     iter_gathered_groups,
     # See comment_delim_info_.
     comment_delim_info,
+    # See lexer_.
+    lexer,
 ):
 
     # Keep track of block comment state.
@@ -852,7 +852,7 @@ def _classify_groups(
     for l in iter_gathered_groups:
         _debug_print("[(group, ws_len, string), ...] = {}\n".format(l))
 
-        if _is_rest_comment(l, is_block_rest_comment, comment_delim_info):
+        if _is_rest_comment(l, is_block_rest_comment, comment_delim_info, lexer):
 
             first_group, first_ws_len, first_string = l[0]
             # The type = # of leading whitespace characters, or 0 if none.
@@ -874,7 +874,7 @@ def _classify_groups(
             # Strip all comment characters off the strings and combine them.
             string = "".join(
                 [
-                    _remove_comment_delim(group, string, comment_delim_info)
+                    _remove_comment_delim(group, string, comment_delim_info, lexer)
                     for group, ws_len, string in l
                 ]
             )
@@ -920,32 +920,29 @@ def _remove_comment_delim(
     string,
     # See comment_delim_info_.
     comment_delim_info,
+    # See lexer_.
+    lexer,
 ):
 
     # Number of characters in a single-line comment delimiter.
     (
-        len_inline_comment_delim,
         # Number of characters in an opening block comment.
         len_opening_block_comment_delim,
         # Number of characters in an closing block comment.
         len_closing_block_comment_delim,
-    ) = (
-        len(comment_delim_info[0]),
-        len(comment_delim_info[1]),
-        len(comment_delim_info[2]),
-    )
+    ) = (len(comment_delim_info[1]), len(comment_delim_info[2]))
 
     if group == _GROUP.inline_comment:
         # Unline the opening and closing block comment delimiters, the inline comment delimiter may be a sequence. Check each possilibty for a match.
         inline_comment_delim_seq = comment_delim_info[0]
         # Ensure the inline comment delimiter is a sequence.
         if isinstance(inline_comment_delim_seq, str):
-            inline_comment_delim_seq = (inline_comment_delim_seq, )
+            inline_comment_delim_seq = (inline_comment_delim_seq,)
         # Look at each possibility for a match.
         string_lower = string.lower()
         for inline_comment_delim in inline_comment_delim_seq:
             if string_lower.startswith(inline_comment_delim):
-                return string[len(inline_comment_delim):]
+                return string[len(inline_comment_delim) :]
         return string
     if group == _GROUP.block_comment:
         return string[len_opening_block_comment_delim:-len_closing_block_comment_delim]
@@ -989,6 +986,8 @@ def _is_rest_comment(
     # True if this line contains the body or end of a block comment
     # that will be interpreted by reST.
     is_block_rest_comment,
+    # See comment_delim_info_.
+    comment_delim_info,
     # See lexer_.
     lexer,
 ):
@@ -1024,7 +1023,9 @@ def _is_rest_comment(
         return True
     # To check the other cases, first remove the comment delimiter so we can
     # examine the next character following the delimiter.
-    first_comment_text = _remove_comment_delim(first_group, first_string, lexer)
+    first_comment_text = _remove_comment_delim(
+        first_group, first_string, comment_delim_info, lexer
+    )
     first_char_is_rest = (
         len(first_comment_text) > 0 and first_comment_text[0] in (" ", "\n")
     ) or len(first_comment_text) == 0
