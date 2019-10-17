@@ -924,13 +924,10 @@ def _remove_comment_delim(
     lexer,
 ):
 
-    # Number of characters in a single-line comment delimiter.
-    (
-        # Number of characters in an opening block comment.
-        len_opening_block_comment_delim,
-        # Number of characters in an closing block comment.
-        len_closing_block_comment_delim,
-    ) = (len(comment_delim_info[1]), len(comment_delim_info[2]))
+    # Number of characters in an opening block comment.
+    len_opening_block_comment_delim = len(comment_delim_info[1])
+    # Number of characters in an closing block comment.
+    len_closing_block_comment_delim = len(comment_delim_info[2])
 
     if group == _GROUP.inline_comment:
         # Special case: COBOL. A comment has the character ``*`` or ``/`` in column 7.
