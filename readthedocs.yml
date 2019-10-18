@@ -1,0 +1,16 @@
+# ***********************************
+# |docname| - ReadTheDocs config file
+# ***********************************
+# See the `docs <https://docs.readthedocs.io/en/stable/config-file/index.html>`_ for details.
+#
+# See `version <https://docs.readthedocs.io/en/stable/config-file/v2.html#version>`_.
+version: 2
+
+# See `python <https://docs.readthedocs.io/en/stable/config-file/v2.html#python>`_.
+python:
+    install:
+        # Install CodeChat with current Sphinx -- ReadTheDocs defaults to Sphinx 1.8.5.
+        -   method: pip
+            path: .
+            extra_requirements:
+            -   sphinx

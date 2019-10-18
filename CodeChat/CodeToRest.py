@@ -670,7 +670,7 @@ def _docname_role(
         prb = inliner.problematic(rawtext, rawtext, msg)
         return [prb], [msg]
     # Return the path component as text.
-    return [nodes.Text(path_component, rawtext, **options)], []
+    return [nodes.inline(rawtext, path_component, **options)], []
 
 
 # .. add_highlight_language:

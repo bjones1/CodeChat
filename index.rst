@@ -77,6 +77,7 @@ Documentation generation
 
    conf.py
    CodeChat.css.rst
+   readthedocs.yml
 
 
 Packaging
