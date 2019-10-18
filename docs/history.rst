@@ -16,6 +16,10 @@ History of recent changes
 
     -   No changes yet.
 
+-   1.7.2, 18-Oct-2019:
+
+    -   Fixes to enable builds on `ReadTheDocs <https://readthedocs.org/>`_.
+
 -   1.7.1, 18-Oct-2019:
 
     -   Support MATLAB ``...`` and ``%`` comments, AppleScript ``--`` and ``#`` comments, and PHP ``#`` and ``//`` comments.
@@ -60,7 +64,7 @@ History of recent changes
 -   1.5.7, 6-Nov-2017
 
     -   Fixed auto-generated ``.. highlight`` directive to use correct name.
-    -   Fixed CSS for the ReadTheDocs theme.
+    -   Fixed CSS for the ReadTheDocs_ theme.
 
 -   1.5.6, 31-Oct-2017
 
