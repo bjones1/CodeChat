@@ -96,7 +96,7 @@ COMMENT_DELIMITER_INFO = {
     "Matlab":         ( ("%", "..."),  "%{",            "%}"),
     "SQL":            ( ( "--", ),     "/*",            "*/"),
     "PowerShell":     ( ( "#", ),      "<#",            "#>"),
-    # ``/*`` ~ ``*/`` not supported (Pygments doesn"t lex these).
+    # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
     "GAS":            ( ( "#", ),      "/*",            "*/"),
     "autohotkey":     ( ( ";", ),      "/*",            "*/"),
     "Prolog":         ( ( "%", ),      "/*",            "*/"),
