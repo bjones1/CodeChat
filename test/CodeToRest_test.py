@@ -166,7 +166,6 @@ class TestCodeToRest:
             rest2 = code_to_rest_string(code_str, alias=alias)
             code2 = rest_to_code_string(rest2, alias)
             assert code == code2
-            print(rest)
             assert remove_codechat_style(rest) == expected_rest_str
             if expected_code_str is not None:
                 assert code == expected_code_str
@@ -511,20 +510,18 @@ class TestCodeToRest:
             ["Bash"],
         )
 
-    # PHP. While the `PHP manual
-    # <http://php.net/manual/en/language.basic-syntax.comments.php>`_ confirms
-    # support for ``//`` inline comments, Pygments doesn't appear to support
-    # these; they are output as code.
+    # PHP.
     def test_27(self):
         self.mt(
             "<?php\n"
             "echo 'Hello world'\n"
             "// Comment1\n"
             "# Comment2\n"
-            "/* Comment3 */\n",
+            "/* Comment3 */\n"
+            "?>",
             bf + " <?php\n"
-            " echo 'Hello world'\n" + " // Comment1\n" + ef + sl(0) + "Comment2\n"
-            "Comment3 \n",
+            " echo 'Hello world'\n" + ef + sl(-1) + "Comment1\n" "Comment2\n"
+            "Comment3 \n" + bf + " ?>\n" + ef,
             ["PHP"],
         )
 
