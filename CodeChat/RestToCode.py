@@ -77,9 +77,9 @@ def language_comment_type(
     # | and ``( '//',     '/*',            '*/')`` for the key ``'C'``
     comment_delimiters
 ):
-    # If the language supports inline comments, index zero will have a non-empty string.
+    # If the language supports inline comments, index zero will have a sequence containing a non-empty string as its first element.
     # If the language supports block comments, index one will have a non-empty string.
-    return [bool(comment_delimiters[0]), bool(comment_delimiters[1])]
+    return [bool(comment_delimiters[0][0]), bool(comment_delimiters[1])]
 
 
 # |
@@ -120,7 +120,7 @@ def formulate_comment(
         # Stops the whole program if there is no inline comment delimiter and it is asking to use an inline comment.
         assert has_inline_comment
         # Formulates an inline comment
-        return "{} {}\n".format(comment_delimiters[0], line)
+        return "{} {}\n".format(comment_delimiters[0][0], line)
     # Create a block comment
     else:
         if not is_block_comment:

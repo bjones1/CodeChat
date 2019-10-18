@@ -520,7 +520,8 @@ class TestCodeToRest:
             "/* Comment3 */\n"
             "?>",
             bf + " <?php\n"
-            " echo 'Hello world'\n" + ef + sl(-1) + "Comment1\n" "Comment2\n"
+            " echo 'Hello world'\n" + ef + sl(-1) + "Comment1\n"
+            "Comment2\n"
             "Comment3 \n" + bf + " ?>\n" + ef,
             ["PHP"],
         )

@@ -130,8 +130,9 @@ def source_lexer(
     #   inline.
     comment_is_inline = not cdi[1]
     # * Likewise, no inline info indicates that generic comments are block
-    #   comments.
-    comment_is_block = not cdi[0]
+    #   comments. Note that inline comments are a sequence of strings, so look
+    #   inside the sequence to the string.
+    comment_is_block = not cdi[0][0]
 
     # 1.    Invoke a Pygments lexer on the provided source code, obtaining an
     #       iterable of tokens. Also analyze Python code for docstrings.
@@ -930,14 +931,13 @@ def _remove_comment_delim(
     len_closing_block_comment_delim = len(comment_delim_info[2])
 
     if group == _GROUP.inline_comment:
+        # .. _COBOL special case:
+        #
         # Special case: COBOL. A comment has the character ``*`` or ``/`` in column 7.
         if lexer.name == "COBOL":
             return string[7:] if string[6] in ("*", "/") else string
         # Unline the opening and closing block comment delimiters, the inline comment delimiter may be a sequence. Check each possilibty for a match.
         inline_comment_delim_seq = comment_delim_info[0]
-        # Ensure the inline comment delimiter is a sequence.
-        if isinstance(inline_comment_delim_seq, str):
-            inline_comment_delim_seq = (inline_comment_delim_seq,)
         # Look at each possibility for a match.
         string_lower = string.lower()
         for inline_comment_delim in inline_comment_delim_seq:
