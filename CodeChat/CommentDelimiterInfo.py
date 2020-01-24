@@ -74,6 +74,7 @@ COMMENT_DELIMITER_INFO = {
     "Vala":           ( ( "//", ),     "/*",            "*/"),
     "Zephir":         ( ( "//", ),     "/*",            "*/"),
     "Haxe":           ( ( "//", ),     "/*",            "*/"),
+    "Thrift":         ( ( "//", ),     "/*",            "*/"),
 
     "PHP":            ( ( "#", "//"),  "/*",            "*/"),
     # Block comments not tested.

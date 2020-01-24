@@ -156,6 +156,7 @@ class TestCodeToRest:
             "Vala",
             "Zephir",
             "Haxe",
+            "Thrift",
         ),
         expected_code_str=None,
     ):

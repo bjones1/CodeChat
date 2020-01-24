@@ -1,4 +1,4 @@
-.. Copyright (C) 2012-2019 Bryan A. Jones.
+.. Copyright (C) 2012-2020 Bryan A. Jones.
 
     This file is part of CodeChat.
 
@@ -14,7 +14,7 @@ History of recent changes
 
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Added support for `Thrift <https://thrift.apache.org/>`_.
 
 -   1.7.2, 18-Oct-2019:
 
