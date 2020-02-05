@@ -123,6 +123,7 @@ COMMENT_DELIMITER_INFO = {
     "Clojure":        ( ( ";", ),        "",              ""),
     "Scheme":         ( ( ";", ),        "",              ""),
     "HTML":           ( (  "", ),    "<!--",           "-->"),
+    "HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
     "MXML":           ( (  "", ),   "<!---",           "-->"),
     "Fortran":        ( ( "!", ),        "",              ""),
     "APL":            ( ( "⍝", ),        "",              ""),
@@ -130,7 +131,7 @@ COMMENT_DELIMITER_INFO = {
     "RPMSpec":        ( ( "#", ),        "",              ""),
     "Nimrod":         ( ( "#", ),        "",              ""),
     # Comments continued on the next line with a ``\`` aren"t supported.
-    "NSIS":           ( ("#", ";"),    "",              ""),
+    "NSIS":           ( ("#", ";"),      "",              ""),
     "TeX":            ( ( "%", ),        "",              ""),
     "Erlang":         ( ( "%", ),        "",              ""),
     "QBasic":         ( ( "'", ),        "",              ""),

@@ -15,6 +15,7 @@ History of recent changes
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
     -   Added support for `Thrift <https://thrift.apache.org/>`_.
+    -   Added support for HTML+Django/Jinja.
 
 -   1.7.2, 18-Oct-2019:
 
