@@ -9,7 +9,7 @@ version: 2
 # See `python <https://docs.readthedocs.io/en/stable/config-file/v2.html#python>`_.
 python:
     install:
-        # Install CodeChat with current Sphinx -- ReadTheDocs defaults to Sphinx 1.8.5.
+        # Install CodeChat with the ``sphinx`` extra requirement.
         -   method: pip
             path: .
             extra_requirements:
