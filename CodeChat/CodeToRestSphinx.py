@@ -39,18 +39,27 @@
 # ----------------
 import os
 from pathlib import Path
+from typing import Dict
 
 # Third-party imports
 # -------------------
-from sphinx.util import logging
+import sphinx
+import sphinx.util
 import sphinx.project
+from sphinx.util import path_stabilize
 from sphinx.util.osutil import SEP, relpath
-from sphinx.io import FiletypeNotFoundError
+import sphinx.io
+# The exception ``FiletypeNotFoundError`` was `deprecated in Sphinx v2.4.0 <https://www.sphinx-doc.org/en/master/extdev/deprecated.html>`_ by moving it from ``sphinx.io`` to ``sphinx.errors``.
+if sphinx.version_info[:3] >= (2, 4, 0):
+    from sphinx.errors import FiletypeNotFoundError
+else:
+    from sphinx.io import FiletypeNotFoundError
 import pygments.util
 
 # Local application imports
 # -------------------------
 from .CodeToRest import code_to_rest_string, get_lexer, add_highlight_language
+from .CodeToMarkdown import code_to_markdown_string
 from .CommentDelimiterInfo import SUPPORTED_GLOBS
 from . import __version__
 
@@ -58,11 +67,11 @@ from . import __version__
 # source-read event
 # =================
 # Create a logger for issuing warnings during the build process.
-logger = logging.getLogger(__name__)
+logger = sphinx.util.logging.getLogger(__name__)
 
 
 # The source-read_ event occurs when a source file is read. If it's code, this
-# routine changes it into reST.
+# routine changes it into reST or Markdown.
 def _source_read(
     # _`app`: The `Sphinx application object <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx>`_.
     app,
@@ -79,8 +88,9 @@ def _source_read(
             # See if ``source_file`` matches any of the globs.
             lexer = None
             lfg = app.config.CodeChat_lexer_for_glob
+            path_docname = Path(docname)
             for glob, lexer_alias in lfg.items():
-                if Path(docname).match(glob):
+                if path_docname.match(glob):
                     # On a match, pass the specified lexer alias.
                     lexer = get_lexer(alias=lexer_alias)
                     break
@@ -88,10 +98,15 @@ def _source_read(
             # this will raise an exception on failure.
             lexer = lexer or get_lexer(filename=docname, code=source[0])
 
-            # Translate code to reST.
-            logger.info("Converted using the {} lexer.".format(lexer.name))
-            source[0] = code_to_rest_string(source[0], lexer=lexer)
-            source[0] = add_highlight_language(source[0], lexer)
+            # Translate code to reST or Markdown.
+            if is_markdown_docname(app.config, docname):
+                source[0] = code_to_markdown_string(source[0], lexer=lexer)
+                markup = "Markdown"
+            else:
+                source[0] = code_to_rest_string(source[0], lexer=lexer)
+                source[0] = add_highlight_language(source[0], lexer)
+                markup = "reST"
+            logger.info("Converted as {} using the {} lexer.".format(markup, lexer.name))
 
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
@@ -102,7 +117,7 @@ def _source_read(
 
 # Return True if the supplied ``docname`` is source code.
 def is_source_code(
-    # The `Sphinx build environament <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
+    # The `Sphinx build environment <http://www.sphinx-doc.org/en/1.5.1/extdev/envapi.html>`_.
     env,
     # See docname_.
     docname,
@@ -115,6 +130,20 @@ def is_source_code(
     # <http://sphinx-doc.org/extdev/envapi.html#sphinx.environment.BuildEnvironment.doc2path>`_.
     docname_ext = env.doc2path(docname, None)
     return Path(docname_ext) == Path(docname)
+
+
+# Return True if the supplied ``docname`` is Markdown; False means reST.
+def is_markdown_docname(
+    # The Sphinx config object.
+    config,
+    # See docname_.
+    docname,
+):
+    # Get the second extension: given a file named ``a.foo.bar``, produce ``[".foo"]``; given ``a.bar``, produce ``[]``.
+    docname_suffixes = Path(docname).suffixes
+    # See if this is a recognized Markdown extension.
+    return len(docname_suffixes) > 1 and config.source_suffix.get(docname_suffixes[-2]) == "markdown"
+
 
 
 # Monkeypatch
@@ -141,12 +170,16 @@ def _path2doc(self, filename):
         filename = relpath(filename, self.srcdir)
     for suffix in self.source_suffix:
         if filename.endswith(suffix):
-            return filename[: -len(suffix)]
+            if sphinx.version_info[:3] >= (2, 3, 0):
+                # This line was added in https://github.com/sphinx-doc/sphinx/commit/155f4b0d00e72d16eed47581f2fee75e41c452cf, starting in v2.3.0. It's a patch to fix https://github.com/sphinx-doc/sphinx/issues/6813.
+                filename = path_stabilize(filename)
+            return filename[:-len(suffix)]
 
     # The following code was added.
     if is_supported_language(filename):
         return filename
 
+    # This was the existing code.
     # the file does not have docname
     return None
 
@@ -154,7 +187,7 @@ def _path2doc(self, filename):
 sphinx.project.Project.path2doc = _path2doc
 
 
-# Return True if the provided filename is a source code langauge CodeChat supports.
+# Return True if the provided filename is a source code language CodeChat supports.
 def is_supported_language(filename):
     # type: (str) -> bool
     source_suffixpatterns = SUPPORTED_GLOBS | set(
@@ -186,7 +219,7 @@ def _doc2path(self, docname, basedir=True):
         if os.path.isfile(basename + suffix):
             break
     else:
-        # Three lines of code added here -- check for the no-extenion case.
+        # Three lines of code added here -- check for the no-extension case.
         if os.path.isfile(os.path.join(self.srcdir, docname)):
             suffix = ""
         else:
@@ -204,22 +237,27 @@ sphinx.project.Project.doc2path = _doc2path
 
 # get_filetype patch
 # ------------------
-# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.io``, version 1.8.1.
-def _get_filetype(source_suffix, filename):
-    # type: (Dict[str, str], str) -> str
+# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.util``, version 2.4.0.
+def _get_filetype(source_suffix: Dict[str, str], filename: str) -> str:
     for suffix, filetype in source_suffix.items():
         if filename.endswith(suffix):
             # If default filetype (None), considered as restructuredtext.
-            return filetype or "restructuredtext"
+            return filetype or 'restructuredtext'
     else:
         # The following code was added.
         if is_supported_language(filename):
-            return "restructuredtext"
+            return "markdown" if is_markdown_docname(_config, filename) else "restructuredtext"
         # This was the existing code.
         raise FiletypeNotFoundError
 
 
-sphinx.io.get_filetype = _get_filetype
+# The function ``sphinx.io.get_filetype`` was `deprecated in Sphinx v2.4.0`_ by moving it to ``sphinx.util.get_filetype``.
+if sphinx.version_info[:3] >= (2, 4, 0):
+    # Sphinx uses ``sphinx.deprecation._ModuleWrapper`` to perform deprecation. In ``sphinx.io``, we need to monkeypatch inside it, hence the ``_module`` (a member of the ``_ModuleWrapper``).
+    sphinx.io._module.get_filetype = _get_filetype
+    sphinx.util.get_filetype = _get_filetype
+else:
+    sphinx.io.get_filetype = _get_filetype
 
 
 # Correct naming for the "show source" option
