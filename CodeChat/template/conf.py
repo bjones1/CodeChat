@@ -115,11 +115,7 @@ templates_path = ["_templates"]
 # A string of reStructuredText that will be included at the end of every source
 # file that is read.
 rst_epilog = (
-    # .. _docname substitution:
-    #
-    # ``|docname|`` substitution
-    # --------------------------
-    # Provide a convenient way to refer to a source file's name. See `_docname_role`.
+    # Provide a convenient way to refer to a source file's name.
     """
 
 .. |docname| replace:: :docname:`name`

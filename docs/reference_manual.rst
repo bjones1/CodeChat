@@ -23,7 +23,7 @@ Docutils
 ========
 CodeChat adds the following role and directives to Docutils:
 
--   ``docname`` (a role): see `_docname_role`; in Sphinx, this is typically used via the ``|docname|`` substitution reference. See `docname substitution`.
+-   ``docname`` (a role): see `_docname_role`; in Sphinx, this is typically used via the ``|docname|`` substitution reference. See `docname substitution <docname substitution>`.
 -   ``codeinclude``: see `_CodeInclude`.
 -   ``fenced-code``: see `_FencedCodeBlock`. This is typically only needed for internal CodeChat use.
 -   ``set-line``: See `_SetLine`. This is typically only needed for internal CodeChat use.
