@@ -18,7 +18,7 @@
 # ***************************************
 # |docname| - a module to lex source code
 # ***************************************
-# This module classifies source code in any format supported by `CommentDelimiterInfo.py` into an interable of ``(type, string)`` tuples; see `source_lexer`.
+# This module classifies source code in any format supported by `CommentDelimiterInfo.py` into an iterable of ``(type, string)`` tuples; see `source_lexer`.
 #
 # .. contents::
 #
@@ -170,6 +170,9 @@ def source_lexer(
 #   <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
 #       ...Some code here...
 #   </div>
+#
+# `Disable Black <https://github.com/psf/black#the-black-code-style>`_ for this block.
+# fmt: off
 codechat_style = (
     '<script type="text/javascript">'
     # Only style after the `DOM is ready <https://stackoverflow.com/questions/799981/document-ready-equivalent-without-jquery>`_.
@@ -223,6 +226,7 @@ codechat_style = (
     "});"
     "</script>"
 )
+# fmt: on
 
 
 # Step 1 of source_lexer_

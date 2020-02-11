@@ -97,7 +97,7 @@ def sl(
     # The line number for the set-line directive, which is comment_line - 4. For
     # example, for a comment in the first line of the file, implying
     # comment_line == 1, use ``sl(-3)``.
-    line
+    line,
 ):
     return ("\n" ".. set-line:: {}\n" "\n" "..\n" "\n").format(line)
 

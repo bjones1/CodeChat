@@ -123,7 +123,8 @@ rst_epilog = (
     """
 
 .. |docname| replace:: :docname:`name`
-""")
+"""
+)
 
 # `source_suffix <http://sphinx-doc.org/config.html#confval-source_suffix>`_:
 # The suffix of source filenames. Add ``.in`` and ``.spec`` files (see below).

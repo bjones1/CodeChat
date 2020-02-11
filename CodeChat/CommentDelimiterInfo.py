@@ -37,7 +37,11 @@ from pygments.lexers import get_all_lexers
 # on comment delimiters that Pygments doesn't explicitly define. This data was
 # mostly taken from the `Wikipedia page
 # <http://en.wikipedia.org/wiki/Comparison_of_programming_languages_(syntax)#Comments>`_.
+#
+# `Disable Black <https://github.com/psf/black#the-black-code-style>`_ for this block.
+# fmt: off
 COMMENT_DELIMITER_INFO = {
+#
 # These languages have unit tests which pass
 # ------------------------------------------
 # See :doc:`../test/CodeToRest_test.py` for the tests.
@@ -123,7 +127,6 @@ COMMENT_DELIMITER_INFO = {
     "Clojure":        ( ( ";", ),        "",              ""),
     "Scheme":         ( ( ";", ),        "",              ""),
     "HTML":           ( (  "", ),    "<!--",           "-->"),
-    "HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
     "MXML":           ( (  "", ),   "<!---",           "-->"),
     "Fortran":        ( ( "!", ),        "",              ""),
     "APL":            ( ( "⍝", ),        "",              ""),
@@ -146,10 +149,15 @@ COMMENT_DELIMITER_INFO = {
     "COBOL":          ( ( "      *", ),  "",              ""),
     "YAML":           ( ( "#", ),        "",              ""),
 
+# These languages lack unit tests
+# -------------------------------
+"HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
+
 # These languages have failing unit tests
 # ---------------------------------------
 # None at this time.
 }
+# fmt: on
 
 # Supported extensions
 # ====================

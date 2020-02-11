@@ -49,7 +49,7 @@ from .CodeToRest import rest_codechat_style
 # _`find_file_ext`: Find the file extension needed, given the language name
 def find_file_ext(
     # See lang_.
-    lang
+    lang,
 ):
     if lang in COMMENT_DELIMITER_INFO:
         # `find_lexer_class <http://pygments.org/docs/api/#pygments.lexers.find_lexer_class>`_
@@ -75,7 +75,7 @@ def language_comment_type(
     # | _`comment_delimiters`: This is the Value in the dictionary found in :doc:`CommentDelimiterInfo.py`
     # | Ex: ``( '#',      '"""',          '"""')`` for the key ``'Python'``
     # | and ``( '//',     '/*',            '*/')`` for the key ``'C'``
-    comment_delimiters
+    comment_delimiters,
 ):
     # If the language supports inline comments, index zero will have a sequence containing a non-empty string as its first element.
     # If the language supports block comments, index one will have a non-empty string.

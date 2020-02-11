@@ -49,6 +49,7 @@ import sphinx.project
 from sphinx.util import path_stabilize
 from sphinx.util.osutil import SEP, relpath
 import sphinx.io
+
 # The exception ``FiletypeNotFoundError`` was `deprecated in Sphinx v2.4.0 <https://www.sphinx-doc.org/en/master/extdev/deprecated.html>`_ by moving it from ``sphinx.io`` to ``sphinx.errors``.
 if sphinx.version_info[:3] >= (2, 4, 0):
     from sphinx.errors import FiletypeNotFoundError
@@ -106,7 +107,9 @@ def _source_read(
                 source[0] = code_to_rest_string(source[0], lexer=lexer)
                 source[0] = add_highlight_language(source[0], lexer)
                 markup = "reST"
-            logger.info("Converted as {} using the {} lexer.".format(markup, lexer.name))
+            logger.info(
+                "Converted as {} using the {} lexer.".format(markup, lexer.name)
+            )
 
         except (KeyError, pygments.util.ClassNotFound) as e:
             # We don't support this language.
@@ -142,8 +145,10 @@ def is_markdown_docname(
     # Get the second extension: given a file named ``a.foo.bar``, produce ``[".foo"]``; given ``a.bar``, produce ``[]``.
     docname_suffixes = Path(docname).suffixes
     # See if this is a recognized Markdown extension.
-    return len(docname_suffixes) > 1 and config.source_suffix.get(docname_suffixes[-2]) == "markdown"
-
+    return (
+        len(docname_suffixes) > 1
+        and config.source_suffix.get(docname_suffixes[-2]) == "markdown"
+    )
 
 
 # Monkeypatch
@@ -173,7 +178,7 @@ def _path2doc(self, filename):
             if sphinx.version_info[:3] >= (2, 3, 0):
                 # This line was added in https://github.com/sphinx-doc/sphinx/commit/155f4b0d00e72d16eed47581f2fee75e41c452cf, starting in v2.3.0. It's a patch to fix https://github.com/sphinx-doc/sphinx/issues/6813.
                 filename = path_stabilize(filename)
-            return filename[:-len(suffix)]
+            return filename[: -len(suffix)]
 
     # The following code was added.
     if is_supported_language(filename):
@@ -242,11 +247,15 @@ def _get_filetype(source_suffix: Dict[str, str], filename: str) -> str:
     for suffix, filetype in source_suffix.items():
         if filename.endswith(suffix):
             # If default filetype (None), considered as restructuredtext.
-            return filetype or 'restructuredtext'
+            return filetype or "restructuredtext"
     else:
         # The following code was added.
         if is_supported_language(filename):
-            return "markdown" if is_markdown_docname(_config, filename) else "restructuredtext"
+            return (
+                "markdown"
+                if is_markdown_docname(_config, filename)
+                else "restructuredtext"
+            )
         # This was the existing code.
         raise FiletypeNotFoundError
 
@@ -310,7 +319,7 @@ def _html_page_context(
 # event, when the config_ settings are available.
 def _builder_inited(
     # See app_.
-    app
+    app,
 ):
 
     try:
@@ -329,7 +338,7 @@ def _builder_inited(
 # this extension.
 def setup(
     # See app_.
-    app
+    app,
 ):
 
     # Ensure we're using a new enough Sphinx using `require_sphinx

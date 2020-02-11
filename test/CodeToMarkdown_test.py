@@ -55,7 +55,7 @@ def code(code_str):
 # function generates the same string.
 def div(
     # The size of the indent, in characters.
-    size
+    size,
 ):
 
     # Each space = 0.5 em, so a 3-space indent would be ``size=1.5``.
