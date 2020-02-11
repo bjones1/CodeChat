@@ -22,6 +22,7 @@ User documentation
    docs/tutorial.rst
    docs/rest-primer.rst
    docs/style_guide.cpp
+   docs/style_guide.md.cpp
    docs/install.rst
    docs/reference_manual.rst
    docs/history.rst

@@ -21,6 +21,7 @@ History of recent changes
     -   Added support for `Thrift <https://thrift.apache.org/>`_.
     -   Added support for HTML+Django/Jinja.
     -   Added support for Sphinx 2.4.0.
+    -   Added support for Markdown in source files. See `style_guide.md.cpp`.
 
 -   1.7.2, 18-Oct-2019:
 
@@ -226,5 +227,3 @@ Ideas for the future
     -   For Sphinx.
     -   For ``code_to_xxx_file`` functions.
     -   For the directives and role in `../CodeChat/CodeToRest.py`.
-
--   Support CodeChat with Markdown in Sphinx. Need to add some way to specify the markup used, either on a file-by-file basis, or as a config setting for the whole project.

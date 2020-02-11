@@ -156,7 +156,7 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=(
         [
-            # Note: I don't include Sphinx in this list: while  :doc:`CodeToRest.py
+            # Note: I don't include Sphinx in this list: while :doc:`CodeToRest.py
             # <CodeChat/CodeToRest.py>` can be executed from the command line if the
             # packages below are installed, :doc:`CodeToRestSphinx.py
             # <CodeChat/CodeToRestSphinx.py>` can only be executed by Sphinx.
@@ -170,7 +170,10 @@ setup(
     # for example:
     #
     #    ``$ pip install -e .[test]``
-    extras_require={"test": ["pytest"], "sphinx": ["sphinx>1"]},
+    extras_require={
+        "test": ["pytest"],
+        "sphinx": ["sphinx>1", "recommonmark"]
+    },
     # To package data files, I'm using ``include_package_data=True`` then
     # putting the files in :doc:`MANIFEST.in <MANIFEST.in>`. See `including data
     # files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.

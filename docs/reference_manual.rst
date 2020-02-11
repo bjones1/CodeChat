@@ -16,7 +16,7 @@ The manual presents links, whose targets give a full explanation of each concept
 
 Syntax
 ======
-See the `style guide <CodeChat syntax>`.
+See the `style guide <CodeChat_syntax>`.
 
 
 Docutils

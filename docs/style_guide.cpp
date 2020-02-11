@@ -23,7 +23,7 @@
 //  This "source file" does not contain any useful, executable code. Instead,
 //  it exemplifies literate programming style.
 //
-// .. _CodeChat syntax:
+// .. _CodeChat_syntax:
 //
 // Syntax
 // ======
