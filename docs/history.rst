@@ -8,10 +8,10 @@
 
     You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
+
 *************************
 History of recent changes
 *************************
-
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
     -   No changes yet.
@@ -219,10 +219,14 @@ History of recent changes
     -   Used ``..`` instead of marker to indent comments, producing cleaner ReST.
     -   Split ``CodeToRest`` into ``CodeToRest``, ``CodeToRestSphinx`` modules.
 
+-   Previous versions lack release notes.
+
+
 ********************
 Ideas for the future
 ********************
 -   Update `../setup.py` to use a ``setup.cfg`` file.
+-   Update Travis OS X tests.
 -   Testing:
 
     -   For Sphinx.
