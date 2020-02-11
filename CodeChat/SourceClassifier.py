@@ -305,7 +305,7 @@ def _pygments_lexer(
     # So, process this with AST if this is Python or Python3 code to find docstrings.
     # If found, store line number and docstring into ``ast_docstring``.
     ast_docstring = {}
-    # Provide a place to store syntax errors resutling from parsing the Python code.
+    # Provide a place to store syntax errors resulting from parsing the Python code.
     ast_syntax_error = ""
     # Determine if code is Python or Python3. Note that AST processing cannot
     # support Python 2 specific syntax (e.g. the ``<>`` operator).
@@ -940,7 +940,7 @@ def _remove_comment_delim(
         # Special case: COBOL. A comment has the character ``*`` or ``/`` in column 7.
         if lexer.name == "COBOL":
             return string[7:] if string[6] in ("*", "/") else string
-        # Unline the opening and closing block comment delimiters, the inline comment delimiter may be a sequence. Check each possilibty for a match.
+        # Unlike the opening and closing block comment delimiters, the inline comment delimiter may be a sequence. Check each possibility for a match.
         inline_comment_delim_seq = comment_delim_info[0]
         # Look at each possibility for a match.
         string_lower = string.lower()

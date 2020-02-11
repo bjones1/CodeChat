@@ -222,6 +222,7 @@ History of recent changes
 ********************
 Ideas for the future
 ********************
+-   Update `../setup.py` to use a ``setup.cfg`` file.
 -   Testing:
 
     -   For Sphinx.

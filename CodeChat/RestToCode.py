@@ -95,7 +95,7 @@ def formulate_comment(
     line,
     # See lang_.
     lang,
-    # _`is_block_comment`: This is a boolean value that tells the program whether to make line_ into
+    # _`is_block_comment`: This is a Boolean value that tells the program whether to make line_ into
     # an inline comment or a block comment.
     # This might be overruled if the `language <lang_>`_ does not support the wanted type of comment.
     is_block_comment,
@@ -254,7 +254,7 @@ def rest_to_code_string(
             if line_list[i + 1] == ".. fenced-code::":
                 # Makes sure that the lines that are supposed to be there are there.
                 if line_list[i + 2] != "" or line_list[i + 3] != " Beginning fence":
-                    # See boolean_.
+                    # See Boolean_.
                     boolean = True
                     break
                 i += 4
@@ -273,7 +273,7 @@ def rest_to_code_string(
                         or line_list[i + 2] != ".."
                         or line_list[i + 3] != ""
                     ):
-                        # See boolean_.
+                        # See Boolean_.
                         boolean = True
                         break
                     i += 4
@@ -285,7 +285,7 @@ def rest_to_code_string(
                         or line_list[i + 2] != ".."
                         or line_list[i + 3] != ""
                     ):
-                        # See boolean_.
+                        # See Boolean_.
                         boolean = True
                         break
                     i += 3
@@ -296,7 +296,7 @@ def rest_to_code_string(
                 if line_list[i + 2] != "" or not line_list[i + 3].startswith(
                     ' <div class="CodeChat-indent" style="margin-left'
                 ):
-                    # See boolean_.
+                    # See Boolean_.
                     boolean = True
                     break
                 # Used to control the line number of the document
@@ -320,7 +320,7 @@ def rest_to_code_string(
                     or line_list[i + 5] != ".."
                     or line_list[i + 6] != ""
                 ):
-                    # See boolean_.
+                    # See Boolean_.
                     boolean = True
                     break
                 # Skips over the added code including the setline part of the code.
@@ -344,7 +344,7 @@ def rest_to_code_string(
                     or line_list[i + 5] != ".."
                     or line_list[i + 6] != ""
                 ):
-                    # See boolean_.
+                    # See Boolean_.
                     boolean = True
                     break
                 # skips over the added code
@@ -358,7 +358,7 @@ def rest_to_code_string(
                     or line_list[i + 3] != ".."
                     or line_list[i + 4] != ""
                 ):
-                    # See boolean_.
+                    # See Boolean_.
                     boolean = True
                     break
                 i += 5
@@ -406,7 +406,7 @@ def rest_to_code_string(
                         i += 1
                         break
             else:
-                # See boolean_.
+                # See Boolean_.
                 boolean = True
                 break
 
@@ -414,12 +414,12 @@ def rest_to_code_string(
                 break
         except:
             if line_list[i] != "":
-                # See boolean_.
+                # See Boolean_.
                 boolean = True
             i += 1
             break
 
-    # _`boolean`: If boolean is set to True, there was a line of invalid reST, so the program returns an error string.
+    # _`Boolean`: If Boolean is set to True, there was a line of invalid reST, so the program returns an error string.
     if boolean:
         # Return an error message.
         string_out += "This was not recognized as valid reST. Please check your input and try again."

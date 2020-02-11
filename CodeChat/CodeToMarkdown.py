@@ -114,7 +114,7 @@ def code_to_markdown_file(
         md_path = source_path + ".md"
     with open(source_path, encoding=input_encoding) as fi:
         code_str = fi.read()
-    # If not already present, provde the filename of the source to help in identifying a lexer.
+    # If not already present, provide the filename of the source to help in identifying a lexer.
     options.setdefault("filename", source_path)
     rst = code_to_markdown_string(code_str, **options)
     with open(md_path, "w", encoding=output_encoding) as fo:

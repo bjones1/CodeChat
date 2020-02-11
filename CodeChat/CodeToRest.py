@@ -120,7 +120,7 @@ def code_to_rest_file(
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=rst_path, encoding=output_encoding)
     code_str = fi.read()
-    # If not already present, provde the filename of the source to help in identifying a lexer.
+    # If not already present, provide the filename of the source to help in identifying a lexer.
     options.setdefault("filename", source_path)
     rst = code_to_rest_string(code_str, **options)
     fo.write(rst)
