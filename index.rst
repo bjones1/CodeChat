@@ -73,6 +73,8 @@ To run the tests, execute ``pytest test`` from the root directory of the project
 
 Documentation generation
 ------------------------
+To build the documentation, execute ``sphinx-build -d _build\doctrees . _build`` from the root directory of the project.
+
 .. toctree::
    :maxdepth: 2
 
