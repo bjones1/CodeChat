@@ -9,12 +9,14 @@
     You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
 
-*************************
-History of recent changes
-*************************
+******************
+History of changes
+******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Update to be compatible with Pygments 2.6.
+    -   Documentation improvements.
+    -   Remove spacing between code and comments using CSS classes. **Warning**: you must update ``CodeChat.css`` with this newer version for any existing projects.
 
 -   1.7.3, 9-Feb-2020:
 
