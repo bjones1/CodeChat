@@ -55,3 +55,20 @@ div.CodeChat-indent {
     /* This is only needed for the `ReadTheDocs theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_. Otherwise, comment it out. */
     /** font-size: 10pt; **/
 }
+
+/* Remove the space between code and a following comment. This style will
+ * be added to comments following code by JavaScript; see
+ * ``CodeChat.SourceClassifer.codechat_style``. */
+.CodeChat_noTop {
+    margin-top: 0px;
+    padding-top: 0px;
+}
+
+/* Remove the space between a comment and the following code. This style will
+ * be added to comments preceeding code JavaScript; see
+ * ``CodeChat.SourceClassifer.codechat_style``. */
+.CodeChat_noBottom {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
