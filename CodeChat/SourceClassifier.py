@@ -41,7 +41,7 @@ from pygments.lexers import (
     guess_lexer_for_filename,
     guess_lexer,
 )
-from pygments.util import text_type, guess_decode
+from pygments.util import guess_decode
 from pygments.lexer import _encoding_map
 from pygments.token import Token
 from pygments.filter import apply_filters
@@ -343,17 +343,17 @@ def _pygments_lexer(
 # Pygments monkeypatching
 # ^^^^^^^^^^^^^^^^^^^^^^^
 # Provide a way to perform preprocessing on text before lexing it. This code was
-# copied from ``pygments.lexer.Lexer.get_token``, v. 2.1.3.
+# copied from ``pygments.lexer.Lexer.get_token``, v. 2.6.1.
 def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
     """
     Return an iterable of (tokentype, value) pairs generated from
-    ``text``. If ``unfiltered`` is set to ``True``, the filtering mechanism
+    `text`. If `unfiltered` is set to `True`, the filtering mechanism
     is bypassed even if filters are defined.
 
     Also preprocess the text, i.e. expand tabs and strip it if
     wanted and applies registered filters.
     """
-    if not isinstance(text, text_type):
+    if not isinstance(text, str):
         if self.encoding == "guess":
             text, _ = guess_decode(text)
         elif self.encoding == "chardet":
@@ -384,7 +384,7 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
         if text.startswith(u"\ufeff"):
             text = text[len(u"\ufeff") :]
 
-    # text now *is* a Unicode string
+    # text now *is* a unicode string
     text = text.replace("\r\n", "\n")
     text = text.replace("\r", "\n")
     if self.stripall:
@@ -395,12 +395,13 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
         text = text.expandtabs(self.tabsize)
     if self.ensurenl and not text.endswith("\n"):
         text += "\n"
+
     # EDIT: This is not from the original Pygments code. It was added to return
     # the preprocessed text.
     return text
 
 
-# This code was copied from ``pygments.lexer.Lexer.get_token``, v. 2.1.3 (the last
+# This code was copied from ``pygments.lexer.Lexer.get_token``, v. 2.6.1 (the last
 # few lines).
 def _pygments_get_tokens_postprocess(self, text, unfiltered=False):
     def streamer():
