@@ -14,9 +14,23 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   Update to be compatible with Pygments 2.6.
+    -   Updated to be compatible with Pygments 2.6.
     -   Documentation improvements.
-    -   Remove spacing between code and comments using CSS classes. **Warning**: you must update ``CodeChat.css`` with this newer version for any existing projects.
+    -   Remove spacing between code and comments using CSS classes.
+    -   Moved the Sphinx template to ``CodeChat/sphinx_template`` and CSS files to ``CodeChat/css``.
+    -   Changed the Sphinx template ``conf.py`` to include CodeChat's ``css`` directory in ``html_static_path``. **Warning**: after updating to this version, you must edit all ``conf.py`` files to incorporate this change and delete the copied ``CodeChat.css`` files. The necessary changes are:
+
+        At the top of ``conf.py``:
+
+        .. code::
+
+            import CodeChat.CodeToRest
+
+        In the body of ``conf.py``:
+
+        .. code::
+
+            html_static_path = CodeChat.CodeToRest.html_static_path()
 
 -   1.7.3, 9-Feb-2020:
 
