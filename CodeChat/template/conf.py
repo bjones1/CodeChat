@@ -15,9 +15,9 @@
 #    You should have received a copy of the GNU General Public License along
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
-# ****************************************************************************
-# template/conf.py - Template configuration file for a Sphinx CodeChat project
-# ****************************************************************************
+# *********************************************************************
+# |docname| - Template configuration file for a Sphinx CodeChat project
+# *********************************************************************
 # This file configures Sphinx, which transforms restructured text (reST) into
 # html. See Sphinx `build configuration file docs
 # <http://sphinx-doc.org/config.html>`_ for more information on the settings
