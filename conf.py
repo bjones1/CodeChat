@@ -48,7 +48,7 @@ import CodeChat
 # `copyright <http://sphinx-doc.org/config.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = "CodeChat"
-copyright = "2019, Bryan A. Jones"
+copyright = "2020, Bryan A. Jones"
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout
