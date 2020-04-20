@@ -37,7 +37,7 @@ The following shows the documentation produced by a CodeChat project template.
 
    CodeChat/template/index.rst
    CodeChat/template/CodeChat.css
-   CodeChat/template/default.css
+   CodeChat/template/CodeChat_default.css
 
 
 Developer documentation
@@ -79,7 +79,7 @@ To build the documentation, execute ``sphinx-build -d _build\doctrees . _build``
    :maxdepth: 2
 
    conf.py
-   CodeChat.css.rst
+   CodeChat.css
    readthedocs.yml
 
 
