@@ -46,7 +46,7 @@ from docutils.writers.html4css1 import Writer
 from docutils.parsers.rst import states
 from docutils import statemachine, utils
 from docutils.utils.error_reporting import SafeString, ErrorString
-
+import pkg_resources
 
 # Local application imports
 # -------------------------
@@ -153,8 +153,7 @@ def code_to_html_string(
             # Include our custom css file: provide the path to the default css and
             # then to our css. The style sheet dirs must include docutils defaults.
             "stylesheet_path": ",".join(Writer.default_stylesheets + ["CodeChat.css"]),
-            "stylesheet_dirs": Writer.default_stylesheet_dirs
-            + [os.path.join(os.path.dirname(__file__), "template")],
+            "stylesheet_dirs": Writer.default_stylesheet_dirs + html_static_path(),
             # Make sure to use Unicode everywhere.
             "output_encoding": "unicode",
             "input_encoding": "unicode",
@@ -193,6 +192,14 @@ def code_to_html_file(
     html = code_to_html_string(code_str, lexer=lexer)
 
     fo.write(html)
+
+
+# Styling
+# --------
+# Provide a programmatic way to get a list of paths to static files needed by CodeChat. When using Sphinx, this should be assigned or appended to `html_static_path <http://sphinx-doc.org/config.html#confval-html_static_path>`_.
+def html_static_path():
+    # There's only one path needed -- ``css/``, relative to this directory.
+    return [pkg_resources.resource_filename("CodeChat", "css")]
 
 
 # Provide correct formatting of CodeChat-produced documents in reST based on the `CodeChat style`.
