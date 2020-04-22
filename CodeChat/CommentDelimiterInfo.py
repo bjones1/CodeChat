@@ -27,9 +27,18 @@
 # These are listed in the order prescribed by `PEP 8
 # <http://www.python.org/dev/peps/pep-0008/#imports>`_.
 #
+# Standard library
+# ----------------
+# None
+#
 # Third-party imports
 # -------------------
 from pygments.lexers import get_all_lexers
+
+# Local application imports
+# -------------------------
+# None.
+
 
 # Supported languages
 # ===================

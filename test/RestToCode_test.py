@@ -36,7 +36,6 @@ from docutils import io
 from tempfile import mkstemp
 import os
 
-#
 # Local application imports
 # -------------------------
 from CodeChat.RestToCode import rest_to_code_file, rest_to_code_string, find_file_ext
@@ -45,7 +44,6 @@ from CodeChat.CodeToRest import (
     code_to_rest_string,
     code_to_html_file,
 )
-
 
 # The string that results from rest_to_code not understanding the material.
 error_str = (
@@ -206,7 +204,7 @@ class TestRestToCodeFileTests(object):
 
     # CSS file test
     def test_2(self):
-        self.rt_given_file(code_file_name="CodeChat.css", lang="CSS", lexer="css")
+        self.rt_given_file(code_file_name="CodeChat/css/CodeChat.css", lang="CSS", lexer="css")
 
     # Empty file (C) test
     def test_3(self):
