@@ -204,7 +204,9 @@ class TestRestToCodeFileTests(object):
 
     # CSS file test
     def test_2(self):
-        self.rt_given_file(code_file_name="CodeChat/css/CodeChat.css", lang="CSS", lexer="css")
+        self.rt_given_file(
+            code_file_name="CodeChat/css/CodeChat.css", lang="CSS", lexer="css"
+        )
 
     # Empty file (C) test
     def test_3(self):

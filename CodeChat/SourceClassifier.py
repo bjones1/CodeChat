@@ -158,7 +158,7 @@ def source_lexer(
 #
 # CodeChat style
 # --------------
-# `../CodeChat.css` provides some of the CSS needed to properly format CodeChat documents. However, not all the necessary styling can be accomplished using CSS. This script sets the styles that can't be set in CSS. Specifically, it removes the bottom margin for cases where code follows a paragraph. The expected structure:
+# `css/CodeChat.css` provides some of the CSS needed to properly format CodeChat documents. However, not all the necessary styling can be accomplished using CSS. This script sets the styles that can't be set in CSS. Specifically, it removes the bottom margin for cases where code follows a paragraph. The expected structure:
 #
 # .. code-block:: HTML
 #   :linenos:

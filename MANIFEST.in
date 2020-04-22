@@ -22,5 +22,6 @@
 # ********************************************************
 # Include the GPL with the distribution.
 include CodeChat/LICENSE.html
-# Template files must also be included.
-include CodeChat/template/*
+# CSS and template files must also be included.
+include CodeChat/sphinx_template/*
+include CodeChat/css/*
