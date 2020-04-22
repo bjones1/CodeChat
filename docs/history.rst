@@ -14,7 +14,11 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   Updated to be compatible with Pygments 2.6.
+    -   No changes yet.
+
+-   1.8.0, 22-Apr-2020:
+
+    -   Updates to be compatible with Pygments 2.6.
     -   Documentation improvements.
     -   Remove spacing between code and comments using CSS classes.
     -   Moved the Sphinx template to ``CodeChat/sphinx_template`` and CSS files to ``CodeChat/css``.
