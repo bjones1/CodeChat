@@ -30,14 +30,14 @@ User documentation
 
 Template documentation
 ----------------------
-The following shows the documentation produced by a CodeChat project template.
+The following shows the documentation produced by a CodeChat project template. It also presents the style sheets used for CodeChat webpages.
 
 .. toctree::
    :maxdepth: 2
 
-   CodeChat/template/index.rst
-   CodeChat/template/CodeChat.css
-   CodeChat/template/CodeChat_default.css
+   CodeChat/sphinx_template/index.rst
+   CodeChat/css/CodeChat.css
+   CodeChat/css/CodeChat_default.css
 
 
 Developer documentation
@@ -79,7 +79,6 @@ To build the documentation, execute ``sphinx-build -d _build\doctrees . _build``
    :maxdepth: 2
 
    conf.py
-   CodeChat.css
    readthedocs.yml
 
 
