@@ -81,7 +81,7 @@ with open(path.join(here, "README.rst"), encoding="utf-8") as f:
     long_description = f.read()
     # The inclusion of a raw tag causes `PyPI <http://pypi.python.org>`_ to not render the reST. Ouch. Remove it before uploading.
     long_description = re.sub(
-        "\.\. raw.*<\/iframe>", "", long_description, flags=re.DOTALL
+        r"\.\. raw.*</iframe>", "", long_description, flags=re.DOTALL
     )
 
 
