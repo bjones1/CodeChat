@@ -240,7 +240,7 @@ History of changes
     -   Used ``..`` instead of marker to indent comments, producing cleaner ReST.
     -   Split ``CodeToRest`` into ``CodeToRest``, ``CodeToRestSphinx`` modules.
 
--   Previous versions `lack release notes <https://github.com/bjones1/CodeChat/blob/ac5aa5d67a8adb6a6ab7770552a7dfd468efdb1d/README.rst>`_.
+-   Previous versions `lack release notes <https://github.com/bjones1/CodeChat/blob/ac5aa5d67a8adb6a6ab7770552a7dfd468efdb1d/README.rst#recent-changes>`_.
 
 
 ********************

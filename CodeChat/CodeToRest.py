@@ -709,9 +709,9 @@ def add_highlight_language(
 #
 # _CodeInclude
 # ^^^^^^^^^^^^
-# Provide a way to include source code to be processed by CodeChat.
+# Provide a way to include source code to be processed by CodeChat. It is a slight modification of the `docutils include directive <https://docutils.sourceforge.io/docs/ref/rst/directives.html#including-an-external-document-fragment>`_ and supports all the same options; it also supports the `class <https://docutils.sourceforge.io/docs/ref/rst/directives.html#id22>`_ option.
 #
-# This is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``, version 0.16.
+# Implementation note: this is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``, version 0.16.
 class _CodeInclude(Directive):
 
     """
