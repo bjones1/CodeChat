@@ -32,6 +32,7 @@
 #
 # Standard library
 # ----------------
+import html
 from io import StringIO
 import os.path
 from pathlib import Path
@@ -710,7 +711,7 @@ def add_highlight_language(
 # ^^^^^^^^^^^^
 # Provide a way to include source code to be processed by CodeChat.
 #
-# This is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``.
+# This is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``, version 0.16.
 class _CodeInclude(Directive):
 
     """
@@ -735,6 +736,7 @@ class _CodeInclude(Directive):
         "end-line": int,
         "start-after": directives.unchanged_required,
         "end-before": directives.unchanged_required,
+        "class": directives.class_option,
     }
 
     standard_include_path = os.path.join(os.path.dirname(states.__file__), "include")
@@ -767,13 +769,13 @@ class _CodeInclude(Directive):
             )
         except UnicodeEncodeError as error:
             raise self.severe(
-                'Problems with "%s" directive path:\n'
+                u'Problems with "%s" directive path:\n'
                 'Cannot encode input file path "%s" '
                 "(wrong locale?)." % (self.name, SafeString(path))
             )
         except IOError as error:
             raise self.severe(
-                'Problems with "%s" directive path:\n%s.'
+                u'Problems with "%s" directive path:\n%s.'
                 % (self.name, ErrorString(error))
             )
         startline = self.options.get("start-line", None)
@@ -786,7 +788,7 @@ class _CodeInclude(Directive):
                 rawtext = include_file.read()
         except UnicodeError as error:
             raise self.severe(
-                'Problem with "%s" directive:\n%s' % (self.name, ErrorString(error))
+                u'Problem with "%s" directive:\n%s' % (self.name, ErrorString(error))
             )
         # start-after/end-before: no restrictions on newlines in match-text,
         # and no restrictions on matching inside lines vs. line boundaries
@@ -831,6 +833,19 @@ class _CodeInclude(Directive):
         # Translate the source code to reST.
         lexer = get_lexer(filename=path, code=rawtext, **code_to_rest_options)
         rawtext = code_to_rest_string(rawtext, lexer=lexer)
+
+        # If the ``class`` option is specified, wrap the code in a div with the specified classes.
+        classes = self.options.get("class")
+        if classes:
+            rawtext = (
+                ".. raw:: html\n"
+                "\n"
+                " <div class='" + html.escape(" ".join(classes)) + "'>\n"
+                "\n" + rawtext + "\n"
+                ".. raw:: html\n"
+                "\n"
+                " </div>\n"
+            )
 
         # If Sphinx is running, insert the appropriate highlight directive.
         if env:

@@ -15,6 +15,7 @@ History of changes
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
     -   Add `support <CodeChat_doStyle>` for styling dynamic content.
+    -   Add the ``class`` option to the `_CodeInclude` directive.
 
 -   1.8.0, 22-Apr-2020:
 
