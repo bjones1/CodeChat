@@ -158,27 +158,47 @@ def source_lexer(
 #
 # CodeChat style
 # --------------
-# `css/CodeChat.css` provides some of the CSS needed to properly format CodeChat documents. However, not all the necessary styling can be accomplished using CSS. This script sets the styles that can't be set in CSS. Specifically, it removes the bottom margin for cases where code follows a paragraph. The expected structure:
+# `css/CodeChat.css` provides some of the CSS needed to properly format CodeChat documents. However, not all the necessary styling can be accomplished using CSS. This script sets the styles that can't be set in CSS. Specifically, it removes the bottom margin for cases where code follows a paragraph, and the top margin for cases where code preceds a paragraph. The expected structure:
 #
 # .. code-block:: HTML
 #   :linenos:
 #
-#   <div class="CodeChat-indent">    An indent from CodeChat -- not present with no indent.
-#       <p>Text.</p>                 DO NOT change this element's bottom margin.
-#       <p>Some text here</p>        This could be any element.
-#   </div>
-#   <div class="highlight-xxx">      Where xxx is the language name, such as c, python, etc.
+#   <!-- All CodeChat-produced code is marked by the ``fenced-code``
+#        class. -->
+#   <div class="fenced-code">
 #       ...Some code here...
+#   </div>
+#
+#   <!-- An indent from CodeChat -- not present with no indent. The
+#        code below will add the classes ``CodeChat_noTop
+#        CodeChat_noBottom`` to this element.
+#   -->
+#   <div class="CodeChat-indent">
+#       <!-- The code below will add the class ``CodeChat_noTop`` to
+#            this element.
+#       -->
+#       <p>Text.</p>
+#       <!-- The code below will add the class ``CodeChat_noBottom``
+#            to this element.
+#       -->
+#       <p>Some text here</p>
+#   </div>
+#
+#   <div class="fenced-code">
+#       ...Some more code here...
 #   </div>
 #
 # `Disable Black <https://github.com/psf/black#the-black-code-style>`_ for this block.
 # fmt: off
 codechat_style = (
     '<script type="text/javascript">'
-    # Only style after the `DOM is ready <https://stackoverflow.com/questions/799981/document-ready-equivalent-without-jquery>`_.
-    'document.addEventListener("DOMContentLoaded", function(event) {'
+    # Define a function to add classes as defined above.
+    "function CodeChat_doStyle("
+        # It takes an optional parameter, the root element to search from. Styles will be applies to this element and all its children. It defaults to ``document``.
+        "element"
+    ") {"
         # Walk the tree in the given direction.
-        "let walk_tree = function("
+        "function walk_tree("
             # The jQuery elements to walk.
             "elements,"
             # The walker function: ``x => x.next/prevElementSibling``.
@@ -211,8 +231,10 @@ codechat_style = (
             "return walk_children;"
         "};"
 
+        # Use ``document`` as the default element if it isn't specified.
+        "element = (typeof element !== 'undefined') ? element : document;"
         # All CodeChat-produced code is marked by the ``fenced-code`` class.
-        'let code = document.getElementsByClassName("fenced-code");'
+        'let code = element.getElementsByClassName("fenced-code");'
         # Go to the next node from code, then set the margin-top of all first children to 0 so that there will be no extra space between the code and the following comment.
         "walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x =>"
             "x.classList.add('CodeChat_noTop')"
@@ -221,7 +243,10 @@ codechat_style = (
         "walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x =>"
             "x.classList.add('CodeChat_noBottom')"
         ");"
-    "});"
+    "}"
+
+    # Only style after the `DOM is ready <https://stackoverflow.com/questions/799981/document-ready-equivalent-without-jquery>`_.
+    'document.addEventListener("DOMContentLoaded", function(event) { CodeChat_doStyle(); });'
     "</script>"
 )
 # fmt: on

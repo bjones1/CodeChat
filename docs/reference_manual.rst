@@ -11,7 +11,7 @@
 ****************
 Reference manual
 ****************
-The manual presents links, whose targets give a full explanation of each concept.
+The manual presents links whose targets give a full explanation of each concept.
 
 
 Syntax
@@ -27,6 +27,13 @@ CodeChat adds the following role and directives to Docutils:
 -   ``codeinclude``: see `_CodeInclude`.
 -   ``fenced-code``: see `_FencedCodeBlock`. This is typically only needed for internal CodeChat use.
 -   ``set-line``: See `_SetLine`. This is typically only needed for internal CodeChat use.
+
+
+.. _CodeChat_doStyle:
+
+JavaScript
+==========
+-   CodeChat documents include JavaScript to `correctly style <CodeChat style>` the resulting HTML. This JavaScript is invoked when the document is ready. To style dynamically-added content, invoke ``CodeChat_doStyle(element)`` to style ``element`` and all its children.
 
 
 Sphinx
