@@ -199,7 +199,7 @@ codechat_style = (
     ") {"
         # Walk the tree in the given direction.
         "function walk_tree("
-            # The jQuery elements to walk.
+            # A list of DOM elements to walk.
             "elements,"
             # The walker function: ``x => x.next/prevElementSibling``.
             "func_walk,"

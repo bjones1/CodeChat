@@ -680,7 +680,7 @@ def _docname_role(
     return [nodes.inline(rawtext, path_component, **options)], []
 
 
-# .. add_highlight_language:
+# .. _add_highlight_language:
 #
 # add_highlight_language
 # ^^^^^^^^^^^^^^^^^^^^^^
