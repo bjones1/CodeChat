@@ -1,4 +1,4 @@
-# .. Copyright (C) 2012-2017 Bryan A. Jones.
+# .. Copyright (C) 2012-2020 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -18,15 +18,16 @@
 # **************************************
 # |docname| - Styling tests for CodeChat
 # **************************************
-# This file contains no useful code, but serves as a test bed to make sure code to comment transitions are styled correctly. The syntax below prevents linter complaints.
-to_code = None
+# This file contains no useful code, but serves as a test bed to make sure code to comment transitions are styled correctly.
 
-
-def to_indented_code():
-    pass
-
-
+# `Disable Black <https://github.com/psf/black#the-black-code-style>`_ for this block.
+# fmt: off
 #
+# The syntax below prevents some linter complaints.
+to_code = None
+def to_indented_code(): pass
+
+
 # All reST types
 # ==============
 # Here are all the reST body elements, tested with intermingled code to check code to text back to code, following the order given in the `reStructuredText Markup Specification <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_.
@@ -34,11 +35,11 @@ def to_indented_code():
 # Sections
 # --------
 if to_code:
-    # and back
-    # ^^^^^^^^
-    #
-    # Sections
-    # ^^^^^^^^
+# and back
+# ^^^^^^^^
+#
+# Sections
+# ^^^^^^^^
     to_indented_code()
 # and back
 # ^^^^^^^^
@@ -51,21 +52,21 @@ if to_code:
 #
 # ----
 if to_code:
-    # ----
-    #
-    # and back.
+# ----
+#
+# and back.
 
-    # A transition
-    #
-    # ----
+# A transition
+#
+# ----
     to_indented_code()
 # ----
 #
 # and back.
 
-# An indented transition
-#
-# ----
+    # An indented transition
+    #
+    # ----
 if to_code:
     # ----
     #
@@ -74,65 +75,65 @@ if to_code:
     # An indented transition
     #
     # ----
-    to_indented_code()
-# ----
-#
-# and back.
+        to_indented_code()
+    # ----
+    #
+    # and back.
 
 #
 # Paragraphs
 # ----------
 # A plain paragraph
 if to_code:
-    # then back.
+# then back.
 
-    # A plain paragraph
+# A plain paragraph
     to_indented_code()
 # then back.
 
-# An indented paragraph
+    # An indented paragraph
 if to_code:
     # then back.
 
     # An indented paragraph
-    to_indented_code()
-# then back.
+        to_indented_code()
+    # then back.
 
 #
 # Bulleted lists
 # --------------
 # - A bulleted list
 if to_code:
-    # - and back.
+# - and back.
 
-    # - A bulleted list
+# - A bulleted list
     to_indented_code()
 # - and back.
 
-# - An indented bulleted list
+    # - An indented bulleted list
 if to_code:
     # - and back.
 
     # - An indented bulleted list
-    to_indented_code()
-# - and back.
+        to_indented_code()
+    # - and back.
 
 #
 # #.    Enumerated lists
 if to_code:
-    # #.    and back.
+# #.    and back.
 
-    # #.    Enumerated lists
+# #.    Enumerated lists
     to_indented_code()
 # #.    and back.
 
-# #.    An indented enumerated list
+    # #.    An indented enumerated list
 if to_code:
     # #.    and back.
 
     # #.    An indented enumerated lists
-    to_indented_code()
-# #.    and back.
+        to_indented_code()
+    # #.    and back.
 
 #
 # Definition lists
@@ -140,64 +141,64 @@ if to_code:
 # A definition
 #   list
 if to_code:
-    # and
-    #   back.
+# and
+#   back.
 
-    # A definition
-    #   list
+# A definition
+#   list
     to_indented_code()
 # and
 #   back.
 
-# An indented definition
-#   list
+    # An indented definition
+    #   list
 if to_code:
     # and
     #   back.
 
     # An indented definition
     #   list
-    to_indented_code()
-# and
-#   back.
+        to_indented_code()
+    # and
+    #   back.
 
 #
 # Field lists
 # -----------
 # :A: field list
 if to_code:
-    # :and: back.
+# :and: back.
 
-    # :A: field list
+# :A: field list
     to_indented_code()
 # :and: back.
 
-# :An indented: field list
+    # :An indented: field list
 if to_code:
     # :and: back.
 
     # :An: indented field list
-    to_indented_code()
-# :and: back.
+        to_indented_code()
+    # :and: back.
 
 #
 # Option lists
 # ------------
 # -An   option list
 if to_code:
-    # -And  back
+# -And  back
 
-    # -An   option list
+# -An   option list
     to_indented_code()
 # -And  back
 
-# -An   indented option list
+    # -An   indented option list
 if to_code:
     # -And  back.
 
     # -An   indented option list
-    to_indented_code()
-# -And  back.
+        to_indented_code()
+    # -And  back.
 
 #
 # Literal blocks
@@ -208,21 +209,21 @@ if to_code:
 #
 #    A literal block
 if to_code:
-    # ::
-    #
-    #   and back.
-
-    # ::
-    #
-    #    A literal block
-    to_indented_code()
 # ::
 #
 #   and back.
 
 # ::
 #
-#   An indented literal block
+#    A literal block
+    to_indented_code()
+# ::
+#
+#   and back.
+
+    # ::
+    #
+    #   An indented literal block
 if to_code:
     # ::
     #
@@ -231,30 +232,30 @@ if to_code:
     # ::
     #
     #   An indented literal block
-    to_indented_code()
-# ::
-#
-#   and back.
+        to_indented_code()
+    # ::
+    #
+    #   and back.
 
 # Per-line quoting::
 #
 # > for a literal block
 if to_code:
-    # and::
-    #
-    # > back.
-
-    # Per-line quoting::
-    #
-    # > for a literal block
-    to_indented_code()
 # and::
 #
 # > back.
 
 # Per-line quoting::
 #
-# > for an indented literal block
+# > for a literal block
+    to_indented_code()
+# and::
+#
+# > back.
+
+    # Per-line quoting::
+    #
+    # > for an indented literal block
 if to_code:
     # and::
     #
@@ -263,10 +264,10 @@ if to_code:
     # Per-line quoting::
     #
     # > for an indented literal block
-    to_indented_code()
-# and::
-#
-# > back.
+        to_indented_code()
+    # and::
+    #
+    # > back.
 
 #
 # Line blocks
@@ -274,45 +275,45 @@ if to_code:
 # | line
 # | blocks
 if to_code:
-    # | and
-    # | back.
+# | and
+# | back.
 
-    # | line
-    # | blocks
+# | line
+# | blocks
     to_indented_code()
 # | and
 # | back.
 
-# | indented line
-# | blocks
+    # | indented line
+    # | blocks
 if to_code:
     # | and
     # | back.
 
     # | indented line
     # | blocks
-    to_indented_code()
-# | and
-# | back.
+        to_indented_code()
+    # | and
+    # | back.
 
 #
 # Doctest blocks
 # --------------
 # >>> Doctest_blocks
 if to_code:
-    # >>> and_back
+# >>> and_back
 
-    # >>> Doctest_blocks
+# >>> Doctest_blocks
     to_indented_code()
 # >>> and_back
 
-# >>> Indented_doctest_blocks
+    # >>> Indented_doctest_blocks
 if to_code:
     # >>> and_back
 
     # >>> Indented_doctest_blocks
-    to_indented_code()
-# >>> and_back
+        to_indented_code()
+    # >>> and_back
 
 #
 # Tables
@@ -323,17 +324,17 @@ if to_code:
 # 1 two
 # = =====
 if to_code:
-    # ===   ====
-    # and   back
-    # ===   ====
-    # 1     two
-    # ===   ====
+# ===   ====
+# and   back
+# ===   ====
+# 1     two
+# ===   ====
 
-    # = =====
-    # A Table
-    # = =====
-    # 1 two
-    # = =====
+# = =====
+# A Table
+# = =====
+# 1 two
+# = =====
     to_indented_code()
 # ===   ====
 # and   back
@@ -341,11 +342,11 @@ if to_code:
 # 1     two
 # ===   ====
 
-# ==    ==============
-# An    indented table
-# ==    ==============
-# 1     two
-# ==    ==============
+    # ==    ==============
+    # An    indented table
+    # ==    ==============
+    # 1     two
+    # ==    ==============
 if to_code:
     # ===   ====
     # and   back
@@ -358,12 +359,12 @@ if to_code:
     # ==    ==============
     # 1     two
     # ==    ==============
-    to_indented_code()
-# ===   ====
-# and   back
-# ===   ====
-# 1     two
-# ===   ====
+        to_indented_code()
+    # ===   ====
+    # and   back
+    # ===   ====
+    # 1     two
+    # ===   ====
 
 #
 # Directives
@@ -378,19 +379,19 @@ if to_code:
 #
 # .. attention:: An attention directive
 if to_code:
-    # .. attention:: and back.
+# .. attention:: and back.
 
-    # .. attention:: An attention directive
+# .. attention:: An attention directive
     to_indented_code()
 # .. attention:: and back.
 
-# .. attention:: An indented attention directive
+    # .. attention:: An indented attention directive
 if to_code:
     # .. attention:: and back.
 
     # .. attention:: An indented attention directive
-    to_indented_code()
-# .. attention:: and back.
+        to_indented_code()
+    # .. attention:: and back.
 
 #
 # contents
@@ -398,26 +399,26 @@ if to_code:
 # .. contents:: A table of contents
 #   :depth: 1
 if to_code:
-    # .. contents:: and back.
-    #   :depth: 1
+# .. contents:: and back.
+#   :depth: 1
 
-    # .. contents:: A table of contents
-    #   :depth: 1
+# .. contents:: A table of contents
+#   :depth: 1
     to_indented_code()
 # .. contents:: and back.
 #   :depth: 1
 
-# .. contents:: An indented table of contents
-#   :depth: 1
+    # .. contents:: An indented table of contents
+    #   :depth: 1
 if to_code:
     # .. contents:: and back.
     #   :depth: 1
 
     # .. contents:: An indented table of contents
     #   :depth: 1
-    to_indented_code()
-# .. contents:: and back.
-#   :depth: 1
+        to_indented_code()
+    # .. contents:: and back.
+    #   :depth: 1
 
 #
 # Nested body elements
