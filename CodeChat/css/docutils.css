@@ -1,9 +1,9 @@
-/* **********************************************
-   |docname| - CSS from PyInstaller documentation
-   **********************************************
-   This was copied from ``doc/stylesheets/default.css`` of commit
-   a21f0660eddff0c33b3a24fea8ddeba13da9bf61 of
-   ``https://github.com/pyinstaller/pyinstaller``.
+/* ****************************
+   |docname| - CSS for docutils
+   ****************************
+   This stylesheet provides a nicer look than Docutils' default stylesheet. It's not intended for use with Sphinx, whose styles are much better.
+
+   This file was copied from `PyInstaller <https://github.com/pyinstaller/pyinstaller/blob/a21f0660eddff0c33b3a24fea8ddeba13da9bf61/doc/stylesheets/default.css>`_.
  */
 
 body {

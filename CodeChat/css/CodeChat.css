@@ -18,7 +18,7 @@
    **********************************************
    |docname| - Style sheet for CodeChat documents
    **********************************************
-   This is a stylesheet for use with CodeChat's extensions to Docutils.
+   This is a stylesheet for use with CodeChat's extensions to Docutils/Sphinx.
 
    The overall goal is to allow comments (everything but ``<pre>`` tags) to appear with normal (double) spacing, while comments and code are single spaced.
 
@@ -40,12 +40,6 @@
     margin-left: 0px;
     border: none;
     -webkit-box-shadow: none;
-}
-
-/* Tweak the size of the indent so that code and comments line up. */
-div.CodeChat-indent {
-    /* This is only needed for the `ReadTheDocs theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_. Otherwise, comment it out. */
-    /** font-size: 10pt; **/
 }
 
 /* Remove the space between code and a following comment. This style will be added to comments following code by JavaScript; see ``CodeChat.SourceClassifer.codechat_style``. */
