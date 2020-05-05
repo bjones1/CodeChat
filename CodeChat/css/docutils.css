@@ -1,7 +1,7 @@
-/* ****************************
-   |docname| - CSS for docutils
-   ****************************
-   This stylesheet provides a nicer look than Docutils' default stylesheet. It's not intended for use with Sphinx, whose styles are much better.
+/* ************************************
+   |docname| - Style sheet for docutils
+   ************************************
+   This style sheet provides a nicer look than Docutils' default style sheet. It's not intended for use with Sphinx, whose styles are much better.
 
    This file was copied from `PyInstaller <https://github.com/pyinstaller/pyinstaller/blob/a21f0660eddff0c33b3a24fea8ddeba13da9bf61/doc/stylesheets/default.css>`_.
  */

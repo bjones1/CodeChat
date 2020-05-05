@@ -35,7 +35,7 @@ Please use the `issue tracker <https://github.com/bjones1/CodeChat/issues>`_ to 
 
 Template documentation
 ----------------------
-The following shows the documentation produced by a CodeChat project template. It also presents the stylesheets used for CodeChat webpages.
+The following shows the documentation produced by a CodeChat project template. It also presents the style sheets used for CodeChat webpages.
 
 .. toctree::
    :maxdepth: 1

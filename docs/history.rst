@@ -17,7 +17,7 @@ History of changes
     -   Add `support <CodeChat_doStyle>` for styling dynamic content.
     -   Add the ``class`` option to the `_CodeInclude` directive.
     -   Reorganize and improve documentation; remove broken links.
-    -   Separated the ReadTheDocs styles in a separate `stylesheet <../CodeChat/css/CodeChat_sphinx_rtd_theme.css>`.
+    -   Separated the ReadTheDocs styles in a separate `style sheet <../CodeChat/css/CodeChat_sphinx_rtd_theme.css>`.
 
 -   1.8.0, 22-Apr-2020:
 

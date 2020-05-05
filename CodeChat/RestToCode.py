@@ -30,7 +30,7 @@
 #
 # Third-party imports
 # -------------------
-# For the docutils default stylesheet and template
+# For the docutils default style sheet and template
 from docutils import io
 from pygments.lexers import find_lexer_class
 from lxml import html

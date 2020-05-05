@@ -18,7 +18,7 @@
    ******************************************************************
    |docname| - Style sheet for CodeChat with the `ReadTheDocs theme`_
    ******************************************************************
-   This stylesheet fixes the size of CodeChat's indent so that code and comments line up when using the `ReadTheDocs theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_. This is only needed for the `ReadTheDocs theme`_. To use it, add the following to your project's ``conf.py``:
+   This style sheet fixes the size of CodeChat's indent so that code and comments line up when using the `ReadTheDocs theme <https://sphinx-rtd-theme.readthedocs.io/en/stable/>`_. This is only needed for the `ReadTheDocs theme`_. To use it, add the following to your project's ``conf.py``:
 
    .. code-block::
     :linenos:

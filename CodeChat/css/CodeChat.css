@@ -18,15 +18,15 @@
    **********************************************
    |docname| - Style sheet for CodeChat documents
    **********************************************
-   This is a stylesheet for use with CodeChat's extensions to Docutils/Sphinx.
+   This is a style sheet for use with CodeChat's extensions to Docutils/Sphinx.
 
    The overall goal is to allow comments (everything but ``<pre>`` tags) to appear with normal (double) spacing, while comments and code are single spaced.
 
    :Author: Bryan A. Jones
    :Contact: bjones AT ece DOT msstate DOT edu
-   :Copyright: This stylesheet has been placed in the public domain.
+   :Copyright: This style sheet has been placed in the public domain.
 
-   This import will cause an error if the Docutils ``html4css1`` style sheet is embedded instead of linked, though the page still displays without problems. However, omitting it will cause the linked stylesheet case to fail, so leave this in.
+   This import will cause an error if the Docutils ``html4css1`` style sheet is embedded instead of linked, though the page still displays without problems. However, omitting it will cause the linked style sheet case to fail, so leave this in.
  */
 @import url(html4css1.css);
 
