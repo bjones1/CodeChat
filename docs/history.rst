@@ -14,6 +14,10 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
+    -   No changes yet.
+
+-   1.8.1, 5-May-2020:
+
     -   Add `support <CodeChat_doStyle>` for styling dynamic content.
     -   Add the ``class`` option to the `_CodeInclude` directive.
     -   Reorganize and improve documentation; remove broken links.
