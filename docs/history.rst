@@ -16,6 +16,11 @@ History of changes
 
     -   No changes yet.
 
+-   1.8.2, 4-Jun-2020:
+
+    -   A syntax error in Python code now produces a correctly-formatted error message.
+    -   Docstrings are now parsed correctly by Python 3.8.
+
 -   1.8.1, 5-May-2020:
 
     -   Add `support <CodeChat_doStyle>` for styling dynamic content.
