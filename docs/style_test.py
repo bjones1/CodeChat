@@ -28,6 +28,18 @@ to_code = None
 def to_indented_code(): pass
 
 
+# Docstrings
+# ==========
+def foo():
+    """A function that
+       checks if docstrings are dedented **properly**.
+
+       Check that multiple paragraphs work.
+
+        Check that indents (even this small one) work."""
+    pass
+
+
 # All reST types
 # ==============
 # Here are all the reST body elements, tested with intermingled code to check code to text back to code, following the order given in the `reStructuredText Markup Specification <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_.

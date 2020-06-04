@@ -326,7 +326,8 @@ def _pygments_lexer(
     # comment, whose contents come from ``inspect.cleandoc`` of the docstring.
     #
     # So, process this with AST if this is Python or Python3 code to find docstrings.
-    # If found, store line number and docstring into ``ast_docstring``.
+    # If found, store ``{ ending_line_number_of_the_comment: docstring }`` into
+    # ``ast_docstring``.
     ast_docstring = {}
     # Provide a place to store syntax errors resulting from parsing the Python code.
     ast_syntax_error = ""
@@ -338,13 +339,17 @@ def _pygments_lexer(
             # If so, walk through the preprocessed code to analyze each token.
             for _ in ast.walk(ast.parse(preprocessed_code_str)):
                 try:
-                    # Check if current token is a docstring.
+                    # Check if current token is a docstring. The docstring will
+                    # be cleaned later.
                     d = ast.get_docstring(_, False)
                     if d is not None:
                         # If so, store current line number and token value. Note
                         # that ``lineno`` gives the last line of the string,
-                        # per http://bugs.python.org/issue16806.
-                        ast_docstring[_.body[0].lineno] = d
+                        # per http://bugs.python.org/issue16806, for
+                        # Python <= 3.7. Per the docs, ``end_lineno`` was
+                        # introduced in Python 3.8.
+                        end_lineno = getattr(_.body[0], "end_lineno", _.body[0].lineno)
+                        ast_docstring[end_lineno] = d
                 except (AttributeError, TypeError):
                     pass
         except SyntaxError as err:
