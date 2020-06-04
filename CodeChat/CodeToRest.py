@@ -204,7 +204,7 @@ def html_static_path():
 
 
 # Provide correct formatting of CodeChat-produced documents in reST based on the `CodeChat style`.
-rest_codechat_style = ".. raw:: html\n" "\n" " " + codechat_style
+rest_codechat_style = ".. raw:: html\n\n " + codechat_style + "\n\n"
 
 
 # Converting classified code to reST
