@@ -23,6 +23,7 @@ os: linux
 # See https://docs.travis-ci.com/user/languages/python.
 language: python
 python:
+  - 3.8
   - 3.7
   - 3.6
   - 3.5
@@ -37,6 +38,9 @@ matrix:
     # before_install_ for details).
     language: generic
     # See https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-.travis.yml.
+    env: INSTALL_TYPE=macpython VERSION=3.8 VENV=venv
+  - os: osx
+    language: generic
     env: INSTALL_TYPE=macpython VERSION=3.7 VENV=venv
   - os: osx
     language: generic
