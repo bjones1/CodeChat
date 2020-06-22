@@ -310,27 +310,6 @@ def _html_page_context(
         context["sourcename"] = sourcename[: -len(double_ext)] + sphinx_ext
 
 
-# Enki_ support
-# =============
-# `Enki <http://enki-editor.org/>`_, which hosts CodeChat, needs to know the
-# HTML file extension. So, save it to a file for Enki_ to read. Note that this
-# can't be done in `Extension setup`_, since the values in ``conf.py`` aren't
-# loaded yet. See also global_config_. Instead, wait for the builder-inited_
-# event, when the config_ settings are available.
-def _builder_inited(
-    # See app_.
-    app,
-):
-
-    try:
-        with open("sphinx-enki-info.txt", "w", encoding="utf-8") as f:
-            f.write(app.config.html_file_suffix)
-    except TypeError:
-        # If ``html_file_suffix`` is None (TypeError), Enki will assume
-        # ``.html``.
-        pass
-
-
 # Extension setup
 # ===============
 # This routine defines the `entry point
@@ -357,9 +336,6 @@ def setup(
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.add_config_value>`_.
     app.add_config_value("CodeChat_lexer_for_glob", {}, "html")
 
-    # Use the `builder-inited <http://sphinx-doc.org/extdev/appapi.html#event-builder-inited>`_
-    # event to write out settings specified in ``conf.py``.
-    app.connect("builder-inited", _builder_inited)
     # Use the `html-page-context <http://www.sphinx-doc.org/en/stable/extdev/appapi.html#event-html-page-context>`_
     # event to correct the extension of source files.
     app.connect("html-page-context", _html_page_context)
