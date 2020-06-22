@@ -137,9 +137,10 @@ CodeChat_lexer_for_glob = {
     # CSS files are auto-detected as a CSS + Lasso file by Pygments,
     # causing it to display incorrectly. Define them as CSS only.
     "*.css": "CSS",
-    # These` files use # as a comment. So does Perl. Ugly, no?
+    # These files use # as a comment. So does Perl. Ugly, no?
     "MANIFEST.in": "Perl",
     ".gitignore": "Perl",
+    "*.json": "Perl",
 }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:

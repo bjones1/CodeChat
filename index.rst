@@ -86,6 +86,7 @@ To build the documentation, execute ``sphinx-build -d _build/doctrees . _build``
 
    conf.py
    readthedocs.yml
+   codechat_config.json
 
 
 Packaging
