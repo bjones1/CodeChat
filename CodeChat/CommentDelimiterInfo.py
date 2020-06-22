@@ -109,6 +109,7 @@ COMMENT_DELIMITER_INFO = {
     "Batchfile":      ( ( "rem", ),      "",              ""),
     "Matlab":         ( ("%", "..."),  "%{",            "%}"),
     "SQL":            ( ( "--", ),     "/*",            "*/"),
+    "PL/pgSQL":       ( ( "--", ),     "/*",            "*/"),
     "PowerShell":     ( ( "#", ),      "<#",            "#>"),
     # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
     "GAS":            ( ( "#", ),      "/*",            "*/"),
