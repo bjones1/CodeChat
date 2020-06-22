@@ -29,6 +29,7 @@
 #
 # Standard library
 # ----------------
+import ast
 from enum import Enum
 import inspect
 
@@ -45,7 +46,6 @@ from pygments.util import guess_decode
 from pygments.lexer import _encoding_map
 from pygments.token import Token
 from pygments.filter import apply_filters
-import ast
 
 # Local application imports
 # -------------------------
