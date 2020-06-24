@@ -106,7 +106,7 @@ pygments_style = "sphinx"
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones. **CodeChat
 # note:** The ``CodeChat.CodeToRestSphinx`` extension is mandatory; without it,
 # CodeChat will not translate source code to reST and then (via Sphinx) to html.
-extensions = ["CodeChat.CodeToRestSphinx", "sphinx.ext.graphviz", "recommonmark"]
+extensions = ["CodeChat.CodeToRestSphinx", "sphinx.ext.graphviz", "sphinx.ext.intersphinx", "recommonmark"]
 
 # `templates_path <http://sphinx-doc.org/config.html#confval-templates_path>`_:
 # Add any paths that contain templates here, relative to this directory.
@@ -165,8 +165,7 @@ exclude_patterns = [
     "dist",
     # Ignore Sphinx output.
     "_build",
-    # Ignore CodeChat's output.
-    "sphinx-enki-info.txt",
+    "CodeChat/sphinx_template/_build",
     # Misc files.
     ".pytest_cache",
     "__pycache__",
@@ -298,3 +297,13 @@ html_sourcelink_suffix = ""
 # `html_file_suffix <http://sphinx-doc.org/config.html#confval-html_file_suffix>`_:
 # This is the file name suffix for HTML files (e.g. ".xhtml").
 ##html_file_suffix = None
+
+
+# Intersphinx
+# ===========
+#`intersphinx_mapping <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#confval-intersphinx_mapping>`_:
+# This config value contains the locations and names of other projects that should be linked to in this documentation.
+intersphinx_mapping = {'CodeChat_System': (
+    'https://codechat-system.readthedocs.io/en/latest/',
+    'F:/enki_all/A_modular_Plugin-CodeChat/_build/objects.inv'
+)}
