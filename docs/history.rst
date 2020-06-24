@@ -14,7 +14,10 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Add the PL/pgSQL language.
+    -   Removed support for the outdated Enki preview plugin.
+    -   Update the `tutorial` to use the CodeChat System.
+    -   Add a `CodeChat configuration file <../CodeChat/sphinx_template/codechat_config.json>` to the Sphinx template.
 
 -   1.8.2, 4-Jun-2020:
 
