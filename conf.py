@@ -166,6 +166,8 @@ exclude_patterns = [
     # Ignore Sphinx output.
     "_build",
     "CodeChat/sphinx_template/_build",
+    # Test files
+    "test/*.html",
     # Misc files.
     ".pytest_cache",
     "__pycache__",

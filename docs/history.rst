@@ -18,6 +18,7 @@ History of changes
     -   Removed support for the outdated Enki preview plugin.
     -   Update the `tutorial` to use the CodeChat System.
     -   Add a `CodeChat configuration file <../CodeChat/sphinx_template/codechat_config.json>` to the Sphinx template.
+    -   Added functional tests for Sphinx.
 
 -   1.8.2, 4-Jun-2020:
 

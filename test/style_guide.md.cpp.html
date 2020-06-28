@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>style_guide.md.cpp - Style recommendations for CodeChat using Markdown &#8212; CodeChat 1.8.2 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/CodeChat.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Reference manual" href="reference_manual.html" />
+    <link rel="prev" title="style_guide.cpp - Style recommendations for CodeChat" href="style_guide.cpp.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <script type="text/javascript">function CodeChat_doStyle(element) {function walk_tree(elements,func_walk,func_child) {let walk_children = [];for (let index = 0; index < elements.length; ++index) {let that = elements[index];while (that && !func_walk(that)) {that = that.parentElement;}if (that) {that = func_walk(that);walk_children.push(that);while (that && func_child(that)) {that = func_child(that);walk_children.push(that);}}}return walk_children;};element = (typeof element !== 'undefined') ? element : document;let code = element.getElementsByClassName("fenced-code");walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x =>x.classList.add('CodeChat_noTop'));walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x =>x.classList.add('CodeChat_noBottom'));}document.addEventListener("DOMContentLoaded", function(event) { CodeChat_doStyle(); });</script><!--- Copyright (C) 2012-2020 Bryan A. Jones.
+
+ This file is part of CodeChat.
+
+ CodeChat is free software: you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free
+ Software Foundation, either version 3 of the License, or (at your option)
+ any later version.
+
+ CodeChat is distributed in the hope that it will be useful, but WITHOUT ANY
+ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ details.
+
+ You should have received a copy of the GNU General Public License along
+ with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
+--><div class="section" id="style-guide-md-cpp-style-recommendations-for-codechat-using-markdown">
+<h1>style_guide.md.cpp - Style recommendations for CodeChat using Markdown<a class="headerlink" href="#style-guide-md-cpp-style-recommendations-for-codechat-using-markdown" title="Permalink to this headline">¶</a></h1>
+<p>CodeChat’s Sphinx extension also supports Markdown.</p>
+<blockquote>
+<div><p>Note: this “source file” does not contain any useful, executable code. Instead, it exemplifies literate programming style.</p>
+</div></blockquote>
+<div class="section" id="use">
+<h2>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<p>Any file with an extension of <code class="docutils literal notranslate"><span class="pre">.&lt;markdown</span> <span class="pre">extension&gt;.&lt;source</span> <span class="pre">file</span> <span class="pre">extension&gt;</span></code> will be processed as Markdown; for example, see this file’s name. The <code class="docutils literal notranslate"><span class="pre">&lt;markdown</span> <span class="pre">extension&gt;</span></code> is defined as any key in Sphinx’s <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_suffix">source_suffix</a> build configuration file whose value is <code class="docutils literal notranslate"><span class="pre">&quot;markdown&quot;</span></code>. See the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/markdown.html">Sphinx manual on Markdown</a> for more information. This feature requires <code class="docutils literal notranslate"><span class="pre">recommonmark</span></code> to be installed, as discussed in the previous link.</p>
+</div>
+<div class="section" id="syntax">
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<p>The same <a class="reference internal" href="style_guide.cpp.html#codechat-syntax"><span class="std std-ref">syntax</span></a> rules apply to Markdown; see <a class="reference external" href="https://commonmark.org/help/">here</a> for basic Markdown syntax.</p>
+</div>
+<div class="section" id="advice">
+<h2>Advice<a class="headerlink" href="#advice" title="Permalink to this headline">¶</a></h2>
+<p>At the present, the author doesn’t use Markdown with CodeChat; however, the information at <a class="reference internal" href="style_guide.cpp.html"><span class="doc">style_guide.cpp</span></a> mostly applies. Instead, this file simply serves as an example of using Markdown with CodeChat.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">CodeChat</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../README.html">An overview of CodeChat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installation instructions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rest-primer.html">reStructuredText Primer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="style_guide.cpp.html"><span>style_guide.cpp</span> - Style recommendations for CodeChat</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">style_guide.md.cpp - Style recommendations for CodeChat using Markdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference_manual.html">Reference manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html">History of changes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="history.html#ideas-for-the-future">Ideas for the future</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/sphinx_template/index.html">Welcome to template’s documentation!</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/css/CodeChat.css.html"><span>CodeChat.css</span> - Style sheet for CodeChat documents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/css/CodeChat_sphinx_rtd_theme.css.html"><span>CodeChat_sphinx_rtd_theme.css</span> - Style sheet for CodeChat with the ReadTheDocs theme</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/css/docutils.css.html"><span>docutils.css</span> - Style sheet for docutils</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/__init__.py.html"><span>__init__.py</span> - CodeChat Package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/SourceClassifier.py.html"><span>SourceClassifier.py</span> - a module to lex source code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/CodeToRest.py.html"><span>CodeToRest.py</span> - a module to translate source code to reST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/CodeToMarkdown.py.html"><span>CodeToMarkdown.py</span> - a module to translate source code to Markdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/RestToCode.py.html"><span>RestToCode.py</span> - a module to translate reST to source code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/CodeToRestSphinx.py.html"><span>CodeToRestSphinx.py</span> - a Sphinx extension to translate source code to reST</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../CodeChat/CommentDelimiterInfo.py.html"><span>CommentDelimiterInfo.py</span> - Info on comment delimiters for many languages</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../.gitignore.html"><span>.gitignore</span> - Files for Git to ignore</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../test/CodeToMarkdown_test.py.html"><span>CodeToMarkdown_test.py</span> - Unit testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../test/CodeToRestSphinx_test.py.html"><span>CodeToRestSphinx_test.py</span> - Unit testing for <code class="xref any docutils literal notranslate"><span class="pre">../CodeChat/CodeToRestSphinx.py</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../test/CodeToRest_test.py.html"><span>CodeToRest_test.py</span> - Unit testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../test/HtmlToCode_test.py.html">HtmlToCode_test.py - Unit testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../test/RestToCode_test.py.html">RestToCode_test.py - Unit testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../.travis.yml.html"><span>.travis.yml</span> - Travis CI configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../appveyor.yml.html"><span>appveyor.yml</span> - Appveyor CI configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="style_test.py.html"><span>style_test.py</span> - Styling tests for CodeChat</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../conf.py.html"><span>conf.py</span> - Sphinx configuration for generating CodeChat’s documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../readthedocs.yml.html"><span>readthedocs.yml</span> - ReadTheDocs config file</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../codechat_config.json.html"><span>codechat_config.json</span> - Configuration for a CodeChat project</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../setup.py.html"><span>setup.py</span> - Package and install CodeChat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../MANIFEST.in.html"><span>MANIFEST.in</span> - Non-source files to include in setup package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="style_guide.cpp.html" title="previous chapter"><span>style_guide.cpp</span> - Style recommendations for CodeChat</a></li>
+      <li>Next: <a href="reference_manual.html" title="next chapter">Reference manual</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Bryan A. Jones.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/docs/style_guide.md.cpp"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
