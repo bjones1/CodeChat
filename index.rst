@@ -67,11 +67,9 @@ To run the tests, execute ``pytest test`` from the root directory of the project
 
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   test/CodeToRest_test.py
-   test/CodeToMarkdown_test.py
-   test/RestToCode_test.py
-   test/HtmlToCode_test.py
+   test/*.py
    .travis.yml
    appveyor.yml
    docs/style_test.py
