@@ -134,7 +134,7 @@ source_suffix = ".rst"
 # <https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.match>`_).
 CodeChat_lexer_for_glob = {
     # The codechat_config.json file uses ``#`` for comments; so does Python.
-    "codechat_config.json" : "Python",
+    "codechat_config.json": "Python",
 }
 
 # `source_encoding <http://sphinx-doc.org/config.html#confval-source_encoding>`_:
