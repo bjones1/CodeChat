@@ -72,6 +72,9 @@ install:
   # using pip.
   - pip install -e .[test]
 
+  # Install Graphviz, to allow building the docs.
+  - choco install graphviz
+
 build: none
 
 test_script:
