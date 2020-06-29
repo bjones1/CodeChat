@@ -171,7 +171,7 @@ setup(
     #
     #    ``$ pip install -e .[test]``
     extras_require={
-        "test": ["pytest", "sphinx"],
+        "test": ["pytest", "sphinx>=3", "recommonmark"],
         "sphinx": ["sphinx>=3", "recommonmark"],
     },
     # To package data files, I'm using ``include_package_data=True`` then
