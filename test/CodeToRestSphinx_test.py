@@ -26,13 +26,10 @@
 #
 # Library imports
 # ---------------
-from difflib import HtmlDiff
+from difflib import unified_diff
 from pathlib import Path
 import subprocess
-from tempfile import TemporaryDirectory
-import time
-from urllib.request import pathname2url
-import webbrowser
+import sys
 
 # Third-party imports
 # -------------------
@@ -50,7 +47,7 @@ def test_1():
     try:
         # See `../codechat_config.json` for an explanation of these arguments.
         cp = subprocess.run(
-            ["sphinx-build", "-E", "-a", ".", "_build"],
+            ["sphinx-build", "-E", ".", "_build"],
             capture_output=True,
             encoding="utf-8",
             check=True,
@@ -93,29 +90,17 @@ def diff_files(
     ) as expected_file:
         actual = remove_navigation(actual_file.readlines())
         expected = remove_navigation(expected_file.readlines())
-        # If the files differ, show the diff in a browser.
+        # If the files differ, show the diff.
         if actual != expected:
-            with TemporaryDirectory() as tmp_dir_name:
-                with open(
-                    tmp_dir_name + "/diff.html", "w", encoding="utf-8"
-                ) as diff_file:
-                    diff_file.write(
-                        HtmlDiff().make_file(
-                            actual,
-                            expected,
-                            "Actual - {}".format(actual_relpath),
-                            "Expected - {}".format(expected_relapth),
-                        )
-                    )
-                webbrowser.open(
-                    "file:{}".format(
-                        pathname2url(str(Path(diff_file.name).absolute()))
-                    ),
-                    2,
+            sys.stderr.writelines(
+                unified_diff(
+                    actual,
+                    expected,
+                    "Actual - {}".format(actual_relpath),
+                    "Expected - {}".format(expected_relapth),
                 )
-                # Wait for the browser to read the file
-                time.sleep(2)
-                assert False
+            )
+            assert False
 
 
 def remove_navigation(lines):
