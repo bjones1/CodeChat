@@ -26,7 +26,6 @@ python:
   - 3.8
   - 3.7
   - 3.6
-  - 3.5
 
 # See https://docs.travis-ci.com/user/customizing-the-build/#Build-Matrix. This
 # manually includes additional OS X tests to the matrix of Linux tests defined
@@ -45,9 +44,6 @@ matrix:
   - os: osx
     language: generic
     env: INSTALL_TYPE=macpython VERSION=3.6 VENV=venv
-  - os: osx
-    language: generic
-    env: INSTALL_TYPE=macpython VERSION=3.5 VENV=venv
 
 # _`before_install`: Perform the manual steps on OS X to install python3 and
 # activate venv, since Python support is not available, per the list of
