@@ -14,6 +14,10 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
+    -   No changes yet.
+
+-   1.8.3, 29-Jun-2020:
+
     -   Add the PL/pgSQL language.
     -   Removed support for the outdated Enki preview plugin.
     -   Update the `tutorial` to use the CodeChat System.
