@@ -313,6 +313,7 @@ html_sourcelink_suffix = ""
 intersphinx_mapping = {
     "CodeChat_System": (
         "https://codechat-system.readthedocs.io/en/latest/",
-        "F:/enki_all/A_modular_Plugin-CodeChat/_build/objects.inv",
+        None,
+        ##"F:/enki_all/A_modular_Plugin-CodeChat/_build/objects.inv",
     )
 }
