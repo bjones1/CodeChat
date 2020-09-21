@@ -112,3 +112,12 @@ You should have received a `copy of the GNU General Public License <CodeChat/LIC
 Search
 ======
 * :ref:`search`
+
+
+Acknowledgements
+================
+Some of this material is based upon work supported by the National Science Foundation under `Grant No. 1612132 <https://www.nsf.gov/awardsearch/showAward?AWD_ID=1612132>`_. Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
+
+.. image:: docs/NSF_4-Color_bitmap_Logo.png
+   :width: 1.5in
+   :alt: NSF logo
