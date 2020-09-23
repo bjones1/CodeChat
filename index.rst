@@ -18,14 +18,15 @@ User documentation
 .. toctree::
    :maxdepth: 1
 
-   README.rst
-   docs/install.rst
-   docs/tutorial.rst
-   docs/rest-primer.rst
+   README
+   docs/install
+   docs/tutorial
+   docs/rest-primer
    docs/style_guide.cpp
    docs/style_guide.md.cpp
-   docs/reference_manual.rst
-   docs/history.rst
+   docs/reference_manual
+   docs/history
+   docs/supporting_literature
 
 
 Contributing
@@ -40,7 +41,7 @@ The following shows the documentation produced by a CodeChat project template. I
 .. toctree::
    :maxdepth: 1
 
-   CodeChat/sphinx_template/index.rst
+   CodeChat/sphinx_template/index
    CodeChat/css/CodeChat.css
    CodeChat/css/CodeChat_sphinx_rtd_theme.css
    CodeChat/css/docutils.css
