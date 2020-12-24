@@ -32,8 +32,8 @@ dist/
 
 # Others
 CodeChat.egg-info/
-sphinx-enki-info.txt
 .pytest_cache/
+.vscode/
 
 # PyCharm-generated files
 .idea/
