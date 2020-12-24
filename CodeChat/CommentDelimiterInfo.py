@@ -92,11 +92,10 @@ COMMENT_DELIMITER_INFO = {
     "PHP":            ( ( "#", "//"),  "/*",            "*/"),
     # Block comments not tested.
     "NASM":           ( ( ";", ), "%comment\n", "%endcomment"),
-    # PIC24 not tested.
     "PIC24":          ( ( ";", ),      "/*",           "*/"),
     # In Python, docstrings are treated as multi-line comments.
+    "Python 2.x":     ( ( "#", ),     '"""',          '"""'),
     "Python":         ( ( "#", ),     '"""',          '"""'),
-    "Python 3":       ( ( "#", ),     '"""',          '"""'),
     "CSS":            ( ( "", ),       "/*",           "*/"),
     # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
     # block comments, but I don"t see this anywhere in man bash. These aren"t
@@ -143,7 +142,7 @@ COMMENT_DELIMITER_INFO = {
     "Makefile":       ( ( "#", ),        "",              ""),
     "RPMSpec":        ( ( "#", ),        "",              ""),
     "Nimrod":         ( ( "#", ),        "",              ""),
-    # Comments continued on the next line with a ``\`` aren"t supported.
+    # Comments continued on the next line with a ``\`` aren't supported.
     "NSIS":           ( ("#", ";"),      "",              ""),
     "TeX":            ( ( "%", ),        "",              ""),
     "Erlang":         ( ( "%", ),        "",              ""),
@@ -151,7 +150,7 @@ COMMENT_DELIMITER_INFO = {
     "VB.net":         ( ( "'", ),        "",              ""),
     "REBOL":          ( ( ";", ),        "",              ""),
     "LLVM":           ( ( ";", ),        "",              ""),
-    "INI":            ( ( ";", ),        "",              ""),
+    "INI":            ( ( ";", "#"),     "",              ""),
     "Ada":            ( ( "--", ),       "",              ""),
     "Eiffel":         ( ( "--", ),       "",              ""),
     "vhdl":           ( ( "--", ),       "",              ""),
@@ -161,7 +160,8 @@ COMMENT_DELIMITER_INFO = {
 
 # These languages lack unit tests
 # -------------------------------
-"HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
+    "HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
+    "TOML":           ( ( "#", ),        "",              ""),
 
 # These languages have failing unit tests
 # ---------------------------------------
