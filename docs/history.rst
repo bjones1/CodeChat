@@ -14,7 +14,11 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Correct hyperlinks to Sphinx docs.
+    -   Support TOML.
+    -   Allow ``#`` as a comment in INI files.
+    -   Update Python parser names for current Pygments.
+    -   Include NSF acknowledgement.
 
 -   1.8.3, 29-Jun-2020:
 
