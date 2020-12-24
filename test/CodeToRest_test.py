@@ -539,7 +539,7 @@ class TestCodeToRest:
     def test_29(self):
         self.mt(
             "a = [1 2 ...\n"
-            "         ... Why not put a comment here?\n"
+            "         ... Comments here not supported.\n"
             "     3 4];\n"
             "% Hello\n"
             "  %{\n"
@@ -548,11 +548,7 @@ class TestCodeToRest:
             "  %}\n",
             bf
             + " a = [1 2 ...\n"
-            + ef
-            + div(4.5, -2)
-            + "Why not put a comment here?\n"
-            + div_end
-            + bf
+            + "          ... Comments here not supported.\n"
             + "      3 4];\n"
             + ef
             + sl(0)
