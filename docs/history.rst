@@ -14,6 +14,10 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
+    -   No changes yet.
+
+-   1.8.4, 24-Dec-2020:
+
     -   Correct hyperlinks to Sphinx docs.
     -   Support TOML.
     -   Allow ``#`` as a comment in INI files.
