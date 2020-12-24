@@ -157,11 +157,11 @@ COMMENT_DELIMITER_INFO = {
     # An inline comment is six ignored characters followed by ``*`` or ``/`` -- there's a `special case <COBOL special case>` in the code to handle this. ``*>`` as an inline comment is not supported.
     "COBOL":          ( ( "      *", ),  "",              ""),
     "YAML":           ( ( "#", ),        "",              ""),
+    "TOML":           ( ( "#", ),        "",              ""),
 
 # These languages lack unit tests
 # -------------------------------
     "HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
-    "TOML":           ( ( "#", ),        "",              ""),
 
 # These languages have failing unit tests
 # ---------------------------------------

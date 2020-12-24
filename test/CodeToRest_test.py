@@ -981,24 +981,75 @@ class TestCodeToRest:
 
     # INI.
     def test_82_a(self):
-        self.mt("; Comment here\n", sl(-3) + "Comment here\n", ["INI"])
+        self.mt(
+            "; Comment here\n"
+            "# Another comment here\n",
+            sl(-3) +
+            "Comment here\n"
+            "Another comment here\n",
+            ["INI"]
+        )
 
     def test_82_b(self):
         self.mt(
-            "Hello World!\n" "; Comment here\n",
-            bf + " Hello World!\n" + ef + sl(-2) + "Comment here\n",
+            "Hello World!\n"
+            "; Comment here\n"
+            "# Another comment here\n",
+            bf +
+            " Hello World!\n" +
+            ef +
+            sl(-2) +
+            "Comment here\n"
+            "Another comment here\n",
             ["INI"],
         )
 
     # YAML.
     def test_83_a(self):
-        self.mt("# Comment here\n", sl(-3) + "Comment here\n", ["YAML"])
+        self.mt(
+            "# Comment here\n",
+            sl(-3) +
+            "Comment here\n",
+            ["YAML"]
+        )
 
     def test_83_b(self):
         self.mt(
-            "invoice: 34843\n" "# Comment here\n",
-            bf + " invoice: 34843\n" + ef + sl(-2) + "Comment here\n",
+            "invoice: 34843\n"
+            "# Comment here\n",
+            bf +
+            " invoice: 34843\n" +
+            ef +
+            sl(-2) +
+            "Comment here\n",
             ["YAML"],
+        )
+
+    def test_83_1(self):
+        self.mt(
+            "# This is a TOML document\n"
+            "\n"
+            'title = "TOML Example"\n'
+            "\n"
+            "# Owner information\n"
+            "[owner]\n"
+            'name = "Tom Preston-Werner"\n'
+            "dob = 1979-05-27T07:32:00-08:00\n",
+            sl(-3) +
+            "This is a TOML document\n" +
+            bf +
+            " \n"
+            ' title = "TOML Example"\n'
+            " \n" +
+            ef +
+            sl(1) +
+            "Owner information\n" +
+            bf +
+            " [owner]\n"
+            ' name = "Tom Preston-Werner"\n'
+            " dob = 1979-05-27T07:32:00-08:00\n" +
+            ef,
+            ["TOML"]
         )
 
     # DocString Testing
