@@ -26,42 +26,15 @@ python:
   - 3.9
   - 3.8
 
-# See https://docs.travis-ci.com/user/customizing-the-build/#Build-Matrix. This
-# manually includes additional OS X tests to the matrix of Linux tests defined
-# above.
-matrix:
-  include:
-  - os: osx
-    # Since OS X doesn't natively support Python, use some workarounds (see
-    # before_install_ for details).
-    language: generic
-    # Homebrew doesn't support OS X 10.13, so use a newer version.
-    osx_image: xcode12
-    # See https://docs.travis-ci.com/user/environment-variables/#Defining-Variables-in-.travis.yml.
-    env: INSTALL_TYPE=macpython VERSION=3.9 VENV=venv
-  - os: osx
-    language: generic
-    osx_image: xcode12
-    env: INSTALL_TYPE=macpython VERSION=3.8 VENV=venv
-
 # _`before_install`: Perform the manual steps on OS X to install python3 and
 # activate venv, since Python support is not available, per the list of
 # `unsupported languages on OS X <https://github.com/travis-ci/travis-ci/issues/2320>`_.
 # The following approach is based on a `workaround <https://github.com/travis-ci/travis-ci/issues/2312#issuecomment-195620855>`_.
 # This was modified based on `instructions to install multiple Python versions on OS X <https://gist.github.com/Bouke/11261620>`_.
 # See also the `pyenv docs <https://github.com/yyuu/pyenv/blob/master/README.md>`_.
-before_install: |
-  if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-    git clone https://github.com/MacPython/terryfy.git
-    # Avoid printing the lines from the script below.
-    source terryfy/travis_tools.sh
-    get_python_environment $INSTALL_TYPE $VERSION $VENV
-    # Install graphviz on Mac.
-    brew install graphviz
-  else
+before_install:
     # Install graphviz on Linux.
-    sudo apt-get -y install graphviz
-  fi
+  - sudo apt-get -y install graphviz
 
 install:
   # Make sure we're using the latest version of pip. Use the approach which
