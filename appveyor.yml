@@ -66,6 +66,8 @@ install:
 
   # Install Graphviz, to allow building the docs.
   - choco install graphviz
+  # Register it, to avoid the ``Format: "png" not recognized. Use one of...`` error.
+  - dot -c
 
 build: none
 
