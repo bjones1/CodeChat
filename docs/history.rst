@@ -16,6 +16,10 @@ History of changes
 
     -   No changes yet.
 
+-   1.8.5, 26-Dec-2020:
+
+    -   Fix CSS to correctly overrides styles in Sphinx v. 3.4.1's ``basic.css``.
+
 -   1.8.4, 24-Dec-2020:
 
     -   Correct hyperlinks to Sphinx docs.
