@@ -319,3 +319,9 @@ intersphinx_mapping = {
         ##"F:/enki_all/A_modular_Plugin-CodeChat/_build/objects.inv",
     )
 }
+
+
+# Options for `Graphviz output <https://www.sphinx-doc.org/master/usage/extensions/graphviz.html>`_
+# ===========================================================================================================
+# The output format for Graphviz when building HTML files.
+graphviz_output_format = "svg"
