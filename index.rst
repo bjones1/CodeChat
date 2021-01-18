@@ -60,6 +60,7 @@ Developer documentation
    CodeChat/CodeToRestSphinx.py
    CodeChat/CommentDelimiterInfo.py
    .gitignore
+   .flake8
 
 
 Testing

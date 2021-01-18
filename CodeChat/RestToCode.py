@@ -40,11 +40,11 @@ from lxml import html
 from .CommentDelimiterInfo import COMMENT_DELIMITER_INFO
 from .CodeToRest import rest_codechat_style
 
+
 # Supporting Functions
 # ====================
 # This section covers all functions that support the main two functions rest_to_code_string_
 # and rest_to_code_file_.
-# |
 #
 # _`find_file_ext`: Find the file extension needed, given the language name
 def find_file_ext(
@@ -278,7 +278,7 @@ def rest_to_code_string(
                         break
                     i += 4
                 # this exception catches the case that the file ends with code rather than a comment
-                except:
+                except Exception:
                     # Makes sure that the lines that are supposed to be there are there.
                     if (
                         line_list[i + 1] != ""
@@ -371,8 +371,7 @@ def rest_to_code_string(
                     temp_i += 1
                     try:
                         line_list[temp_i + 1]
-                        stuff = 0
-                    except:
+                    except Exception:
                         temp_i += 1
                         break
                 # .. _number_consecutive_comments:
@@ -397,8 +396,7 @@ def rest_to_code_string(
                     # This ensures that the while loop does not loop forever due to the next line being ``None``
                     try:
                         line_list[i + 1]
-                        stuff = 0
-                    except:
+                    except Exception:
                         f = formulate_comment(
                             line_list[i], lang, is_block_comment, position, line_counter
                         )
@@ -412,7 +410,7 @@ def rest_to_code_string(
 
             if boolean:
                 break
-        except:
+        except Exception:
             if line_list[i] != "":
                 # See Boolean_.
                 boolean = True
@@ -573,7 +571,7 @@ def html_to_code_string(
             html_list2 = html_list[1].split('.dtd">\n', 1)
             html_str = html_list[0] + html_list2[1]
         # If the style sheets are not in the string, get out of the for loop.
-        except:
+        except Exception:
             break
     # Take out the 2 style sheets; they are not needed
     for i in range(2):
@@ -582,7 +580,7 @@ def html_to_code_string(
             html_list2 = html_list[1].split("</style>\n", 1)
             html_str = html_list[0] + html_list2[1]
         # If the style sheets are not in the string, get out of the for loop.
-        except:
+        except Exception:
             break
 
     # This needs to be preprocessed because there are cases where there are ``<span>``\ (s) in the middle,

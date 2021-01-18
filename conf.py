@@ -145,6 +145,7 @@ CodeChat_lexer_for_glob = {
     # These files use # as a comment. So does Perl. Ugly, no?
     "MANIFEST.in": "Perl",
     ".gitignore": "Perl",
+    ".flake8": "Perl",
     "*.json": "Perl",
 }
 

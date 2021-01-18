@@ -767,7 +767,7 @@ class _CodeInclude(Directive):
             include_file = io.FileInput(
                 source_path=path, encoding=encoding, error_handler=e_handler
             )
-        except UnicodeEncodeError as error:
+        except UnicodeEncodeError:
             raise self.severe(
                 u'Problems with "%s" directive path:\n'
                 'Cannot encode input file path "%s" '

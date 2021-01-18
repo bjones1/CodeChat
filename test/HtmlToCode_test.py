@@ -31,16 +31,11 @@
 #
 # Third-party imports
 # -------------------
-# Used to run docutils.
-from docutils import io
-from tempfile import mkstemp
-import os
-
+# None.
 #
 # Local application imports
 # -------------------------
-from CodeChat.RestToCode import html_to_code_file, html_to_code_string, find_file_ext
-from CodeChat.CodeToRest import code_to_html_string, code_to_html_file
+from CodeChat.RestToCode import html_to_code_file
 
 
 # TODO. See last test in RestToCode_test.py.

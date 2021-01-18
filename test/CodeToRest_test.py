@@ -1536,30 +1536,30 @@ main(){
             _is_space_indented_line(
                 "comment\n", 3, "*", False, c_comment_delimiter_info
             )
-            == False
+            is False
         )
         assert (
             _is_space_indented_line(
                 "  comment\n", 3, "*", False, c_comment_delimiter_info
             )
-            == False
+            is False
         )
         assert (
             _is_space_indented_line(
                 "   comment\n", 3, "*", False, c_comment_delimiter_info
             )
-            == True
+            is True
         )
 
     # Tests of block comment end indentation using spaces.
     def test_4_2(self):
         assert (
             _is_space_indented_line("*/", 3, "*", True, c_comment_delimiter_info)
-            == True
+            is True
         )
         assert (
             _is_space_indented_line(" */", 3, "*", True, c_comment_delimiter_info)
-            == True
+            is True
         )
 
     # Tests of block comment body indentation using spaces.
@@ -1568,34 +1568,34 @@ main(){
             _is_delim_indented_line(
                 "comment\n", 3, "*", False, c_comment_delimiter_info
             )
-            == False
+            is False
         )
         assert (
             _is_delim_indented_line(
                 " *comment\n", 3, "*", False, c_comment_delimiter_info
             )
-            == False
+            is False
         )
         assert (
             _is_delim_indented_line(
                 " * comment\n", 3, "*", False, c_comment_delimiter_info
             )
-            == True
+            is True
         )
         assert (
             _is_delim_indented_line(" *\n", 3, "*", False, c_comment_delimiter_info)
-            == True
+            is True
         )
 
     # Tests of block comment end indentation using spaces.
     def test_4_4(self):
         assert (
             _is_delim_indented_line("*/", 3, "*", True, c_comment_delimiter_info)
-            == False
+            is False
         )
         assert (
             _is_delim_indented_line(" */", 3, "*", True, c_comment_delimiter_info)
-            == True
+            is True
         )
 
     # _is_rest_comment tests
@@ -1947,9 +1947,7 @@ main(){
     # ---------------------
     def test_11(self):
         out_stringio = StringIO()
-        generated_rest = _generate_rest(
-            [(-1, "\n"), (-1, "code\n"), (-1, "\n")], out_stringio
-        )
+        _generate_rest([(-1, "\n"), (-1, "code\n"), (-1, "\n")], out_stringio)
         assert (
             out_stringio.getvalue() ==
             # Note: Not using a """ string, since the string trailing whitespace option in
@@ -1960,9 +1958,7 @@ main(){
 
     def test_12(self):
         out_stringio = StringIO()
-        generated_rest = _generate_rest(
-            [(0, "\n"), (0, "comment\n"), (0, "\n")], out_stringio
-        )
+        _generate_rest([(0, "\n"), (0, "comment\n"), (0, "\n")], out_stringio)
         assert (
             out_stringio.getvalue()
             == sl(-3)
@@ -1974,7 +1970,5 @@ comment
 
     def test_13(self):
         out_stringio = StringIO()
-        generated_rest = _generate_rest(
-            [(3, "\n"), (3, "comment\n"), (3, "\n")], out_stringio
-        )
+        _generate_rest([(3, "\n"), (3, "comment\n"), (3, "\n")], out_stringio)
         assert out_stringio.getvalue() == div(1.5, -3) + "\ncomment\n\n" + div_end
