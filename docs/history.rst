@@ -14,6 +14,10 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
+    -   No changes yet.
+
+-   1.8.6, 19-Jan-2020:
+
     -   Avoid a crash in the parser.
 
 -   1.8.5, 26-Dec-2020:
