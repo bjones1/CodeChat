@@ -14,11 +14,11 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Avoid a crash in the parser.
 
 -   1.8.5, 26-Dec-2020:
 
-    -   Fix CSS to correctly overrides styles in Sphinx v. 3.4.1's ``basic.css``.
+    -   Fix CSS to correctly override styles in Sphinx v. 3.4.1's ``basic.css``.
 
 -   1.8.4, 24-Dec-2020:
 

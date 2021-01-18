@@ -923,9 +923,9 @@ def _classify_groups(
                 if not string.isspace() and first_ws_len > 0:
                     # The first ws_len - 1 characters should be stripped.
                     string = string[first_ws_len - 1 :]
-                    # The last character, if it's a space, should also be
+                    # The last character, if it exists and is a space, should also be
                     # stripped.
-                    if string[0] == " ":
+                    if string and string[0] == " ":
                         string = string[1:]
             # A comment of ``//\n`` qualifies as a reST comment, but should
             # not have the ``\n`` stripped off. Avoid this case. Otherwise,
