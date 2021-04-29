@@ -98,7 +98,7 @@ COMMENT_DELIMITER_INFO = {
     "Python":         ( ( "#", ),     '"""',          '"""'),
     "CSS":            ( ( "", ),       "/*",           "*/"),
     # This covers csh and sh as well. Wikipedia claims that ``<#`` ~ ``#>`` are
-    # block comments, but I don"t see this anywhere in man bash. These aren"t
+    # block comments, but I don"t see this anywhere in man bash. These aren't
     # supported.
     "Bash":           ( ( "#", ),        "",              ""),
     "Tcsh":           ( ( "#", ),        "",              ""),
