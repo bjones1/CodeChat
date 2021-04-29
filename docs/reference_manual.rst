@@ -42,6 +42,10 @@ CodeChat provides the `../CodeChat/CodeToRestSphinx.py` extension. This extensio
 
 -   `CodeChat_lexer_for_glob <CodeChat_lexer_for_glob>`
 
+It also provides the following utilities:
+
+-   `exclude_small_files`
+
 
 API
 ===

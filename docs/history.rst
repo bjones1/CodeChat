@@ -14,7 +14,7 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Added `exclude_small_files`.
 
 -   1.8.6, 19-Jan-2020:
 

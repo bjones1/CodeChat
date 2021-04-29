@@ -44,11 +44,13 @@ from typing import Dict
 # Third-party imports
 # -------------------
 import sphinx
-import sphinx.util
+from sphinx.application import Sphinx
+from sphinx.config import Config
+import sphinx.io
 import sphinx.project
+import sphinx.util
 from sphinx.util import path_stabilize
 from sphinx.util.osutil import SEP, relpath
-import sphinx.io
 
 # The exception ``FiletypeNotFoundError`` was `deprecated in Sphinx v2.4.0 <https://www.sphinx-doc.org/en/master/extdev/deprecated.html>`_ by moving it from ``sphinx.io`` to ``sphinx.errors``.
 if sphinx.version_info[:3] >= (2, 4, 0):
@@ -63,6 +65,40 @@ from .CodeToRest import code_to_rest_string, get_lexer, add_highlight_language
 from .CodeToMarkdown import code_to_markdown_string
 from .CommentDelimiterInfo import SUPPORTED_GLOBS
 from . import __version__
+
+
+# Utility
+# =======
+#
+# .. _exclude_small_files:
+#
+# exclude_small_files
+# -------------------
+# Python requires ``__init__.py`` files; these are often small or even empty. Provide a function to exclude these from the docs in order to reduce noise. Invoke this from a ``setup`` function in a Sphinx extension.
+#
+# Therefore, this function excludes small files matching the given glob from a Sphinx build.
+def exclude_small_files(
+    # The Sphinx application object.
+    app_: Sphinx,
+    # A `glob pattern <https://docs.python.org/3/library/pathlib.html#pathlib.Path.glob>`_ specifying which files should be excluded if they are empty.
+    pattern: str,
+    # Optional; the maximum size of an ignorable file, in bytes. Defaults to 0.
+    max_size: int = 0,
+):
+    # This returns a function which will be called by the `config-inited`_ event.
+    def excluder(app: Sphinx, config: Config):
+        # The path must start in the `srcdir <https://www.sphinx-doc.org/en/master/extdev/appapi.html#sphinx.application.Sphinx.srcdir>`_.
+        root_path = Path(app.srcdir)
+        # This is slightly inefficient, since it doesn't use the existing excludes to avoid searching already-excluded values.
+        app.config.exclude_patterns += [  # type: ignore
+            # Paths must be relative to the srcdir.
+            x.relative_to(root_path).as_posix()
+            for x in root_path.glob(pattern)
+            if x.stat().st_size <= max_size
+        ]
+
+    # Connect this to the `config-inited <https://www.sphinx-doc.org/en/master/extdev/appapi.html#event-config-inited>`_ Sphinx event.
+    app_.connect("config-inited", excluder)
 
 
 # source-read event
