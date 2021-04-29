@@ -199,8 +199,8 @@ def is_markdown_docname(
 # --------------
 # For source files, make their docname the same as the file name; for reST
 # files, allow Sphinx to strip off the extension as before. This patch
-# accomplishes this. It comes from ``sphinx.project.Project``, line 46 and
-# following in Sphinx 2.0.1.
+# accomplishes this. It comes from ``sphinx.project.Project``, line 70 and
+# following in Sphinx 3.4.3.
 def _path2doc(self, filename):
     # type: (str) -> str
     """Return the docname for the filename if the file is document.
@@ -246,7 +246,7 @@ def is_supported_language(filename):
 # Next, the way docnames get transformed back to a full path needs to be fixed
 # for source files. Specifically, a docname might be the source file, without
 # adding an extension. This code comes from ``sphinx.project.Project`` of Sphinx
-# 2.0.1.
+# 3.4.3.
 def _doc2path(self, docname, basedir=True):
     # type: (str, bool) -> str
     """Return the filename for the document name.
