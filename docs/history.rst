@@ -14,7 +14,12 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
+    -   No changes yet.
+
+-   1.8.7, 11-Jun-2021:
+
     -   Added `exclude_small_files`.
+    -   Fixed to be compatible with Sphinx 4.0.
 
 -   1.8.6, 19-Jan-2020:
 
