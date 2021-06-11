@@ -354,10 +354,10 @@ def _pygments_lexer(
                     pass
         except SyntaxError as err:
             # Take the file name (which shows up as ``<unknown>`` out of the error message returned.
-            ast_syntax_error = "SyntaxError: {}. Docstrings cannot be processed.\n".format(
-                err
-            ).replace(
-                "<unknown>, ", ""
+            ast_syntax_error = (
+                "SyntaxError: {}. Docstrings cannot be processed.\n".format(
+                    err
+                ).replace("<unknown>, ", "")
             )
 
     # Now, run the lexer.
