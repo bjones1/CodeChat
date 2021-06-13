@@ -21,7 +21,7 @@ Basic restructuredText
 ======================
 CodeChat relies on `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ (`reST <http://docutils.sourceforge.net/rst.html>`_) in comments to provide human-readable markup. "ReStructuredText is an easy-to-read, what-you-see-is-what-you-get plaintext markup syntax" [#]_. So, this tutorial begins by exploring reST_ using the CodeChat System.
 
-First, `install and run <https://codechat-system.readthedocs.io/en/latest/CodeChat_Server/contents.html#installation>`_ the CodeChat server and install the `Visual Studio Code`_ `CodeChat extension`_. Next, download the `the CodeChat reST tutorial <https://raw.githubusercontent.com/bjones1/CodeChat/master/docs/rest-primer.rst>`_. Open this file in Visual Studio Code, then `open CodeChat <use codechat>`. Edit the text -- your changes are visible immediately.
+First, `install and run <https://codechat-system.readthedocs.io/en/latest/CodeChat_Server/contents.html#installation>`_ the CodeChat Server and install the `Visual Studio Code`_ `CodeChat extension`_. Next, download the `the CodeChat reST tutorial <https://raw.githubusercontent.com/bjones1/CodeChat/master/docs/rest-primer.rst>`_. Open this file in Visual Studio Code, then `open CodeChat <use codechat>`. Edit the text -- your changes are visible immediately.
 
 Now, explore creating your own reST_ file: create a new file, then save it with an extension of ``.rst``. Based on the very helpful `reST primer <http://sphinx-doc.org/rest.html>`_, try out some syntax: create headings, include a hyperlink, add an image, use inline markup. When errors occur, they are reported in the log window and in-line in the resulting web page.
 
