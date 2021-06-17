@@ -158,6 +158,11 @@ COMMENT_DELIMITER_INFO = {
     "COBOL":          ( ( "      *", ),  "",              ""),
     "YAML":           ( ( "#", ),        "",              ""),
     "TOML":           ( ( "#", ),        "",              ""),
+    "Mako":           ( ( "##", ), "<%doc>",       "</%doc>"),
+    "HTML+Mako":      ( ( "##", ), "<%doc>",       "</%doc>"),
+    "XML+Mako":       ( ( "##", ), "<%doc>",       "</%doc>"),
+    "JavaScript+Mako": ( ( "##", ), "<%doc>",      "</%doc>"),
+    "CSS+Mako":       ( ( "##", ), "<%doc>",       "</%doc>"),
 
 # These languages lack unit tests
 # -------------------------------

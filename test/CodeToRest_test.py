@@ -33,6 +33,7 @@
 from io import StringIO
 import re
 import shutil
+from textwrap import dedent
 
 # Third-party imports
 # -------------------
@@ -72,6 +73,7 @@ except pygments.util.ClassNotFound:
 # fence == ``ef``) contain the fence strings ``_generate_rest`` produces.
 bf = "\n" ".. fenced-code::\n" "\n" " Beginning fence\n"
 ef = " Ending fence\n" "\n" "..\n" "\n"
+
 
 # ``_generate_rest`` inserts a ``<div>`` to format indented comments followed by
 # a ``set-line`` directive to show line numbers of the comments correctly. This
@@ -119,8 +121,7 @@ c_lexer = get_lexer_by_name("c")
 class TestCodeToRest:
     # C-like language tests
     # =====================
-    # multi-test: Check that the given code's output is correct over several
-    # C-like languages.
+    # multi-test: Check that the given code's output is correct over the provided sequence of languages.
     def mt(
         self,
         code_str,
@@ -1025,6 +1026,7 @@ class TestCodeToRest:
             ["YAML"],
         )
 
+    # TOML
     def test_83_1(self):
         self.mt(
             "# This is a TOML document\n"
@@ -1050,6 +1052,29 @@ class TestCodeToRest:
             " dob = 1979-05-27T07:32:00-08:00\n" +
             ef,
             ["TOML"]
+        )
+
+    # Mako.
+    @pytest.mark.skip(reason="Fails using Pygments 2.8.1, since that version classifies comments (and many other tokens) as ``Token.Comment.Preproc``. See https://github.com/pygments/pygments/issues/1841.")
+    def test_83_2(self):
+        self.mt(dedent("""\
+            ## A single-line comment.
+            <%inherit file="base.html"/>
+            <%doc>
+                A multi-
+                line comment.
+            </%doc>"""),
+            sl(-3) +
+            "A single-line comment.\n" +
+            bf +
+            ' <%inherit file="base.html"/>\n' +
+            ef +
+            sl(-1) +
+            "\n"
+            "    A multi-\n"
+            "    line comment.\n"
+            "\n",
+            ["HTML+Mako"]
         )
 
     # DocString Testing

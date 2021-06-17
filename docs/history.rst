@@ -14,7 +14,7 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Add preliminary support for Mako. However, Pygments doesn't parse Mako comments correctly, so CodeChat can't yet support Mako.
 
 -   1.8.7, 11-Jun-2021:
 
