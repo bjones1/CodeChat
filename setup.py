@@ -171,8 +171,8 @@ setup(
     #
     #    ``$ pip install -e .[test]``
     extras_require={
-        "test": ["pytest", "sphinx>=3", "recommonmark"],
-        "sphinx": ["sphinx>=3", "recommonmark"],
+        "test": ["pytest", "sphinx>=3", "myst-parser"],
+        "sphinx": ["sphinx>=3", "myst-parser"],
     },
     # To package data files, I'm using ``include_package_data=True`` then
     # putting the files in :doc:`MANIFEST.in <MANIFEST.in>`. See `including data

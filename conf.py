@@ -110,7 +110,7 @@ extensions = [
     "CodeChat.CodeToRestSphinx",
     "sphinx.ext.graphviz",
     "sphinx.ext.intersphinx",
-    "recommonmark",
+    "myst_parser",
 ]
 
 # `templates_path <https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-templates_path>`_:
