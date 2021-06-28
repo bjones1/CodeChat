@@ -8,10 +8,10 @@
 
     You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-***********************
-An overview of CodeChat
-***********************
-`CodeChat <http://codechat.readthedocs.io/en/latest/README.html>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
+********
+CodeChat
+********
+`CodeChat <http://codechat.readthedocs.io/en/latest/>`_ transforms source code into a web page, allowing developers to view their program as a beautiful and descriptive document by adding headings, formatting, hyperlinks, diagrams, images, and other forms of rich content to capture the ideas and insights that naturally flow from the process of writing a program. It also provides a blank slate in which to plan ahead, by sketching out an algorithm before committing it to code or laying out a design document which can evolve as the code does. This `literate programming <http://www.literateprogramming.com/>`_ paradigm changes the way developers think by intermingling ideas with their implementation as code, dramatically improving a programmer’s abilities.
 
 .. Note that hyperlinks don't use the typical :doc: syntax here, because:
 
@@ -31,21 +31,6 @@ Background
 Put simply, literate programming (LP) is the realization that a program is a document written to and for fellow programmers, not simply a list of instructions for a computer. LP tools therefore produce a nicely-formatted document which contains the code intermixed with explanatory prose. `Donald Knuth <http://en.wikipedia.org/wiki/Donald_Knuth>`_ introduced literate programming using his WEB tool in his seminal `paper <http://www.literateprogramming.com/knuthweb.pdf>`_. Per Figure 1 of this paper_, the WEB system takes a ``.w`` document as input then produces either a "tangled" source file for compilation or a "woven" document as a ``.tex`` file. The document is beautiful; the WEB source is difficult to digest (see Figure 2a-c); the source code is completely unreadable (see Figure 3). While a plethora of `tools <http://en.wikipedia.org/wiki/Literate_programming#Tools>`_ developed over the years attempt to address these problems, only one `LP-inspired <http://rant.gulbrandsen.priv.no/udoc/history>`_ variant has gained widespread acceptance: documentation generators, such as `Doxygen <http://www.doxygen.org>`_ and `JavaDoc <http://www.oracle.com/technetwork/java/javase/documentation/index-jsp-135444.html>`_, which extract documentation directly from source code, rather than extracting source code from the documentation, as WEB and most LP tools do. CodeChat addresses these LP weaknesses by producing a document directly from the code; employing human-readable markup (reStructuredText); and by supporting a GUI to make editing an LP document-program faster and easier.
 
 
-.. _tutorial-examples:
-
-Examples
-========
-Some examples of literate programming using CodeChat:
-
-*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <http://codechat.readthedocs.io/en/latest/>`_
-*   Use of tables to help design a `simple parser <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
-*   Use of a numbered list to explain a `simple state machine <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
-*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <http://codechat.readthedocs.io/en/latest/conf.py.html>`_.
-*   Use of fonts to show what ``setup.py`` `commands to run <http://codechat.readthedocs.io/en/latest/setup.py.html>`_
-*   `Documentation <https://pyinstaller-sample-hook.readthedocs.io/en/latest/>`_ for integrating a PyInstaller hook into a distribution.
-*   Code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_
-
-
-More information
-================
-Refer to the `CodeChat docuumentation <http://codechat.readthedocs.io/en/latest>`_ for more information.
+Getting started
+===============
+Refer to the `CodeChat documentation <http://codechat.readthedocs.io/en/latest>`_ for more information.

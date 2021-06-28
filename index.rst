@@ -8,17 +8,36 @@
 
    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
-****************************
-CodeChat's table of contents
-****************************
-Welcome to CodeChat's documentation! For new users, begin by reading `README`. For others, documentation for this program is divided into the following sections.
+.. include:: README.rst
+   :end-before: Getting started
+
+
+.. _tutorial-examples:
+
+Examples
+========
+Some examples of literate programming using CodeChat:
+
+*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <http://codechat.readthedocs.io/en/latest/dev-toctree.html>`_.
+*   Use of tables to help design a `simple parser <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
+*   Use of a numbered list to explain a `simple state machine <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
+*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <http://codechat.readthedocs.io/en/latest/conf.py.html>`_.
+*   Use of fonts to show what ``setup.py`` `commands to run <http://codechat.readthedocs.io/en/latest/setup.py.html>`_.
+*   `Documentation <https://pyinstaller-sample-hook.readthedocs.io/en/latest/>`_ for integrating a PyInstaller hook into a distribution.
+*   Code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+
+   README
+
 
 User documentation
 ==================
 .. toctree::
    :maxdepth: 1
 
-   README
    docs/install
    docs/tutorial
    docs/rest-primer
@@ -29,73 +48,20 @@ User documentation
    docs/supporting_literature
 
 
-Contributing
-------------
-Please use the `issue tracker <https://github.com/bjones1/CodeChat/issues>`_ to report bugs or request features; even better, contribute to the `code <https://github.com/bjones1/CodeChat>`_!
-
-
-Template documentation
-----------------------
-The following shows the documentation produced by a CodeChat project template. It also presents the style sheets used for CodeChat webpages.
-
-.. toctree::
-   :maxdepth: 1
-
-   CodeChat/sphinx_template/index
-   CodeChat/css/CodeChat.css
-   CodeChat/css/CodeChat_sphinx_rtd_theme.css
-   CodeChat/css/docutils.css
-
-
 Developer documentation
 =======================
-.. toctree::
-   :maxdepth: 1
-
-   CodeChat/__init__.py
-   CodeChat/SourceClassifier.py
-   CodeChat/CodeToRest.py
-   CodeChat/CodeToMarkdown.py
-   CodeChat/RestToCode.py
-   CodeChat/CodeToRestSphinx.py
-   CodeChat/CommentDelimiterInfo.py
-   .gitignore
-   .flake8
-
-
-Testing
--------
-To run the tests, execute ``pytest test`` from the root directory of the project.
+See `docs/dev-toctree`.
 
 .. toctree::
    :maxdepth: 1
-   :glob:
+   :hidden:
 
-   test/*.py
-   .travis.yml
-   appveyor.yml
-   docs/style_test.py
+   docs/dev-toctree
 
 
-Documentation generation
-------------------------
-To build the documentation, execute ``sphinx-build -d _build/doctrees . _build`` from the root directory of the project.
-
-.. toctree::
-   :maxdepth: 1
-
-   conf.py
-   readthedocs.yml
-   codechat_config.json
-
-
-Packaging
----------
-.. toctree::
-   :maxdepth: 1
-
-   setup.py
-   MANIFEST.in
+Help
+====
+Please use the `issue tracker <https://github.com/bjones1/CodeChat/issues>`_ to report bugs or request features; even better, contribute to the `code <https://github.com/bjones1/CodeChat>`_!
 
 
 License
@@ -113,7 +79,7 @@ You should have received a `copy of the GNU General Public License <CodeChat/LIC
 
 Search
 ======
-* :ref:`search`
+See the `search`.
 
 
 Acknowledgements

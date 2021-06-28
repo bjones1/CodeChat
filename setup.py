@@ -126,7 +126,7 @@ setup(
     # version with a regex (see `version parse code
     # <https://packaging.python.org/en/latest/single_source_version.html#single-sourcing-the-project-version>`_).
     version=find_version("CodeChat", "__init__.py"),
-    description="The CodeChat system for software documentation",
+    description="The CodeChat System for software documentation",
     long_description=long_description,
     # The project's main homepage.
     url="http://codechat.readthedocs.io/en/latest/",

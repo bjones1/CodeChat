@@ -46,7 +46,7 @@ Sphinx_
 ========
 "`Sphinx <http://sphinx-doc.org/index.html>`_ is a tool that makes it easy to create intelligent and beautiful documentation" [#]_. It provides additional features lacking basic reStructuredText_, including the ability to link together many documents (such as all the files in a program's source code).
 
-To use Sphinx with the CodeChat system, first download and unzip the `source code for CodeChat <https://github.com/bjones1/CodeChat/archive/master.zip>`_, which provides a example Sphinx project. Open ``README.rst`` from the unzipped files; the CodeChat system will render the project. Most of the files in this project will render. Make a few edits; note that you must save the file before the render takes place. Open a source file and make a few edits, again saving to render the edits.
+To use Sphinx with the CodeChat System, first download and unzip the `source code for CodeChat <https://github.com/bjones1/CodeChat/archive/master.zip>`_, which provides a example Sphinx project. Open ``README.rst`` from the unzipped files; the CodeChat System will render the project. Most of the files in this project will render. Make a few edits; note that you must save the file before the render takes place. Open a source file and make a few edits, again saving to render the edits.
 
 In addition to providing a number of beautiful themes for rendering reST_ files, Sphinx creates a set of linked documents. To see this in action, open :file:`{location of unzipped CodeChat files}/index.rst`. This file determines the hierarchical `document structure <http://sphinx-doc.org/markup/toctree.html>`_. For example, the following markup includes headings from ``README.rst`` into ``index.rst``::
 
