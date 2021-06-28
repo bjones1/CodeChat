@@ -15,6 +15,8 @@ History of changes
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
     -   Add preliminary support for Mako. However, Pygments doesn't parse Mako comments correctly, so CodeChat can't yet support Mako.
+    -   Update to the latest docutils.
+    -   Move the Sphinx template to the CodeChat System.
 
 -   1.8.7, 11-Jun-2021:
 
@@ -42,7 +44,7 @@ History of changes
     -   Add the PL/pgSQL language.
     -   Removed support for the outdated Enki preview plugin.
     -   Update the `tutorial` to use the CodeChat System.
-    -   Add a `CodeChat configuration file <../CodeChat/sphinx_template/codechat_config.json>` to the Sphinx template.
+    -   Add a CodeChat configuration file to the Sphinx template.
     -   Added functional tests for Sphinx.
 
 -   1.8.2, 4-Jun-2020:

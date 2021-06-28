@@ -134,9 +134,10 @@ rst_epilog = (
 # The suffix of source filenames. Add ``.in`` and ``.spec`` files (see below).
 source_suffix = ".rst"
 
-# **CodeChat note:** A dict of {glob_, lexer_alias}, which uses lexer_alias
-# (e.g. a lexer's `short name <http://pygments.org/docs/lexers/>`_) to analyze
-# any file which matches the given glob-style pattern (e.g. `glob
+# **CodeChat note:** _`CodeChat_lexer_for_glob`: a dict of ``{glob, lexer_alias}``,
+# which uses ``lexer_alias`` (e.g. a lexer's
+# `short name <http://pygments.org/docs/lexers/>`_) to analyze any file which
+# matches the given glob-style pattern (e.g. a `glob
 # <https://docs.python.org/3/library/pathlib.html#pathlib.PurePath.match>`_).
 CodeChat_lexer_for_glob = {
     # CSS files are auto-detected as a CSS + Lasso file by Pygments,
@@ -317,7 +318,7 @@ intersphinx_mapping = {
         "https://codechat-system.readthedocs.io/en/latest/", (
             None,
             # An optional local file location -- useful when updating both Sphinx builds before the updates are pushed to the server.
-            ##"../CodeChat_system/_build/objects.inv",
+            "../CodeChat_system/_build/objects.inv",
         ),
     )
 }
