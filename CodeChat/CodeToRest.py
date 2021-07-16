@@ -72,13 +72,15 @@ def code_to_rest_string(
     **options
 ):
 
+    lexer = get_lexer(code=code_str, **options)
+    if not lexer:
+        raise ValueError("Unable to determine a lexer for this string.")
+
     # Use a StringIO to capture writes into a string.
     output_rst = StringIO()
     # Include a header containing some `CodeChat style`. Don't put this in a separate ``.js`` file, since docutils doesn't have an easy way to include it.
     output_rst.write(rest_codechat_style)
-    ast_syntax_error, classified_lines = source_lexer(
-        code_str, get_lexer(code=code_str, **options)
-    )
+    ast_syntax_error, classified_lines = source_lexer(code_str, lexer)
     if ast_syntax_error:
         output_rst.write(".. error:: {}\n\n".format(ast_syntax_error))
     _generate_rest(classified_lines, output_rst)
