@@ -147,7 +147,6 @@ CodeChat_lexer_for_glob = {
     "MANIFEST.in": "Perl",
     ".gitignore": "Perl",
     ".flake8": "Perl",
-    "*.json": "Perl",
 }
 
 # `source_encoding <https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_encoding>`_:
