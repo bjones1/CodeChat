@@ -1,0 +1,15 @@
+# **********************************************
+# |docname| - Configuration for black and pytest
+# **********************************************
+[tool.black]
+# Per the `docs <https://black.readthedocs.io/en/stable/installation_and_usage.html#command-line-options>`_, this is a regex, but should **not** be enclosed in slashes (don't use ``/regex/``, instead use ``regex``.) This is different from the ``--exclude`` option, which does requires the slashes.
+extend-exclude = '''
+    # File with weird formatting.
+    test/CodeToRest_test\.py
+'''
+
+
+[tool.pytest.ini_options]
+testpaths = [
+    "test",
+]

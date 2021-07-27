@@ -576,7 +576,7 @@ def _gather_groups_on_newlines(
 ):
 
     # Keep a list of (group, string) tuples we're accumulating.
-    l = []
+    _list = []
 
     # Keep track of the length of whitespace at the beginning of the body and
     # end portions of a block comment.
@@ -600,7 +600,7 @@ def _gather_groups_on_newlines(
             # what the indent must be: (column in which comment starts) +
             # (length of comment delimiter) + (1 space).
             ws_len = len_opening_block_comment + 1
-            for group_, ws_len_, string_ in l:
+            for group_, ws_len_, string_ in _list:
                 ws_len += len(string_)
             # Determine the indent style (all spaces, or spaces followed by a
             # character, typically ``*``). If it's not spaces only, it must
@@ -644,7 +644,7 @@ def _gather_groups_on_newlines(
 
         for index, split_str in enumerate(splitlines):
             # Accumulate results.
-            l.append((group, ws_len, split_str))
+            _list.append((group, ws_len, split_str))
 
             # For block comments, move from a start to a body group.
             if group == _GROUP.block_comment_start:
@@ -657,16 +657,16 @@ def _gather_groups_on_newlines(
 
             # Yield when we find a newline, then clear our accumulator.
             if split_str.endswith("\n"):
-                yield l
-                l = []
+                yield _list
+                _list = []
 
         # We've output a group; reset the ws_len to 0 in case the group just
         # output was a multi-line block comment with ws_len > 0.
         ws_len = 0
 
     # Output final group, if one is still accumulating.
-    if l:
-        yield l
+    if _list:
+        yield _list
 
 
 # Block comment indentation processing
@@ -883,18 +883,18 @@ def _classify_groups(
     is_block_rest_comment = False
 
     # Walk through groups.
-    for l in iter_gathered_groups:
-        _debug_print("[(group, ws_len, string), ...] = {}\n".format(l))
+    for _list in iter_gathered_groups:
+        _debug_print("[(group, ws_len, string), ...] = {}\n".format(_list))
 
-        if _is_rest_comment(l, is_block_rest_comment, comment_delim_info, lexer):
+        if _is_rest_comment(_list, is_block_rest_comment, comment_delim_info, lexer):
 
-            first_group, first_ws_len, first_string = l[0]
+            first_group, first_ws_len, first_string = _list[0]
             # The type = # of leading whitespace characters, or 0 if none.
             if first_group == _GROUP.whitespace:
                 # Encode this whitespace in the type, then drop it.
                 type_ = len(first_string)
-                l.pop(0)
-                first_group, first_ws_len, first_string = l[0]
+                _list.pop(0)
+                first_group, first_ws_len, first_string = _list[0]
             # For body or end block comments, use the indent set by at the
             # beginning of the comment. Otherwise, there is no indent, so
             # set it to 0.
@@ -909,7 +909,7 @@ def _classify_groups(
             string = "".join(
                 [
                     _remove_comment_delim(group, string, comment_delim_info, lexer)
-                    for group, ws_len, string in l
+                    for group, ws_len, string in _list
                 ]
             )
             # Remove the initial space character from the first comment,
@@ -937,7 +937,7 @@ def _classify_groups(
         # Everything else is considered code.
         else:
             type_ = -1
-            string = "".join([string for group, ws_len, string in l])
+            string = "".join([string for group, ws_len, string in _list])
             is_block_rest_comment = False
 
         yield type_, string
