@@ -45,7 +45,7 @@ import sys
 def test_1():
     root_path = Path(__file__).parents[1]
     try:
-        # See `../codechat_config.json` for an explanation of these arguments.
+        # See `../codechat_config.yaml` for an explanation of these arguments.
         cp = subprocess.run(
             ["sphinx-build", "-E", ".", "_build"],
             capture_output=True,
@@ -63,7 +63,7 @@ def test_1():
         # Check Markdown rendering.
         diff_files(root_path, "docs/style_guide.md.cpp.html", "style_guide.md.cpp.html")
         # Check CodeChat_lexer_for_glob rendering.
-        diff_files(root_path, "codechat_config.json.html", "codechat_config.json.html")
+        diff_files(root_path, "codechat_config.yaml.html", "codechat_config.yaml.html")
 
     except Exception:
         # Print out the Sphinx results on any test failure.
