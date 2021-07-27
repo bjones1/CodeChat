@@ -8,6 +8,8 @@
 
    You should have received a copy of the GNU General Public License along with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 
+.. _CodeChat_root:
+
 .. include:: README.rst
    :end-before: Getting started
 
@@ -18,11 +20,11 @@ Examples
 ========
 Some examples of literate programming using CodeChat:
 
-*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <http://codechat.readthedocs.io/en/latest/dev-toctree.html>`_.
-*   Use of tables to help design a `simple parser <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#step-5-of-lexer-to-rest>`_.
-*   Use of a numbered list to explain a `simple state machine <http://codechat.readthedocs.io/en/latest/CodeChat/CodeToRest.py.html#summary-and-implementation>`_.
-*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <http://codechat.readthedocs.io/en/latest/conf.py.html>`_.
-*   Use of fonts to show what ``setup.py`` `commands to run <http://codechat.readthedocs.io/en/latest/setup.py.html>`_.
+*   Use of a ``toctree`` directive to categorize all source files in `CodeChat itself <docs/dev-toctree>`.
+*   Use of tables to help design a `simple parser <Converting_classified_code_to_reST>`.
+*   Use of a numbered list to explain a `simple state machine <summary_and_implementation>`.
+*   Use of hyperlinks to provide reference information for all `Sphinx configuration values <conf.py>`.
+*   Use of fonts to show what ``setup.py`` `commands to run <setup.py>`.
 *   `Documentation <https://pyinstaller-sample-hook.readthedocs.io/en/latest/>`_ for integrating a PyInstaller hook into a distribution.
 *   Code examples in a course on `microprocessors <http://www.ece.msstate.edu/courses/ece3724/main_pic24/docs/sphinx/textbook_examples.html>`_.
 

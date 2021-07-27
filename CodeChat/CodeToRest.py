@@ -209,6 +209,8 @@ def html_static_path():
 rest_codechat_style = ".. raw:: html\n\n " + codechat_style + "\n\n"
 
 
+# .. _Converting_classified_code_to_reST:
+#
 # Converting classified code to reST
 # ==================================
 # Approach

@@ -38,16 +38,22 @@
 # To package
 # ==========
 # Create a source distribution, a built distribution, then upload both to
-# `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_::
+# `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_:
+#
+# .. code:: bash
+#   :number-lines:
 #
 #   python -m pip install -U pip setuptools wheel twine
 #   python setup.py sdist bdist_wheel
 #   python -m twine upload dist/*
 #
 # For `development
-# <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_::
+# <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
-#   pip install -e .
+# .. code:: bash
+#   :number-lines:
+#
+#       pip install -e .
 #
 #
 # Packaging script
