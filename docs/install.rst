@@ -14,5 +14,5 @@ Installation instructions
 The `CodeChat System <https://codechat-system.readthedocs.io/>`_ provides a GUI for CodeChat integrated within a variety of text editors and IDEs. Install that for most use cases. If you prefer to use CodeChat from the terminal / command prompt:
 
 * From the terminal / command line, execute :command:`pip install --upgrade CodeChat` (Windows) or :command:`pip3 install --upgrade CodeChat` (Linux/Mac).
-* `Download <https://github.com/bjones1/CodeChat/archive/master.zip>`_ the source, unzip, then execute :command:`python setup.py install` from the command line.
+* `Download <https://github.com/bjones1/CodeChat/archive/master.zip>`_ the source, unzip, then execute :command:`python setup.py install` (Windows) or :command:`python3 setup.py install` (Linux/Mac) from the terminal / command line.
 * Clone the `CodeChat <https://github.com/bjones1/CodeChat>`_ repository, then execute :command:`python setup.py install` (Windows) or :command:`python3 setup.py install` (Linux/Mac) from the terminal / command line.
