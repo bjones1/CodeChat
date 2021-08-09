@@ -23,7 +23,7 @@
 //  > Note: this "source file" does not contain any useful, executable code. Instead, it exemplifies literate programming style.
 //
 // ## Use
-// Any file with an extension of `.<markdown extension>.<source file extension>` will be processed as Markdown; for example, see this file's name. The ``<markdown extension>`` is defined as any key in Sphinx's [source_suffix](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_suffix) build configuration file whose value is `"markdown"`. See the [Sphinx manual on Markdown](https://www.sphinx-doc.org/en/master/usage/markdown.html) for more information. This feature requires ``recommonmark`` to be installed, as discussed in the previous link.
+// Any file with an extension of `.<markdown extension>.<source file extension>` will be processed as Markdown; for example, see this file's name. The ``<markdown extension>`` is defined as any key in Sphinx's [source_suffix](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_suffix) build configuration file whose value is `"markdown"`. See the [Sphinx manual on Markdown](https://www.sphinx-doc.org/en/master/usage/markdown.html) for more information. This feature requires the ``myst_parser`` extension for Sphinx, as discussed in the previous link.
 //
 // ## Syntax
 // The same [syntax](CodeChat_syntax) rules apply to Markdown; see [here](https://commonmark.org/help/) for basic Markdown syntax.
