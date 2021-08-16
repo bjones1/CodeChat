@@ -111,7 +111,8 @@ COMMENT_DELIMITER_INFO = {
     "PL/pgSQL":       ( ( "--", ),     "/*",            "*/"),
     "PowerShell":     ( ( "#", ),      "<#",            "#>"),
     # ``/*`` ~ ``*/`` not supported (Pygments doesn't lex these).
-    "GAS":            ( ( "#", ),      "/*",            "*/"),
+    "GAS":            ( ( "#", ";" ),  "/*",            "*/"),
+    "ARM":            ( ( "#", ";", "@"), "/*",         "*/"),
     "autohotkey":     ( ( ";", ),      "/*",            "*/"),
     "Prolog":         ( ( "%", ),      "/*",            "*/"),
     "AutoIt":         ( ( ";", ),     "#cs",           "#ce"),
