@@ -67,7 +67,8 @@ COMMENT_DELIMITER_INFO = {
     "Go":             ( ( "//", ),     "/*",            "*/"),
     "JavaScript":     ( ( "//", ),     "/*",            "*/"),
     "Objective-C":    ( ( "//", ),     "/*",            "*/"),
-    "Rust":           ( ( "//", ),     "/*",            "*/"),
+    #  Support Rust comments (``//``) as well as `Rustdoc <https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html#outer-and-inner-documentation>`_.
+    "Rust":           ( ( "//", "///", "//!"), "/*",    "*/"),
     "Scala":          ( ( "//", ),     "/*",            "*/"),
     "Swift":          ( ( "//", ),     "/*",            "*/"),
     "verilog":        ( ( "//", ),     "/*",            "*/"),
