@@ -19,7 +19,7 @@
 # |docname| - Styling tests for CodeChat
 # **************************************
 # This file contains no useful code, but serves as a test bed to make sure code to comment transitions are styled correctly.
-
+#
 # `Disable Black <https://github.com/psf/black#the-black-code-style>`_ for this block.
 # fmt: off
 #
