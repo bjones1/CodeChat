@@ -53,7 +53,7 @@
 # .. code:: bash
 #   :number-lines:
 #
-#       pip install -e .
+#       pip install -e .[test]
 #
 #
 # Packaging script
@@ -177,7 +177,7 @@ setup(
     #
     #    ``$ pip install -e .[test]``
     extras_require={
-        "test": ["pytest", "sphinx>=3", "myst-parser"],
+        "test": ["pytest", "sphinx>=3", "myst-parser", "black", "flake8"],
         "sphinx": ["sphinx>=3", "myst-parser"],
     },
     # To package data files, I'm using ``include_package_data=True`` then
