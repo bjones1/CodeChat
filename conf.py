@@ -180,6 +180,7 @@ exclude_patterns = [
     "Thumbs.db",
     ".DS_Store",
     ".vscode",
+    "venv",
 ]
 
 # `default_role <https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-default_role>`_: The

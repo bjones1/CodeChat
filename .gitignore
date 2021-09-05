@@ -34,6 +34,7 @@ dist/
 CodeChat.egg-info/
 .pytest_cache/
 .vscode/
+venv/
 
 # PyCharm-generated files
 .idea/
