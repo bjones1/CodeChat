@@ -89,9 +89,13 @@ def get_lexer(
         return get_lexer_by_name(alias, **options)
     if filename:
         if code:
-            return guess_lexer_for_filename(filename, code, **options)
-        else:
-            return get_lexer_for_filename(filename, **options)
+            # Given code, try to guess a more accurate lexer.
+            lexer_ = guess_lexer_for_filename(filename, code, **options)
+            # Only use this guess if we support it.
+            if lexer_.name in COMMENT_DELIMITER_INFO:
+                return lexer_
+        # If guessing fails or isn't available, look up a lexer based on the file name.
+        return get_lexer_for_filename(filename, **options)
     if mimetype:
         return get_lexer_for_mimetype(mimetype, **options)
     if code:
