@@ -16,9 +16,14 @@ History of changes
 
     -   No changes yet.
 
+-   1.8.9, 5-Sep-2021:
+
+    -   Added rustdoc, ARM assembly languages.
+    -   Improve automatic lexer selection.
+
 -   1.8.8, 27-Jul-2021:
 
-    -   Add preliminary support for Mako. However, Pygments doesn't parse Mako comments correctly, so CodeChat can't yet support Mako.
+    -   Add support for Mako.
     -   Update to the latest docutils.
     -   Move the Sphinx template to the CodeChat System.
     -   Fix an exception when no parser was found.
