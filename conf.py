@@ -146,7 +146,8 @@ CodeChat_lexer_for_glob = {
     # These files use # as a comment. So does Perl. Ugly, no?
     "MANIFEST.in": "Perl",
     ".gitignore": "Perl",
-    ".flake8": "Perl",
+    # Misc.
+    ".flake8": "INI",
 }
 
 # `source_encoding <https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_encoding>`_:

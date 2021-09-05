@@ -63,7 +63,7 @@ def test_1():
         # Check Markdown rendering.
         diff_files(root_path, "docs/style_guide.md.cpp.html", "style_guide.md.cpp.html")
         # Check CodeChat_lexer_for_glob rendering.
-        diff_files(root_path, "codechat_config.yaml.html", "codechat_config.yaml.html")
+        diff_files(root_path, ".flake8.html", ".flake8.html")
 
     except Exception:
         # Print out the Sphinx results on any test failure.
