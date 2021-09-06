@@ -40,20 +40,27 @@
 # Create a source distribution, a built distribution, then upload both to
 # `CodeChat at PyPI <https://pypi.python.org/pypi/CodeChat>`_:
 #
-# .. code:: bash
-#   :number-lines:
+# .. code-block:: console
+#   :linenos:
 #
 #   python -m pip install -U pip setuptools wheel twine
 #   python setup.py sdist bdist_wheel
 #   python -m twine upload dist/*
 #
+# To create an RPM, first manually edit the ``name=`` setting to add a ``python3-`` prefix. Then, use (on an RPM-based Linux distribution):
+#
+# .. code-block:: console
+#   :linenos:
+#
+#   python3 setup.py bdist_rpm
+#
 # For `development
 # <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
-# .. code:: bash
-#   :number-lines:
+# .. code-block:: bash
+#   :linenos:
 #
-#       pip install -e .[test]
+#   pip install -e .[test]
 #
 #
 # Packaging script
@@ -118,7 +125,6 @@ setup(
     # This must comply with `PEP 0426
     # <http://legacy.python.org/dev/peps/pep-0426/#name>`_'s
     # name requirements.
-    name="CodeChat",
     # Projects should comply with the `version scheme
     # <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
     # specified in PEP440. I use this so that my Sphinx docs will have the same
