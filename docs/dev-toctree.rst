@@ -61,4 +61,5 @@ Packaging
    :maxdepth: 1
 
    ../setup.py
+   ../setup.cfg
    ../MANIFEST.in
