@@ -47,7 +47,7 @@
 #   python setup.py sdist bdist_wheel
 #   python -m twine upload dist/*
 #
-# To create an RPM, first manually edit the ``name=`` setting to add a ``python3-`` prefix. Then, use (on an RPM-based Linux distribution):
+# To create an RPM, first manually edit the ``name=`` setting to add a ``python3-`` prefix and lowercase the name (e.g. ``name=python3-codechat``, not ``name=python3-CodeChat``). Then, use (on an RPM-based Linux distribution):
 #
 # .. code-block:: console
 #   :linenos:
@@ -125,6 +125,7 @@ setup(
     # This must comply with `PEP 0426
     # <http://legacy.python.org/dev/peps/pep-0426/#name>`_'s
     # name requirements.
+    name="CodeChat",
     # Projects should comply with the `version scheme
     # <http://legacy.python.org/dev/peps/pep-0440/#public-version-identifiers>`_
     # specified in PEP440. I use this so that my Sphinx docs will have the same
