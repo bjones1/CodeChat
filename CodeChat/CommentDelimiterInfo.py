@@ -137,7 +137,8 @@ COMMENT_DELIMITER_INFO = {
     "Lua":            ( ( "--", ),   "--[[",            "]]"),
     "Clojure":        ( ( ";", ),        "",              ""),
     "Scheme":         ( ( ";", ),        "",              ""),
-    "HTML":           ( (  "", ),    "<!--",           "-->"),
+    # Include JavaScript single-line comments, since the HTML parser recognizes embedded JS. TODO: allow multiple block comment symbols so we can also support JS with ``/*`` and ``*/`` block comments.
+    "HTML":           ( ( "//", ),   "<!--",           "-->"),
     "MXML":           ( (  "", ),   "<!---",           "-->"),
     "Fortran":        ( ( "!", ),        "",              ""),
     "APL":            ( ( "⍝", ),        "",              ""),
@@ -168,6 +169,7 @@ COMMENT_DELIMITER_INFO = {
 
 # These languages lack unit tests
 # -------------------------------
+    # TODO: What single-line comment character does Django/Jinja support?
     "HTML+Django/Jinja": ( ( "", ),  "<!--",           "-->"),
 
 # These languages have failing unit tests
