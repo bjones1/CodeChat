@@ -14,7 +14,10 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Allow JavaScript single-line comments embedded in HTML.
+    -   Initial support for translating to PreTeXt.
+    -   Added instructions for creating RPM packages.
+    -   Added support for XML and XSLT.
 
 -   1.8.9, 5-Sep-2021:
 
