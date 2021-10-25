@@ -228,13 +228,18 @@ def _path2doc(self, filename):
 
 sphinx.project.Project.path2doc = _path2doc
 
+# Avoid recomputing the value of this variable by defining it globally.
+source_suffixpatterns = None
 
 # Return True if the provided filename is a source code language CodeChat supports.
 def is_supported_language(filename):
     # type: (str) -> bool
-    source_suffixpatterns = SUPPORTED_GLOBS | set(
-        _config.CodeChat_lexer_for_glob.keys()
-    )
+    # Initialize this if necessary.
+    global source_suffixpatterns
+    if not source_suffixpatterns:
+        source_suffixpatterns = SUPPORTED_GLOBS | set(
+            _config.CodeChat_lexer_for_glob.keys()
+        )
     path_filename = Path(filename)
     for source_suffixpattern in source_suffixpatterns:
         if path_filename.match(source_suffixpattern):
