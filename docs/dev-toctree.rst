@@ -11,6 +11,7 @@ Core code
    ../CodeChat/SourceClassifier.py
    ../CodeChat/CodeToRest.py
    ../CodeChat/CodeToMarkdown.py
+   ../CodeChat/CodeToPretext.py
    ../CodeChat/RestToCode.py
    ../CodeChat/CodeToRestSphinx.py
    ../CodeChat/mdbook_CodeChat.py
