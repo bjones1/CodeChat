@@ -61,9 +61,10 @@ import pygments.util
 
 # Local application imports
 # -------------------------
-from .CodeToRest import code_to_rest_string, get_lexer, add_highlight_language
+from .CodeToRest import code_to_rest_string, add_highlight_language
 from .CodeToMarkdown import code_to_markdown_string
 from .CommentDelimiterInfo import SUPPORTED_GLOBS
+from .SourceClassifier import get_lexer
 from . import __version__
 
 

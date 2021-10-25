@@ -18,6 +18,7 @@ History of changes
     -   Initial support for translating to PreTeXt.
     -   Added instructions for creating RPM packages.
     -   Added support for XML and XSLT.
+    -   Added support for using CodeChat with mdbook.
 
 -   1.8.9, 5-Sep-2021:
 

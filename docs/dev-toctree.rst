@@ -13,6 +13,7 @@ Core code
    ../CodeChat/CodeToMarkdown.py
    ../CodeChat/RestToCode.py
    ../CodeChat/CodeToRestSphinx.py
+   ../CodeChat/mdbook_CodeChat.py
    ../CodeChat/CommentDelimiterInfo.py
    ../.gitignore
    ../.flake8

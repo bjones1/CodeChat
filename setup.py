@@ -191,4 +191,8 @@ setup(
     # putting the files in :doc:`MANIFEST.in <MANIFEST.in>`. See `including data
     # files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
     include_package_data=True,
+    # Make it easy to run the mdbooks CodeChat preprocessor.
+    entry_points={
+        "console_scripts": ["mdbook-CodeChat = CodeChat.mdbook_CodeChat:main"]
+    },
 )
