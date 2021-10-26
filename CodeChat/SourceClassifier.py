@@ -272,7 +272,7 @@ def _pygments_lexer(
     # detected lexer.
     preprocessed_code_str = _pygments_get_tokens_preprocess(lexer, code_str)
     # Note: though Pygments does support a `String.Doc token type <http://pygments.org/docs/tokens/#literals>`_,
-    # it doesn't truly identify docstring; from Pygments 2.1.3,
+    # it doesn't truly identify docstrings; from Pygments 2.1.3,
     # ``pygments.lexers.python.PythonLexer``:
     #
     # .. code-block:: Python3
@@ -306,7 +306,7 @@ def _pygments_lexer(
     # is better than evaluating arbitrary Python then looking at its
     # ``__doc__`` attributes.
     #
-    # Perhaps the approach would be to scan with ast, then see if the line
+    # Perhaps the approach would be to scan with ast_, then see if the line
     # number matches the ending line number of a string, and if so convert the
     # string into a comment. Trickiness: Python will merge strings; consider
     # the following:
@@ -323,13 +323,13 @@ def _pygments_lexer(
     #    >>> print(foo.__doc__)
     #    A comment. More. And more.
     #
-    # It's probably best not to support this case. Unfortunately, AST reports
+    # It's probably best not to support this case. Unfortunately, ast_ reports
     # this as a single string, rather than as a list of several elements.
-    # The approach: make sure the docstring found by ast is in the text of a
+    # The approach: make sure the docstring found by ast_ is in the text of a
     # Pygments string token. If so, replace the string token by a block
     # comment, whose contents come from ``inspect.cleandoc`` of the docstring.
     #
-    # So, process this with AST if this is Python or Python3 code to find docstrings.
+    # So, process this with ast_ if this is Python or Python3 code to find docstrings.
     # If found, store ``{ ending_line_number_of_the_comment: docstring }`` into
     # ``ast_docstring``.
     ast_docstring = {}
@@ -357,7 +357,7 @@ def _pygments_lexer(
                 except (AttributeError, TypeError):
                     pass
         except SyntaxError as err:
-            # Take the file name (which shows up as ``<unknown>`` out of the error message returned.
+            # Take the file name (which shows up as ``<unknown>``) out of the error message returned.
             ast_syntax_error = (
                 "SyntaxError: {}. Docstrings cannot be processed.\n".format(
                     err
