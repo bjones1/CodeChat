@@ -801,9 +801,20 @@ class TestCodeToRest:
 
     # HTML.
     def test_65(self):
-        self.mt(
-            "<!--\n" "multi-\n" "line\n" "comment\n" "-->\n",
-            sl(-3) + "\nmulti-\n" "line\n" "comment\n\n",
+        self.mt(dedent("""\
+            <!--
+            multi-
+            line
+            comment
+            -->
+            """),
+            sl(-3) + dedent("""\
+
+                multi-
+                line
+                comment
+
+                """),
             ["HTML"],
         )
 

@@ -20,6 +20,7 @@ History of changes
     -   Added support for XML and XSLT.
     -   Added support for using CodeChat with mdbook.
     -   Include hyperlinks to each line in the resulting HTML.
+    -   Workaround for Pygments HTML lexer.
 
 -   1.8.9, 5-Sep-2021:
 

@@ -142,7 +142,6 @@ COMMENT_DELIMITER_INFO = {
     # The XML and XSLT lexers also need a `fix to Pygments`_.
     "XML":            ( ( "", ),     "<!--",           "-->"),
     "XSLT":           ( ( "", ),     "<!--",           "-->"),
-    "HTML":           ( ( "//", ),   "<!--",           "-->"),
     "MXML":           ( (  "", ),   "<!---",           "-->"),
     "Fortran":        ( ( "!", ),        "",              ""),
     "APL":            ( ( "⍝", ),        "",              ""),

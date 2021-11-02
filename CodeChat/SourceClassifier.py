@@ -131,12 +131,12 @@ def source_lexer(
     # to correctly process comments:
     cdi = COMMENT_DELIMITER_INFO[lexer.name]
     # * If there's no multi-line start info, then classify generic comments as
-    #   inline.
-    comment_is_inline = not cdi[1]
+    #   inline. The exception is HTML, which (currently, as of Pygments v.10.0) classifies as generic comments, but also supports in-line JavaScript comments.
+    comment_is_inline = False if lexer.name == "HTML" else not cdi[1]
     # * Likewise, no inline info indicates that generic comments are block
     #   comments. Note that inline comments are a sequence of strings, so look
     #   inside the sequence to the string.
-    comment_is_block = not cdi[0][0]
+    comment_is_block = True if lexer.name == "HTML" else not cdi[0][0]
 
     # 1.    Invoke a Pygments lexer on the provided source code, obtaining an
     #       iterable of tokens. Also analyze Python code for docstrings.
