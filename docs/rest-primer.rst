@@ -14,7 +14,7 @@ This is a simplified version of the excellent `Sphinx reStructuredText Primer <h
 
 Inline markup
 -------------
-The standard reST inline markup is quite simple: *emphasis (italics)*, **strong emphasis (boldface)**, and ``code samples``.
+The standard reST inline markup is quite simple: *\*emphasis (italics)\**, **\*s\*trong emphasis (boldface)\*\***, and ````code samples````.
 
 Lists and Quote-like blocks
 ---------------------------
@@ -91,7 +91,6 @@ Gotchas
 -------
 There are some problems one commonly runs into while authoring reST documents:
 
-* **Separation of inline markup:** Inline markup spans must be separated from the surrounding text by non-word characters; you have to use a backslash-escaped space to get around that. For example, H\ :sub:`2`\ O, not H:sub:`2`O.
+* **Separation of inline markup:** Inline markup spans must be separated from the surrounding text by non-word characters; you have to use a backslash-escaped space to get around that. For example, use ``H\ :sub:`2`\ O`` (H\ :sub:`2`\ O), not ``H:sub:`2`O`` (which produces as error).
 
 * **No nested inline markup:** Something like *H\ :sub:`2`\ O* is not possible.
-

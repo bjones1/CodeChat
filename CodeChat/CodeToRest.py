@@ -395,7 +395,10 @@ rest_codechat_style = ".. raw:: html\n\n " + codechat_style + "\n\n"
 # Note that mixing code and comments is hard: reST will still apply some of
 # its parsing rules to an inline code block or inline literal, meaning
 # that leading or trailing spaces and backticks will not be preserved,
-# instead parsing incorrectly. For example ::
+# instead parsing incorrectly. For example,
+#
+# .. code:: rest
+#   :number-lines:
 #
 #    :code:` Testing `
 #

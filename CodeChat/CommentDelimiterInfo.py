@@ -137,7 +137,7 @@ COMMENT_DELIMITER_INFO = {
     "Lua":            ( ( "--", ),   "--[[",            "]]"),
     "Clojure":        ( ( ";", ),        "",              ""),
     "Scheme":         ( ( ";", ),        "",              ""),
-    # Include JavaScript single-line comments, since the HTML parser recognizes embedded JS. However, this change requires a `fix to Pygments <https://github.com/pygments/pygments/issues/1896>`_`. TODO: allow multiple block comment symbols so we can also support JS with ``/*`` and ``*/`` block comments.
+    # Include JavaScript single-line comments, since the HTML parser recognizes embedded JS. However, this change requires a `fix to Pygments <https://github.com/pygments/pygments/issues/1896>`_. TODO: allow multiple block comment symbols so we can also support JS with ``/*`` and ``*/`` block comments.
     "HTML":           ( ( "//", ),   "<!--",           "-->"),
     # The XML and XSLT lexers also need a `fix to Pygments`_.
     "XML":            ( ( "", ),     "<!--",           "-->"),
