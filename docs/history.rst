@@ -19,6 +19,7 @@ History of changes
     -   Added instructions for creating RPM packages.
     -   Added support for XML and XSLT.
     -   Added support for using CodeChat with mdbook.
+    -   Include hyperlinks to each line in the resulting HTML.
 
 -   1.8.9, 5-Sep-2021:
 

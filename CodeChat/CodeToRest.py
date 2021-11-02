@@ -562,25 +562,36 @@ class _FencedCodeBlock(CodeBlock):
         # Now, process the resulting contents as a code block.
         nodeList = CodeBlock.run(self)
 
-        # Sphinx fix: if the current `highlight
-        # <http://sphinx-doc.org/markup/code.html>`_ language is ``python``,
-        # "Normal Python code is only highlighted if it is parseable" (quoted
-        # from the previous link). This means code snippets, such as
-        # ``def foo():`` won't be highlighted: Python wants ``def foo(): pass``,
-        # for example. To get around this, setting the ``highlight_args`` option
-        # "force"=True skips the parsing. I found this in
-        # ``Sphinx.highlighting.highlight_block`` (see the ``force`` argument)
-        # and in ``Sphinx.writers.html.HTMLWriter.visit_literal_block``, where
-        # the ``code-block`` directive (which supports fragments of code, not
-        # just parseable code) has ``highlight_args['force'] = True`` set. This
-        # should be ignored by docutils, so it's done for both Sphinx and
-        # docutils. **Note:** This is based on examining Sphinx 1.3.1 source
-        # code.
-        #
-        # Note that the nodeList returned by the CodeBlock directive contains
-        # only a single ``literal_block`` node. The setting should be applied to
-        # it.
-        nodeList[0]["highlight_args"] = {"force": True}
+        highlight_args = nodeList[0].setdefault("highlight_args", {})
+        highlight_args.update(
+            {
+                # Sphinx fix: if the current `highlight
+                # <http://sphinx-doc.org/markup/code.html>`_ language is ``python``,
+                # "Normal Python code is only highlighted if it is parseable" (quoted
+                # from the previous link). This means code snippets, such as
+                # ``def foo():`` won't be highlighted: Python wants ``def foo(): pass``,
+                # for example. To get around this, setting the ``highlight_args`` option
+                # "force"=True skips the parsing. I found this in
+                # ``Sphinx.highlighting.highlight_block`` (see the ``force`` argument)
+                # and in ``Sphinx.writers.html.HTMLWriter.visit_literal_block``, where
+                # the ``code-block`` directive (which supports fragments of code, not
+                # just parseable code) has ``highlight_args['force'] = True`` set. This
+                # should be ignored by docutils, so it's done for both Sphinx and
+                # docutils. **Note:** This is based on examining Sphinx 1.3.1 source
+                # code.
+                #
+                # Note that the nodeList returned by the CodeBlock directive contains
+                # only a single ``literal_block`` node. The setting should be applied to
+                # it.
+                "force": True,
+                # The ``HTMLFormatter``, one of the `Pygments formatters <https://pygments.org/docs/formatters/#formatter-classes>`_, supports the ``lineanchors`` option, which adds a unique ID to each formatted line. Enable this for future use with ctags.
+                "lineanchors": "CodeChat",
+                # To get useful results, line numbers must be accurate; otherwise, they restart at 1 for each block. See `_SetLine`_ for details on how to extract the current line number.
+                "linenostart": self.state_machine.input_lines.items[
+                    self.state_machine.line_offset
+                ][1],
+            }
+        )
 
         return nodeList
 
