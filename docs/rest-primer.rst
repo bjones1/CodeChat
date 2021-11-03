@@ -10,11 +10,11 @@
 
 reStructuredText Primer
 =======================
-This is a simplified version of the excellent `Sphinx reStructuredText Primer <http://sphinx-doc.org/rest.html>`_.
+This is a simplified version of the excellent `Sphinx reStructuredText Primer <http://sphinx-doc.org/rest.html>`_. It's meant to be viewed in the CodeChat System, which displays the source text and the resulting rendered HTML side by side.
 
 Inline markup
 -------------
-The standard reST inline markup is quite simple: *\*emphasis (italics)\**, **\*s\*trong emphasis (boldface)\*\***, and ````code samples````.
+The standard reST inline markup is quite simple: *emphasis (italics)*, **strong emphasis (boldface)**, and ``code samples``.
 
 Lists and Quote-like blocks
 ---------------------------
@@ -35,9 +35,9 @@ reST can autonumber lists:
 
 Line blocks are a way of preserving line breaks:
 
-   | These lines are
-   | broken exactly like in
-   | the source file.
+| These lines are
+| broken exactly like in
+| the source file.
 
 Source Code
 -----------

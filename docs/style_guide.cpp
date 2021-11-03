@@ -15,9 +15,9 @@
 //  You should have received a copy of the GNU General Public License along
 //  with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 //
-// **********************************************
-// |docname| - Style recommendations for CodeChat
-// **********************************************
+// ***************************************************************************
+// |docname| - Style recommendations for CodeChat with reStructuredText markup
+// ***************************************************************************
 // .. note::
 //
 //  This "source file" does not contain any useful, executable code. Instead,
@@ -119,9 +119,9 @@
         // Return value: Amount of bananas, in pounds, needed.
         int bananas_for_balanced_diet(
             // Amount of apples available, in pounds.
-            apples,
+            unsigned int apples,
             // Amount of oranges available, in pounds.
-            oranges) {
+            unsigned int oranges) {
 
             // Per `myPlate <http://www.choosemyplate.gov/food-groups/fruits-amount.pdf>`_,
             // the following calculations determine the needed mass of bananas.
@@ -133,12 +133,6 @@
 //      beginning of :doc:`../README`) to provide a quick overview of the file's
 //      structure.
 //
-// *    Avoid long lines; wrap your lines at 80 characters. Many editors aren't
-//      configured to wrap lines nicely, or can't do it well. They certainly won't
-//      wrap bulleted lists, indentation, etc. well. Make sure your code is
-//      readable in a plain text editor or IDE, not only when viewed using
-//      CodeChat.
-//
 // *    `Avoid tabs
 //      <http://tarantsov.com/hackers-coding-style-guide/why-tabs-should-be-avoided.html>`_.
 //      They make the resulting HTML less predictable. A tab after the initial
@@ -148,7 +142,7 @@
 //      the preceding reST element -- this makes code difficult to edit. For
 //      example, note how this list is constructed: not as ``* A bullet
 //      here...``, but ``*    A bullet here`` to align with tab stops. (Per the
-//      preceding point, no tabs are used, just tab stops; in my case, all
+//      preceding point, no tabs are used, just tab stops; in this case, all
 //      indents are aligned to 4 space boundaries.)
 //
 // *    Use in-line `hyperlinks <http://sphinx-doc.org/rest.html#external-links>`_
