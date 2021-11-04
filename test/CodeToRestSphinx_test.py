@@ -56,7 +56,7 @@ def test_1():
 
         # Check errors and warnings.
         assert "ERROR" not in cp.stderr
-        assert cp.stderr.count("WARNING") == 3
+        assert "WARNING" not in cp.stderr
 
         # Check styling.
         diff_files(root_path, "docs/style_test.py.html", "style_test.py.html")
