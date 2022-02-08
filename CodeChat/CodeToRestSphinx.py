@@ -231,6 +231,7 @@ sphinx.project.Project.path2doc = _path2doc
 # Avoid recomputing the value of this variable by defining it globally.
 source_suffixpatterns = None
 
+
 # Return True if the provided filename is a source code language CodeChat supports.
 def is_supported_language(filename):
     # type: (str) -> bool
