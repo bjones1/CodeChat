@@ -10,7 +10,7 @@
 
 reStructuredText Primer
 =======================
-This is a simplified version of the excellent `Sphinx reStructuredText Primer <http://sphinx-doc.org/rest.html>`_. It's meant to be viewed in the CodeChat System, which displays the source text and the resulting rendered HTML side by side.
+This is a simplified version of the excellent `Sphinx reStructuredText Primer <https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html>`_. It's meant to be viewed in the CodeChat System, which displays the source text and the resulting rendered HTML side by side.
 
 Inline markup
 -------------
