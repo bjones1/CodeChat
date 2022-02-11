@@ -410,11 +410,11 @@ def _pygments_get_tokens_preprocess(self, text, unfiltered=False):
             text = decoded
         else:
             text = text.decode(self.encoding)
-            if text.startswith(u"\ufeff"):
-                text = text[len(u"\ufeff") :]
+            if text.startswith("\ufeff"):
+                text = text[len("\ufeff") :]
     else:
-        if text.startswith(u"\ufeff"):
-            text = text[len(u"\ufeff") :]
+        if text.startswith("\ufeff"):
+            text = text[len("\ufeff") :]
 
     # text now *is* a unicode string
     text = text.replace("\r\n", "\n")
