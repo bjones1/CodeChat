@@ -11,7 +11,7 @@
 ********
 Tutorial
 ********
-This tutorial shows how the `Visual Studio Code <https://code.visualstudio.com/>`_ text editor, integrated with the `CodeChat extension <https://marketplace.visualstudio.com/items?itemName=CodeChat.codechat>`_, provides a powerful environment for creating expressive programs.
+This tutorial shows how the `Visual Studio Code <https://code.visualstudio.com/>`_ text editor, integrated with the `CodeChat extension <https://marketplace.visualstudio.com/items?itemName=CodeChat.codechat>`_, provides a powerful environment for creating expressive programs. The `CodeChat System <https://codechat-system.readthedocs.io>`_ supports `several other renderers <https://codechat-system.readthedocs.io/en/latest/CodeChat_Server/install.html#templates>`_ as well.
 
 .. contents:: Contents
     :local:
@@ -57,9 +57,10 @@ In addition to providing a number of beautiful themes for rendering reST_ files,
 
 One important note: when referring to files in subdirectories, a forward slash **MUST** be used, even on Windows. That is, use ``CodeChat/filename``, not ``CodeChat\filename``. Sphinx supports many other `markup constructs <http://sphinx-doc.org/markup/index.html>`_ as well.
 
+
 Creating a new Sphinx project
 =============================
-To create a new Sphinx project, copy the files in the `Sphinx template directory <https://github.com/bjones1/CodeChat/tree/master/CodeChat/sphinx_template>`_, available from :file:`{location of unzipped CodeChat files}/CodeChat/sphinx_template`, to a new directory. Open the file ``index.rst`` in this new directory; the new project is ready and will render.
+To create a new Sphinx project, copy the files in the `Sphinx template directory <https://github.com/bjones1/CodeChat_system/tree/master/CodeChat_Server/CodeChat_Server/templates/sphinx>`_ to a new directory. Open the file ``index.rst`` in this new directory; the new project is ready and will render.
 
 Next, create a new file and save it with the ``.rst`` extension in the empty directory you created. Add some content to this file, including at least one heading, but notice that it generates a warning in the log window. To fix this, include it in your Sphinx project: in ``index.rst`` add it to your ``toctree`` directive. Assuming the name of the file you created was ``demo.rst``, the syntax is::
 
