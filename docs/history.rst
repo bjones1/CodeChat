@@ -14,7 +14,7 @@ History of changes
 ******************
 -   `Github master <https://github.com/bjones1/CodeChat>`_:
 
-    -   No changes yet.
+    -   Added support for Kotlin.
 
 -   1.9.0, 4-Nov-2021:
 

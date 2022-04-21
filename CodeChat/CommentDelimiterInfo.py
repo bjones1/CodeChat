@@ -89,6 +89,7 @@ COMMENT_DELIMITER_INFO = {
     "Zephir":         ( ( "//", ),     "/*",            "*/"),
     "Haxe":           ( ( "//", ),     "/*",            "*/"),
     "Thrift":         ( ( "//", ),     "/*",            "*/"),
+    "Kotlin":         ( ( "//", ),     "/*",            "*/"),
 
     "PHP":            ( ( "#", "//"),  "/*",            "*/"),
     # Block comments not tested.
