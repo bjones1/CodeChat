@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>.flake8 - Flake8 configuration &#8212; CodeChat 1.8.9 documentation</title>
+    <title>.flake8 - Flake8 configuration &#8212; CodeChat 1.9.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
     <link rel="stylesheet" type="text/css" href="_static/CodeChat.css" />
@@ -37,38 +37,38 @@
   <script type="text/javascript">function CodeChat_doStyle(element) {function walk_tree(elements,func_walk,func_child) {let walk_children = [];for (let index = 0; index < elements.length; ++index) {let that = elements[index];while (that && !func_walk(that)) {that = that.parentElement;}if (that) {that = func_walk(that);walk_children.push(that);while (that && func_child(that)) {that = func_child(that);walk_children.push(that);}}}return walk_children;};element = (typeof element !== 'undefined') ? element : document;let code = element.getElementsByClassName("fenced-code");walk_tree(code, x => x.nextElementSibling, x => x.firstElementChild).map(x =>x.classList.add('CodeChat_noTop'));walk_tree(code, x => x.previousElementSibling, x => x.lastElementChild).map(x =>x.classList.add('CodeChat_noBottom'));}document.addEventListener("DOMContentLoaded", function(event) { CodeChat_doStyle(); });</script><section id="docname-flake8-configuration">
 <h1><span>.flake8</span> - Flake8 configuration<a class="headerlink" href="#docname-flake8-configuration" title="Permalink to this headline">¶</a></h1>
 <p>See the <a class="reference external" href="https://flake8.pycqa.org/en/latest/user/configuration.html">docs</a> for more details.</p>
-<div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-10" name="CodeChat-10"></a><span class="k">[flake8]</span>
+<div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-10" name="CodeChat-10" href="#CodeChat-10"></a><span class="k">[flake8]</span><span class="w"></span>
 </pre></div>
 </div>
 <p>Although there is a <a class="reference external" href="https://flake8.pycqa.org/en/latest/user/options.html#cmdoption-flake8-max-doc-length">max-doc-length</a>, setting this still produces lots of error about long lines, even if those lines are just a comment. The docs on <a class="reference external" href="https://flake8.pycqa.org/en/latest/user/options.html#cmdoption-flake8-max-line-length">max-line-length</a> states that it applies to ALL lines – including comments – unless they contain a URL or a string. So, set this to allow long comments.</p>
-<div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-14" name="CodeChat-14"></a><span class="na">max-line-length</span> <span class="o">=</span> <span class="s">50000</span>
-<a id="CodeChat-15" name="CodeChat-15"></a>
-<a id="CodeChat-16" name="CodeChat-16"></a><span class="na">extend-ignore</span> <span class="o">=</span>
+<div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-14" name="CodeChat-14" href="#CodeChat-14"></a><span class="na">max-line-length</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">50000</span><span class="w"></span>
+<a id="CodeChat-15" name="CodeChat-15" href="#CodeChat-15"></a>
+<a id="CodeChat-16" name="CodeChat-16" href="#CodeChat-16"></a><span class="na">extend-ignore</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="CodeChat-indent" style="margin-left:2.0em;"><p>Black formats this differently.</p>
-</div><div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-23" name="CodeChat-23"></a>    <span class="na">E203</span>
+</div><div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-23" name="CodeChat-23" href="#CodeChat-23"></a><span class="w">    </span><span class="na">E203</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="CodeChat-indent" style="margin-left:2.0em;"><p>The Sphinx-generated <code class="docutils literal notranslate"><span class="pre">conf.py</span></code> files break this rule a lot.</p>
-</div><div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-27" name="CodeChat-27"></a>    <span class="na">E265</span>
-<a id="CodeChat-28" name="CodeChat-28"></a>
-<a id="CodeChat-29" name="CodeChat-29"></a><span class="na">per-file-ignores</span> <span class="o">=</span>
+</div><div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-27" name="CodeChat-27" href="#CodeChat-27"></a><span class="w">    </span><span class="na">E265</span><span class="w"></span>
+<a id="CodeChat-28" name="CodeChat-28" href="#CodeChat-28"></a>
+<a id="CodeChat-29" name="CodeChat-29" href="#CodeChat-29"></a><span class="na">per-file-ignores</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
 </pre></div>
 </div>
 <div class="CodeChat-indent" style="margin-left:2.0em;"><p>The indents for the in-line JS code make flake8 unhappy.</p>
-</div><div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-30" name="CodeChat-30"></a>    <span class="na">CodeChat/SourceClassifier.py: E131</span>
-<a id="CodeChat-31" name="CodeChat-31"></a> 
+</div><div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-30" name="CodeChat-30" href="#CodeChat-30"></a><span class="w">    </span><span class="na">CodeChat/SourceClassifier.py: E131</span><span class="w"></span>
+<a id="CodeChat-31" name="CodeChat-31" href="#CodeChat-31"></a><span class="w"> </span>
 </pre></div>
 </div>
 <p>Exclude generated files and the test file with lots of weird formatting.</p>
-<div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-31" name="CodeChat-31"></a><span class="na">exclude</span> <span class="o">=</span>
-<a id="CodeChat-32" name="CodeChat-32"></a>    <span class="na">build</span>
-<a id="CodeChat-33" name="CodeChat-33"></a>    <span class="na">_build</span>
-<a id="CodeChat-34" name="CodeChat-34"></a>    <span class="na">CommentDelimiterInfo.py</span>
-<a id="CodeChat-35" name="CodeChat-35"></a>    <span class="na">CodeToRest_test.py</span>
-<a id="CodeChat-36" name="CodeChat-36"></a>    <span class="na">docs</span>
-<a id="CodeChat-37" name="CodeChat-37"></a>    <span class="na">venv</span>
+<div class="code fenced-code highlight-ini notranslate"><div class="highlight"><pre><span></span><a id="CodeChat-31" name="CodeChat-31" href="#CodeChat-31"></a><span class="na">exclude</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
+<a id="CodeChat-32" name="CodeChat-32" href="#CodeChat-32"></a><span class="w">    </span><span class="na">build</span><span class="w"></span>
+<a id="CodeChat-33" name="CodeChat-33" href="#CodeChat-33"></a><span class="w">    </span><span class="na">_build</span><span class="w"></span>
+<a id="CodeChat-34" name="CodeChat-34" href="#CodeChat-34"></a><span class="w">    </span><span class="na">CommentDelimiterInfo.py</span><span class="w"></span>
+<a id="CodeChat-35" name="CodeChat-35" href="#CodeChat-35"></a><span class="w">    </span><span class="na">CodeToRest_test.py</span><span class="w"></span>
+<a id="CodeChat-36" name="CodeChat-36" href="#CodeChat-36"></a><span class="w">    </span><span class="na">docs</span><span class="w"></span>
+<a id="CodeChat-37" name="CodeChat-37" href="#CodeChat-37"></a><span class="w">    </span><span class="na">venv</span><span class="w"></span>
 </pre></div>
 </div>
 </section>
@@ -145,7 +145,7 @@
       &copy;2020, Bryan A. Jones.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.2.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
