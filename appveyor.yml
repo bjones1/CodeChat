@@ -72,4 +72,4 @@ install:
 build: none
 
 test_script:
-  - py.test test
+  - python -m pytest ./test
