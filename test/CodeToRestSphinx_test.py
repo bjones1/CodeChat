@@ -65,7 +65,9 @@ def test_1():
         # Check CodeChat_lexer_for_glob rendering.
         diff_files(root_path, ".flake8.html", ".flake8.html")
 
-    except Exception:
+    except Exception as e:
+        if isinstance(e, subprocess.CalledProcessError):
+            cp = e
         # Print out the Sphinx results on any test failure.
         print(cp.stdout)
         print(cp.stderr)
