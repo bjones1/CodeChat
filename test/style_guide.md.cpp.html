@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>style_guide.md.cpp - Style recommendations for CodeChat using Markdown &#8212; CodeChat 1.9.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
@@ -14,6 +14,7 @@
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
     <script src="../_static/jquery.js"></script>
     <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Reference manual" href="reference_manual.html" />
@@ -53,21 +54,21 @@
  with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <section id="style-guide-md-cpp-style-recommendations-for-codechat-using-markdown">
-<h1>style_guide.md.cpp - Style recommendations for CodeChat using Markdown<a class="headerlink" href="#style-guide-md-cpp-style-recommendations-for-codechat-using-markdown" title="Permalink to this headline">¶</a></h1>
+<h1>style_guide.md.cpp - Style recommendations for CodeChat using Markdown<a class="headerlink" href="#style-guide-md-cpp-style-recommendations-for-codechat-using-markdown" title="Permalink to this heading">¶</a></h1>
 <p>CodeChat’s Sphinx extension also supports Markdown.</p>
 <blockquote>
 <div><p>Note: this “source file” does not contain any useful, executable code. Instead, it exemplifies literate programming style.</p>
 </div></blockquote>
 <section id="use">
-<h2>Use<a class="headerlink" href="#use" title="Permalink to this headline">¶</a></h2>
+<h2>Use<a class="headerlink" href="#use" title="Permalink to this heading">¶</a></h2>
 <p>Any file with an extension of <code class="docutils literal notranslate"><span class="pre">.&lt;markdown</span> <span class="pre">extension&gt;.&lt;source</span> <span class="pre">file</span> <span class="pre">extension&gt;</span></code> will be processed as Markdown; for example, see this file’s name. The <code class="docutils literal notranslate"><span class="pre">&lt;markdown</span> <span class="pre">extension&gt;</span></code> is defined as any key in Sphinx’s <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-source_suffix">source_suffix</a> build configuration file whose value is <code class="docutils literal notranslate"><span class="pre">&quot;markdown&quot;</span></code>. See the <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/markdown.html">Sphinx manual on Markdown</a> for more information. This feature requires the <code class="docutils literal notranslate"><span class="pre">myst_parser</span></code> extension for Sphinx, as discussed in the previous link.</p>
 </section>
 <section id="syntax">
-<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h2>
+<h2>Syntax<a class="headerlink" href="#syntax" title="Permalink to this heading">¶</a></h2>
 <p>The same <a class="reference internal" href="style_guide.cpp.html#codechat-syntax"><span class="std std-ref">syntax</span></a> rules apply to Markdown; see <a class="reference external" href="https://commonmark.org/help/">here</a> for basic Markdown syntax.</p>
 </section>
 <section id="advice">
-<h2>Advice<a class="headerlink" href="#advice" title="Permalink to this headline">¶</a></h2>
+<h2>Advice<a class="headerlink" href="#advice" title="Permalink to this heading">¶</a></h2>
 <p>At the present, the author doesn’t use Markdown with CodeChat; however, the information at <a class="reference download internal" download="" href="../_downloads/efe4311796da7da0e767e8cf25c39362/style_guide.cpp"><span class="xref download myst">style_guide.cpp</span></a> mostly applies. Instead, this file simply serves as an example of using Markdown with CodeChat.</p>
 </section>
 </section>
@@ -125,7 +126,7 @@
     </form>
     </div>
 </div>
-<script>$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
 
 
 
@@ -142,7 +143,7 @@
       &copy;2020, Bryan A. Jones.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.0.1</a>
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
