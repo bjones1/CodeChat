@@ -16,6 +16,11 @@ History of changes
 
     -   No changes yet.
 
+-   1.9.2, 10-Jun-2022:
+
+    -   Added support for Sphinx 5.0.
+    -   Corrected styling for tables, admonitions, and tables of contents: correctly removed space between code and comments.
+
 -   1.9.1, 21-Apr-2022:
 
     -   Added support for Kotlin.
