@@ -1,4 +1,4 @@
-# .. Copyright (C) 2012-2020 Bryan A. Jones.
+# .. Copyright (C) 2012-2022 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -47,7 +47,7 @@ import CodeChat.CodeToRestSphinx
 # `copyright <https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-copyright>`_:
 # General information about the project. **Change this** for your project.
 project = "CodeChat"
-copyright = "2020, Bryan A. Jones"
+copyright = "2022, Bryan A. Jones"
 
 # The version info for the project you're documenting, acts as replacement for
 # ``|version|`` and ``|release|``, also used in various other places throughout

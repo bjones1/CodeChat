@@ -1,4 +1,4 @@
-.. Copyright (C) 2012-2020 Bryan A. Jones.
+.. Copyright (C) 2012-2022 Bryan A. Jones.
 
    This file is part of CodeChat.
 
@@ -68,7 +68,7 @@ Please use the `issue tracker <https://github.com/bjones1/CodeChat/issues>`_ to 
 
 License
 =======
-Copyright (C) 2012-2020 Bryan A. Jones.
+Copyright (C) 2012-2022 Bryan A. Jones.
 
 This file is part of CodeChat.
 
