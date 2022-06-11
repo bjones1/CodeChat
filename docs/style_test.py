@@ -387,8 +387,6 @@ if to_code:
 # -----------------------------------------------------------------------------------------
 # Attention
 # ^^^^^^^^^
-# There is space before and after code, but this is built into the attention directive, so this is OK.
-#
 # .. attention:: An attention directive
 if to_code:
 # .. attention:: and back.
