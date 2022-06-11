@@ -303,14 +303,19 @@ def _get_filetype(source_suffix: Dict[str, str], filename: str) -> str:
         raise FiletypeNotFoundError
 
 
-# The function ``sphinx.io.get_filetype`` was `deprecated in Sphinx v2.4.0`_ by moving it to ``sphinx.util.get_filetype``. Per the `where to patch <https://docs.python.org/3/library/unittest.mock.html#where-to-patch>`_ docs, patch this where the ``get_filetype`` function is used, not where it's defined. It's used in ``sphinx.io`` before and after deprecation; it's used in the deprecation machinery otherwise.
+# Per the `where to patch <https://docs.python.org/3/library/unittest.mock.html#where-to-patch>`_ docs, patch this where the ``get_filetype`` function is used, not where it's defined:
 SPHINX_VERSION = sphinx.version_info[:3]
 if SPHINX_VERSION >= (2, 4, 0) and SPHINX_VERSION < (4, 0, 0):
-    # Sphinx uses ``sphinx.deprecation._ModuleWrapper`` to perform deprecation. In ``sphinx.io``, we need to monkeypatch inside it, hence the ``_module`` (a member of the ``_ModuleWrapper``).
+    # The function ``sphinx.io.get_filetype`` was `deprecated in Sphinx v2.4.0`_; it was renamed to ``sphinx.util.get_filetype`` instead. Sphinx uses ``sphinx.deprecation._ModuleWrapper`` to perform deprecation. Since ``get_filetype`` is used in ``sphinx.io``, we need to monkeypatch inside it, hence the ``_module`` (a member of the ``_ModuleWrapper``).
     sphinx.io._module.get_filetype = _get_filetype
-else:
+elif SPHINX_VERSION >= (4, 0, 0) and SPHINX_VERSION < (5, 0, 0):
+    # In these versions, ``get_filetype`` is used in ``sphinx.io``. It's no longer deprecated, but removed; therefore, a direct monkeypatch works.
     sphinx.io.get_filetype = _get_filetype
-
+else:
+    # In current Sphinx, ``get_filetype`` is used in several places:
+    sphinx.builders.get_filetype = _get_filetype
+    sphinx.io.get_filetype = _get_filetype
+    sphinx.transforms.i18n.get_filetype = _get_filetype
 
 # Correct naming for the "show source" option
 # ===========================================
