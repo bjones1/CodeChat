@@ -49,6 +49,7 @@ from sphinx.config import Config
 import sphinx.io
 import sphinx.project
 import sphinx.util
+
 # This was deprecated_ in Sphinx v5.1.0.
 if sphinx.version_info[:3] >= (5, 1, 0):
     from sphinx.util.osutil import path_stabilize
@@ -123,7 +124,6 @@ def _source_read(
     # A list whose single element is the contents of the source file.
     source,
 ):
-
     if is_source_code(app.env, docname):
         # See if it's an extension we should process.
         try:
@@ -166,7 +166,6 @@ def is_source_code(
     # See docname_.
     docname,
 ):
-
     # If the docname's extension doesn't change when asking for its full path,
     # then it's source code. Normally, the docname of ``foo.rst`` is ``foo``;
     # only for source code is the docname of ``foo.c`` also ``foo.c``. Look up
@@ -321,6 +320,7 @@ else:
     sphinx.io.get_filetype = _get_filetype
     sphinx.transforms.i18n.get_filetype = _get_filetype
 
+
 # Correct naming for the "show source" option
 # ===========================================
 # The following function corrects the extension of source files in the
@@ -346,7 +346,6 @@ def _html_page_context(
     # page is created from an HTML template alone.
     doctree,
 ):
-
     sourcename = context.get("sourcename")
     ext = Path(pagename).suffix
     # The extension Sphinx uses optionally includes the `html_sourcelink_suffix <http://www.sphinx-doc.org/en/stable/config.html#confval-html_sourcelink_suffix>`_.
@@ -371,7 +370,6 @@ def setup(
     # See app_.
     app,
 ):
-
     # Ensure we're using a new enough Sphinx using `require_sphinx
     # <http://sphinx-doc.org/extdev/appapi.html#sphinx.application.Sphinx.require_sphinx>`_.
     app.require_sphinx("2.0")

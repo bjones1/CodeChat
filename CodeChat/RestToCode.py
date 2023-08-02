@@ -141,7 +141,6 @@ def formulate_block_comment(
     # See line_counter_.
     line_counter,
 ):
-
     # This covers the case that the language does not support inline comments.
     # It places block comment delimiters around a single line to give an inline effect
     # There is no added space between the end of the comment and the end delimiter because this
@@ -190,7 +189,6 @@ def rest_to_code_file(
     # _`output_encoding`: Encoding to use for the output file.
     output_encoding="utf-8",
 ):
-
     if out_path is None:
         # Find the file extension of the given language.
         file_ext = find_file_ext(lang)
@@ -442,7 +440,6 @@ def html_to_code_file(
     # See output_encoding_
     output_encoding="utf-8",
 ):
-
     if out_path is None:
         # Find the file extension of the given language.
         file_ext = find_file_ext(lang)
@@ -477,7 +474,6 @@ def html_to_code_string(
     # See lang_.
     lang,
 ):
-
     string_out = "\n.. set-line:: -3\n\n..\n\n"
 
     def traverse_etree(element):

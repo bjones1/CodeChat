@@ -76,7 +76,6 @@ def get_lexer(
     # _`options`: Specify the lexer (see `get_lexer` arguments), and provide it any other needed options.
     **options
 ):
-
     # This sets the default tabsize to 4 spaces in
     # `Pygments' lexer <http://pygments.org/docs/api/#pygments.lexer.Lexer>`_,
     # and this link is a list  of
@@ -125,7 +124,6 @@ def source_lexer(
     # _`lexer`: The lexer used to analyze the code.
     lexer,
 ):
-
     _debug_print("Lexer: {}\n".format(lexer.name))
     # Gather some additional information, based on the lexer, which is needed
     # to correctly process comments:
@@ -264,7 +262,6 @@ def _pygments_lexer(
     # See lexer_.
     lexer,
 ):
-
     # Pygments does some cleanup on the code given to it before lexing it. If
     # this is Python code, we want to run AST on that cleaned-up version, so
     # that AST results can be correlated with Pygments results. However,
@@ -465,7 +462,6 @@ def _group_lexer_tokens(
     # Docstring dict found from AST scanning.
     ast_docstring,
 ):
-
     # Keep track of the current group, string, and line no.
     current_string = ""
     current_group = None
@@ -536,7 +532,6 @@ def _group_for_tokentype(
     # See comment_is_block_.
     comment_is_block,
 ):
-
     # The list of Pygments `tokens <http://pygments.org/docs/tokens/>`_ lists
     # ``Token.Text`` (how a newline is classified) and ``Token.Whitespace``.
     # Consider either as whitespace.
@@ -578,7 +573,6 @@ def _gather_groups_on_newlines(
     # An element of COMMENT_DELIMITER_INFO for the language being classified.
     comment_delim_info,
 ):
-
     # Keep a list of (group, string) tuples we're accumulating.
     _list = []
 
@@ -760,7 +754,6 @@ def _is_space_indented_line(
     # See comment_delim_info_.
     comment_delim_info,
 ):
-
     # A line containing only whitespace is always considered valid.
     if line.isspace():
         return True
@@ -831,7 +824,6 @@ def _is_delim_indented_line(
     # See comment_delim_info_.
     comment_delim_info,
 ):
-
     # A line the correct number of spaces, followed by a delimiter then either
     # a space or a newline is correctly indented.
     if (
@@ -882,7 +874,6 @@ def _classify_groups(
     # See lexer_.
     lexer,
 ):
-
     # Keep track of block comment state.
     is_block_rest_comment = False
 
@@ -891,7 +882,6 @@ def _classify_groups(
         _debug_print("[(group, ws_len, string), ...] = {}\n".format(_list))
 
         if _is_rest_comment(_list, is_block_rest_comment, comment_delim_info, lexer):
-
             first_group, first_ws_len, first_string = _list[0]
             # The type = # of leading whitespace characters, or 0 if none.
             if first_group == _GROUP.whitespace:
@@ -961,7 +951,6 @@ def _remove_comment_delim(
     # See lexer_.
     lexer,
 ):
-
     # Number of characters in an opening block comment.
     len_opening_block_comment_delim = len(comment_delim_info[1])
     # Number of characters in an closing block comment.
@@ -1004,7 +993,6 @@ def _remove_beginning_comment_delim(
     # The string which start with the delimiter to be removed.
     string,
 ):
-
     # Loop through all delimiters.
     for bcd in beginning_comment_delim_seq:
         # If we find one at the beginning of the string, strip it off.
@@ -1028,7 +1016,6 @@ def _is_rest_comment(
     # See lexer_.
     lexer,
 ):
-
     # See if there is any _GROUP.other in this line. If so, it's not a reST
     # comment.
     group_tuple, ws_len_tuple, string_tuple = list(zip(*line_list))

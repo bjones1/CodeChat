@@ -71,7 +71,6 @@ def code_to_rest_string(
     # See `options <options>`.
     **options
 ):
-
     lexer = get_lexer(code=code_str, **options)
     if not lexer:
         raise ValueError("Unable to determine a lexer for this string.")
@@ -112,7 +111,6 @@ def code_to_rest_file(
     # See `options <options>`.
     **options
 ):
-
     # Provide a default ``rst_path``.
     if not rst_path:
         rst_path = source_path + ".rst"
@@ -144,7 +142,6 @@ def code_to_html_string(
     # See `options <options>`.
     **options
 ):
-
     rest = code_to_rest_string(code_str, **options)
     # `docutils
     # <http://docutils.sourceforge.net/docs/user/tools.html#rst2html-py>`_
@@ -185,7 +182,6 @@ def code_to_html_file(
     # See output_encoding_.
     output_encoding="utf-8",
 ):
-
     html_path = html_path or source_path + ".html"
     fi = io.FileInput(source_path=source_path, encoding=input_encoding)
     fo = io.FileOutput(destination_path=html_path, encoding=output_encoding)
@@ -356,6 +352,7 @@ rest_codechat_style = ".. raw:: html\n\n " + codechat_style + "\n\n"
 # |                          |   </div>                |                                   |
 # +--------------------------+-------------------------+-----------------------------------+
 
+
 # Following either a fenced code block or a raw block, care must be taken to
 # separate these blocks' content from indented comments which follow them. For
 # example, the following code:
@@ -432,7 +429,6 @@ def _generate_rest(
     # A file-like output to which the reST text is written.
     out_file,
 ):
-
     # Keep track of the current type. Begin with a 0-indent comment.
     current_type = -2
 
@@ -499,7 +495,6 @@ def _exit_state(
     # See out_file_.
     out_file,
 ):
-
     # Code state: emit an ending fence.
     if type_ == -1:
         out_file.write(" Ending fence\n\n..\n\n")
@@ -607,7 +602,6 @@ class _FencedCodeBlock(CodeBlock):
 # reported. ``.. set-line:: 10`` makes the current line report as line 10,
 # regardless of its actual location in the file.
 class _SetLine(Directive):
-
     required_arguments = 1
     optional_arguments = 0
     final_argument_whitespace = False
@@ -680,7 +674,6 @@ def _docname_role(
     # A list of strings, the directive content for customization (from the "role" directive). To be interpreted by the role function.
     content=[],
 ):
-
     # See https://doughellmann.com/blog/2010/05/09/defining-custom-roles-in-sphinx/.
     env = inliner.document.settings.env
     try:
@@ -710,7 +703,6 @@ def add_highlight_language(
     # The lexer which was used to produce this source.
     lexer,
 ):
-
     # If there's `file-wide metadata <http://www.sphinx-doc.org/en/stable/markup/misc.html#file-wide-metadata>`_, then it's hard to know where the `highlight directive`_ can be safely placed:
     #
     # - Putting it before file-wide metadata demotes it to not being metadata.

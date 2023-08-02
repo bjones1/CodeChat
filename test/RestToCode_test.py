@@ -52,7 +52,6 @@ error_str = (
 
 
 class TestRestToCodeErrCatching(object):
-
     # Error testing main code
     def et(
         self,
@@ -90,9 +89,7 @@ class TestRestToCodeErrCatching(object):
             "Haxe",
         ),
     ):
-
         for alias in alias_seq:
-
             code = rest_to_code_string(rest, alias)
             assert code == error_str
 
@@ -105,7 +102,6 @@ class TestRestToCodeErrCatching(object):
 
 class TestRestToCodeString(object):
     def mt(self, given_code, expected_code, lang):
-
         rest = code_to_rest_string(given_code, alias=lang)
         code = rest_to_code_string(rest, lang)
         assert code == expected_code
@@ -165,10 +161,8 @@ class TestRestToCodeString(object):
 
 
 class TestRestToCodeFileTests(object):
-
     # Round trip testing in files with a given name
     def rt_given_file(self, code_file_name=None, lang="Python", lexer=None):
-
         # Get the extension of the given file so you can match it with the temporary files.
         file_name = code_file_name.rsplit(".")
         ext = "." + file_name[-1]

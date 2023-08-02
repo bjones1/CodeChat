@@ -58,7 +58,6 @@ def code_to_pretext_string(
     # See `options <options>`.
     **options,
 ):
-
     # Use a StringIO to capture writes into a string.
     output_ptx = StringIO()
     ast_syntax_error, classified_lines = source_lexer(
@@ -100,7 +99,6 @@ def code_to_pretext_file(
     # See `options <options>`.
     **options,
 ):
-
     # Provide a default ``rst_path``.
     if not pt_path:
         pt_path = source_path + ".ptx"
@@ -131,7 +129,6 @@ def _generate_pretext(
     # A file-like output to which the pretext source is written.
     out_file,
 ):
-
     # Determine the number of characters produced when a newline is written.
     newline_chars = out_file.write("\n")
     # Undo this write.
@@ -191,7 +188,6 @@ def _exit_state(
     # The number of character written by a newline.
     newline_chars,
 ):
-
     # Code state: do nothing.
     if type_ == -1:
         pass

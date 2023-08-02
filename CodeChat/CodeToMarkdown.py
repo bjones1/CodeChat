@@ -69,7 +69,6 @@ def code_to_markdown_string(
     # See `options <options>`.
     **options
 ):
-
     # Use a StringIO to capture writes into a string.
     output_md = StringIO()
     # Include a header containing some `CodeChat style`.
@@ -108,7 +107,6 @@ def code_to_markdown_file(
     # See `options <options>`.
     **options
 ):
-
     # Provide a default ``rst_path``.
     if not md_path:
         md_path = source_path + ".md"
@@ -141,7 +139,6 @@ def _generate_markdown(
     # A file-like output to which the markdown text is written.
     out_file,
 ):
-
     # Keep track of the current type. Begin with neither comment nor code.
     current_type = -2
 
@@ -192,7 +189,6 @@ def _exit_state(
     # See out_file_.
     out_file,
 ):
-
     # Code state: emit an ending fence.
     if type_ == -1:
         out_file.write(_fence + "\n")
