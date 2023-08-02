@@ -16,6 +16,7 @@ Core code
    ../CodeChat/CodeToRestSphinx.py
    ../CodeChat/mdbook_CodeChat.py
    ../CodeChat/CommentDelimiterInfo.py
+   ../CodeChat/css/__init__.py
    ../.gitignore
    ../.flake8
    ../pyproject.toml

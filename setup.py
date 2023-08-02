@@ -43,8 +43,8 @@
 # .. code-block:: console
 #   :linenos:
 #
-#   python -m pip install -U pip setuptools wheel twine
-#   python setup.py sdist bdist_wheel
+#   python -m pip install -U pip setuptools wheel twine build
+#   python -m build
 #   python -m twine upload dist/*
 #
 # To create an RPM, first manually edit the ``name=`` setting to add a ``python3-`` prefix and lowercase the name (e.g. ``name=python3-codechat``, not ``name=python3-CodeChat``). Then, use (on an RPM-based Linux distribution):
@@ -162,7 +162,7 @@ setup(
         "Topic :: Text Processing :: Markup",
     ],
     keywords="literate programming",
-    packages=["CodeChat"],
+    packages=["CodeChat", "CodeChat.css"],
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:

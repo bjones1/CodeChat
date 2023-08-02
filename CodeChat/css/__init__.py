@@ -1,4 +1,4 @@
-# .. Copyright (C) 2012-2017 Bryan A. Jones.
+# .. Copyright (C) 2012-2022 Bryan A. Jones.
 #
 #    This file is part of CodeChat.
 #
@@ -16,26 +16,6 @@
 #    with CodeChat.  If not, see <http://www.gnu.org/licenses/>.
 #
 # ***********************************
-# |docname| - Files for Git to ignore
+# |docname| - CodeChat CSS data files
 # ***********************************
-syntax: glob
-# Python compiled files
-*.pyc
-*.pyo
-
-# CodeChat-generated files
-_build/
-
-# Files created when packaging
-build/
-dist/
-
-# Others
-CodeChat.egg-info/
-.pytest_cache/
-.vscode/
-.venv/
-
-# PyCharm-generated files
-.idea/
-.cache/
+# This file defines this directory as a Python package, to provide access to the CSS data files it contains.
