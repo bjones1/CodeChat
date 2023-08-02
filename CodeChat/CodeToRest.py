@@ -33,8 +33,8 @@
 # Standard library
 # ----------------
 import html
+import importlib.resources
 from io import StringIO
-import os.path
 from pathlib import Path
 import re
 
@@ -46,8 +46,6 @@ from docutils.parsers.rst import directives, Directive, roles
 from docutils.writers.html4css1 import Writer
 from docutils.parsers.rst import states
 from docutils import statemachine, utils
-from docutils.utils.error_reporting import SafeString, ErrorString
-import pkg_resources
 
 # Local application imports
 # -------------------------
@@ -69,7 +67,7 @@ def code_to_rest_string(
     # _`code_str`: the code to translate to reST.
     code_str,
     # See `options <options>`.
-    **options
+    **options,
 ):
     lexer = get_lexer(code=code_str, **options)
     if not lexer:
@@ -109,7 +107,7 @@ def code_to_rest_file(
     # Encoding to use for the output file.
     output_encoding="utf-8",
     # See `options <options>`.
-    **options
+    **options,
 ):
     # Provide a default ``rst_path``.
     if not rst_path:
@@ -140,7 +138,7 @@ def code_to_html_string(
     # send them to stderr.
     warning_stream=None,
     # See `options <options>`.
-    **options
+    **options,
 ):
     rest = code_to_rest_string(code_str, **options)
     # `docutils
@@ -197,8 +195,9 @@ def code_to_html_file(
 # --------
 # Provide a programmatic way to get a list of paths to static files needed by CodeChat. When using Sphinx, this should be assigned or appended to `html_static_path <http://sphinx-doc.org/config.html#confval-html_static_path>`_.
 def html_static_path():
-    # There's only one path needed -- ``css/``, relative to this directory.
-    return [pkg_resources.resource_filename("CodeChat", "css")]
+    # There's only one path needed -- ``css/``, relative to this directory. TODO: this won't correctly handle resources that get placed in temp files, such as a zip file.
+    with importlib.resources.as_file(importlib.resources.files("CodeChat.css")) as p:
+        return [str(p)]
 
 
 # Provide correct formatting of CodeChat-produced documents in reST based on the `CodeChat style`.
@@ -721,7 +720,7 @@ def add_highlight_language(
 # ^^^^^^^^^^^^
 # Provide a way to include source code to be processed by CodeChat. It is a slight modification of the `docutils include directive <https://docutils.sourceforge.io/docs/ref/rst/directives.html#including-an-external-document-fragment>`_ and supports all the same options; it also supports the `class <https://docutils.sourceforge.io/docs/ref/rst/directives.html#id22>`_ option.
 #
-# Implementation note: this is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``, version 0.16.
+# Implementation note: this is mostly copied directly from ``docutils.parsers.rst.directives.misc.Include``, version 0.21.
 class _CodeInclude(Directive):
 
     """
@@ -749,22 +748,24 @@ class _CodeInclude(Directive):
         "class": directives.class_option,
     }
 
-    standard_include_path = os.path.join(os.path.dirname(states.__file__), "include")
+    standard_include_path = Path(states.__file__).parent / "include"
 
     def run(self):
-        """Include a file as part of the content of this reST file."""
+        """Include a file as part of the content of this reST file.
+
+        Depending on the options, the file (or a clipping) is
+        converted to nodes and returned or inserted into the input stream.
+        """
         if not self.state.document.settings.file_insertion_enabled:
             raise self.warning('"%s" directive disabled.' % self.name)
-        source = self.state_machine.input_lines.source(
-            self.lineno - self.state_machine.input_offset - 1
-        )
-        source_dir = os.path.dirname(os.path.abspath(source))
+        current_source = self.state.document.current_source
         path = directives.path(self.arguments[0])
         if path.startswith("<") and path.endswith(">"):
-            path = os.path.join(self.standard_include_path, path[1:-1])
-        path = os.path.normpath(os.path.join(source_dir, path))
-        path = utils.relative_path(None, path)
-        path = nodes.reprunicode(path)
+            _base = self.standard_include_path
+            path = path[1:-1]
+        else:
+            _base = Path(current_source).parent
+        path = utils.relative_path(None, _base / path)
         encoding = self.options.get(
             "encoding", self.state.document.settings.input_encoding
         )
@@ -773,21 +774,24 @@ class _CodeInclude(Directive):
             "tab-width", self.state.document.settings.tab_width
         )
         try:
-            self.state.document.settings.record_dependencies.add(path)
             include_file = io.FileInput(
                 source_path=path, encoding=encoding, error_handler=e_handler
             )
         except UnicodeEncodeError:
             raise self.severe(
-                'Problems with "%s" directive path:\n'
-                'Cannot encode input file path "%s" '
-                "(wrong locale?)." % (self.name, SafeString(path))
+                f'Problems with "{self.name}" directive path:\n'
+                f'Cannot encode input file path "{path}" '
+                "(wrong locale?)."
             )
-        except IOError as error:
+        except OSError as error:
             raise self.severe(
-                'Problems with "%s" directive path:\n%s.'
-                % (self.name, ErrorString(error))
+                f'Problems with "{self.name}" directive '
+                f"path:\n{io.error_string(error)}."
             )
+        else:
+            self.state.document.settings.record_dependencies.add(path)
+
+        # Get to-be-included content
         startline = self.options.get("start-line", None)
         endline = self.options.get("end-line", None)
         try:
@@ -798,7 +802,7 @@ class _CodeInclude(Directive):
                 rawtext = include_file.read()
         except UnicodeError as error:
             raise self.severe(
-                'Problem with "%s" directive:\n%s' % (self.name, ErrorString(error))
+                f'Problem with "{self.name}" directive:\n' + io.error_string(error)
             )
         # start-after/end-before: no restrictions on newlines in match-text,
         # and no restrictions on matching inside lines vs. line boundaries
@@ -866,8 +870,47 @@ class _CodeInclude(Directive):
         include_lines = statemachine.string2lines(
             rawtext, tab_width, convert_whitespace=True
         )
+        for i, line in enumerate(include_lines):
+            if len(line) > self.state.document.settings.line_length_limit:
+                raise self.warning(
+                    '"%s": line %d exceeds the' " line-length-limit." % (path, i + 1)
+                )
+
         # **Deleted code**: Options for ``literal`` and ``code`` don't apply.
+        # Prevent circular inclusion:
+        clip_options = (startline, endline, before_text, after_text)
+        include_log = self.state.document.include_log
+        # log entries are tuples (<source>, <clip-options>)
+        if not include_log:  # new document, initialize with document source
+            include_log.append(
+                (utils.relative_path(None, current_source), (None, None, None, None))
+            )
+        if (path, clip_options) in include_log:
+            master_paths = (pth for (pth, opt) in reversed(include_log))
+            inclusion_chain = "\n> ".join((path, *master_paths))
+            raise self.warning(
+                'circular inclusion in "%s" directive:\n%s'
+                % (self.name, inclusion_chain)
+            )
+
+        if "parser" in self.options:
+            # parse into a dummy document and return created nodes
+            document = utils.new_document(path, self.state.document.settings)
+            document.include_log = include_log + [(path, clip_options)]
+            parser = self.options["parser"]()
+            parser.parse("\n".join(include_lines), document)
+            # clean up doctree and complete parsing
+            document.transformer.populate_from_components((parser,))
+            document.transformer.apply_transforms()
+            return document.children
+
+        # Include as rST source:
+        #
+        # mark end (cf. parsers.rst.states.Body.comment())
+        include_lines += ["", '.. end of inclusion from "%s"' % path]
         self.state_machine.insert_input(include_lines, path)
+        # update include-log
+        include_log.append((path, clip_options))
         return []
 
 
