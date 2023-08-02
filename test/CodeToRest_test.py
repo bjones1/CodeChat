@@ -1311,7 +1311,7 @@ class TestRestToHtml:
                 " Second fence\n"
             )
             == '<pre class="code python fenced-code literal-block">\n'
-            " \n"
+            ' <span class="whitespace">\n</span>'
             '<span class="name">testing</span>\n'
             "</pre>"
         )
@@ -1328,8 +1328,8 @@ class TestRestToHtml:
                 " Second fence\n"
             )
             == '<pre class="code python fenced-code literal-block">\n'
-            '<span class="name">testing</span>\n'
-            " \n"
+            '<span class="name">testing</span><span class="whitespace">\n</span>'
+            ' \n'
             "</pre>"
         )
 
@@ -1378,9 +1378,9 @@ class TestCodeToRestNew:
         test_py_code = "# A comment\nan_identifier\n"
         test_token_list = [
             (Token.Comment.Single, "# A comment"),
-            (Token.Text, "\n"),
+            (Token.Text.Whitespace, "\n"),
             (Token.Name, "an_identifier"),
-            (Token.Text, "\n"),
+            (Token.Text.Whitespace, "\n"),
         ]
 
         lexer = get_lexer_by_name("python")
