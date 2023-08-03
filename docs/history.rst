@@ -19,6 +19,7 @@ History of changes
 -   1.9.3, 2-Aug-2023:
 
     -   Added support for Sphinx 7.0.
+    -   Fix deprecations.
 
 -   1.9.2, 10-Jun-2022:
 
