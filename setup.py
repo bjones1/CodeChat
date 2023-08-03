@@ -47,13 +47,6 @@
 #   python -m build
 #   python -m twine upload dist/*
 #
-# To create an RPM, first manually edit the ``name=`` setting to add a ``python3-`` prefix and lowercase the name (e.g. ``name=python3-codechat``, not ``name=python3-CodeChat``). Then, use (on an RPM-based Linux distribution):
-#
-# .. code-block:: console
-#   :linenos:
-#
-#   python3 setup.py bdist_rpm
-#
 # For `development
 # <https://pythonhosted.org/setuptools/setuptools.html#development-mode>`_:
 #
