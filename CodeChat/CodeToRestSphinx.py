@@ -37,6 +37,7 @@
 #
 # Standard library
 # ----------------
+import contextlib
 import os
 from pathlib import Path
 from typing import Dict
@@ -45,6 +46,7 @@ from typing import Dict
 # -------------------
 import sphinx
 from sphinx.application import Sphinx
+import sphinx.builders
 from sphinx.config import Config
 import sphinx.io
 import sphinx.project
@@ -55,7 +57,6 @@ if sphinx.version_info[:3] >= (5, 1, 0):
     from sphinx.util.osutil import path_stabilize
 else:
     from sphinx.util import path_stabilize
-from sphinx.util.osutil import SEP, relpath
 
 # The exception ``FiletypeNotFoundError`` was `deprecated <https://www.sphinx-doc.org/en/master/extdev/deprecated.html>`_  in Sphinx v2.4.0 by moving it from ``sphinx.io`` to ``sphinx.errors``.
 if sphinx.version_info[:3] >= (2, 4, 0):
@@ -203,30 +204,30 @@ def is_markdown_docname(
 # --------------
 # For source files, make their docname the same as the file name; for reST
 # files, allow Sphinx to strip off the extension as before. This patch
-# accomplishes this. It comes from ``sphinx.project.Project``, line 70 and
-# following in Sphinx 3.4.3.
-def _path2doc(self, filename):
-    # type: (str) -> str
-    """Return the docname for the filename if the file is document.
+# accomplishes this. It comes from ``sphinx.project.Project``, line 79 and
+# following in Sphinx 7.2.6.
+def _path2doc(self, filename: str | os.PathLike[str]) -> str | None:
+    """Return the docname for the filename if the file is a document.
 
     *filename* should be absolute or relative to the source directory.
     """
-    if filename.startswith(self.srcdir):
-        filename = relpath(filename, self.srcdir)
-    for suffix in self.source_suffix:
-        if filename.endswith(suffix):
-            if sphinx.version_info[:3] >= (2, 3, 0):
-                # This line was added in https://github.com/sphinx-doc/sphinx/commit/155f4b0d00e72d16eed47581f2fee75e41c452cf, starting in v2.3.0. It's a patch to fix https://github.com/sphinx-doc/sphinx/issues/6813.
-                filename = path_stabilize(filename)
-            return filename[: -len(suffix)]
+    try:
+        return self._path_to_docname[filename]  # type: ignore[index]
+    except KeyError:
+        if os.path.isabs(filename):
+            with contextlib.suppress(ValueError):
+                filename = os.path.relpath(filename, self.srcdir)
 
-    # The following code was added.
-    if is_supported_language(filename):
-        return filename
+        for suffix in self.source_suffix:
+            if os.path.basename(filename).endswith(suffix):
+                return path_stabilize(filename).removesuffix(suffix)
 
-    # This was the existing code.
-    # the file does not have docname
-    return None
+        # The following code was added.
+        if is_supported_language(filename):
+            return filename
+
+        # the file does not have a docname
+        return None
 
 
 sphinx.project.Project.path2doc = _path2doc
@@ -256,31 +257,26 @@ def is_supported_language(filename):
 # Next, the way docnames get transformed back to a full path needs to be fixed
 # for source files. Specifically, a docname might be the source file, without
 # adding an extension. This code comes from ``sphinx.project.Project`` of Sphinx
-# 3.4.3.
-def _doc2path(self, docname, basedir=True):
-    # type: (str, bool) -> str
+# 7.2.6.
+def _doc2path(self, docname: str, absolute: bool) -> str:
     """Return the filename for the document name.
 
-    If *basedir* is True, return as an absolute path.
+    If *absolute* is True, return as an absolute path.
     Else, return as a relative path to the source directory.
     """
-    docname = docname.replace(SEP, os.path.sep)
-    basename = os.path.join(self.srcdir, docname)
-    for suffix in self.source_suffix:
-        if os.path.isfile(basename + suffix):
-            break
-    else:
+    try:
+        filename = self._docname_to_path[docname]
+    except KeyError:
         # Three lines of code added here -- check for the no-extension case.
         if os.path.isfile(os.path.join(self.srcdir, docname)):
-            suffix = ""
+            filename = docname
         else:
-            # document does not exist
-            suffix = list(self.source_suffix)[0]
+            # Backwards compatibility: the document does not exist
+            filename = docname + self._first_source_suffix
 
-    if basedir:
-        return basename + suffix
-    else:
-        return docname + suffix
+    if absolute:
+        return os.path.join(self.srcdir, filename)
+    return filename
 
 
 sphinx.project.Project.doc2path = _doc2path
@@ -288,7 +284,7 @@ sphinx.project.Project.doc2path = _doc2path
 
 # get_filetype patch
 # ------------------
-# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.util``, version 2.4.0.
+# The ``get_filetype`` function raises an exception if it can't determine the type of a file. Patch it to also recognize source code as reST. This was taken from ``sphinx.util``, version 7.2.6.
 def _get_filetype(source_suffix: Dict[str, str], filename: str) -> str:
     for suffix, filetype in source_suffix.items():
         if filename.endswith(suffix):
@@ -317,6 +313,7 @@ elif SPHINX_VERSION >= (4, 0, 0) and SPHINX_VERSION < (5, 0, 0):
 else:
     # In current Sphinx, ``get_filetype`` is used in several places:
     sphinx.builders.get_filetype = _get_filetype
+    # Current Sphinx (7.2.6) doesn't need this.
     sphinx.io.get_filetype = _get_filetype
     sphinx.transforms.i18n.get_filetype = _get_filetype
 
