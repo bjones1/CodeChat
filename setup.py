@@ -180,8 +180,7 @@ setup(
         "test": ["pytest", "sphinx>=3", "myst-parser", "black", "flake8"],
         "sphinx": ["sphinx>=3", "myst-parser"],
     },
-    # To package data files, I'm using ``include_package_data=True`` then
-    # putting the files in :doc:`MANIFEST.in <MANIFEST.in>`. See `including data
+    # To package data files, I'm using ``include_package_data=True``. See `including data
     # files <http://pythonhosted.org/setuptools/setuptools.html#including-data-files>`_.
     include_package_data=True,
     # Make it easy to run the mdbooks CodeChat preprocessor.
