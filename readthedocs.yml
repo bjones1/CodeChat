@@ -6,11 +6,17 @@
 # See `version <https://docs.readthedocs.io/en/stable/config-file/v2.html#version>`_.
 version: 2
 
+# `Required settings <https://docs.readthedocs.io/en/stable/config-file/v2.html#build>`_.
+build:
+    os: "ubuntu-22.04"
+    tools:
+        python: "3.11"
+
 # See `python <https://docs.readthedocs.io/en/stable/config-file/v2.html#python>`_.
 python:
     install:
         # Install CodeChat with the ``sphinx`` extra requirement.
-        -   method: pip
-            path: .
-            extra_requirements:
-            -   sphinx
+        - method: pip
+          path: .
+          extra_requirements:
+              - sphinx
